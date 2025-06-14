@@ -7,15 +7,15 @@ type LayoutType = {
 };
 const Layout: FC<LayoutType> = ({ children }) => {
   return (
-    <>
+    <div id="main-layout">
       <header>
         <Header />
       </header>
-      <div id="main-app-container">{children}</div>
+      <main id="main-app-container">{children}</main>
       <footer>
         <Footer />
       </footer>
-    </>
+    </div>
   );
 };
 
