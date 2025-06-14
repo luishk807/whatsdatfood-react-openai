@@ -1,0 +1,13 @@
+#main-home-search-container {
+  padding: 5%;
+  flex: 1;
+  min-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.main-home-title {
+  font-size: 2.5em;
+  margin-bottom: 20px;
+}

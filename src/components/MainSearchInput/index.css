@@ -1,0 +1,21 @@
+.main-search-input-container {
+  width: 100%;
+  justify-content: start;
+  text-align: left;
+}
+.main-search-input {
+  border: none;
+  width: 90%;
+  margin-left: 1px;
+  margin: 3px;
+  padding: 10px;
+  font-size: 1.5em;
+}
+.main-search-input:focus {
+  border: none;
+  outline: none;
+}
+.main-search-input:hover {
+  border: none;
+  outline: none;
+}

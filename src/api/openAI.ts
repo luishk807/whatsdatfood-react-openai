@@ -1,15 +1,15 @@
 import OpenAi from "openai";
+import { InterfaceRequestAI } from "types/indeex";
 
-interface InterfaceRequestAI {
-  inputText: string;
-}
-
+const openAiKey: string | undefined = process.env.REACT_APP_OPENAI;
+console.log(openAiKey);
 const openai = new OpenAi({
-  apiKey: process.env.OPENAI_KEY,
+  apiKey: openAiKey,
 });
 export async function getOpenAIResponse({
   inputText,
 }: InterfaceRequestAI): Promise<any> {
+  console.log("process.env.REACT_APP_OPENAI", process.env.REACT_APP_OPENAI);
   const response = openai.responses.create({
     model: "gpt-4.1",
     input: [
