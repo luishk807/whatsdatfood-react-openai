@@ -1,39 +1,19 @@
-import OpenAi from "openai";
-import { InterfaceRequestAI } from "types/indeex";
+import { InterfaceRequestAI } from "types/index";
+import axios from "axios";
 
-const openAiKey: string | undefined = process.env.REACT_APP_OPENAI;
-console.log(openAiKey);
-const openai = new OpenAi({
-  apiKey: openAiKey,
-});
 export async function getOpenAIResponse({
   inputText,
 }: InterfaceRequestAI): Promise<any> {
-  console.log("process.env.REACT_APP_OPENAI", process.env.REACT_APP_OPENAI);
-  const response = openai.responses.create({
-    model: "gpt-4.1",
-    input: [
-      {
-        role: "user",
-        content: [
-          {
-            type: "input_text",
-            text: inputText,
-          },
-        ],
-      },
-    ],
-    text: {
-      format: {
-        type: "text",
-      },
-    },
-    reasoning: {},
-    tools: [],
-    temperature: 1,
-    max_output_tokens: 100,
-    top_p: 1,
-    store: true,
-  });
-  return response;
+  const backend_url: string | undefined = process.env
+    .REACT_APP_BACKEND_URL as string;
+  try {
+    const response = await axios({
+      method: "get",
+      url: `${backend_url}/open-ai/get-menu?restaurant=${inputText}`,
+    });
+    console.log("heeee", response);
+    return response;
+  } catch (err) {
+    console.log(err);
+  }
 }

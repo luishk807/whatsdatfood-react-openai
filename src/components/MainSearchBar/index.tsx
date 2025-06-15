@@ -5,6 +5,7 @@ import MainSearchInput from "components/MainSearchInput";
 import "./index.css";
 import { Grid } from "@mui/material";
 import { IconButton } from "@mui/material";
+import { getOpenAIResponse } from "api/openAI";
 
 const MainSearchBar: FC = () => {
   const [inputValue, setInputValue] = useState("");
@@ -22,9 +23,16 @@ const MainSearchBar: FC = () => {
     return () => clearTimeout(timeoutId);
   }, [inputValue]);
 
+  const handleAPIReuest = async () => {
+    const resp = await getOpenAIResponse({
+      inputText: debounceValue || inputValue,
+    });
+    console.log(resp);
+  };
   useEffect(() => {
     if (debounceValue) {
       console.log("call api", debounceValue);
+      handleAPIReuest();
       setDebounceValue("");
     }
   }, [debounceValue]);
@@ -43,7 +51,7 @@ const MainSearchBar: FC = () => {
         <MainSearchInput onChange={handleOnChange} />
       </Grid>
       <Grid display="flex" justifyContent="end" size={2}>
-        <IconButton className="main-search-button">
+        <IconButton onClick={handleAPIReuest} className="main-search-button">
           <ArrowUpwardRoundedIcon className="main-search-button-icon" />
         </IconButton>
       </Grid>

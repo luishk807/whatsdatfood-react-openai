@@ -1,5 +1,5 @@
 import { type FC, useState } from "react";
-import { MainSearchInputType } from "@/types/indeex";
+import { MainSearchInputType } from "@/types/index";
 import "./index.css";
 const MainSearchInput: FC<MainSearchInputType> = ({ onChange }) => {
   const [inputValue, setInputValue] = useState("");
