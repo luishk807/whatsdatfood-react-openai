@@ -16,6 +16,9 @@ const MainSearchBar: FC = () => {
   const [selectedValue, setSelectedValue] = useState("");
 
   const handleOnChange = (value: any) => {
+    if (suggestions.length) {
+      setSuggestions([]);
+    }
     setInputValue(value);
   };
 
@@ -41,6 +44,10 @@ const MainSearchBar: FC = () => {
     //   inputText: debounceValue || inputValue,
     // });
     console.log("calling ai");
+  };
+
+  const handleHighlightSuggest = (value: string) => {
+    return value.replace(inputValue, `<b>${inputValue}</b>`);
   };
 
   useEffect(() => {
@@ -83,16 +90,20 @@ const MainSearchBar: FC = () => {
           <div className="main-suggestion-container">
             <ul>
               {suggestions.length &&
-                suggestions.map((suggestion, indx) => (
-                  <li
-                    onClick={() =>
-                      handleSelectSuggestion(_.get(suggestion, "name"))
-                    }
-                    key={indx}
-                  >
-                    {_.get(suggestion, "name")}
-                  </li>
-                ))}
+                suggestions.map((suggestion, indx) => {
+                  const new_suggest = handleHighlightSuggest(
+                    _.get(suggestion, "name"),
+                  );
+                  return (
+                    <li
+                      onClick={() =>
+                        handleSelectSuggestion(_.get(suggestion, "name"))
+                      }
+                      key={indx}
+                      dangerouslySetInnerHTML={{ __html: new_suggest }}
+                    />
+                  );
+                })}
             </ul>
           </div>
         </div>
