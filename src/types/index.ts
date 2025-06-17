@@ -4,4 +4,5 @@ export type InterfaceRequestAI = {
 
 export type MainSearchInputType = {
   onChange: (search: string) => void;
+  selectedValue: string;
 };

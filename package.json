@@ -15,7 +15,7 @@
     "@types/node": "^16.18.126",
     "@types/react": "^19.1.5",
     "@types/react-dom": "^19.1.5",
-    "axios": "^1.9.0",
+    "axios": "^1.10.0",
     "lodash": "^4.17.21",
     "openai": "^4.103.0",
     "react": "^17.0.0 || ^18.0.0 || ^19.0.0",
@@ -52,5 +52,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/lodash": "^4.17.17"
   }
 }

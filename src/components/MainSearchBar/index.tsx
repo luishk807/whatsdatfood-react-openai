@@ -6,10 +6,14 @@ import "./index.css";
 import { Grid } from "@mui/material";
 import { IconButton } from "@mui/material";
 import { getOpenAIResponse } from "api/openAI";
+import _ from "lodash";
+import { getRestaurantByName } from "api/restaurants";
 
 const MainSearchBar: FC = () => {
   const [inputValue, setInputValue] = useState("");
   const [debounceValue, setDebounceValue] = useState("");
+  const [suggestions, setSuggestions] = useState([]);
+  const [selectedValue, setSelectedValue] = useState("");
 
   const handleOnChange = (value: any) => {
     setInputValue(value);
@@ -23,16 +27,26 @@ const MainSearchBar: FC = () => {
     return () => clearTimeout(timeoutId);
   }, [inputValue]);
 
-  const handleAPIReuest = async () => {
-    const resp = await getOpenAIResponse({
-      inputText: debounceValue || inputValue,
-    });
-    console.log(resp);
+  const handleSuggestions = async () => {
+    const resp = await getRestaurantByName(debounceValue);
+    setSuggestions(resp.length ? resp : []);
   };
+
+  const handleSelectSuggestion = (value: string) => {
+    setSelectedValue(value);
+    setSuggestions([]);
+  };
+  const handleAIRequest = async () => {
+    // const resp = await getOpenAIResponse({
+    //   inputText: debounceValue || inputValue,
+    // });
+    console.log("calling ai");
+  };
+
   useEffect(() => {
     if (debounceValue) {
       console.log("call api", debounceValue);
-      handleAPIReuest();
+      handleSuggestions();
       setDebounceValue("");
     }
   }, [debounceValue]);
@@ -48,12 +62,40 @@ const MainSearchBar: FC = () => {
         <AutoAwesomeIcon className="main-search-icon" />
       </Grid>
       <Grid size={9}>
-        <MainSearchInput onChange={handleOnChange} />
+        <MainSearchInput
+          selectedValue={selectedValue}
+          onChange={handleOnChange}
+        />
       </Grid>
       <Grid display="flex" justifyContent="end" size={2}>
-        <IconButton onClick={handleAPIReuest} className="main-search-button">
+        <IconButton onClick={handleAIRequest} className="main-search-button">
           <ArrowUpwardRoundedIcon className="main-search-button-icon" />
         </IconButton>
+      </Grid>
+      <Grid size={12} display="flex" justifyContent="center">
+        <div
+          className={`main-search-suggestions-container ${
+            suggestions.length
+              ? "suggestions-container-show"
+              : "suggestions-container-hide"
+          }`}
+        >
+          <div className="main-suggestion-container">
+            <ul>
+              {suggestions.length &&
+                suggestions.map((suggestion, indx) => (
+                  <li
+                    onClick={() =>
+                      handleSelectSuggestion(_.get(suggestion, "name"))
+                    }
+                    key={indx}
+                  >
+                    {_.get(suggestion, "name")}
+                  </li>
+                ))}
+            </ul>
+          </div>
+        </div>
       </Grid>
     </Grid>
   );
