@@ -84,6 +84,13 @@
 
 .main-suggestion-container {
   margin: 10px;
-  height: 200px;
+  min-height: 50px;
   overflow-y: auto;
+  max-height: 500px;
+}
+
+.main-search-loading-icon {
+  width: 35px;
+  margin-right: 10px;
+  margin-top: 5px;
 }

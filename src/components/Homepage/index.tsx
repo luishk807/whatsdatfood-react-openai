@@ -1,9 +1,11 @@
-import { type FC } from "react";
-// import { getOpenAIResponse } from "api/openAI";
-// import { InterfaceRequestAI } from "types/indeex";
-import MainSearchBar from "components/MainSearchBar";
+import { type FC, lazy, Suspense } from "react";
 import Layout from "components/Layout";
 import "./index.css";
+import Loading from "../Loading";
+// import { getOpenAIResponse } from "api/openAI";
+// import { InterfaceRequestAI } from "types/indeex";
+// import MainSearchBar from "components/MainSearchBar";
+const LazyMainSerach = lazy(() => import("../MainSearchBar"));
 
 const Homepage: FC = () => {
   const handleSubmit = async () => {
@@ -15,7 +17,19 @@ const Homepage: FC = () => {
     <Layout>
       <div id="main-home-search-container">
         <div className="main-home-title">Find your favorite menu</div>
-        <MainSearchBar />
+        <Suspense
+          fallback={
+            <Loading
+              style={{
+                width: "30px",
+                display: "flex",
+                margin: "0px auto",
+              }}
+            />
+          }
+        >
+          <LazyMainSerach />
+        </Suspense>
       </div>
     </Layout>
   );

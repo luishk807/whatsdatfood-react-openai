@@ -1,0 +1,48 @@
+[
+  {
+    "name": "King's Kitchen",
+    "address": "92 E Broadway, New York, NY 10002, USA",
+    "menu": [
+      {
+        "name": "Roast Duck over Rice",
+        "category": "Rice Plates",
+        "description": "Tender Cantonese-style roast duck served over steamed white rice."
+      },
+      {
+        "name": "Soy Sauce Chicken",
+        "category": "Rice Plates",
+        "description": "Classic soy sauce marinated chicken, served with rice and vegetables."
+      },
+      {
+        "name": "BBQ Pork (Char Siu) over Rice",
+        "category": "Rice Plates",
+        "description": "Sweet and savory Cantonese BBQ pork slices over steamed rice."
+      },
+      {
+        "name": "Wonton Noodle Soup",
+        "category": "Noodle Soup",
+        "description": "Shrimp and pork wontons in a light broth with egg noodles."
+      },
+      {
+        "name": "Beef Brisket Noodle Soup",
+        "category": "Noodle Soup",
+        "description": "Braised beef brisket served in a rich broth with noodles."
+      },
+      {
+        "name": "Roast Pork Bun",
+        "category": "Dim Sum",
+        "description": "Steamed bun filled with sweet and savory BBQ pork."
+      },
+      {
+        "name": "Steamed Shrimp Dumplings (Har Gow)",
+        "category": "Dim Sum",
+        "description": "Delicate dumplings filled with shrimp, served steamed."
+      },
+      {
+        "name": "Egg Tart",
+        "category": "Dessert",
+        "description": "Flaky pastry shell filled with creamy egg custard."
+      }
+    ]
+  }
+]
