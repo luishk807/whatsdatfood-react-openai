@@ -1,0 +1,12 @@
+.menu-result-category-title {
+  font-size: 2em;
+  display: flex;
+  justify-content: start;
+  padding: 5px;
+  background-color: black;
+  color: white;
+}
+
+.menu-result-category-container {
+  padding: 10px 0px;
+}

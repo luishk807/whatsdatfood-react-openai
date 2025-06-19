@@ -1,5 +1,6 @@
 import { type FC, useEffect, useState } from "react";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
+import { useNavigate } from "react-router-dom";
 import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded";
 import MainSearchInput from "components/MainSearchInput";
 import "./index.css";
@@ -12,8 +13,10 @@ import { getRestaurantByName } from "api/restaurants";
 import { _get } from "utils";
 
 const MainSearchBar: FC = () => {
+  const navigate = useNavigate();
   const [inputValue, setInputValue] = useState("");
   const [debounceValue, setDebounceValue] = useState("");
+  const [slugName, setSlugName] = useState("");
   const [suggestions, setSuggestions] = useState([]);
   const [selectedValue, setSelectedValue] = useState("");
   const [showLoadingIcon, setShowLoadingIcon] = useState(false);
@@ -39,8 +42,10 @@ const MainSearchBar: FC = () => {
     setSuggestions(resp.length ? resp : []);
   };
 
-  const handleSelectSuggestion = (value: string) => {
+  const handleSelectSuggestion = (value: string, slug: string) => {
     setSelectedValue(value);
+    setSlugName(slug);
+    setShowLoadingIcon(true);
     setSuggestions([]);
   };
   const handleAIRequest = async () => {
@@ -48,6 +53,7 @@ const MainSearchBar: FC = () => {
     //   inputText: debounceValue || inputValue,
     // });
     setShowLoadingIcon(true);
+    navigate(`/menu-results/${slugName}`);
     console.log("calling ai");
   };
 
@@ -60,6 +66,10 @@ const MainSearchBar: FC = () => {
     }
   }, [debounceValue]);
 
+  useEffect(() => {
+    setShowLoadingIcon(false);
+  }, [selectedValue]);
+
   return (
     <Grid container id="main-search-container">
       <Grid
@@ -70,13 +80,13 @@ const MainSearchBar: FC = () => {
       >
         <AutoAwesomeIcon className="main-search-icon" />
       </Grid>
-      <Grid size={9}>
+      <Grid size={{ md: 10, xs: 9 }}>
         <MainSearchInput
           selectedValue={selectedValue}
           onChange={handleOnChange}
         />
       </Grid>
-      <Grid display="flex" justifyContent="end" size={2}>
+      <Grid display="flex" justifyContent="end" size={{ md: 1, xs: 2 }}>
         {showLoadingIcon ? (
           <Loading
             style={{
@@ -104,7 +114,7 @@ const MainSearchBar: FC = () => {
               {suggestions.length &&
                 suggestions.map((suggestion, indx) => {
                   const rest_name = _get(suggestion, "name");
-
+                  const slugName = _get(suggestion, "slug");
                   const address = getBuiltAddress({
                     address: _get(suggestion, "address"),
                     city: _get(suggestion, "city"),
@@ -122,7 +132,9 @@ const MainSearchBar: FC = () => {
                   console.log(new_suggest);
                   return (
                     <li
-                      onClick={() => handleSelectSuggestion(complete_name)}
+                      onClick={() =>
+                        handleSelectSuggestion(complete_name, slugName)
+                      }
                       key={indx}
                       dangerouslySetInnerHTML={{ __html: new_suggest }}
                     />

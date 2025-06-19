@@ -1,4 +1,4 @@
-import { InterfaceRequestAI } from "types/index";
+import { RequestAIInterface } from "interfaces";
 import axios from "axios";
 
 const backend_url: string | undefined = process.env
@@ -7,7 +7,7 @@ const backend_url: string | undefined = process.env
 export async function getOpenAIResponse({
   restaurant,
   address,
-}: InterfaceRequestAI): Promise<any> {
+}: RequestAIInterface): Promise<any> {
   try {
     const response = await axios({
       method: "get",
@@ -21,7 +21,7 @@ export async function getOpenAIResponse({
 
 export async function getOpenAIResturantList({
   restaurant,
-}: InterfaceRequestAI): Promise<any> {
+}: RequestAIInterface): Promise<any> {
   try {
     const response = await axios({
       method: "get",

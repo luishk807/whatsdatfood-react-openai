@@ -1,15 +1,6 @@
 #main-home-search-container {
   padding: 5%;
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  margin-right: -50%;
   width: 50%;
-  transform: translate(-50%, -50%);
-  -webkit-transform: translate(-50%, -50%);
-  -moz-transform: translate(-50%, -50%);
-  -ms-transform: translate(-50%, -50%);
-  -o-transform: translate(-50%, -50%);
 }
 
 @media (max-width: 600px) {

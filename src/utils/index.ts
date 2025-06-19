@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { DEFAULT_CURRENCY } from "customConstants";
 import { getTypeFn, getBuiltAddressType } from "../types";
 
 export const _get: getTypeFn = (obj, flag) => {
@@ -8,6 +9,17 @@ export const _get: getTypeFn = (obj, flag) => {
 export const handleHighlightSuggest = (value: string, target: string) => {
   const regex = new RegExp("(" + target + ")", "gi");
   return value.replace(regex, `<b>$1</b>`);
+};
+
+export const convertCurrency = (
+  amount: number,
+  currency: any = DEFAULT_CURRENCY,
+) => {
+  const { code, name } = currency;
+  return new Intl.NumberFormat(code, {
+    style: "currency",
+    currency: name,
+  }).format(amount);
 };
 
 export const getBuiltAddress: getBuiltAddressType = (address) => {

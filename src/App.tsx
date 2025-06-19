@@ -1,11 +1,13 @@
 import { Suspense, lazy } from "react";
+import Layout from "components/Layout";
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
 
 import Loading from "./components/Loading";
 
 const LazyHomepage = lazy(() => import("./components/Homepage"));
-const LazyResult = lazy(() => import("./components/ResultSection"));
+const LazyResult = lazy(() => import("./components/MenuResults"));
+const LazyNotFound = lazy(() => import("./components/NotFound"));
 
 function App() {
   const customStyle = {
@@ -18,16 +20,28 @@ function App() {
           path="/"
           element={
             <Suspense fallback={<Loading style={customStyle} />}>
-              <LazyHomepage />
+              <Layout>
+                <LazyHomepage />
+              </Layout>
             </Suspense>
           }
         />
         <Route
-          path="/result"
+          path="/menu-results/:restaurant"
           element={
             <Suspense fallback={<Loading style={customStyle} />}>
-              <LazyResult />
+              <Layout>
+                <LazyResult />
+              </Layout>
             </Suspense>
+          }
+        />
+        <Route
+          path="*"
+          element={
+            <Layout>
+              <LazyNotFound />
+            </Layout>
           }
         />
       </Routes>
