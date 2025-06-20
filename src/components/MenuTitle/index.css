@@ -1,0 +1,13 @@
+.menu-results-main-section {
+  padding: 10px 0px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+}
+.menu-results-main-title {
+  font-size: 3em;
+}
+.menu-results-main-address {
+  font-size: 2em;
+}

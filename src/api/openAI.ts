@@ -1,9 +1,7 @@
 import { RequestAIInterface } from "interfaces";
 import axios from "axios";
 
-const backend_url: string | undefined = process.env
-  .REACT_APP_BACKEND_URL as string;
-
+import { BACKEND_URL } from "@/customConstant";
 export async function getOpenAIResponse({
   restaurant,
   address,
@@ -11,7 +9,7 @@ export async function getOpenAIResponse({
   try {
     const response = await axios({
       method: "get",
-      url: `${backend_url}/open-ai/get-menu?restaurant=${restaurant}&address=${address}`,
+      url: `${BACKEND_URL}/open-ai/get-menu?restaurant=${restaurant}&address=${address}`,
     });
     return response;
   } catch (err) {
@@ -25,7 +23,7 @@ export async function getOpenAIResturantList({
   try {
     const response = await axios({
       method: "get",
-      url: `${backend_url}/open-ai/get-menu?restaurant=${restaurant}`,
+      url: `${BACKEND_URL}/open-ai/get-menu?restaurant=${restaurant}`,
     });
     return response;
   } catch (err) {

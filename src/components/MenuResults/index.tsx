@@ -1,15 +1,20 @@
-import { type FC, useMemo, Suspense } from "react";
+import { useState, useMemo, type FC, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Grid } from "@mui/material";
-import { convertCurrency } from "utils";
 import SamplerResults from "samples/menu-item.json";
-import { MenuItemType } from "types";
 import MenuItem from "components/MenuItem";
+import { RestaurantType } from "types";
+import { getRestaurantBySlug } from "api/restaurants";
+import MenuTitle from "../MenuTitle";
 import "./index.css";
 
 const MenuResults: FC = () => {
   const { restaurant } = useParams();
+  const [restaurantInfo, setRestaurantInfo] = useState<RestaurantType | null>(
+    null,
+  );
   console.log(SamplerResults);
+
   console.log("result", restaurant);
 
   const map = new Map();
@@ -27,19 +32,32 @@ const MenuResults: FC = () => {
   const newMenu = Object.fromEntries(map);
 
   console.log(newMenu);
+
+  const handleFetchRestaurant = async () => {
+    if (restaurant) {
+      const resp: RestaurantType = await getRestaurantBySlug(
+        String(restaurant),
+      );
+      setRestaurantInfo(resp);
+    }
+  };
+
+  useEffect(() => {
+    handleFetchRestaurant();
+  }, [restaurant]);
+
   return (
     <Grid container>
+      <MenuTitle restaurant={restaurantInfo} />
       <Grid size={12}>
-        <h1>{restaurant}</h1>
-      </Grid>
-      <Grid size={12}>
-        {Object.keys(newMenu).map((category) => {
+        {Object.keys(newMenu).map((category, catIndx) => {
           return (
-            <Grid container className="menu-result-category-container">
-              <Grid
-                size={12}
-                className="menu-result-category-title  alex-brush-regular"
-              >
+            <Grid
+              key={catIndx}
+              container
+              className="menu-result-category-container"
+            >
+              <Grid size={12} className="menu-result-category-title">
                 {category}
               </Grid>
               <Grid size={12}>

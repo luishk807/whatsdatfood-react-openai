@@ -1,6 +1,7 @@
 import { type FC } from "react";
 import { Grid, Box } from "@mui/material";
 import { convertCurrency } from "utils";
+import Image from "components/Image";
 import "./index.css";
 
 export type MenuInterfaceItemType = {
@@ -16,14 +17,14 @@ export interface MenuItemInterface {
 const MenuItem: FC<MenuItemInterface> = ({ item }) => {
   return (
     <Grid container className="item-menu-item-container">
+      <Grid
+        sx={{ display: { xs: "block", md: "none" } }}
+        className="item-menu-item-title-mobile"
+      >
+        {item.name}
+      </Grid>
       <Grid size={{ xs: 12, md: 2 }} className="item-menu-item-img">
-        <Box
-          sx={{ display: { xs: "block", md: "none" } }}
-          className="item-menu-item-title-mobile"
-        >
-          {item.name}
-        </Box>
-        <img src={item.image} alt={item.name} />
+        <Image alt={item.name} />
       </Grid>
       <Grid size={{ xs: 12, md: 10 }}>
         <Grid container>
@@ -39,6 +40,8 @@ const MenuItem: FC<MenuItemInterface> = ({ item }) => {
 
               <Grid
                 size={{ xs: 12, md: 2 }}
+                display="flex"
+                justifyContent={{ xs: "center", md: "end" }}
                 className="item-menu-item-price alex-brush-regular"
               >
                 {convertCurrency(item.price)}

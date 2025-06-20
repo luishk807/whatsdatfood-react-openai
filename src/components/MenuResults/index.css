@@ -1,10 +1,9 @@
 .menu-result-category-title {
-  font-size: 2em;
+  font-size: 1.5em;
+  font-weight: bold;
   display: flex;
   justify-content: start;
   padding: 5px;
-  background-color: black;
-  color: white;
 }
 
 .menu-result-category-container {

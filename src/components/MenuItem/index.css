@@ -12,22 +12,18 @@
 }
 
 .item-menu-item-title-mobile {
-  position: absolute;
   background-color: rgba(255, 255, 255, 0.6);
   padding: 5px 0px;
   font-size: 1.5em;
   width: 100%;
 }
 .item-menu-item-title {
-  font-size: 1.5em;
+  font-size: 1.2em;
   font-weight: bold;
 }
 .item-menu-item-price {
-  background-color: maroon;
   font-size: 1.5em;
   padding: 5px 0px;
-  color: white;
-  outline: 2px dashed white;
   outline-offset: -4px;
 }
 .item-menu-item-description {
