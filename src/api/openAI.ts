@@ -1,7 +1,7 @@
 import { RequestAIInterface } from "interfaces";
 import axios from "axios";
 
-import { BACKEND_URL } from "@/customConstant";
+import { BACKEND_URL } from "customConstants";
 export async function getOpenAIResponse({
   restaurant,
   address,

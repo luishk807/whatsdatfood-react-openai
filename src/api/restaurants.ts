@@ -1,5 +1,5 @@
 import { RestaurantType } from "types";
-import { BACKEND_URL } from "customConstant";
+import { BACKEND_URL } from "customConstants";
 import { _get } from "utils";
 export const getRestaurantByName = async (
   name: string,
@@ -10,6 +10,10 @@ export const getRestaurantByName = async (
         aiRestaurant(name: $name) {
           name
           address
+          city
+          state
+          postal_code
+          slug
         }
       }
     `;
@@ -38,6 +42,14 @@ export const getRestaurantByName = async (
     console.error(err);
     return [];
   }
+};
+
+export const getRestaurantMenuItemsBySlug = async (slug: string) => {
+  const query = `#graphql
+    query getRestaurantMenuItems($slug: String!) {
+      
+    }
+  `
 };
 
 export const getRestaurantBySlug = async (

@@ -53,9 +53,9 @@ const MainSearchBar: FC = () => {
     // const resp = await getOpenAIResponse({
     //   inputText: debounceValue || inputValue,
     // });
+
     setShowLoadingIcon(true);
     navigate(`/menu-results/${slugName}`);
-    console.log("calling ai");
   };
 
   useEffect(() => {

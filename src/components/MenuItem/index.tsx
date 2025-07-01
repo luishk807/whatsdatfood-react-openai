@@ -42,7 +42,7 @@ const MenuItem: FC<MenuItemInterface> = ({ item }) => {
                 size={{ xs: 12, md: 2 }}
                 display="flex"
                 justifyContent={{ xs: "center", md: "end" }}
-                className="item-menu-item-price alex-brush-regular"
+                className="item-menu-item-price"
               >
                 {convertCurrency(item.price)}
               </Grid>
