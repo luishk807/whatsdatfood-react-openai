@@ -20,19 +20,23 @@ export type MenuItemType = {
 };
 
 export type RestaurantType = {
-  address: string;
-  city: string;
-  country: string;
-  createdAt: string;
-  deletedAt: null;
-  id: number;
+  id?: number;
   name: string;
-  postal_code: string;
-  slug: string;
-  state: string;
-  updatedAt: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  createdAt?: string;
+  deletedAt?: null;
+  postal_code?: string;
+  slug?: string;
+  state?: string;
+  updatedAt?: string;
 };
 
-export type getTypeFn = (obj: object, flag: string) => string;
+export type getTypeFn = (
+  obj: object,
+  flag: string,
+  defaultValue?: any,
+) => string;
 
 export type getBuiltAddressType = (address: addressType) => string;

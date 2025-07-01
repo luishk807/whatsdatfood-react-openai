@@ -1,11 +1,39 @@
 import { RestaurantType } from "types";
 import { BACKEND_URL } from "customConstant";
-export const getRestaurantByName = async (name: string) => {
+import { _get } from "utils";
+export const getRestaurantByName = async (
+  name: string,
+): Promise<RestaurantType[]> => {
   try {
-    const resp = await fetch(
-      `${BACKEND_URL}/open-ai/get-restaurant-list?restaurant=${name}&limit=10&page=1`,
-    );
-    return await resp.json();
+    const query = `#graphql
+      query GetAiRestaurant($name: String!) {
+        aiRestaurant(name: $name) {
+          name
+          address
+        }
+      }
+    `;
+    const resp = await fetch(`${BACKEND_URL}/graphql`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query,
+        variables: {
+          name,
+        },
+      }),
+    });
+
+    const json = await resp.json();
+    const data = _get(json, "data.aiRestaurant", []);
+
+    if (!Array.isArray(data)) {
+      console.error("expected array but got: ", data);
+      return [];
+    }
+    return data as RestaurantType[];
   } catch (err) {
     console.error(err);
     return [];

@@ -1,15 +1,15 @@
 import { type FC, useEffect, useState } from "react";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
-import { useNavigate } from "react-router-dom";
 import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded";
+import { Grid, IconButton } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 import MainSearchInput from "components/MainSearchInput";
 import "./index.css";
-import { Grid } from "@mui/material";
-import { IconButton } from "@mui/material";
 import { getBuiltAddress, handleHighlightSuggest } from "utils";
 // import { getOpenAIResponse } from "api/openAI";'
 import Loading from "components/Loading";
 import { getRestaurantByName } from "api/restaurants";
+import { RestaurantType } from "types";
 import { _get } from "utils";
 
 const MainSearchBar: FC = () => {
@@ -17,7 +17,7 @@ const MainSearchBar: FC = () => {
   const [inputValue, setInputValue] = useState("");
   const [debounceValue, setDebounceValue] = useState("");
   const [slugName, setSlugName] = useState("");
-  const [suggestions, setSuggestions] = useState([]);
+  const [suggestions, setSuggestions] = useState<RestaurantType[]>([]);
   const [selectedValue, setSelectedValue] = useState("");
   const [showLoadingIcon, setShowLoadingIcon] = useState(false);
 
@@ -39,7 +39,8 @@ const MainSearchBar: FC = () => {
   const handleSuggestions = async () => {
     const resp = await getRestaurantByName(debounceValue);
     setShowLoadingIcon(false);
-    setSuggestions(resp.length ? resp : []);
+    const suggestionArray = Array.isArray(resp) ? resp : [];
+    setSuggestions(suggestionArray);
   };
 
   const handleSelectSuggestion = (value: string, slug: string) => {
@@ -91,8 +92,8 @@ const MainSearchBar: FC = () => {
           <Loading
             style={{
               width: "30px",
-              "margin-right": "10px",
-              "margin-top": "5px",
+              marginRight: "10px",
+              marginTop: "5px",
             }}
           />
         ) : (

@@ -2,8 +2,12 @@ import _ from "lodash";
 import { DEFAULT_CURRENCY } from "customConstants";
 import { getTypeFn, getBuiltAddressType } from "../types";
 
-export const _get: getTypeFn = (obj, flag) => {
-  return _.get(obj, flag);
+export const _get: getTypeFn = (
+  obj: any,
+  flag: string,
+  defaultvalue: any = "",
+) => {
+  return _.get(obj, flag, defaultvalue);
 };
 
 export const handleHighlightSuggest = (value: string, target: string) => {
