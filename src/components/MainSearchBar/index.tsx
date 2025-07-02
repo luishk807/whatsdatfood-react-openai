@@ -115,7 +115,7 @@ const MainSearchBar: FC = () => {
               {suggestions.length &&
                 suggestions.map((suggestion, indx) => {
                   const rest_name = _get(suggestion, "name");
-                  const slugName = _get(suggestion, "slug");
+                  const slugName = _get<string>(suggestion, "slug");
                   const address = getBuiltAddress({
                     address: _get(suggestion, "address"),
                     city: _get(suggestion, "city"),

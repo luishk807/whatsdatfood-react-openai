@@ -7,7 +7,7 @@ export const getRestaurantByName = async (
   try {
     const query = `#graphql
       query GetAiRestaurant($name: String!) {
-        aiRestaurant(name: $name) {
+        aiRestaurantNameList(name: $name) {
           name
           address
           city
@@ -31,7 +31,7 @@ export const getRestaurantByName = async (
     });
 
     const json = await resp.json();
-    const data = _get(json, "data.aiRestaurant", []);
+    const data = _get(json, "data.aiRestaurantNameList", []);
 
     if (!Array.isArray(data)) {
       console.error("expected array but got: ", data);
@@ -44,19 +44,44 @@ export const getRestaurantByName = async (
   }
 };
 
-export const getRestaurantMenuItemsBySlug = async (slug: string) => {
-  const query = `#graphql
-    query getRestaurantMenuItems($slug: String!) {
-      
-    }
-  `
-};
-
 export const getRestaurantBySlug = async (
   slug: string,
 ): Promise<RestaurantType> => {
-  const resp = await fetch(
-    `${BACKEND_URL}/restaurants/find?restaurant=${slug}`,
-  );
-  return await resp.json();
+  try {
+    const query = `#graphql
+    query getRestaurantBySlug($slug: String) {
+      aiRestaurantBySlug(slug: $slug) {
+        name
+        address
+        restRestaurantItems {
+            name
+            description
+            top_choice
+            price
+            category
+        }
+      }
+    }
+  `;
+    const resp = await fetch(`${BACKEND_URL}/graphql`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query,
+        variables: {
+          slug,
+        },
+      }),
+    });
+    const json = await resp.json();
+    const data = _get(json, "data.aiRestaurantBySlug");
+
+    console.log(data);
+    return data as RestaurantType;
+  } catch (err) {
+    console.error(err);
+    return {} as RestaurantType;
+  }
 };

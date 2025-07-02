@@ -15,8 +15,13 @@ export type MenuItemType = {
   name: string;
   description: string;
   category: string;
+  top_choice: boolean;
   price?: number;
   image?: string;
+};
+
+export type RestCategoryMenu = {
+  [category: string]: MenuItemType[];
 };
 
 export type RestaurantType = {
@@ -31,12 +36,9 @@ export type RestaurantType = {
   slug?: string;
   state?: string;
   updatedAt?: string;
+  restRestaurantItems?: [MenuItemType];
 };
 
-export type getTypeFn = (
-  obj: object,
-  flag: string,
-  defaultValue?: any,
-) => string;
+export type getTypeFn = <T>(obj: object, flag: string, defaultValue?: T) => T;
 
 export type getBuiltAddressType = (address: addressType) => string;

@@ -2,10 +2,10 @@ import _ from "lodash";
 import { DEFAULT_CURRENCY } from "customConstants";
 import { getTypeFn, getBuiltAddressType } from "../types";
 
-export const _get: getTypeFn = (
+export const _get: getTypeFn = <T>(
   obj: any,
   flag: string,
-  defaultvalue: any = "",
+  defaultvalue?: T,
 ) => {
   return _.get(obj, flag, defaultvalue);
 };
