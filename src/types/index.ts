@@ -1,3 +1,5 @@
+import { LOADING_TYPES } from "@/customConstants";
+
 export type addressType = {
   address: string;
   city?: string;
@@ -38,6 +40,17 @@ export type RestaurantType = {
   updatedAt?: string;
   restRestaurantItems?: [MenuItemType];
 };
+
+export type MenuInterfaceItemType = {
+  name: string;
+  category: string;
+  description: string;
+  top_choice: boolean;
+  image: string;
+  price: number;
+};
+
+export type LoadingType = (typeof LOADING_TYPES)[keyof typeof LOADING_TYPES];
 
 export type getTypeFn = <T>(obj: object, flag: string, defaultValue?: T) => T;
 

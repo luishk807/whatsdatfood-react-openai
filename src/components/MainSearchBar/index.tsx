@@ -3,14 +3,13 @@ import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded";
 import { Grid, IconButton } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import MainSearchInput from "components/MainSearchInput";
+import MainSearchInput from "@/components/MainSearchInput";
 import "./index.css";
-import { getBuiltAddress, handleHighlightSuggest } from "utils";
-// import { getOpenAIResponse } from "api/openAI";'
-import Loading from "components/Loading";
-import { getRestaurantByName } from "api/restaurants";
-import { RestaurantType } from "types";
-import { _get } from "utils";
+import { getBuiltAddress, handleHighlightSuggest } from "@/utils";
+import Loading from "@/components/Loading";
+import { getRestaurantByName } from "@/api/restaurants";
+import { RestaurantType } from "@/types";
+import { _get } from "@/utils";
 
 const MainSearchBar: FC = () => {
   const navigate = useNavigate();
@@ -50,10 +49,6 @@ const MainSearchBar: FC = () => {
     setSuggestions([]);
   };
   const handleAIRequest = async () => {
-    // const resp = await getOpenAIResponse({
-    //   inputText: debounceValue || inputValue,
-    // });
-
     setShowLoadingIcon(true);
     navigate(`/menu-results/${slugName}`);
   };

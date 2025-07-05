@@ -1,6 +1,6 @@
 import _ from "lodash";
-import { DEFAULT_CURRENCY } from "customConstants";
-import { getTypeFn, getBuiltAddressType } from "../types";
+import { DEFAULT_CURRENCY } from "@/customConstants";
+import { getTypeFn, getBuiltAddressType } from "@/types";
 
 export const _get: getTypeFn = <T>(
   obj: any,

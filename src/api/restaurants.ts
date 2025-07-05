@@ -1,6 +1,6 @@
-import { RestaurantType } from "types";
-import { BACKEND_URL } from "customConstants";
-import { _get } from "utils";
+import { RestaurantType } from "@/types";
+import { BACKEND_URL } from "@/customConstants";
+import { _get } from "@/utils";
 export const getRestaurantByName = async (
   name: string,
 ): Promise<RestaurantType[]> => {

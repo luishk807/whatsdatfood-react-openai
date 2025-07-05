@@ -1,12 +1,19 @@
 import { useState, type FC, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Grid } from "@mui/material";
-import MenuItem from "components/MenuItem";
-import { RestaurantType, MenuItemType, RestCategoryMenu } from "types";
-import { getRestaurantBySlug } from "api/restaurants";
-import MenuTitle from "../MenuTitle";
+import MenuItem from "@/components/MenuItem";
+import {
+  RestaurantType,
+  MenuItemType,
+  RestCategoryMenu,
+  MenuInterfaceItemType,
+} from "@/types";
+import LoadingComponent from "../LoadingComponent";
+import { getRestaurantBySlug } from "@/api/restaurants";
+import MenuTitle from "@/components/MenuTitle";
 import "./index.css";
-import { _get } from "utils";
+import { _get } from "@/utils";
+import { LOADING_TYPES } from "@/customConstants";
 
 const MenuResults: FC = () => {
   const { restaurant } = useParams();
@@ -25,20 +32,17 @@ const MenuResults: FC = () => {
       console.log(menuItems);
 
       if (menuItems && menuItems.length) {
-        const map = new Map();
+        const map = new Map<string, MenuItemType[]>();
 
         menuItems.forEach((item) => {
           if (!map.has(item.category)) {
             map.set(item.category, [item]);
           } else {
-            const values = map.get(item.category);
-            values.push(item);
-            map.set(item.category, values);
+            map.set(item.category, [...map.get(item.category)!, item]);
           }
         });
 
         const newMenu = Object.fromEntries(map);
-        console.log(newMenu);
         setRestaurantMenu(newMenu);
       }
 
@@ -57,24 +61,29 @@ const MenuResults: FC = () => {
     <Grid container>
       <MenuTitle restaurant={restaurantInfo} />
       <Grid size={12}>
-        {Object.keys(restaurantMenu).map((category, catIndx) => {
-          return (
-            <Grid
-              key={catIndx}
-              container
-              className="menu-result-category-container"
-            >
-              <Grid size={12} className="menu-result-category-title">
-                {category}
+        <LoadingComponent<RestCategoryMenu>
+          type={LOADING_TYPES.CIRCULAR}
+          data={restaurantMenu}
+        >
+          {Object.keys(restaurantMenu).map((category, catIndx) => {
+            return (
+              <Grid
+                key={catIndx}
+                container
+                className="menu-result-category-container"
+              >
+                <Grid size={12} className="menu-result-category-title">
+                  {category}
+                </Grid>
+                <Grid size={12}>
+                  {restaurantMenu[category].map((item: any, indx: number) => (
+                    <MenuItem key={indx} item={item} />
+                  ))}
+                </Grid>
               </Grid>
-              <Grid size={12}>
-                {restaurantMenu[category].map((item: any, indx: number) => (
-                  <MenuItem key={indx} item={item} />
-                ))}
-              </Grid>
-            </Grid>
-          );
-        })}
+            );
+          })}
+        </LoadingComponent>
       </Grid>
     </Grid>
   );

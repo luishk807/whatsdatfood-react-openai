@@ -1,19 +1,11 @@
 import { type FC } from "react";
 import { Grid, Box } from "@mui/material";
-import { convertCurrency } from "utils";
-import Image from "components/Image";
+import { convertCurrency } from "@/utils";
+import Image from "@/components/Image";
+import { MenuItemInterface } from "@/interfaces";
 import "./index.css";
+import StarRoundedIcon from "@mui/icons-material/StarRounded";
 
-export type MenuInterfaceItemType = {
-  name: string;
-  category: string;
-  description: string;
-  image: string;
-  price: number;
-};
-export interface MenuItemInterface {
-  item: MenuInterfaceItemType;
-}
 const MenuItem: FC<MenuItemInterface> = ({ item }) => {
   return (
     <Grid container className="item-menu-item-container">
@@ -24,7 +16,9 @@ const MenuItem: FC<MenuItemInterface> = ({ item }) => {
         {item.name}
       </Grid>
       <Grid size={{ xs: 12, md: 2 }} className="item-menu-item-img">
-        <Image alt={item.name} />
+        <Box>
+          <Image alt={item.name} />
+        </Box>
       </Grid>
       <Grid size={{ xs: 12, md: 10 }}>
         <Grid container>
@@ -35,7 +29,7 @@ const MenuItem: FC<MenuItemInterface> = ({ item }) => {
                 size={10}
                 className="item-menu-item-title"
               >
-                {item.name}
+                {item.name} {item.top_choice && <StarRoundedIcon />}
               </Grid>
 
               <Grid

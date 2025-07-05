@@ -1,0 +1,11 @@
+#no-image-container {
+  display: flex;
+  width: 150px;
+  height: 150px;
+  justify-content: center;
+}
+#no-image-container .no-photo-img {
+  width: 50%;
+  height: auto;
+  opacity: 0.3;
+}
