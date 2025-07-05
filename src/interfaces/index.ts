@@ -24,3 +24,12 @@ export interface LoadingInterface {
 export interface MenuItemInterface {
   item: MenuInterfaceItemType;
 }
+
+export interface ImageInterface {
+  url?: string | null;
+  alt?: string | null;
+}
+
+export interface MenuItemImageInterface<T> {
+  data: T | null;
+}

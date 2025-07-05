@@ -1,4 +1,4 @@
-import { RestaurantType } from "@/types";
+import { RestaurantType, RestaurantItemImageType } from "@/types";
 import { BACKEND_URL } from "@/customConstants";
 import { _get } from "@/utils";
 export const getRestaurantByName = async (
@@ -59,6 +59,9 @@ export const getRestaurantBySlug = async (
             top_choice
             price
             category
+            restaurantItemRestImages{
+                name
+            }
         }
       }
     }
@@ -83,5 +86,55 @@ export const getRestaurantBySlug = async (
   } catch (err) {
     console.error(err);
     return {} as RestaurantType;
+  }
+};
+
+export const getRestaurantItemImages = async (
+  restItemId: number,
+): Promise<RestaurantItemImageType | null> => {
+  if (!restItemId) {
+    throw new Error("Restaurant id is empty");
+  }
+  const query = `#graphql
+    query getRestaurantImages($restItemId: Int) {
+      getRestaurantImage(id: $restItemId) {
+        name
+        restaurantItemImageRestItem{
+            name
+            price
+            top_choice
+        }
+      }
+    }
+  `;
+
+  try {
+    const resp = await fetch(`${BACKEND_URL}/graphql`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query,
+        variables: {
+          restItemId,
+        },
+      }),
+    });
+
+    const json = await resp.json();
+    const data = _get(json, "data.getRestaurantImage");
+
+    console.log(data);
+
+    if (!data) {
+      console.warn("No image found for restaurant item:", restItemId);
+      return null;
+    }
+
+    return data as RestaurantItemImageType;
+  } catch (err) {
+    console.error(err);
+    return null;
   }
 };

@@ -25,7 +25,7 @@ const Loading = ({ style, type = "custom" }: LoadingInterface) => {
       width="100%"
       justifyContent="center"
       alignItems="center"
-      minHeight={100}
+      minHeight={20}
     >
       <Grid size={12} textAlign="center">
         <LoadingContainer />

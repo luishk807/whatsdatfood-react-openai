@@ -9,6 +9,7 @@ import { getBuiltAddress, handleHighlightSuggest } from "@/utils";
 import Loading from "@/components/Loading";
 import { getRestaurantByName } from "@/api/restaurants";
 import { RestaurantType } from "@/types";
+import SearchButton from "../SearchButton";
 import { _get } from "@/utils";
 
 const MainSearchBar: FC = () => {
@@ -82,7 +83,11 @@ const MainSearchBar: FC = () => {
           onChange={handleOnChange}
         />
       </Grid>
-      <Grid display="flex" justifyContent="end" size={{ md: 1, xs: 2 }}>
+      <SearchButton<boolean>
+        onSubmit={handleAIRequest}
+        showLoading={showLoadingIcon}
+      />
+      {/* <Grid display="flex" justifyContent="end" size={{ md: 1, xs: 2 }}>
         {showLoadingIcon ? (
           <Loading
             style={{
@@ -96,7 +101,7 @@ const MainSearchBar: FC = () => {
             <ArrowUpwardRoundedIcon className="main-search-button-icon" />
           </IconButton>
         )}
-      </Grid>
+      </Grid> */}
       <Grid size={12} display="flex" justifyContent="center">
         <div
           className={`main-search-suggestions-container ${

@@ -1,10 +1,8 @@
 import { FC } from "react";
 import "./index.css";
 import NoImage from "../NoImage";
-export interface ImageInterface {
-  url?: string | null;
-  alt?: string | null;
-}
+import { ImageInterface } from "@/interfaces";
+
 const Image: FC<ImageInterface> = ({ url, alt }) => {
   if (!url || !alt) {
     return <NoImage />;

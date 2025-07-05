@@ -1,10 +1,12 @@
 import { type FC } from "react";
-import { Grid, Box } from "@mui/material";
+import { Grid } from "@mui/material";
+import { _get } from "@/utils";
 import { convertCurrency } from "@/utils";
-import Image from "@/components/Image";
 import { MenuItemInterface } from "@/interfaces";
 import "./index.css";
 import StarRoundedIcon from "@mui/icons-material/StarRounded";
+import MenuItemImage from "@/components/MenuItemImage";
+import { MenuInterfaceItemType } from "@/types";
 
 const MenuItem: FC<MenuItemInterface> = ({ item }) => {
   return (
@@ -16,10 +18,9 @@ const MenuItem: FC<MenuItemInterface> = ({ item }) => {
         {item.name}
       </Grid>
       <Grid size={{ xs: 12, md: 2 }} className="item-menu-item-img">
-        <Box>
-          <Image alt={item.name} />
-        </Box>
+        <MenuItemImage<MenuInterfaceItemType> data={item} />
       </Grid>
+
       <Grid size={{ xs: 12, md: 10 }}>
         <Grid container>
           <Grid size={12}>

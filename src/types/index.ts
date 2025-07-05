@@ -41,13 +41,31 @@ export type RestaurantType = {
   restRestaurantItems?: [MenuItemType];
 };
 
+export type RestaurantItemImageType = {
+  id?: bigint;
+  restaurant_menu_item_id: bigint;
+  name?: string;
+  url_m?: string;
+  url_s?: string;
+  owner?: string;
+  license?: string;
+  flickr_id?: string;
+  category?: string;
+  created_at?: Date;
+  updated_at?: Date;
+  deleted_at?: Date;
+  restaurantItemImageRestItem?: MenuItemType;
+};
+
 export type MenuInterfaceItemType = {
+  id: number;
   name: string;
   category: string;
   description: string;
   top_choice: boolean;
   image: string;
   price: number;
+  restaurantItemImageRestItem?: RestaurantItemImageType;
 };
 
 export type LoadingType = (typeof LOADING_TYPES)[keyof typeof LOADING_TYPES];
