@@ -1,14 +1,20 @@
-.main-search-button {
+#main-search-button-container .main-search-button {
   width: 35px;
   padding: 5px;
   margin-right: 5px !important;
-  background-color: rgba(0, 0, 255) !important;
   border-radius: 20px;
   -webkit-border-radius: 20px;
   -moz-border-radius: 20px;
   -ms-border-radius: 20px;
   -o-border-radius: 20px;
 }
-.main-search-button-icon {
+#main-search-button-container .main-search-button.inactive {
+  background-color: #ccc !important;
+}
+
+#main-search-button-container .main-search-button.active {
+  background-color: rgba(0, 0, 255) !important;
+}
+#main-search-button-container .main-search-button .main-search-button-icon {
   fill: white !important;
 }

@@ -1,12 +1,10 @@
 import { type FC, useEffect, useState } from "react";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
-import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded";
-import { Grid, IconButton } from "@mui/material";
+import { Grid } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import MainSearchInput from "@/components/MainSearchInput";
 import "./index.css";
 import { getBuiltAddress, handleHighlightSuggest } from "@/utils";
-import Loading from "@/components/Loading";
 import { getRestaurantByName } from "@/api/restaurants";
 import { RestaurantType } from "@/types";
 import SearchButton from "../SearchButton";
@@ -83,25 +81,11 @@ const MainSearchBar: FC = () => {
           onChange={handleOnChange}
         />
       </Grid>
-      <SearchButton<boolean>
+      <SearchButton<string>
         onSubmit={handleAIRequest}
         showLoading={showLoadingIcon}
+        data={inputValue}
       />
-      {/* <Grid display="flex" justifyContent="end" size={{ md: 1, xs: 2 }}>
-        {showLoadingIcon ? (
-          <Loading
-            style={{
-              width: "30px",
-              marginRight: "10px",
-              marginTop: "5px",
-            }}
-          />
-        ) : (
-          <IconButton onClick={handleAIRequest} className="main-search-button">
-            <ArrowUpwardRoundedIcon className="main-search-button-icon" />
-          </IconButton>
-        )}
-      </Grid> */}
       <Grid size={12} display="flex" justifyContent="center">
         <div
           className={`main-search-suggestions-container ${

@@ -4,6 +4,8 @@ import { _get } from "@/utils";
 import { RestaurantItemImageType } from "@/types";
 import { MenuItemImageInterface } from "@/interfaces";
 import { getRestaurantItemImages } from "@/api/restaurants";
+import { LOADING_TYPES } from "@/customConstants";
+import LoadingComponent from "../LoadingComponent";
 import "./index.css";
 import { useState, useEffect } from "react";
 
@@ -21,25 +23,19 @@ const MenuItemImage = <T,>({ data }: MenuItemImageInterface<T>) => {
 
     const fetchImage = async () => {
       const restItemId = _get<number>(data, "id");
-      const dbImage = _get(data, "restaurantItemImageRestItem.0", {});
+      const dbImage = _get(data, "restaurantItemImageRestItem.0", null);
 
-      let imageData = {};
+      let imageData = null;
 
-      if (!Object.keys(dbImage).length) {
+      if (!dbImage) {
         try {
           const imageResp = await getRestaurantItemImages(restItemId);
-          if (imageResp) {
-            imageData = {
-              ...imageResp,
-            };
-          }
+          imageData = imageResp ? imageResp : {};
         } catch (err) {
           console.error(err);
         }
       } else {
-        imageData = {
-          ...dbImage,
-        };
+        imageData = dbImage ? dbImage : {};
       }
 
       if (imageData && !cancelled) {
@@ -64,8 +60,10 @@ const MenuItemImage = <T,>({ data }: MenuItemImageInterface<T>) => {
   }, [data]);
 
   return (
-    <Box>
-      <Image url={imageInfo?.url_m} alt={imageInfo?.name} />
+    <Box id="menu-item-image-box">
+      <LoadingComponent data={imageInfo} type={LOADING_TYPES.CIRCULAR}>
+        <Image url={imageInfo?.url_m} alt={imageInfo?.name} />
+      </LoadingComponent>
     </Box>
   );
 };

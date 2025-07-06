@@ -1,19 +1,67 @@
 import { Link } from "react-router-dom";
 import "./index.css";
+import MenuIcon from "@mui/icons-material/Menu";
 import { Grid } from "@mui/material";
+import { useState } from "react";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import IconButton from "@mui/material/IconButton";
 const Header = () => {
+  const [showMenu, setShowMenu] = useState(false);
+
+  const toggleMenu = () => setShowMenu(!showMenu);
+  
+  const MenuLinks = () => {
+    return (
+      <ul className="header-list-ul">
+        <li className="header-list-ul-li">About</li>
+        <li className="header-list-ul-li">Contact</li>
+      </ul>
+    );
+  };
   return (
-    <Grid container id="header-container">
-      <Grid className="header-logo">
-        <Link to="/">What's that food</Link>
+    <>
+      <Grid container id="header-container">
+        <Grid className="header-logo" size={{ lg: 2, xs: 6 }}>
+          <Link to="/">What's that food</Link>
+        </Grid>
+        <Grid
+          size={{ lg: 10 }}
+          sx={{
+            display: {
+              md: "flex",
+              xs: "none",
+            },
+          }}
+          className="header-list-menu"
+        >
+          <MenuLinks />
+        </Grid>
+        <Grid
+          size={{ xs: 6 }}
+          sx={{
+            justifyContent: "end",
+            display: {
+              xs: "flex",
+              md: "none",
+            },
+          }}
+        >
+          <IconButton onClick={toggleMenu}>
+            <MenuIcon />
+          </IconButton>
+        </Grid>
       </Grid>
-      <Grid className="header-list-menu">
-        <ul className="header-list-ul">
-          <li className="header-list-ul-li">About</li>
-          <li className="header-list-ul-li">Contact</li>
-        </ul>
+      <Grid container className={`header-big-menu ${showMenu ? "active" : ""}`}>
+        <Grid className="header-big-menu-icon">
+          <IconButton onClick={toggleMenu} size="small">
+            <CloseRoundedIcon sx={{ fontSize: "24px" }} />
+          </IconButton>
+        </Grid>
+        <Grid className="header-big-menu-list">
+          <MenuLinks />
+        </Grid>
       </Grid>
-    </Grid>
+    </>
   );
 };
 

@@ -2,13 +2,16 @@ import { Grid, IconButton } from "@mui/material";
 import Loading from "@/components/Loading";
 import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded";
 import "./index.css";
+import { isDisabled } from "@testing-library/user-event/dist/utils";
 interface SearchButtonInterface<T> {
   onSubmit: () => void;
-  showLoading: T | null;
+  showLoading: boolean;
+  data?: T | "";
 }
 const SearchButton = <T,>({
   onSubmit,
   showLoading,
+  data,
 }: SearchButtonInterface<T>) => {
   if (showLoading) {
     return (
@@ -21,14 +24,25 @@ const SearchButton = <T,>({
       />
     );
   }
+
+  const isActive = !!data;
+
+  const iconButtonProps = {
+    onClick: isActive ? onSubmit : undefined,
+    className: `main-search-button ${isActive ? "active" : "inactive"}`,
+    disabled: !isActive,
+  };
   return (
-    <>
-      <Grid display="flex" justifyContent="end" size={{ md: 1, xs: 2 }}>
-        <IconButton onClick={onSubmit} className="main-search-button">
-          <ArrowUpwardRoundedIcon className="main-search-button-icon" />
-        </IconButton>
-      </Grid>
-    </>
+    <Grid
+      id="main-search-button-container"
+      display="flex"
+      justifyContent="end"
+      size={{ md: 1, xs: 2 }}
+    >
+      <IconButton {...iconButtonProps}>
+        <ArrowUpwardRoundedIcon className="main-search-button-icon" />
+      </IconButton>
+    </Grid>
   );
 };
 
