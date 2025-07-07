@@ -2,9 +2,9 @@ import { FC, useMemo } from "react";
 import "./index.css";
 import { LOADING_TYPES } from "@/customConstants";
 import Grid from "@mui/material/Grid";
-import { CircularProgress, LinearProgress, Box } from "@mui/material";
+import { CircularProgress, LinearProgress } from "@mui/material";
 import { LoadingInterface } from "@/interfaces";
-import SkeletonMenuItem from "../SkeletonLoaders/MenuResultPage";
+import loadingGif from "@/assets/loading.gif";
 
 const Loading = ({
   style,
@@ -21,7 +21,7 @@ const Loading = ({
         return () => (CustomComponent ? <CustomComponent /> : null);
       default:
         return () => (
-          <img className="loading-icon" src="/loading.gif" alt="loading" />
+          <img className="loading-icon" src={loadingGif} alt="loading" />
         );
     }
   }, [type]);

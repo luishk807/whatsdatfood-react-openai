@@ -19,6 +19,10 @@ module.exports = {
   module: {
     rules: [
       {
+        test: /\.(png|jpe?g|gif|svg)$/i,
+        type: "asset/resource",
+      },
+      {
         test: /\.tsx?$/, // Match .ts and .tsx files
         use: "ts-loader",
         exclude: /node_modules/,
