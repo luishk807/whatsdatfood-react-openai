@@ -114,7 +114,6 @@ const MainSearchBar: FC = () => {
                     complete_name,
                     inputValue,
                   );
-                  console.log(new_suggest);
                   return (
                     <li
                       onClick={() =>

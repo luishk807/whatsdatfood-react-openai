@@ -13,6 +13,7 @@ const MenuItemImage = <T,>({ data }: MenuItemImageInterface<T>) => {
   const [imageInfo, setImageInfo] = useState<RestaurantItemImageType | null>(
     null,
   );
+  const [showLoading, setShowLoading] = useState(true);
 
   useEffect(() => {
     if (!data) {
@@ -22,22 +23,21 @@ const MenuItemImage = <T,>({ data }: MenuItemImageInterface<T>) => {
     let cancelled = false;
 
     const fetchImage = async () => {
+      setShowLoading(true);
       const restItemId = _get<number>(data, "id");
       const dbImage = _get(data, "restaurantItemImageRestItem.0", null);
 
       let imageData = null;
 
       if (!dbImage) {
-        try {
+        if (restItemId) {
           const imageResp = await getRestaurantItemImages(restItemId);
           imageData = imageResp ? imageResp : {};
-        } catch (err) {
-          console.error(err);
         }
       } else {
         imageData = dbImage ? dbImage : {};
       }
-
+      setShowLoading(false);
       if (imageData && !cancelled) {
         setImageInfo({
           restaurant_menu_item_id: _get(imageData, "restaurant_menu_item_id"),
@@ -61,7 +61,11 @@ const MenuItemImage = <T,>({ data }: MenuItemImageInterface<T>) => {
 
   return (
     <Box id="menu-item-image-box">
-      <LoadingComponent data={imageInfo} type={LOADING_TYPES.CIRCULAR}>
+      <LoadingComponent
+        showLoading={showLoading}
+        data={imageInfo}
+        type={LOADING_TYPES.CIRCULAR}
+      >
         <Image url={imageInfo?.url_m} alt={imageInfo?.name} />
       </LoadingComponent>
     </Box>

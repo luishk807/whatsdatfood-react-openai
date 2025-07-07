@@ -8,5 +8,6 @@ export const BACKEND_URL: string | undefined =
 export const LOADING_TYPES = {
   LINEAR: "linear",
   CIRCULAR: "circular",
+  SPINER: "spiner",
   CUSTOM: "custom",
 };

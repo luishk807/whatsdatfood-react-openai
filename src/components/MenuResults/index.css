@@ -4,6 +4,8 @@
   display: flex;
   justify-content: start;
   padding: 5px;
+  background-color: black;
+  color: white;
 }
 
 .menu-result-category-container {

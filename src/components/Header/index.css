@@ -32,6 +32,7 @@
   overflow: hidden;
   transition: opacity 0.5s ease-out;
   flex-direction: column !important;
+  z-index: -1;
 }
 .header-big-menu.active {
   opacity: 1;

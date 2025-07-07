@@ -1,6 +1,6 @@
 .item-menu-item-container {
   border-top: 1px solid rgba(0, 0, 0, 0.09);
-  padding: 10px 0px;
+  padding: 10px 10px;
 }
 
 .item-menu-item-title-mobile {
@@ -32,4 +32,9 @@
   justify-content: start;
   padding: 10px 0px;
   font-size: 1.2em;
+}
+.item-menu-item-btn {
+  margin-bottom: 5px;
+  border: 1px solid black;
+  color: black;
 }

@@ -53,6 +53,9 @@ export const getRestaurantBySlug = async (
       aiRestaurantBySlug(slug: $slug) {
         name
         address
+        city
+        state
+        postal_code
         restRestaurantItems {
             name
             description
@@ -93,7 +96,7 @@ export const getRestaurantItemImages = async (
   restItemId: number,
 ): Promise<RestaurantItemImageType | null> => {
   if (!restItemId) {
-    throw new Error("Restaurant id is empty");
+    throw null;
   }
   const query = `#graphql
     query getRestaurantImages($restItemId: Int) {

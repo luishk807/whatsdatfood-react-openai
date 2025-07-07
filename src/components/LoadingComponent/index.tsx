@@ -5,9 +5,11 @@ const LoadingComponent = <T,>({
   children,
   data,
   type,
+  showLoading = true,
+  customLoader,
 }: LoadingComponentInterface<T>) => {
-  if (!data) {
-    return <Loading type={type} />;
+  if (!data && showLoading) {
+    return <Loading type={type} customLoader={customLoader} />;
   }
 
   return <>{children}</>;

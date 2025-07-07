@@ -1,12 +1,12 @@
 import { type FC } from "react";
-import { Grid } from "@mui/material";
+import { Button, Grid } from "@mui/material";
 import { _get } from "@/utils";
 import { convertCurrency } from "@/utils";
 import { MenuItemInterface } from "@/interfaces";
-import "./index.css";
-import StarRoundedIcon from "@mui/icons-material/StarRounded";
-import MenuItemImage from "@/components/MenuItemImage";
 import { MenuInterfaceItemType } from "@/types";
+import MenuItemImage from "@/components/MenuItemImage";
+import MenuItemTitle from "@/components/MenuItemTitle";
+import "./index.css";
 
 const MenuItem: FC<MenuItemInterface> = ({ item }) => {
   return (
@@ -15,7 +15,7 @@ const MenuItem: FC<MenuItemInterface> = ({ item }) => {
         sx={{ display: { xs: "block", md: "none" } }}
         className="item-menu-item-title-mobile"
       >
-        {item.name}
+        <MenuItemTitle name={item.name} top_choice={item.top_choice} />
       </Grid>
       <Grid size={{ xs: 12, md: 2 }} className="item-menu-item-img">
         <MenuItemImage<MenuInterfaceItemType> data={item} />
@@ -30,7 +30,7 @@ const MenuItem: FC<MenuItemInterface> = ({ item }) => {
                 size={10}
                 className="item-menu-item-title"
               >
-                {item.name} {item.top_choice && <StarRoundedIcon />}
+                <MenuItemTitle name={item.name} top_choice={item.top_choice} />
               </Grid>
 
               <Grid
@@ -45,7 +45,22 @@ const MenuItem: FC<MenuItemInterface> = ({ item }) => {
           </Grid>
 
           <Grid size={12} className="item-menu-item-description">
-            {item.description}
+            <Grid container className="w-full">
+              <Grid size={{ lg: 10, xs: 12 }} className="flex justify-start">
+                {item.description}
+              </Grid>
+              <Grid
+                size={{ lg: 2, xs: 12 }}
+                className="flex justify-end flex-col"
+              >
+                <Button variant="outlined" className="item-menu-item-btn">
+                  Add to cart
+                </Button>
+                <Button variant="outlined" className="item-menu-item-btn">
+                  Send to friend
+                </Button>
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
       </Grid>

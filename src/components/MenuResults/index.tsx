@@ -1,19 +1,15 @@
 import { useState, type FC, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Grid } from "@mui/material";
+import { Grid, Box, Skeleton } from "@mui/material";
 import MenuItem from "@/components/MenuItem";
-import {
-  RestaurantType,
-  MenuItemType,
-  RestCategoryMenu,
-  MenuInterfaceItemType,
-} from "@/types";
+import { RestaurantType, MenuItemType, RestCategoryMenu } from "@/types";
 import LoadingComponent from "../LoadingComponent";
 import { getRestaurantBySlug } from "@/api/restaurants";
 import MenuTitle from "@/components/MenuTitle";
 import "./index.css";
 import { _get } from "@/utils";
 import { LOADING_TYPES } from "@/customConstants";
+import SkeletonMenuItem from "../SkeletonLoaders/MenuResultPage";
 
 const MenuResults: FC = () => {
   const { restaurant } = useParams();
@@ -21,16 +17,17 @@ const MenuResults: FC = () => {
   const [restaurantInfo, setRestaurantInfo] = useState<RestaurantType | null>(
     null,
   );
+  const [showLoading, setShowLoading] = useState(true);
 
   const handleFetchRestaurant = async () => {
+    setShowLoading(true);
     if (restaurant) {
       const resp: RestaurantType = await getRestaurantBySlug(
         String(restaurant),
       );
       const menuItems = _get<MenuItemType[]>(resp, "restRestaurantItems", []);
 
-      console.log(menuItems);
-
+      setShowLoading(false);
       if (menuItems && menuItems.length) {
         const map = new Map<string, MenuItemType[]>();
 
@@ -49,6 +46,9 @@ const MenuResults: FC = () => {
       setRestaurantInfo({
         name: resp.name,
         address: resp.address,
+        city: resp.city,
+        state: resp.state,
+        postal_code: resp.postal_code,
       });
     }
   };
@@ -59,12 +59,13 @@ const MenuResults: FC = () => {
 
   return (
     <Grid container>
-      <MenuTitle restaurant={restaurantInfo} />
-      <Grid size={12}>
-        <LoadingComponent<RestCategoryMenu>
-          type={LOADING_TYPES.CIRCULAR}
-          data={restaurantMenu}
-        >
+      <LoadingComponent
+        customLoader={SkeletonMenuItem}
+        type={LOADING_TYPES.CUSTOM}
+        data={restaurantInfo}
+      >
+        <MenuTitle restaurant={restaurantInfo} />
+        <Grid size={12}>
           {Object.keys(restaurantMenu).map((category, catIndx) => {
             return (
               <Grid
@@ -83,8 +84,8 @@ const MenuResults: FC = () => {
               </Grid>
             );
           })}
-        </LoadingComponent>
-      </Grid>
+        </Grid>
+      </LoadingComponent>
     </Grid>
   );
 };

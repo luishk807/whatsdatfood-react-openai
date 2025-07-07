@@ -1,4 +1,4 @@
-import { ReactNode, CSSProperties } from "react";
+import { ReactNode, CSSProperties, ComponentType } from "react";
 import { RestaurantType, MenuInterfaceItemType } from "@/types";
 import { LoadingType } from "@/types";
 export interface RequestAIInterface {
@@ -12,13 +12,16 @@ export interface MenuTitleInterface {
 
 export interface LoadingComponentInterface<T> {
   children: ReactNode;
-  data: T | null;
+  data?: T | null;
   type?: LoadingType;
+  showLoading?: boolean;
+  customLoader?: ComponentType;
 }
 
 export interface LoadingInterface {
   style?: CSSProperties;
   type?: LoadingType;
+  customLoader?: ComponentType;
 }
 
 export interface MenuItemInterface {
