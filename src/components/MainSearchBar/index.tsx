@@ -1,4 +1,5 @@
 import { type FC, useEffect, useState } from "react";
+import clsx from "clsx";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import { Grid } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -16,23 +17,15 @@ const MainSearchBar: FC = () => {
   const [debounceValue, setDebounceValue] = useState("");
   const [slugName, setSlugName] = useState("");
   const [suggestions, setSuggestions] = useState<RestaurantType[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
   const [selectedValue, setSelectedValue] = useState("");
   const [showLoadingIcon, setShowLoadingIcon] = useState(false);
 
   const handleOnChange = (value: any) => {
-    if (suggestions.length) {
-      setSuggestions([]);
-    }
+    setShowSuggestions(false);
+    setSuggestions([]);
     setInputValue(value);
   };
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      setDebounceValue(inputValue);
-    }, 1000);
-
-    return () => clearTimeout(timeoutId);
-  }, [inputValue]);
 
   const handleSuggestions = async () => {
     const resp = await getRestaurantByName(debounceValue);
@@ -53,6 +46,12 @@ const MainSearchBar: FC = () => {
   };
 
   useEffect(() => {
+    if (suggestions.length > 0) {
+      setShowSuggestions(true);
+    }
+  }, [suggestions]);
+
+  useEffect(() => {
     if (debounceValue) {
       console.log("call api", debounceValue);
       setShowLoadingIcon(true);
@@ -64,6 +63,14 @@ const MainSearchBar: FC = () => {
   useEffect(() => {
     setShowLoadingIcon(false);
   }, [selectedValue]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setDebounceValue(inputValue);
+    }, 1000);
+
+    return () => clearTimeout(timeoutId);
+  }, [inputValue]);
 
   return (
     <Grid container id="main-search-container">
@@ -88,42 +95,40 @@ const MainSearchBar: FC = () => {
       />
       <Grid size={12} display="flex" justifyContent="center">
         <div
-          className={`main-search-suggestions-container ${
-            suggestions.length
-              ? "suggestions-container-show"
-              : "suggestions-container-hide"
-          }`}
+          className={clsx("main-search-suggestions-container", {
+            "suggestions-container-show": showSuggestions,
+            "suggestions-container-hide": !showSuggestions,
+          })}
         >
           <div className="main-suggestion-container">
             <ul>
-              {suggestions.length &&
-                suggestions.map((suggestion, indx) => {
-                  const rest_name = _get(suggestion, "name");
-                  const slugName = _get<string>(suggestion, "slug");
-                  const address = getBuiltAddress({
-                    address: _get(suggestion, "address"),
-                    city: _get(suggestion, "city"),
-                    state: _get(suggestion, "state"),
-                    country: _get(suggestion, "country"),
-                    postal_code: _get(suggestion, "postal_code"),
-                  });
+              {suggestions.map((suggestion, indx) => {
+                const rest_name = _get(suggestion, "name");
+                const slugName = _get<string>(suggestion, "slug");
+                const address = getBuiltAddress({
+                  address: _get(suggestion, "address"),
+                  city: _get(suggestion, "city"),
+                  state: _get(suggestion, "state"),
+                  country: _get(suggestion, "country"),
+                  postal_code: _get(suggestion, "postal_code"),
+                });
 
-                  const complete_name = `${rest_name} ${address}`;
+                const complete_name = `${rest_name} ${address}`;
 
-                  const new_suggest = handleHighlightSuggest(
-                    complete_name,
-                    inputValue,
-                  );
-                  return (
-                    <li
-                      onClick={() =>
-                        handleSelectSuggestion(complete_name, slugName)
-                      }
-                      key={indx}
-                      dangerouslySetInnerHTML={{ __html: new_suggest }}
-                    />
-                  );
-                })}
+                const new_suggest = handleHighlightSuggest(
+                  complete_name,
+                  inputValue,
+                );
+                return (
+                  <li
+                    onClick={() =>
+                      handleSelectSuggestion(complete_name, slugName)
+                    }
+                    key={indx}
+                    dangerouslySetInnerHTML={{ __html: new_suggest }}
+                  />
+                );
+              })}
             </ul>
           </div>
         </div>
