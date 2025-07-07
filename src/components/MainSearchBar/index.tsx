@@ -41,14 +41,15 @@ const MainSearchBar: FC = () => {
     setSuggestions([]);
   };
   const handleAIRequest = async () => {
+    if (!slugName) {
+      return;
+    }
     setShowLoadingIcon(true);
     navigate(`/menu-results/${slugName}`);
   };
 
   useEffect(() => {
-    if (suggestions.length > 0) {
-      setShowSuggestions(true);
-    }
+      setShowSuggestions(suggestions.length > 0);
   }, [suggestions]);
 
   useEffect(() => {
@@ -103,17 +104,19 @@ const MainSearchBar: FC = () => {
           <div className="main-suggestion-container">
             <ul>
               {suggestions.map((suggestion, indx) => {
-                const rest_name = _get(suggestion, "name");
+                const rest_name = _get<string>(suggestion, "name");
                 const slugName = _get<string>(suggestion, "slug");
                 const address = getBuiltAddress({
-                  address: _get(suggestion, "address"),
-                  city: _get(suggestion, "city"),
-                  state: _get(suggestion, "state"),
-                  country: _get(suggestion, "country"),
-                  postal_code: _get(suggestion, "postal_code"),
+                  address: _get<string>(suggestion, "address"),
+                  city: _get<string>(suggestion, "city"),
+                  state: _get<string>(suggestion, "state"),
+                  country: _get<string>(suggestion, "country"),
+                  postal_code: _get<string>(suggestion, "postal_code"),
                 });
 
-                const complete_name = `${rest_name} ${address}`;
+                const complete_name = address
+                  ? `${rest_name} ${address}`
+                  : rest_name;
 
                 const new_suggest = handleHighlightSuggest(
                   complete_name,

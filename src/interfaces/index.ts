@@ -36,3 +36,8 @@ export interface ImageInterface {
 export interface MenuItemImageInterface<T> {
   data: T | null;
 }
+export interface SearchButtonInterface<T> {
+  onSubmit: () => void;
+  showLoading: boolean;
+  data?: T | "";
+}

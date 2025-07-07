@@ -2,12 +2,8 @@ import { Grid, IconButton } from "@mui/material";
 import Loading from "@/components/Loading";
 import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded";
 import "./index.css";
-import { isDisabled } from "@testing-library/user-event/dist/utils";
-interface SearchButtonInterface<T> {
-  onSubmit: () => void;
-  showLoading: boolean;
-  data?: T | "";
-}
+import { SearchButtonInterface } from "@/interfaces";
+
 const SearchButton = <T,>({
   onSubmit,
   showLoading,
