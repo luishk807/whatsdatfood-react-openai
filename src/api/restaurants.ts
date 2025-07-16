@@ -57,6 +57,7 @@ export const getRestaurantBySlug = async (
         state
         postal_code
         restRestaurantItems {
+            id
             name
             description
             top_choice
@@ -99,9 +100,11 @@ export const getRestaurantItemImages = async (
     throw null;
   }
   const query = `#graphql
-    query getRestaurantImages($restItemId: Int) {
+    query getRestaurantImages($restItemId: ID) {
       getRestaurantImage(id: $restItemId) {
         name
+        url_m
+        owner
         restaurantItemImageRestItem{
             name
             price
@@ -127,8 +130,6 @@ export const getRestaurantItemImages = async (
 
     const json = await resp.json();
     const data = _get(json, "data.getRestaurantImage");
-
-    console.log(data);
 
     if (!data) {
       console.warn("No image found for restaurant item:", restItemId);

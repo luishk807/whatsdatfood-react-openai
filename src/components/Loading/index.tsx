@@ -29,12 +29,10 @@ const Loading = ({
     <Grid
       container
       style={style}
-      width="100%"
-      justifyContent="center"
-      alignItems="center"
+      className="w-full justify-center items-center"
       minHeight={20}
     >
-      <Grid size={12} className="w-full" textAlign="center">
+      <Grid size={12} className="w-full h-full flex" textAlign="center">
         <LoadingContainer />
       </Grid>
     </Grid>

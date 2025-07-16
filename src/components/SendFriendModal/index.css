@@ -1,0 +1,38 @@
+#send-friend-modal {
+  position: relative;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  background-color: white;
+  box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.25);
+  border: 2px solid #000;
+  -moz-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  -o-transform: translate(-50%, -50%);
+}
+
+.send-friend-modal-button {
+  margin-top: 10px;
+}
+
+.send-friend-item-container {
+  width: 100%;
+  margin: 10px 0px;
+}
+
+.send-friend-image-holder {
+  display: flex;
+  justify-content: center;
+  height: 300px;
+  width: 100%;
+  overflow: hidden;
+  background-size: cover;
+}
+
+.send-friend-image-holder img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.5s ease-in-out;
+}

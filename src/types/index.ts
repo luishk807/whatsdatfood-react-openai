@@ -49,7 +49,7 @@ export type RestaurantItemImageType = {
   url_s?: string;
   owner?: string;
   license?: string;
-  flickr_id?: string;
+  context_link?: string;
   category?: string;
   created_at?: Date;
   updated_at?: Date;
@@ -66,6 +66,14 @@ export type MenuInterfaceItemType = {
   image: string;
   price: number;
   restaurantItemImageRestItem?: RestaurantItemImageType;
+};
+
+export type SendFriendModalData = {
+  restaurantName: string;
+  address: string;
+  itemName: string;
+  price: string;
+  image?: string;
 };
 
 export type LoadingType = (typeof LOADING_TYPES)[keyof typeof LOADING_TYPES];

@@ -1,0 +1,11 @@
+.item-menu-item-btn {
+  margin-bottom: 5px;
+  border: 1px solid black;
+  color: black;
+  width: 100%;
+}
+
+.item-menu-item-btn:hover {
+  background-color: black;
+  color: white;
+}

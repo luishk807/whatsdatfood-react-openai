@@ -1,14 +1,62 @@
-import { type FC } from "react";
-import { Button, Grid } from "@mui/material";
-import { _get } from "@/utils";
+import { useEffect, useMemo, useState, type FC } from "react";
+import { Grid, Skeleton, Box } from "@mui/material";
+import { _get, getBuiltAddress } from "@/utils";
 import { convertCurrency } from "@/utils";
 import { MenuItemInterface } from "@/interfaces";
-import { MenuInterfaceItemType } from "@/types";
+import { MenuInterfaceItemType, SendFriendModalData } from "@/types";
 import MenuItemImage from "@/components/MenuItemImage";
 import MenuItemTitle from "@/components/MenuItemTitle";
 import "./index.css";
+import Button from "@/components/Button";
+import SendFriendModal from "../SendFriendModal";
 
-const MenuItem: FC<MenuItemInterface> = ({ item }) => {
+const MenuItem: FC<MenuItemInterface> = ({ item, restaurant }) => {
+  const [sendFriendPayload, setSendPayload] =
+    useState<SendFriendModalData | null>(null);
+
+  useEffect(() => {
+    let isMounted = false;
+
+    if (restaurant && item) {
+      if (!isMounted) {
+        let address = _get(restaurant, "address", "");
+        let city = _get(restaurant, "city", "");
+        let state = _get(restaurant, "state", "");
+        let postal_code = _get(restaurant, "postal_code", "");
+        let country = _get(restaurant, "country", "");
+        let image = _get(item, "url_m", "");
+
+        const full_address = getBuiltAddress({
+          address,
+          city,
+          state,
+          postal_code,
+          country,
+        });
+
+        setSendPayload({
+          restaurantName: _get(restaurant, "name", ""),
+          address: full_address,
+          itemName: _get(item, "name", ""),
+          price: _get(item, "price", ""),
+          image: image,
+        });
+      }
+    }
+
+    return () => {
+      isMounted = true;
+    };
+  }, [item, restaurant]);
+
+  const handleUpdateImage = (newImage: string) => {
+    if (newImage && sendFriendPayload) {
+      setSendPayload({
+        ...sendFriendPayload,
+        image: newImage,
+      });
+    }
+  };
   return (
     <Grid container className="item-menu-item-container">
       <Grid
@@ -18,7 +66,10 @@ const MenuItem: FC<MenuItemInterface> = ({ item }) => {
         <MenuItemTitle name={item.name} top_choice={item.top_choice} />
       </Grid>
       <Grid size={{ xs: 12, md: 2 }} className="item-menu-item-img">
-        <MenuItemImage<MenuInterfaceItemType> data={item} />
+        <MenuItemImage<MenuInterfaceItemType>
+          data={item}
+          onImageChange={handleUpdateImage}
+        />
       </Grid>
 
       <Grid size={{ xs: 12, md: 10 }}>
@@ -53,12 +104,8 @@ const MenuItem: FC<MenuItemInterface> = ({ item }) => {
                 size={{ lg: 2, xs: 12 }}
                 className="flex justify-end flex-col"
               >
-                <Button variant="outlined" className="item-menu-item-btn">
-                  Add to cart
-                </Button>
-                <Button variant="outlined" className="item-menu-item-btn">
-                  Send to friend
-                </Button>
+                <Button>Add to cart</Button>
+                <SendFriendModal data={sendFriendPayload} />
               </Grid>
             </Grid>
           </Grid>

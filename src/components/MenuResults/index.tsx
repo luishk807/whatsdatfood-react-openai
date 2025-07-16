@@ -25,6 +25,7 @@ const MenuResults: FC = () => {
       const resp: RestaurantType = await getRestaurantBySlug(
         String(restaurant),
       );
+
       const menuItems = _get<MenuItemType[]>(resp, "restRestaurantItems", []);
 
       setShowLoading(false);
@@ -32,10 +33,12 @@ const MenuResults: FC = () => {
         const map = new Map<string, MenuItemType[]>();
 
         menuItems.forEach((item) => {
-          if (!map.has(item.category)) {
-            map.set(item.category, [item]);
-          } else {
-            map.set(item.category, [...map.get(item.category)!, item]);
+          if (item) {
+            if (!map.has(item.category)) {
+              map.set(item.category, [item]);
+            } else {
+              map.set(item.category, [...map.get(item.category)!, item]);
+            }
           }
         });
 
@@ -78,7 +81,11 @@ const MenuResults: FC = () => {
                 </Grid>
                 <Grid size={12}>
                   {restaurantMenu[category].map((item: any, indx: number) => (
-                    <MenuItem key={indx} item={item} />
+                    <MenuItem
+                      key={indx}
+                      item={item}
+                      restaurant={restaurantInfo}
+                    />
                   ))}
                 </Grid>
               </Grid>

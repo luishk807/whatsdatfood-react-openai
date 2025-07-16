@@ -1,5 +1,9 @@
 import { ReactNode, CSSProperties, ComponentType } from "react";
-import { RestaurantType, MenuInterfaceItemType } from "@/types";
+import {
+  RestaurantType,
+  MenuInterfaceItemType,
+  SendFriendModalData,
+} from "@/types";
 import { LoadingType } from "@/types";
 export interface RequestAIInterface {
   restaurant: string;
@@ -26,6 +30,7 @@ export interface LoadingInterface {
 
 export interface MenuItemInterface {
   item: MenuInterfaceItemType;
+  restaurant?: RestaurantType | null;
 }
 
 export interface ImageInterface {
@@ -35,9 +40,19 @@ export interface ImageInterface {
 
 export interface MenuItemImageInterface<T> {
   data: T | null;
+  onImageChange?: (newImage: string) => void;
 }
 export interface SearchButtonInterface<T> {
   onSubmit: () => void;
   showLoading: boolean;
   data?: T | "";
+}
+
+export interface CustomModalInterface {
+  children: ReactNode;
+  label?: string;
+}
+
+export interface SendFriendModalInterface {
+  data?: SendFriendModalData | null;
 }
