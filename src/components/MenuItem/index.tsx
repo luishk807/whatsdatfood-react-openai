@@ -104,7 +104,7 @@ const MenuItem: FC<MenuItemInterface> = ({ item, restaurant }) => {
                 size={{ lg: 2, xs: 12 }}
                 className="flex justify-end flex-col"
               >
-                <Button>Add to cart</Button>
+                <Button>Add to list</Button>
                 <SendFriendModal data={sendFriendPayload} />
               </Grid>
             </Grid>
