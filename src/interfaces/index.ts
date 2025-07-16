@@ -1,9 +1,8 @@
 import { ReactNode, CSSProperties, ComponentType } from "react";
-import {
-  RestaurantType,
-  MenuInterfaceItemType,
-  SendFriendModalData,
-} from "@/types";
+import { RestaurantType, MenuInterfaceItemType } from "@/types/restaurants";
+
+import { SendFriendModalData } from "@/types";
+
 import { LoadingType } from "@/types";
 export interface RequestAIInterface {
   restaurant: string;

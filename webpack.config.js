@@ -59,6 +59,9 @@ module.exports = {
       "process.env.REACT_APP_BACKEND_URL": JSON.stringify(
         process.env.REACT_APP_BACKEND_URL || "",
       ),
+      "process.env.REACT_APP_GRAPHQL_BACKEND_URL": JSON.stringify(
+        process.env.REACT_APP_GRAPHQL_BACKEND_URL || "",
+      ),
       "process.env.NODE_ENV": JSON.stringify(
         process.env.NODE_ENV || "development",
       ),

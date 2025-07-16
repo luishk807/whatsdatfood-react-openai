@@ -2,7 +2,11 @@ import { useState, type FC, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Grid, Box, Skeleton } from "@mui/material";
 import MenuItem from "@/components/MenuItem";
-import { RestaurantType, MenuItemType, RestCategoryMenu } from "@/types";
+import {
+  RestaurantType,
+  MenuItemType,
+  RestCategoryMenu,
+} from "@/types/restaurants";
 import LoadingComponent from "../LoadingComponent";
 import { getRestaurantBySlug } from "@/api/restaurants";
 import MenuTitle from "@/components/MenuTitle";

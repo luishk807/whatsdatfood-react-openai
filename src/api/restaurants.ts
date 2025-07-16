@@ -1,5 +1,5 @@
-import { RestaurantType, RestaurantItemImageType } from "@/types";
-import { BACKEND_URL } from "@/customConstants";
+import { RestaurantType, RestaurantItemImageType } from "@/types/restaurants";
+import { BACKEND_GRAPHQL_URL } from "@/customConstants";
 import { _get } from "@/utils";
 export const getRestaurantByName = async (
   name: string,
@@ -17,7 +17,7 @@ export const getRestaurantByName = async (
         }
       }
     `;
-    const resp = await fetch(`${BACKEND_URL}/graphql`, {
+    const resp = await fetch(`${BACKEND_GRAPHQL_URL}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -70,7 +70,7 @@ export const getRestaurantBySlug = async (
       }
     }
   `;
-    const resp = await fetch(`${BACKEND_URL}/graphql`, {
+    const resp = await fetch(`${BACKEND_GRAPHQL_URL}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -115,7 +115,7 @@ export const getRestaurantItemImages = async (
   `;
 
   try {
-    const resp = await fetch(`${BACKEND_URL}/graphql`, {
+    const resp = await fetch(`${BACKEND_GRAPHQL_URL}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

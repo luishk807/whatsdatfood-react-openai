@@ -7,7 +7,7 @@ import MainSearchInput from "@/components/MainSearchInput";
 import "./index.css";
 import { getBuiltAddress, handleHighlightSuggest } from "@/utils";
 import { getRestaurantByName } from "@/api/restaurants";
-import { RestaurantType } from "@/types";
+import { RestaurantType } from "@/types/restaurants";
 import SearchButton from "../SearchButton";
 import { _get } from "@/utils";
 
@@ -49,7 +49,7 @@ const MainSearchBar: FC = () => {
   };
 
   useEffect(() => {
-      setShowSuggestions(suggestions.length > 0);
+    setShowSuggestions(suggestions.length > 0);
   }, [suggestions]);
 
   useEffect(() => {
