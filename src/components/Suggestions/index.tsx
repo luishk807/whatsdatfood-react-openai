@@ -1,4 +1,5 @@
 import { _get } from "@/utils";
+import { useRef, useEffect } from "react";
 import clsx from "clsx";
 import { getBuiltAddress, handleHighlightSuggest } from "@/utils";
 import "./index.css";
@@ -9,9 +10,29 @@ const SuggestionsComponent = <T extends { name: string }>({
   onHandleSelection,
   show,
   value,
+  onClose,
 }: SuggestionComponentType<T>) => {
+  const suggestionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (
+        suggestionRef.current &&
+        !suggestionRef.current.contains(e.target as Node)
+      ) {
+        onClose();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [suggestionRef]);
   return (
     <div
+      ref={suggestionRef}
       className={clsx("main-search-suggestions-container", {
         "suggestions-container-show": show,
         "suggestions-container-hide": !show,

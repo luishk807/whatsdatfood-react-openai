@@ -103,6 +103,7 @@ const MainSearchBar: FC = () => {
           suggestions={suggestions}
           show={showSuggestions}
           value={inputValue}
+          onClose={() => setShowSuggestions(false)}
           onHandleSelection={handleSelectSuggestion}
         />
       </Grid>

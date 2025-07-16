@@ -1,4 +1,5 @@
 import { LOADING_TYPES } from "@/customConstants";
+import type { RefObject } from "react";
 
 export type addressType = {
   address: string;
@@ -23,6 +24,7 @@ export type SendFriendModalData = {
 
 export type SuggestionComponentType<T extends { name: string }> = {
   onHandleSelection: (name: string, slug: string) => void;
+  onClose: () => void;
   suggestions: T[];
   show: boolean;
   value: string;
