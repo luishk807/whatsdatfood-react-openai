@@ -2,13 +2,8 @@ import { _get } from "@/utils";
 import clsx from "clsx";
 import { getBuiltAddress, handleHighlightSuggest } from "@/utils";
 import "./index.css";
+import { SuggestionComponentType } from "@/types";
 
-type SuggestionComponentType<T extends { name: string }> = {
-  onHandleSelection: (name: string, slug: string) => void;
-  suggestions: T[];
-  show: boolean;
-  value: string;
-};
 const SuggestionsComponent = <T extends { name: string }>({
   suggestions,
   onHandleSelection,

@@ -23,14 +23,21 @@ const MainSearchBar: FC = () => {
   const handleOnChange = (value: any) => {
     setShowSuggestions(false);
     setSuggestions([]);
+    setSelectedValue("");
     setInputValue(value);
   };
 
   const handleSuggestions = async () => {
-    const resp = await getRestaurantByName(debounceValue);
-    setShowLoadingIcon(false);
-    const suggestionArray = Array.isArray(resp) ? resp : [];
-    setSuggestions(suggestionArray);
+    try {
+      const resp = await getRestaurantByName(debounceValue);
+      const suggestionArray = Array.isArray(resp) ? resp : [];
+      setSuggestions(suggestionArray);
+    } catch (e) {
+      console.error(e);
+      setSuggestions([]);
+    } finally {
+      setShowLoadingIcon(false);
+    }
   };
 
   const handleSelectSuggestion = (value: string, slug: string) => {
@@ -52,12 +59,10 @@ const MainSearchBar: FC = () => {
   }, [suggestions]);
 
   useEffect(() => {
-    if (debounceValue) {
-      console.log("call api", debounceValue);
-      setShowLoadingIcon(true);
-      handleSuggestions();
-      setDebounceValue("");
-    }
+    if (!debounceValue) return;
+    setShowLoadingIcon(true);
+    handleSuggestions();
+    setDebounceValue("");
   }, [debounceValue]);
 
   useEffect(() => {

@@ -21,6 +21,13 @@ export type SendFriendModalData = {
   image?: string;
 };
 
+export type SuggestionComponentType<T extends { name: string }> = {
+  onHandleSelection: (name: string, slug: string) => void;
+  suggestions: T[];
+  show: boolean;
+  value: string;
+};
+
 export type LoadingType = (typeof LOADING_TYPES)[keyof typeof LOADING_TYPES];
 
 export type getTypeFn = <T>(obj: object, flag: string, defaultValue?: T) => T;
