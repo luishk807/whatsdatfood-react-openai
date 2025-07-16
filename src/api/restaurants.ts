@@ -37,6 +37,11 @@ export const getRestaurantByName = async (
       console.error("expected array but got: ", data);
       return [];
     }
+
+    if (!data.length) {
+      return [{ name: "-1" }];
+    }
+
     return data as RestaurantType[];
   } catch (err) {
     console.error(err);

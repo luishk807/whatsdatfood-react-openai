@@ -1,15 +1,14 @@
 import { type FC, useEffect, useState } from "react";
-import clsx from "clsx";
 import AutoAwesomeIcon from "@mui/icons-material/AutoAwesome";
 import { Grid } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import MainSearchInput from "@/components/MainSearchInput";
 import "./index.css";
-import { getBuiltAddress, handleHighlightSuggest } from "@/utils";
 import { getRestaurantByName } from "@/api/restaurants";
 import { RestaurantType } from "@/types/restaurants";
 import SearchButton from "../SearchButton";
 import { _get } from "@/utils";
+import SuggestionsComponent from "../Suggestions";
 
 const MainSearchBar: FC = () => {
   const navigate = useNavigate();
@@ -95,46 +94,12 @@ const MainSearchBar: FC = () => {
         data={inputValue}
       />
       <Grid size={12} display="flex" justifyContent="center">
-        <div
-          className={clsx("main-search-suggestions-container", {
-            "suggestions-container-show": showSuggestions,
-            "suggestions-container-hide": !showSuggestions,
-          })}
-        >
-          <div className="main-suggestion-container">
-            <ul>
-              {suggestions.map((suggestion, indx) => {
-                const rest_name = _get<string>(suggestion, "name");
-                const slugName = _get<string>(suggestion, "slug");
-                const address = getBuiltAddress({
-                  address: _get<string>(suggestion, "address"),
-                  city: _get<string>(suggestion, "city"),
-                  state: _get<string>(suggestion, "state"),
-                  country: _get<string>(suggestion, "country"),
-                  postal_code: _get<string>(suggestion, "postal_code"),
-                });
-
-                const complete_name = address
-                  ? `${rest_name} ${address}`
-                  : rest_name;
-
-                const new_suggest = handleHighlightSuggest(
-                  complete_name,
-                  inputValue,
-                );
-                return (
-                  <li
-                    onClick={() =>
-                      handleSelectSuggestion(complete_name, slugName)
-                    }
-                    key={indx}
-                    dangerouslySetInnerHTML={{ __html: new_suggest }}
-                  />
-                );
-              })}
-            </ul>
-          </div>
-        </div>
+        <SuggestionsComponent<RestaurantType>
+          suggestions={suggestions}
+          show={showSuggestions}
+          value={inputValue}
+          onHandleSelection={handleSelectSuggestion}
+        />
       </Grid>
     </Grid>
   );
