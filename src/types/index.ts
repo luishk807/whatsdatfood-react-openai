@@ -1,5 +1,6 @@
 import { LOADING_TYPES } from "@/customConstants";
 import { FIELD_TYPES } from "@/customConstants";
+import { AlertColor } from "@mui/material";
 
 export type addressType = {
   address: string;
@@ -48,6 +49,12 @@ export type formCompValueType = {
 
 export type formCompObjType = {
   [key: string]: formCompValueType;
+};
+
+export type snackBarObjType = {
+  open: boolean;
+  message: string;
+  severity: AlertColor;
 };
 
 export type LoadingType = (typeof LOADING_TYPES)[keyof typeof LOADING_TYPES];
