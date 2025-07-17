@@ -51,3 +51,14 @@ export const isHomePage = () => {
   const location = useLocation();
   return location.pathname === "/";
 };
+
+export const getMissingField = (requiredFields: string[], fields: string[]) => {
+  const formKeys = new Set(fields);
+  return requiredFields.filter((item) => !formKeys.has(item));
+};
+
+export const getLabelFromKey = (allFields: any[], fields: any[]) => {
+  return allFields
+    .filter((item) => fields.includes(item.name))
+    .map((item) => item.label);
+};

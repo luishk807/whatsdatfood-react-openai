@@ -1,0 +1,12 @@
+#form-component-container {
+  width: 100%;
+}
+
+#form-component-container .field-title {
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
+#form-component-container .field-container {
+  margin: 10px 0px;
+}

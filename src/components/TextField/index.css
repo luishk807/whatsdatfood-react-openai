@@ -1,0 +1,19 @@
+#textfield-container {
+  width: 100%;
+}
+#textfield-container label {
+  margin: 5px 0px;
+  font-size: 1em;
+  display: block;
+}
+
+#textfield-container input {
+  padding: 5px 0px;
+  font-size: 1.2em;
+  border-radius: 5px;
+  border: 1px solid rgba(0, 0, 0, 0.4);
+}
+
+#textfield-container input.error {
+  border: 1px solid red !important;
+}

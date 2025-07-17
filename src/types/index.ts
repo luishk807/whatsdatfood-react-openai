@@ -1,5 +1,5 @@
 import { LOADING_TYPES } from "@/customConstants";
-import type { RefObject } from "react";
+import { FIELD_TYPES } from "@/customConstants";
 
 export type addressType = {
   address: string;
@@ -28,6 +28,26 @@ export type SuggestionComponentType<T extends { name: string }> = {
   suggestions: T[];
   show: boolean;
   value: string;
+};
+
+export type FieldTypes = (typeof FIELD_TYPES)[keyof typeof FIELD_TYPES];
+
+export type FormFieldType = {
+  type: FieldTypes;
+  name: string;
+  label: string;
+  placeholder?: boolean;
+  isRequired?: boolean;
+};
+
+export type formCompValueType = {
+  value: string;
+  label: string;
+  type: string;
+};
+
+export type formCompObjType = {
+  [key: string]: formCompValueType;
 };
 
 export type LoadingType = (typeof LOADING_TYPES)[keyof typeof LOADING_TYPES];

@@ -5,10 +5,12 @@ import "./App.css";
 
 import Loading from "@/components/Loading";
 
-const LazyHomepage = lazy(() => import("./components/Homepage"));
-const LazyResult = lazy(() => import("./components/MenuResults"));
-const LazyNotFound = lazy(() => import("./components/NotFound"));
-
+const LazyHomepage = lazy(() => import("@/components/Homepage"));
+const LazyResult = lazy(() => import("@/components/MenuResults"));
+const LazyNotFound = lazy(() => import("@/components/NotFound"));
+const LazySignIN = lazy(() => import("@/components/SignInComponent"));
+const LazyCreateAccount = lazy(() => import("@/components/CreateAccount"));
+const LazyUserAccount = lazy(() => import("@/components/UserAccount"));
 function App() {
   const customStyle = {
     width: "30px",
@@ -32,6 +34,36 @@ function App() {
             <Suspense fallback={<Loading style={customStyle} />}>
               <Layout>
                 <LazyResult />
+              </Layout>
+            </Suspense>
+          }
+        />
+        <Route
+          path="/sign-in"
+          element={
+            <Suspense fallback={<Loading style={customStyle} />}>
+              <Layout>
+                <LazySignIN />
+              </Layout>
+            </Suspense>
+          }
+        />
+        <Route
+          path="/create-account"
+          element={
+            <Suspense fallback={<Loading style={customStyle} />}>
+              <Layout>
+                <LazyCreateAccount />
+              </Layout>
+            </Suspense>
+          }
+        />
+        <Route
+          path="/account"
+          element={
+            <Suspense fallback={<Loading style={customStyle} />}>
+              <Layout>
+                <LazyUserAccount />
               </Layout>
             </Suspense>
           }

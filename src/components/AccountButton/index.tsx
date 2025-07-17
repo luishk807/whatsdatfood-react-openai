@@ -3,6 +3,7 @@ import { Menu, MenuItem } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import "./index.css";
+import { Link } from "react-router-dom";
 
 const AccountButton = () => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -16,7 +17,7 @@ const AccountButton = () => {
         <AccountCircleRoundedIcon />
       </IconButton>
       <Menu
-        id="simple-menu"
+        id="account-dropdown-menu"
         onClose={() => setAnchorEl(null)}
         anchorEl={anchorEl}
         open={open}
@@ -49,8 +50,16 @@ const AccountButton = () => {
           },
         }}
       >
-        <MenuItem>Sign In</MenuItem>
-        <MenuItem>Create Account</MenuItem>
+        <MenuItem>
+          <Link className="dropdown-link" to="/sign-in">
+            Sign In
+          </Link>
+        </MenuItem>
+        <MenuItem>
+          <Link className="dropdown-link" to="/create-account">
+            Create Account
+          </Link>
+        </MenuItem>
       </Menu>
     </>
   );

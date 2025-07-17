@@ -1,4 +1,5 @@
 #main-app-container {
+  display: flex;
 }
 
 #main-layout {

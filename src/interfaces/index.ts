@@ -1,9 +1,6 @@
 import { ReactNode, CSSProperties, ComponentType } from "react";
 import { RestaurantType, MenuInterfaceItemType } from "@/types/restaurants";
-
-import { SendFriendModalData } from "@/types";
-
-import { LoadingType } from "@/types";
+import { LoadingType, FormFieldType, SendFriendModalData } from "@/types";
 export interface RequestAIInterface {
   restaurant: string;
   address?: string;
@@ -54,4 +51,20 @@ export interface CustomModalInterface {
 
 export interface SendFriendModalInterface {
   data?: SendFriendModalData | null;
+}
+
+export interface TextFieldInterface {
+  label: string;
+  name?: string;
+  isError?: boolean;
+  type?: string;
+  isPlaceholder?: boolean;
+  onChange: (value: string) => void;
+}
+
+export interface FormComponentInterface {
+  fields: FormFieldType[];
+  title?: string;
+  submitLabel?: string;
+  onHandleSubmit: (data: any) => void;
 }

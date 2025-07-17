@@ -1,0 +1,193 @@
+import { lazy, useState, useMemo, type FC } from "react";
+import { Box, Grid } from "@mui/material";
+import { FormFieldType, formCompObjType, formCompValueType } from "@/types";
+import { FIELD_TYPES } from "@/customConstants";
+import { FormComponentInterface } from "@/interfaces";
+import "./index.css";
+import { getMissingField, getLabelFromKey } from "@/utils";
+const LazyTextField = lazy(() => import("@/components/TextField"));
+const LazyButton = lazy(() => import("@/components/Button"));
+
+const FormComponent: FC<FormComponentInterface> = ({
+  fields,
+  title,
+  submitLabel,
+  onHandleSubmit,
+}) => {
+  const [formData, setFormData] = useState<formCompObjType>({});
+  const [errors, setErrors] = useState<string[]>([]);
+  const [errorFields, setErrorFields] = useState<string[]>([]);
+  const handleOnChange = (key: string, item: formCompValueType) => {
+    setErrors([]);
+    setErrorFields([]);
+    const { label, value, type } = item;
+    if (key && value) {
+      setFormData({
+        ...formData,
+        [key]: {
+          value,
+          label,
+          type: type,
+        },
+      });
+    } else {
+      setFormData((prev) => {
+        const { [key]: _, ...rest } = prev;
+        return rest;
+      });
+    }
+  };
+
+  const getFieldError = (item: formCompValueType) => {
+    switch (item.type) {
+      case FIELD_TYPES.textfield:
+      case FIELD_TYPES.date:
+        return item.value ? "" : `${item.label} can't be empty`;
+      case FIELD_TYPES.email:
+        return item.value && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(item.value)
+          ? ""
+          : `${item.label} must be valid`;
+      case FIELD_TYPES.password: {
+        const passwordFields = fields.filter(
+          (item) => item.isRequired && item.type === FIELD_TYPES.password,
+        );
+
+        const passwordFieldKeys = passwordFields.map((item) => item.name);
+        const formPasswordFields = Object.keys(formData).filter(
+          (key) => formData[key].type === FIELD_TYPES.password,
+        );
+
+        const missingPassword = getMissingField(
+          passwordFieldKeys,
+          formPasswordFields,
+        );
+
+        const labelMissing = getLabelFromKey(fields, missingPassword);
+
+        if (labelMissing.length) {
+          return labelMissing.length
+            ? `${labelMissing.join(",")} is missing`
+            : "";
+        } else {
+          const passwordValues = passwordFieldKeys.map(
+            (key) => formData[key]?.value,
+          );
+          const allMatch = passwordValues.every(
+            (val) => val === passwordValues[0],
+          );
+
+          const labelMissing = getLabelFromKey(fields, passwordFieldKeys);
+
+          if (!allMatch) {
+            return `${labelMissing.join(", ")} doesn't match`;
+          }
+          return "";
+        }
+      }
+    }
+  };
+
+  const handleSubmit = () => {
+    setErrors([]);
+    let payloadMap = new Map();
+    let errorList: string[] = [];
+
+    if (!Object.keys(formData).length) {
+      setErrors((prev) => [...prev, "form can't be empty"]);
+      return;
+    }
+
+    Object.keys(formData).forEach((key: string) => {
+      const error = getFieldError(formData[key]);
+      if (error) {
+        errorList.push(error);
+      }
+      payloadMap.set(key, formData[key].value);
+    });
+
+    if (!errorList.length) {
+      const fieldMissing = getMissingField(
+        requiredFields,
+        Array.from(payloadMap.keys()),
+      );
+
+      if (fieldMissing.length) {
+        setErrors(fieldMissing.map((item) => `${item} can't be empty`));
+        setErrorFields(fieldMissing);
+        return;
+      }
+
+      onHandleSubmit && onHandleSubmit(Object.fromEntries(payloadMap));
+    } else {
+      setErrors(Array.from(new Set(errorList)));
+    }
+  };
+
+  const getFieldType = (field: FormFieldType, key: number) => {
+    switch (field.type) {
+      case FIELD_TYPES.textfield:
+      case FIELD_TYPES.date:
+      case FIELD_TYPES.email:
+      case FIELD_TYPES.password:
+        return (
+          <Grid
+            size={12}
+            className="field-container"
+            key={`${key}-${field.name}`}
+          >
+            <LazyTextField
+              name={field.name}
+              type={field.type}
+              label={field.label}
+              isError={errorFields.includes(field.name)}
+              isPlaceholder={field.placeholder}
+              onChange={(value: string) =>
+                handleOnChange(field.name, {
+                  label: field.label,
+                  type: field.type,
+                  value,
+                })
+              }
+            />
+          </Grid>
+        );
+    }
+  };
+
+  if (!fields.length) {
+    throw new Error("No Fields Available");
+  }
+
+  const requiredFields = useMemo(
+    () => fields.filter((item) => item.isRequired).map((item) => item.name),
+    [fields],
+  );
+  return (
+    <Box>
+      <Grid container id="form-component-container">
+        {title && (
+          <Grid className="field-title" size={12}>
+            {title}
+          </Grid>
+        )}
+        {!!errors.length && (
+          <Grid>
+            <ul>
+              {errors.map((item, indx) => (
+                <li key={indx}>{item}</li>
+              ))}
+            </ul>
+          </Grid>
+        )}
+        {fields.map((item, indx) => getFieldType(item, indx))}
+        {submitLabel && (
+          <Grid size={12} className="field-container">
+            <LazyButton onClick={handleSubmit}>{submitLabel}</LazyButton>
+          </Grid>
+        )}
+      </Grid>
+    </Box>
+  );
+};
+
+export default FormComponent;

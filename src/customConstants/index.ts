@@ -13,3 +13,12 @@ export const LOADING_TYPES = {
   SPINER: "spiner",
   CUSTOM: "custom",
 };
+
+export const FIELD_TYPES = {
+  textfield: "text",
+  button: "button",
+  submit: "submit",
+  email: "email",
+  date: "date",
+  password: "password",
+} as const;
