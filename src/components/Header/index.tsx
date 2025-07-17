@@ -1,20 +1,34 @@
 import { Link } from "react-router-dom";
 import "./index.css";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Grid } from "@mui/material";
+import { Grid, Box } from "@mui/material";
 import { useState } from "react";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import AccountButton from "../AccountButton";
 import IconButton from "@mui/material/IconButton";
 const Header = () => {
   const [showMenu, setShowMenu] = useState(false);
 
   const toggleMenu = () => setShowMenu(!showMenu);
-  
+
   const MenuLinks = () => {
     return (
       <ul className="header-list-ul">
+        <li className="header-list-ul-li">
+          <Box sx={{ display: { xs: "none", sm: "block" } }}>
+            <AccountButton />
+          </Box>
+        </li>
         <li className="header-list-ul-li">About</li>
         <li className="header-list-ul-li">Contact</li>
+        <li className="header-list-ul-li">
+          <Box sx={{ display: { xs: "block", sm: "none" } }}>Sign In</Box>
+        </li>
+        <li className="header-list-ul-li">
+          <Box sx={{ display: { xs: "block", sm: "none" } }}>
+            Create Account
+          </Box>
+        </li>
       </ul>
     );
   };
