@@ -1,4 +1,4 @@
-import { Grid, IconButton } from "@mui/material";
+import { Box, Grid, IconButton } from "@mui/material";
 import Loading from "@/components/Loading";
 import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded";
 import "./index.css";
@@ -29,16 +29,11 @@ const SearchButton = <T,>({
     disabled: !isActive,
   };
   return (
-    <Grid
-      id="main-search-button-container"
-      display="flex"
-      justifyContent="end"
-      size={{ md: 1, xs: 2 }}
-    >
+    <Box id="main-search-button-container" display="flex" justifyContent="end">
       <IconButton {...iconButtonProps}>
         <ArrowUpwardRoundedIcon className="main-search-button-icon" />
       </IconButton>
-    </Grid>
+    </Box>
   );
 };
 

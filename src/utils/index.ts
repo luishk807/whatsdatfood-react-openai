@@ -1,7 +1,7 @@
 import _ from "lodash";
 import { DEFAULT_CURRENCY } from "@/customConstants";
 import { getTypeFn, getBuiltAddressType } from "@/types";
-
+import { useLocation } from "react-router-dom";
 export const _get: getTypeFn = <T>(
   obj: any,
   flag: string,
@@ -45,4 +45,9 @@ export const getBuiltAddress: getBuiltAddressType = (address) => {
     new_address += `${country} `;
   }
   return new_address.trim();
+};
+
+export const isHomePage = () => {
+  const location = useLocation();
+  return location.pathname === "/";
 };

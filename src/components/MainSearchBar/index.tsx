@@ -93,11 +93,14 @@ const MainSearchBar: FC = () => {
           onChange={handleOnChange}
         />
       </Grid>
-      <SearchButton<string>
-        onSubmit={handleAIRequest}
-        showLoading={showLoadingIcon}
-        data={inputValue}
-      />
+      <Grid size={{ md: 1, xs: 2 }} className="flex justify-center">
+        <SearchButton<string>
+          onSubmit={handleAIRequest}
+          showLoading={showLoadingIcon}
+          data={inputValue}
+        />
+      </Grid>
+
       <Grid size={12} display="flex" justifyContent="center">
         <SuggestionsComponent<RestaurantType>
           suggestions={suggestions}
