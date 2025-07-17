@@ -4,12 +4,12 @@ import { FormFieldType, snackBarObjType } from "@/types";
 import { addUser } from "@/api/users";
 import "./index.css";
 import SnackBarComponent from "@/components/Snackbar";
-
 import { CREATE_ACCOUNT } from "@/customConstants/forms";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 const CreateAccount = () => {
+  const navigate = useNavigate();
   const [snackbarObj, setSnakbarObj] = useState<snackBarObjType>({
     open: false,
     message: "account created",
@@ -26,6 +26,10 @@ const CreateAccount = () => {
         ...snackbarObj,
         open: true,
       });
+
+      setTimeout(() => {
+        navigate("/sign-in");
+      }, 2000);
     } catch (err) {
       setSnakbarObj({
         open: true,
