@@ -2,7 +2,7 @@ import { Suspense, lazy } from "react";
 import Layout from "@/components/Layout";
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
-
+import ProtectedRoute from "./components/ProtectedRoute";
 import Loading from "@/components/Loading";
 
 const LazyHomepage = lazy(() => import("@/components/Homepage"));
@@ -58,16 +58,19 @@ function App() {
             </Suspense>
           }
         />
-        <Route
-          path="/account"
-          element={
-            <Suspense fallback={<Loading style={customStyle} />}>
-              <Layout>
-                <LazyUserAccount />
-              </Layout>
-            </Suspense>
-          }
-        />
+        <Route element={<ProtectedRoute />}>
+          <Route
+            path="/account"
+            element={
+              <Suspense fallback={<Loading style={customStyle} />}>
+                <Layout>
+                  <LazyUserAccount />
+                </Layout>
+              </Suspense>
+            }
+          />
+        </Route>
+
         <Route
           path="*"
           element={

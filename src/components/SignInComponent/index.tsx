@@ -1,12 +1,36 @@
 import { Box, Grid } from "@mui/material";
-import FormComponent from "../FormComponent";
+import FormComponent from "@/components/FormComponent";
 import { FormFieldType } from "@/types";
 import "./index.css";
 import { SIGN_IN_FIELDS } from "@/customConstants/forms";
 import { Link } from "react-router-dom";
+// import { login } from "@/api/login";
+import { useNavigate } from "react-router-dom";
+
+import useSnackbarHook from "@/customHooks/useSnackBar";
+import useLogin from "@/customHooks/useLogin";
 const SignInComponent = () => {
-  const handleSubmit = (formData: any) => {
+  const { SnackbarComponent, showSnackBar } = useSnackbarHook();
+  const navigator = useNavigate();
+  const { login } = useLogin();
+
+  const handleSubmit = async (formData: any) => {
     console.log("form data", formData);
+    try {
+      const { username, password } = formData;
+      const resp = await login(username, password);
+
+      if (resp) {
+        showSnackBar("SUCCESS: You are logged in!", "success");
+        setTimeout(() => {
+          navigator("/account");
+        }, 2000);
+      } else {
+        showSnackBar("ERROR: unable to log in!", "error");
+      }
+    } catch (err) {
+      showSnackBar("ERROR: unable to log in!", "error");
+    }
   };
 
   const formFields: FormFieldType[] = SIGN_IN_FIELDS;
@@ -34,6 +58,7 @@ const SignInComponent = () => {
           </Grid>
         </Grid>
       </Box>
+      {SnackbarComponent}
     </Box>
   );
 };

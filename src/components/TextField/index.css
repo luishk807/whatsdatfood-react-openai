@@ -8,10 +8,13 @@
 }
 
 #textfield-container input {
-  padding: 5px 0px;
+  padding: 5px;
   font-size: 1.2em;
   border-radius: 5px;
   border: 1px solid rgba(0, 0, 0, 0.4);
+  width: 100%;
+  box-sizing: border-box;
+  height: 40px;
 }
 
 #textfield-container input.error {

@@ -15,7 +15,11 @@ const SnackBarComponent: FC<SnackBarComponentInterface> = ({
   onClose,
 }) => {
   return (
-    <Snackbar open={open} onClose={onClose}>
+    <Snackbar
+      open={open}
+      onClose={onClose}
+      anchorOrigin={{ vertical: "top", horizontal: "center" }}
+    >
       <Alert
         onClose={onClose}
         severity={severity}

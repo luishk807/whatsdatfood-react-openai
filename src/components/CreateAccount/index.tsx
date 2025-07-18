@@ -1,41 +1,29 @@
 import { Box, Grid } from "@mui/material";
 import FormComponent from "@/components/FormComponent";
-import { FormFieldType, snackBarObjType } from "@/types";
-import { addUser } from "@/api/users";
-import "./index.css";
-import SnackBarComponent from "@/components/Snackbar";
+import { FormFieldType } from "@/types";
+import { handleCreateUser } from "@/api/users";
 import { CREATE_ACCOUNT } from "@/customConstants/forms";
 import { Link, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import useSnackbarHook from "@/customHooks/useSnackBar";
+import "./index.css";
 
 const CreateAccount = () => {
   const navigate = useNavigate();
-  const [snackbarObj, setSnakbarObj] = useState<snackBarObjType>({
-    open: false,
-    message: "account created",
-    severity: "success",
-  });
+  const { SnackbarComponent, showSnackBar } = useSnackbarHook();
 
   const handleSubmit = async (formData: any) => {
     const { confirm_password: _, ...payload } = formData;
     console.log(payload);
 
     try {
-      await addUser(payload);
-      setSnakbarObj({
-        ...snackbarObj,
-        open: true,
-      });
+      await handleCreateUser(payload);
+      showSnackBar("SUCCESS: Account is created!", "success");
 
       setTimeout(() => {
         navigate("/sign-in");
       }, 2000);
     } catch (err) {
-      setSnakbarObj({
-        open: true,
-        message: "unable to create account",
-        severity: "error",
-      });
+      showSnackBar("ERROR: Unable to create account!", "error");
     }
   };
 
@@ -60,23 +48,13 @@ const CreateAccount = () => {
         />
         <Grid container>
           <Grid size={12} className="flex justify-start">
-            <Link to="/" className="link-text">
+            <Link to="/sign-in" className="link-text">
               Back to Login
             </Link>
           </Grid>
         </Grid>
       </Box>
-      <SnackBarComponent
-        open={snackbarObj.open}
-        severity={snackbarObj.severity}
-        onClose={() =>
-          setSnakbarObj({
-            ...snackbarObj,
-            open: false,
-          })
-        }
-        message={snackbarObj.message}
-      />
+      {SnackbarComponent}
     </Box>
   );
 };

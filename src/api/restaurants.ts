@@ -1,51 +1,31 @@
 import { RestaurantType, RestaurantItemImageType } from "@/types/restaurants";
-import { BACKEND_GRAPHQL_URL } from "@/customConstants";
+
 import { _get } from "@/utils";
+import { useMutation } from "@apollo/client";
+import {
+  GET_RESTAURANTS_BY_NAME,
+  GET_RESTAURANT_BY_SLUG,
+  GET_RESTAURANT_IMAGES,
+} from "@/graphql/queries/restaurants";
 export const getRestaurantByName = async (
   name: string,
 ): Promise<RestaurantType[]> => {
   try {
-    const query = `#graphql
-      query GetAiRestaurant($name: String!) {
-        aiRestaurantNameList(name: $name) {
-          name
-          address
-          city
-          state
-          postal_code
-          slug
-        }
-      }
-    `;
-    const resp = await fetch(`${BACKEND_GRAPHQL_URL}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const [GetAiRestaurant] = useMutation(GET_RESTAURANTS_BY_NAME);
+    const { data } = await GetAiRestaurant({
+      variables: {
+        name,
       },
-      body: JSON.stringify({
-        query,
-        variables: {
-          name,
-        },
-      }),
     });
 
-    const json = await resp.json();
-    const data = _get(json, "data.aiRestaurantNameList", []);
-
-    if (!Array.isArray(data)) {
-      console.error("expected array but got: ", data);
-      return [];
-    }
-
-    if (!data.length) {
-      return [{ name: "-1" }];
-    }
-
-    return data as RestaurantType[];
+    const resp = _get(data, "GetAiRestaurant");
+    console.log("getRestaurantByName", resp);
+    return resp as RestaurantType[];
   } catch (err) {
-    console.error(err);
-    return [];
+    if (err instanceof Error) {
+      throw new Error(err.message);
+    }
+    throw new Error("unable to find restaurant");
   }
 };
 
@@ -53,45 +33,16 @@ export const getRestaurantBySlug = async (
   slug: string,
 ): Promise<RestaurantType> => {
   try {
-    const query = `#graphql
-    query getRestaurantBySlug($slug: String) {
-      aiRestaurantBySlug(slug: $slug) {
-        name
-        address
-        city
-        state
-        postal_code
-        restRestaurantItems {
-            id
-            name
-            description
-            top_choice
-            price
-            category
-            restaurantItemRestImages{
-                name
-            }
-        }
-      }
-    }
-  `;
-    const resp = await fetch(`${BACKEND_GRAPHQL_URL}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const [getRestaurantBySlug] = useMutation(GET_RESTAURANT_BY_SLUG);
+    const { data } = await getRestaurantBySlug({
+      variables: {
+        slug,
       },
-      body: JSON.stringify({
-        query,
-        variables: {
-          slug,
-        },
-      }),
     });
-    const json = await resp.json();
-    const data = _get(json, "data.aiRestaurantBySlug");
 
-    console.log(data);
-    return data as RestaurantType;
+    const resp = _get(data, "getRestaurantBySlug");
+    console.log("getRestaurantBySlug", data);
+    return resp as RestaurantType;
   } catch (err) {
     console.error(err);
     return {} as RestaurantType;
@@ -104,46 +55,29 @@ export const getRestaurantItemImages = async (
   if (!restItemId) {
     throw null;
   }
-  const query = `#graphql
-    query getRestaurantImages($restItemId: ID) {
-      getRestaurantImage(id: $restItemId) {
-        name
-        url_m
-        owner
-        restaurantItemImageRestItem{
-            name
-            price
-            top_choice
-        }
-      }
-    }
-  `;
 
   try {
-    const resp = await fetch(`${BACKEND_GRAPHQL_URL}`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
+    const [getRestaurantImages] = useMutation(GET_RESTAURANT_IMAGES);
+    const { data } = await getRestaurantImages({
+      variables: {
+        restItemId,
       },
-      body: JSON.stringify({
-        query,
-        variables: {
-          restItemId,
-        },
-      }),
     });
 
-    const json = await resp.json();
-    const data = _get(json, "data.getRestaurantImage");
+    const resp = _get(data, "getRestaurantImages");
 
-    if (!data) {
+    console.log("getRestaurantItemImages", resp);
+    if (!resp) {
       console.warn("No image found for restaurant item:", restItemId);
       return null;
     }
 
     return data as RestaurantItemImageType;
   } catch (err) {
-    console.error(err);
-    return null;
+    if (err instanceof Error) {
+      throw new Error(err.message);
+    }
+
+    throw new Error("ERROR: unable to get restaurant imges");
   }
 };

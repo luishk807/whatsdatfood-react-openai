@@ -28,10 +28,12 @@ const TextField: FC<TextFieldInterface> = ({
         )}
         <Grid size={12}>
           <input
-            className={`w-full py-10 ${isError && "error"}`}
+            className={`${isError && "error"}`}
+            id={name}
             name={name}
             type={type}
             value={inputValue}
+            autoComplete={name}
             onChange={onChangeInput}
             {...(isPlaceholder && { placeholder: label })}
           />
