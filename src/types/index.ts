@@ -57,6 +57,11 @@ export type snackBarObjType = {
   severity: AlertColor;
 };
 
+export type StatusType = {
+  id: number;
+  name: string;
+};
+
 export type LoadingType = (typeof LOADING_TYPES)[keyof typeof LOADING_TYPES];
 
 export type getTypeFn = <T>(obj: object, flag: string, defaultValue?: T) => T;

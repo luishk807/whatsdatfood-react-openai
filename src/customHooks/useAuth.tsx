@@ -1,28 +1,15 @@
-import { useEffect } from "react";
-import { useLazyQuery } from "@apollo/client";
-import { CHECK_AUTH } from "@/graphql/queries/login";
 import { _get } from "@/utils";
 import { useNavigate } from "react-router-dom";
-
+import { useContext } from "react";
+import { AuthContext } from "@/components/useContext/AuthProvider";
 const useAuth = () => {
+  const authContext = useContext(AuthContext);
   const navigate = useNavigate();
-  const [checkAuth, { data, loading, error }] = useLazyQuery(CHECK_AUTH, {
-    fetchPolicy: "network-only",
-  });
 
-  useEffect(() => {
-    checkAuth();
-  }, []);
+  if (!authContext) {
+    throw new Error("no Auth data available!");
+  }
 
-  useEffect(() => {
-    if (data?.checkAuth) {
-      console.log("user is logged in", data.checkAuth);
-    } else {
-      console.log("not logged in");
-      navigate("/");
-    }
-  }, [data, loading]);
-
-  return null;
+  return authContext;
 };
 export default useAuth;

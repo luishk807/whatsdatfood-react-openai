@@ -1,17 +1,12 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { CHECK_AUTH } from "@/graphql/queries/login";
-import { useQuery } from "@apollo/client";
+import useAuth from "@/customHooks/useAuth";
 
 const ProtectedRoute = () => {
-  const { data, loading, error } = useQuery(CHECK_AUTH, {
-    fetchPolicy: "network-only",
-  });
-
+  const { user, loading } = useAuth();
   if (loading) {
     return <p>...loading</p>;
   }
-
-  if (error || !data?.checkAuth) {
+  if (!user) {
     return <Navigate to="/sign-in" replace />;
   }
 

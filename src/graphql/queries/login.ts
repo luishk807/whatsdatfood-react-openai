@@ -8,6 +8,14 @@ export const LOGIN_QUERY = gql`
   }
 `;
 
+export const LOGOUT_QUERY = gql`
+  mutation login {
+    login {
+      success
+    }
+  }
+`;
+
 export const CHECK_AUTH = gql`
   query checkAuth {
     checkAuth {
