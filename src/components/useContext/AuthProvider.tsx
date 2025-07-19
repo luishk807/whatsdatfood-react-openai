@@ -29,6 +29,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
+    console.log("data", data);
     if (data?.checkAuth) {
       setUser(data.checkAuth);
     } else {
