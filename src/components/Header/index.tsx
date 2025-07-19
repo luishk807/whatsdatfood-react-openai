@@ -22,11 +22,17 @@ const Header = () => {
         <li className="header-list-ul-li">About</li>
         <li className="header-list-ul-li">Contact</li>
         <li className="header-list-ul-li">
-          <Box sx={{ display: { xs: "block", sm: "none" } }}>Sign In</Box>
+          <Box sx={{ display: { xs: "block", sm: "none" } }}>
+            <Link to="/sign-in" className="link-text">
+              Sign In
+            </Link>
+          </Box>
         </li>
         <li className="header-list-ul-li">
           <Box sx={{ display: { xs: "block", sm: "none" } }}>
-            Create Account
+            <Link to="/create-account" className="link-text">
+              Create Account
+            </Link>
           </Box>
         </li>
       </ul>

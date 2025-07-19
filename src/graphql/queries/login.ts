@@ -12,6 +12,16 @@ export const CHECK_AUTH = gql`
   query checkAuth {
     checkAuth {
       first_name
+      last_name
+      email
+      dob
+      created_at
+      userUserRole {
+        name
+      }
+      userUserRatings {
+        rating
+      }
     }
   }
 `;
