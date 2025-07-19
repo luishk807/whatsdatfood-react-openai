@@ -15,12 +15,29 @@ export const CHECK_AUTH = gql`
       last_name
       email
       dob
-      created_at
+      createdAt
       userUserRole {
         name
       }
+      userStatus {
+        name
+      }
+      userUserSearches {
+        userSearchesRestaurant {
+          name
+        }
+      }
       userUserRatings {
         rating
+        comment
+        createdAt
+        userRatingRestaurantItem {
+          name
+          restaurantItemRest {
+            name
+            address
+          }
+        }
       }
     }
   }
