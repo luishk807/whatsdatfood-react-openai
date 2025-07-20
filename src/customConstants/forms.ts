@@ -33,7 +33,7 @@ export const CREATE_ACCOUNT = [
     name: "username",
     label: "Username",
     isRequired: true,
-    type: FIELD_TYPES.textfield,
+    type: FIELD_TYPES.username,
   },
   {
     name: "password",

@@ -1,16 +1,80 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu, MenuItem } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import "./index.css";
 import { Link } from "react-router-dom";
+import useAuth from "@/customHooks/useAuth";
+
+type dropDownMenuKeyType = "account" | "guest" | "admin";
+
+type dropDownMenuItemType = {
+  name: string;
+  url: string;
+};
+
+type dropDownMenuListType = Partial<
+  Record<dropDownMenuKeyType, dropDownMenuItemType[]>
+>;
 
 const AccountButton = () => {
+  const { user } = useAuth();
+  const [dropDownMenus, setDropDownMenus] = useState<
+    dropDownMenuItemType[] | null
+  >(null);
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
   const open = Boolean(anchorEl);
   const toggleMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };
+
+  const DropDownMenuList: dropDownMenuListType = {
+    account: [
+      {
+        name: "Account",
+        url: "/account",
+      },
+      {
+        name: "My Profile",
+        url: "/profile",
+      },
+      {
+        name: "Ratings",
+        url: "/my-ratings",
+      },
+      {
+        name: "Searches",
+        url: "/search-history",
+      },
+      {
+        name: "Logout",
+        url: "",
+      },
+    ],
+    guest: [
+      {
+        name: "Sign In",
+        url: "/sign-in",
+      },
+      {
+        name: "Create Account",
+        url: "/create-account",
+      },
+    ],
+  };
+
+  const getMenuType = () => {
+    console.log("user", user);
+    console.log("DropDownMenuList", DropDownMenuList);
+  };
+
+  useEffect(() => {
+    console.log("user", user);
+    if (user) {
+      getMenuType();
+    }
+  }, [user]);
+
   return (
     <>
       <IconButton onClick={toggleMenu} size="medium">

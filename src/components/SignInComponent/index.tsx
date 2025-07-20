@@ -6,6 +6,7 @@ import { SIGN_IN_FIELDS } from "@/customConstants/forms";
 import { Link } from "react-router-dom";
 // import { login } from "@/api/login";
 import { useNavigate } from "react-router-dom";
+import useAuth from "@/customHooks/useAuth";
 
 import useSnackbarHook from "@/customHooks/useSnackBar";
 import useLogin from "@/customHooks/useLogin";
@@ -13,6 +14,7 @@ const SignInComponent = () => {
   const { SnackbarComponent, showSnackBar } = useSnackbarHook();
   const navigator = useNavigate();
   const { login } = useLogin();
+  const { checkUser } = useAuth();
 
   const handleSubmit = async (formData: any) => {
     console.log("form data", formData);
@@ -21,6 +23,7 @@ const SignInComponent = () => {
       const resp = await login(username, password);
 
       if (resp) {
+        checkUser();
         showSnackBar("SUCCESS: You are logged in!", "success");
         setTimeout(() => {
           navigator("/account");

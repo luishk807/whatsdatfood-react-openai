@@ -20,3 +20,10 @@
 #textfield-container input.error {
   border: 1px solid red !important;
 }
+
+#textfield-container .inputfield-loader {
+  width: 30px;
+  position: absolute;
+  top: 5px;
+  right: 0px;
+}

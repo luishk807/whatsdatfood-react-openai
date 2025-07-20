@@ -1,10 +1,13 @@
-import { ApolloClient, InMemoryCache } from "@apollo/client";
+import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
 import { BACKEND_GRAPHQL_URL } from "@/customConstants";
 
-const client = new ApolloClient({
+const httpLink = new HttpLink({
   uri: `${BACKEND_GRAPHQL_URL}`,
-  cache: new InMemoryCache(),
   credentials: "include",
+});
+const client = new ApolloClient({
+  link: httpLink,
+  cache: new InMemoryCache(),
 });
 
 export default client;

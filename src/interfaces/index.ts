@@ -59,6 +59,8 @@ export interface TextFieldInterface {
   isError?: boolean;
   type?: string;
   isPlaceholder?: boolean;
+  showLoader?: boolean;
+  showLoaderElement?: ReactNode;
   onChange: (value: string) => void;
 }
 

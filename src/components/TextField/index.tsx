@@ -2,6 +2,8 @@ import { Box, Grid } from "@mui/material";
 import { ChangeEvent, useState, type FC } from "react";
 import "./index.css";
 import { TextFieldInterface } from "@/interfaces";
+import Loading from "../Loading";
+import { LOADING_TYPES } from "@/customConstants";
 
 const TextField: FC<TextFieldInterface> = ({
   label,
@@ -10,6 +12,8 @@ const TextField: FC<TextFieldInterface> = ({
   isError,
   type = "text",
   isPlaceholder,
+  showLoader = false,
+  showLoaderElement,
 }) => {
   const [inputValue, setInputValue] = useState<string>("");
 
@@ -26,7 +30,7 @@ const TextField: FC<TextFieldInterface> = ({
             <label htmlFor="inputfield">{label}</label>
           </Grid>
         )}
-        <Grid size={12}>
+        <Grid size={12} className="relative">
           <input
             className={`${isError && "error"}`}
             id={name}
@@ -37,6 +41,12 @@ const TextField: FC<TextFieldInterface> = ({
             onChange={onChangeInput}
             {...(isPlaceholder && { placeholder: label })}
           />
+          {showLoader && (
+            <Box className="inputfield-loader">
+              <Loading type={LOADING_TYPES.SPINER} />
+            </Box>
+          )}
+          {showLoaderElement}
         </Grid>
       </Grid>
     </Box>

@@ -6,6 +6,9 @@ import { FormComponentInterface } from "@/interfaces";
 import "./index.css";
 import { getMissingField, getLabelFromKey } from "@/utils";
 const LazyTextField = lazy(() => import("@/components/TextField"));
+const LazyTextFieldDebounce = lazy(
+  () => import("@/components/TextFieldDebounce"),
+);
 const LazyButton = lazy(() => import("@/components/Button"));
 
 const FormComponent: FC<FormComponentInterface> = ({
@@ -136,6 +139,29 @@ const FormComponent: FC<FormComponentInterface> = ({
             key={`${key}-${field.name}`}
           >
             <LazyTextField
+              name={field.name}
+              type={field.type}
+              label={field.label}
+              isError={errorFields.includes(field.name)}
+              isPlaceholder={field.placeholder}
+              onChange={(value: string) =>
+                handleOnChange(field.name, {
+                  label: field.label,
+                  type: field.type,
+                  value,
+                })
+              }
+            />
+          </Grid>
+        );
+      case FIELD_TYPES.username:
+        return (
+          <Grid
+            size={12}
+            className="field-container"
+            key={`${key}-${field.name}`}
+          >
+            <LazyTextFieldDebounce
               name={field.name}
               type={field.type}
               label={field.label}

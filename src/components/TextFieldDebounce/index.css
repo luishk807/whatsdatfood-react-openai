@@ -1,0 +1,11 @@
+.loader-message.success {
+  color: green;
+}
+.loader-message.error {
+  color: red;
+}
+
+.loader-message {
+  display: flex;
+  justify-content: start;
+}

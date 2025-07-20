@@ -21,4 +21,5 @@ export const FIELD_TYPES = {
   email: "email",
   date: "date",
   password: "password",
+  username: "username",
 } as const;

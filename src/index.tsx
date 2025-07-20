@@ -6,7 +6,7 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import { ApolloProvider } from "@apollo/client";
 import client from "@/graphql";
-import { AuthProvider } from "./components/useContext/AuthProvider";
+import { AuthProvider } from "./useContext/AuthProvider";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement,
