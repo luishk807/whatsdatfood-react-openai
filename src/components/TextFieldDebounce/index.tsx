@@ -1,7 +1,8 @@
 import { Box, Grid } from "@mui/material";
-import { ReactNode, useEffect, useState, type FC } from "react";
+import { ReactNode, useEffect, useState, useCallback, type FC } from "react";
 import "./index.css";
 import { TextFieldInterface } from "@/interfaces";
+import { debounce } from "lodash";
 
 import TextField from "@/components/TextField";
 import useFormHook from "@/customHooks/useForm";
@@ -14,43 +15,51 @@ const TextFieldDebounce: FC<TextFieldInterface> = ({
 }) => {
   const [inputValue, setInputValue] = useState("");
   const [loaderElement, setLoaderElement] = useState<ReactNode | null>(null);
-  const [debounceValue, setDebouceValue] = useState("");
 
-  const { checkValidUsername, usernameLoading, usernameError } = useFormHook();
+  const { checkValidUsername, usernameLoading } = useFormHook();
 
   const handleOnChange = (value: string) => {
     setInputValue(value);
     setLoaderElement(null);
   };
+
+  const debounceCheckUsername = useCallback(
+    debounce(async (username: string) => {
+      try {
+        const resp = await checkValidUsername(username);
+
+        setLoaderElement(
+          resp ? (
+            <Box className="loader-message error">
+              Username is already being used!
+            </Box>
+          ) : (
+            <Box className="loader-message success">Username is available!</Box>
+          ),
+        );
+      } catch (err) {
+        setLoaderElement(
+          <Box className="loader-message success">
+            Unable to perform search
+          </Box>,
+        );
+      }
+    }, 1000),
+    [checkValidUsername],
+  );
+
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setDebouceValue(inputValue);
-    }, 1000);
+    if (inputValue) {
+      debounceCheckUsername(inputValue);
+    } else {
+      setLoaderElement(null);
+    }
 
     return () => {
-      clearTimeout(timeout);
+      // cleanup and unmount to cancel any pending call
+      debounceCheckUsername.cancel();
     };
-  }, [inputValue]);
-
-  const checkUsername = async () => {
-    const resp = await checkValidUsername(debounceValue);
-
-    setLoaderElement(
-      resp ? (
-        <Box className="loader-message error">
-          Username is already being used!
-        </Box>
-      ) : (
-        <Box className="loader-message success">Username is available!</Box>
-      ),
-    );
-  };
-
-  useEffect(() => {
-    if (debounceValue) {
-      checkUsername();
-    }
-  }, [debounceValue]);
+  }, [inputValue, debounceCheckUsername]);
 
   return (
     <TextField
