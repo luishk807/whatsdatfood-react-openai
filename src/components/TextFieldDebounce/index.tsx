@@ -34,7 +34,6 @@ const TextFieldDebounce: FC<TextFieldInterface> = ({
 
   const checkUsername = async () => {
     const resp = await checkValidUsername(debounceValue);
-    console.log("is value", resp);
 
     setLoaderElement(
       resp ? (
