@@ -24,24 +24,24 @@ export const CHECK_AUTH = gql`
       email
       dob
       createdAt
-      userUserRole {
+      role {
         name
       }
-      userStatus {
+      status {
         name
       }
-      userUserSearches {
-        userSearchesRestaurant {
+      searches {
+        restaurant {
           name
         }
       }
-      userUserRatings {
+      ratings {
         rating
         comment
         createdAt
-        userRatingRestaurantItem {
+        restaurantItem {
           name
-          restaurantItemRest {
+          restaurant {
             name
             address
           }

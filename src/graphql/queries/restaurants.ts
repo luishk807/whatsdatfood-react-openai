@@ -21,14 +21,14 @@ export const GET_RESTAURANT_BY_SLUG = gql`
       city
       state
       postal_code
-      restRestaurantItems {
+      restaurantItems {
         id
         name
         description
         top_choice
         price
         category
-        restaurantItemRestImages {
+        images {
           name
         }
       }
@@ -42,7 +42,7 @@ export const GET_RESTAURANT_IMAGES = gql`
       name
       url_m
       owner
-      restaurantItemImageRestItem {
+      restaurantItem {
         name
         price
         top_choice
