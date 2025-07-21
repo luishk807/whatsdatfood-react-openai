@@ -3,7 +3,6 @@ import Image from "@/components/Image";
 import { _get } from "@/utils";
 import { RestaurantItemImageType } from "@/types/restaurants";
 import { MenuItemImageInterface } from "@/interfaces";
-import { getRestaurantItemImages } from "@/api/restaurants";
 import { LOADING_TYPES } from "@/customConstants";
 import LoadingComponent from "../LoadingComponent";
 import "./index.css";
