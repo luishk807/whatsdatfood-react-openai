@@ -5,17 +5,14 @@ import AccountCircleRoundedIcon from "@mui/icons-material/AccountCircleRounded";
 import "./index.css";
 import { Link } from "react-router-dom";
 import useAuth from "@/customHooks/useAuth";
+import { _get } from "@/utils";
+import {
+  dropDownMenuItemType,
+  dropDownMenuListType,
+  dropDownMenuKeyType,
+} from "@/types";
 
-type dropDownMenuKeyType = "account" | "guest" | "admin";
-
-type dropDownMenuItemType = {
-  name: string;
-  url: string;
-};
-
-type dropDownMenuListType = Partial<
-  Record<dropDownMenuKeyType, dropDownMenuItemType[]>
->;
+import { DROPDOWN_MENU } from "@/customConstants";
 
 const AccountButton = () => {
   const { user } = useAuth();
@@ -28,50 +25,20 @@ const AccountButton = () => {
     setAnchorEl(event.currentTarget);
   };
 
-  const DropDownMenuList: dropDownMenuListType = {
-    account: [
-      {
-        name: "Account",
-        url: "/account",
-      },
-      {
-        name: "My Profile",
-        url: "/profile",
-      },
-      {
-        name: "Ratings",
-        url: "/my-ratings",
-      },
-      {
-        name: "Searches",
-        url: "/search-history",
-      },
-      {
-        name: "Logout",
-        url: "",
-      },
-    ],
-    guest: [
-      {
-        name: "Sign In",
-        url: "/sign-in",
-      },
-      {
-        name: "Create Account",
-        url: "/create-account",
-      },
-    ],
-  };
+  const DropDownMenuList: dropDownMenuListType = DROPDOWN_MENU;
 
-  const getMenuType = () => {
-    console.log("user", user);
-    console.log("DropDownMenuList", DropDownMenuList);
+  const getMenuType = (role: dropDownMenuKeyType) => {
+    if (DropDownMenuList[role]) {
+      setDropDownMenus(DropDownMenuList[role]);
+    }
   };
 
   useEffect(() => {
-    console.log("user", user);
     if (user) {
-      getMenuType();
+      const role: string = _get(user, "role.name", "");
+      if (role) {
+        getMenuType(role.toLowerCase() as keyof dropDownMenuListType);
+      }
     }
   }, [user]);
 
@@ -114,16 +81,17 @@ const AccountButton = () => {
           },
         }}
       >
-        <MenuItem>
-          <Link className="dropdown-link" to="/sign-in">
-            Sign In
-          </Link>
-        </MenuItem>
-        <MenuItem>
-          <Link className="dropdown-link" to="/create-account">
-            Create Account
-          </Link>
-        </MenuItem>
+        {dropDownMenus &&
+          dropDownMenus.map((item, indx) => (
+            <MenuItem
+              key={indx}
+              component={Link}
+              className="dropdown-link"
+              to={item.url}
+            >
+              {item.name}
+            </MenuItem>
+          ))}
       </Menu>
     </>
   );

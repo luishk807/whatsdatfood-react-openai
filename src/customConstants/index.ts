@@ -23,3 +23,38 @@ export const FIELD_TYPES = {
   password: "password",
   username: "username",
 } as const;
+
+export const DROPDOWN_MENU = {
+  user: [
+    {
+      name: "Account",
+      url: "/account",
+    },
+    {
+      name: "My Profile",
+      url: "/profile",
+    },
+    {
+      name: "Ratings",
+      url: "/my-ratings",
+    },
+    {
+      name: "Searches",
+      url: "/search-history",
+    },
+    {
+      name: "Logout",
+      url: "",
+    },
+  ],
+  guest: [
+    {
+      name: "Sign In",
+      url: "/sign-in",
+    },
+    {
+      name: "Create Account",
+      url: "/create-account",
+    },
+  ],
+};

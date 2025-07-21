@@ -62,6 +62,16 @@ export type StatusType = {
   name: string;
 };
 
+export type dropDownMenuKeyType = "user" | "guest" | "admin";
+
+export type dropDownMenuItemType = {
+  name: string;
+  url: string;
+};
+
+export type dropDownMenuListType = Partial<
+  Record<dropDownMenuKeyType, dropDownMenuItemType[]>
+>;
 export type LoadingType = (typeof LOADING_TYPES)[keyof typeof LOADING_TYPES];
 
 export type getTypeFn = <T>(obj: object, flag: string, defaultValue?: T) => T;
