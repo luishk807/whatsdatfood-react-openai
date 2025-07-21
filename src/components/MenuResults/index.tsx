@@ -8,55 +8,55 @@ import {
   RestCategoryMenu,
 } from "@/types/restaurants";
 import LoadingComponent from "../LoadingComponent";
-import { getRestaurantBySlug } from "@/api/restaurants";
 import MenuTitle from "@/components/MenuTitle";
 import "./index.css";
 import { _get } from "@/utils";
 import { LOADING_TYPES } from "@/customConstants";
 import SkeletonMenuItem from "../SkeletonLoaders/MenuResultPage";
+import useRestaurantMutation from "@/customHooks/useRestaurantMutations";
 
 const MenuResults: FC = () => {
+  const { getRestaurantListBySlug, getRestaurantListBySlugQuery } =
+    useRestaurantMutation();
+  const { loading } = getRestaurantListBySlugQuery;
   const { restaurant } = useParams();
   const [restaurantMenu, setRestaurantMenu] = useState<RestCategoryMenu>({});
   const [restaurantInfo, setRestaurantInfo] = useState<RestaurantType | null>(
     null,
   );
-  const [showLoading, setShowLoading] = useState(true);
 
   const handleFetchRestaurant = async () => {
-    setShowLoading(true);
     if (restaurant) {
-      const resp: RestaurantType = await getRestaurantBySlug(
-        String(restaurant),
-      );
+      const resp = await getRestaurantListBySlug(restaurant);
 
-      const menuItems = _get<MenuItemType[]>(resp, "restRestaurantItems", []);
+      if (resp) {
+        const menuItems = _get<MenuItemType[]>(resp, "restaurantItems", []);
 
-      setShowLoading(false);
-      if (menuItems && menuItems.length) {
-        const map = new Map<string, MenuItemType[]>();
+        if (menuItems && menuItems.length) {
+          const map = new Map<string, MenuItemType[]>();
 
-        menuItems.forEach((item) => {
-          if (item) {
-            if (!map.has(item.category)) {
-              map.set(item.category, [item]);
-            } else {
-              map.set(item.category, [...map.get(item.category)!, item]);
+          menuItems.forEach((item) => {
+            if (item) {
+              if (!map.has(item.category)) {
+                map.set(item.category, [item]);
+              } else {
+                map.set(item.category, [...map.get(item.category)!, item]);
+              }
             }
-          }
+          });
+
+          const newMenu = Object.fromEntries(map);
+          setRestaurantMenu(newMenu);
+        }
+
+        setRestaurantInfo({
+          name: _get(resp, "name"),
+          address: _get(resp, "address"),
+          city: _get(resp, "city"),
+          state: _get(resp, "state"),
+          postal_code: _get(resp, "postal_code"),
         });
-
-        const newMenu = Object.fromEntries(map);
-        setRestaurantMenu(newMenu);
       }
-
-      setRestaurantInfo({
-        name: resp.name,
-        address: resp.address,
-        city: resp.city,
-        state: resp.state,
-        postal_code: resp.postal_code,
-      });
     }
   };
 
@@ -67,6 +67,7 @@ const MenuResults: FC = () => {
   return (
     <Grid container>
       <LoadingComponent
+        showLoading={loading}
         customLoader={SkeletonMenuItem}
         type={LOADING_TYPES.CUSTOM}
         data={restaurantInfo}

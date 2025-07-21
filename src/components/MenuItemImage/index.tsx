@@ -9,11 +9,15 @@ import LoadingComponent from "../LoadingComponent";
 import "./index.css";
 import { useState, useEffect } from "react";
 import SkeletonMenuImageItem from "@/components/SkeletonLoaders/ItemImage";
-
+import useRestaurantMutation from "@/customHooks/useRestaurantMutations";
 const MenuItemImage = <T,>({
   data,
   onImageChange,
 }: MenuItemImageInterface<T>) => {
+  const { getRestaurantImageById, getRestaurantListByImageQuery } =
+    useRestaurantMutation();
+
+  const { loading } = getRestaurantListByImageQuery;
   const [imageInfo, setImageInfo] = useState<RestaurantItemImageType | null>(
     null,
   );
@@ -35,7 +39,7 @@ const MenuItemImage = <T,>({
 
       if (!dbImage) {
         if (restItemId) {
-          const imageResp = await getRestaurantItemImages(restItemId);
+          const imageResp = await getRestaurantImageById(restItemId);
           imageData = imageResp ? imageResp : {};
         }
       } else {
@@ -79,7 +83,7 @@ const MenuItemImage = <T,>({
   return (
     <Box id="menu-item-image-box">
       <LoadingComponent
-        showLoading={showLoading}
+        showLoading={loading}
         data={imageInfo}
         type={LOADING_TYPES.CUSTOM}
         customLoader={SkeletonMenuImageItem}

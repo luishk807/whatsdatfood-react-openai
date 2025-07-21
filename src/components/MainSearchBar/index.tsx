@@ -4,21 +4,22 @@ import { Grid } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import MainSearchInput from "@/components/MainSearchInput";
 import "./index.css";
-import { getRestaurantByName } from "@/api/restaurants";
 import { RestaurantType } from "@/types/restaurants";
 import SearchButton from "../SearchButton";
 import { _get } from "@/utils";
 import SuggestionsComponent from "../Suggestions";
-
+import useRestaurantMutation from "@/customHooks/useRestaurantMutations";
 const MainSearchBar: FC = () => {
   const navigate = useNavigate();
+  const { getRestaurantListByName, getRestaurantListByNameQuery } =
+    useRestaurantMutation();
+  const { loading } = getRestaurantListByNameQuery;
   const [inputValue, setInputValue] = useState("");
   const [debounceValue, setDebounceValue] = useState("");
   const [slugName, setSlugName] = useState("");
   const [suggestions, setSuggestions] = useState<RestaurantType[]>([]);
   const [showSuggestions, setShowSuggestions] = useState<boolean>(false);
   const [selectedValue, setSelectedValue] = useState("");
-  const [showLoadingIcon, setShowLoadingIcon] = useState(false);
 
   const handleOnChange = (value: any) => {
     setShowSuggestions(false);
@@ -29,28 +30,24 @@ const MainSearchBar: FC = () => {
 
   const handleSuggestions = async () => {
     try {
-      const resp = await getRestaurantByName(debounceValue);
+      const resp = await getRestaurantListByName(debounceValue);
       const suggestionArray = Array.isArray(resp) ? resp : [];
       setSuggestions(suggestionArray);
     } catch (e) {
       console.error(e);
       setSuggestions([]);
-    } finally {
-      setShowLoadingIcon(false);
     }
   };
 
   const handleSelectSuggestion = (value: string, slug: string) => {
     setSelectedValue(value);
     setSlugName(slug);
-    setShowLoadingIcon(true);
     setSuggestions([]);
   };
   const handleAIRequest = async () => {
     if (!slugName) {
       return;
     }
-    setShowLoadingIcon(true);
     navigate(`/menu-results/${slugName}`);
   };
 
@@ -60,14 +57,9 @@ const MainSearchBar: FC = () => {
 
   useEffect(() => {
     if (!debounceValue) return;
-    setShowLoadingIcon(true);
     handleSuggestions();
     setDebounceValue("");
   }, [debounceValue]);
-
-  useEffect(() => {
-    setShowLoadingIcon(false);
-  }, [selectedValue]);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -96,7 +88,7 @@ const MainSearchBar: FC = () => {
       <Grid size={{ md: 1, xs: 2 }} className="flex justify-center">
         <SearchButton<string>
           onSubmit={handleAIRequest}
-          showLoading={showLoadingIcon}
+          showLoading={loading}
           data={inputValue}
         />
       </Grid>

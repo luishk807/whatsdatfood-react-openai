@@ -23,7 +23,7 @@ export type RestaurantType = {
   slug?: string;
   state?: string;
   updatedAt?: string;
-  restRestaurantItems?: [MenuItemType];
+  restaurantItems?: [MenuItemType];
 };
 
 export type RestaurantItemImageType = {
@@ -39,7 +39,7 @@ export type RestaurantItemImageType = {
   created_at?: Date;
   updated_at?: Date;
   deleted_at?: Date;
-  restaurantItemImageRestItem?: MenuItemType;
+  restaurantItem?: MenuItemType;
 };
 
 export type MenuInterfaceItemType = {
@@ -50,5 +50,5 @@ export type MenuInterfaceItemType = {
   top_choice: boolean;
   image: string;
   price: number;
-  restaurantItemImageRestItem?: RestaurantItemImageType;
+  restaurant?: RestaurantType;
 };

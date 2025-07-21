@@ -16,7 +16,7 @@ export type UserRating = {
   createdAt?: Date;
   updatedAt?: Date;
   comment?: string;
-  userRatingRestaurantItem?: MenuItemType;
+  restaurantItem?: MenuItemType;
 };
 
 export type UserRoleType = {
@@ -37,8 +37,8 @@ export type UserSearchesType = {
   id: number;
   user_id: number;
   restaurant_id: number;
-  userSearchesRestaurant: RestaurantType;
-  userSearchesUser: UserType;
+  restaurant: RestaurantType;
+  user: UserType;
 };
 
 export type UserType = {
@@ -55,8 +55,8 @@ export type UserType = {
   createdAt?: Date;
   updatedAt?: Date;
   status_id?: number;
-  userUserRatings?: [UserRating];
-  userStatus?: StatusType;
-  userUserRole?: UserRoleType;
-  userUserSearches?: [UserSearchesType];
+  ratings?: [UserRating];
+  status?: StatusType;
+  role?: UserRoleType;
+  searches?: [UserSearchesType];
 };
