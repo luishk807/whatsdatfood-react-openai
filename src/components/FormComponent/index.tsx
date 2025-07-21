@@ -5,6 +5,7 @@ import { FIELD_TYPES } from "@/customConstants";
 import { FormComponentInterface } from "@/interfaces";
 import "./index.css";
 import { getMissingField, getLabelFromKey } from "@/utils";
+const LazyRating = lazy(() => import("@/components/Rating"));
 const LazyTextField = lazy(() => import("@/components/TextField"));
 const LazyTextFieldDebounce = lazy(
   () => import("@/components/TextFieldDebounce"),
@@ -90,7 +91,9 @@ const FormComponent: FC<FormComponentInterface> = ({
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
     setErrors([]);
     let payloadMap = new Map();
     let errorList: string[] = [];
@@ -177,6 +180,26 @@ const FormComponent: FC<FormComponentInterface> = ({
             />
           </Grid>
         );
+      case FIELD_TYPES.rating:
+        return (
+          <Grid
+            size={12}
+            className="field-container flex flex-col"
+            key={`${key}-${field.name}`}
+          >
+            <LazyRating
+              defaultValue={0}
+              label={field.label}
+              onClick={(value: number) =>
+                handleOnChange(field.name, {
+                  label: field.label,
+                  type: field.type,
+                  value: String(value),
+                })
+              }
+            />
+          </Grid>
+        );
     }
   };
 
@@ -190,7 +213,16 @@ const FormComponent: FC<FormComponentInterface> = ({
   );
   return (
     <Box>
-      <Grid container id="form-component-container">
+      <Grid
+        container
+        id="form-component-container"
+        sx={{
+          padding: {
+            lg: "0px",
+            xs: "10px",
+          },
+        }}
+      >
         {title && (
           <Grid className="field-title" size={12}>
             {title}
@@ -208,7 +240,9 @@ const FormComponent: FC<FormComponentInterface> = ({
         {fields.map((item, indx) => getFieldType(item, indx))}
         {submitLabel && (
           <Grid size={12} className="field-container">
-            <LazyButton onClick={handleSubmit}>{submitLabel}</LazyButton>
+            <LazyButton type="button" onClick={handleSubmit}>
+              {submitLabel}
+            </LazyButton>
           </Grid>
         )}
       </Grid>

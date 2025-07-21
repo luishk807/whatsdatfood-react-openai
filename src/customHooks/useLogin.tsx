@@ -11,11 +11,13 @@ const useLogin = () => {
           username,
           password,
         },
+        context: {
+          credentials: "include",
+        },
       });
 
       const resp = _get(data, "login");
 
-      console.log("login", login);
       return resp;
     } catch (err) {
       if (err instanceof Error) {

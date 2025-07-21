@@ -1,5 +1,4 @@
-import { LOADING_TYPES } from "@/customConstants";
-import { FIELD_TYPES } from "@/customConstants";
+import { FIELD_TYPES, LOADING_TYPES, ACCOUNT_TYPE } from "@/customConstants";
 import { AlertColor } from "@mui/material";
 
 export type addressType = {
@@ -62,7 +61,8 @@ export type StatusType = {
   name: string;
 };
 
-export type dropDownMenuKeyType = "user" | "guest" | "admin";
+export type dropDownMenuKeyType =
+  (typeof ACCOUNT_TYPE)[keyof typeof ACCOUNT_TYPE];
 
 export type dropDownMenuItemType = {
   name: string;

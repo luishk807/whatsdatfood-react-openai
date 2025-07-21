@@ -9,7 +9,8 @@ import MenuItemImage from "@/components/MenuItemImage";
 import MenuItemTitle from "@/components/MenuItemTitle";
 import "./index.css";
 import Button from "@/components/Button";
-import SendFriendModal from "../SendFriendModal";
+import SendFriendModal from "@/components/SendFriendModal";
+import RatingComponent from "@/components/RatingModal";
 
 const MenuItem: FC<MenuItemInterface> = ({ item, restaurant }) => {
   const [sendFriendPayload, setSendPayload] =
@@ -64,7 +65,7 @@ const MenuItem: FC<MenuItemInterface> = ({ item, restaurant }) => {
         sx={{ display: { xs: "block", md: "none" } }}
         className="item-menu-item-title-mobile"
       >
-        <MenuItemTitle name={item.name} top_choice={item.top_choice} />
+        <MenuItemTitle data={item} />
       </Grid>
       <Grid size={{ xs: 12, md: 2 }} className="item-menu-item-img">
         <MenuItemImage<MenuInterfaceItemType>
@@ -82,7 +83,7 @@ const MenuItem: FC<MenuItemInterface> = ({ item, restaurant }) => {
                 size={10}
                 className="item-menu-item-title"
               >
-                <MenuItemTitle name={item.name} top_choice={item.top_choice} />
+                <MenuItemTitle data={item} />
               </Grid>
 
               <Grid

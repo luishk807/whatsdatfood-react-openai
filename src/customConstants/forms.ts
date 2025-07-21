@@ -63,3 +63,24 @@ export const SIGN_IN_FIELDS = [
     type: FIELD_TYPES.password,
   },
 ];
+
+export const CREATE_RATING = [
+  {
+    name: "rating",
+    label: "Your Rating",
+    isRequired: true,
+    type: FIELD_TYPES.rating,
+  },
+  {
+    name: "title",
+    label: "Title",
+    isRequired: true,
+    type: FIELD_TYPES.textfield,
+  },
+  {
+    name: "comment",
+    label: "Comment",
+    isRequired: true,
+    type: FIELD_TYPES.textfield,
+  },
+];

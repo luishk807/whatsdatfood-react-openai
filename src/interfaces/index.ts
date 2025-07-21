@@ -1,4 +1,4 @@
-import { ReactNode, CSSProperties, ComponentType } from "react";
+import { ReactNode, CSSProperties, ComponentType, FC } from "react";
 import { RestaurantType, MenuInterfaceItemType } from "@/types/restaurants";
 import { LoadingType, FormFieldType, SendFriendModalData } from "@/types";
 export interface RequestAIInterface {
@@ -46,6 +46,7 @@ export interface SearchButtonInterface<T> {
 
 export interface CustomModalInterface {
   children: ReactNode;
+  customButton?: ReactNode;
   label?: string;
 }
 
@@ -68,5 +69,12 @@ export interface FormComponentInterface {
   fields: FormFieldType[];
   title?: string;
   submitLabel?: string;
-  onHandleSubmit: (data: any) => void;
+  onHandleSubmit: (data: any, e?: any) => void;
+}
+
+export interface RatingCustomInterface {
+  defaultValue: number;
+  label?: string;
+  onClick?: (value: number) => void;
+  isDisplay?: boolean;
 }

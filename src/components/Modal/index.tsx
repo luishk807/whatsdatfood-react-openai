@@ -1,16 +1,40 @@
-import { Modal } from "@mui/material";
-import { useState, type FC } from "react";
+import { Modal, Box } from "@mui/material";
+import { useState, useEffect, type FC, useMemo, ChangeEvent } from "react";
 import { CustomModalInterface } from "@/interfaces";
 import Button from "@/components/Button";
-const CustomModal: FC<CustomModalInterface> = ({ children, label }) => {
+import "./index.css";
+const CustomModal: FC<CustomModalInterface> = ({
+  children,
+  label,
+  customButton,
+}) => {
   const [open, setOpen] = useState(false);
 
-  const toggleModal = () => {
-    setOpen(!open);
+  const toggleModal = (e: React.MouseEvent<HTMLElement>) => {
+    console.log("xxxx");
+    e.preventDefault();
+    e.stopPropagation();
+
+    setOpen((prev) => !prev);
   };
+
   return (
     <>
-      <Button onClick={toggleModal}>{label}</Button>
+      {customButton ? (
+        <Box
+          component="div"
+          role="button"
+          tabIndex={0}
+          onClick={toggleModal} // <- this is what was missing
+          onKeyDown={(e) => {
+            if (e.key === "Enter" || e.key === " ") toggleModal(e as any);
+          }}
+        >
+          {customButton}
+        </Box>
+      ) : (
+        <Button onClick={toggleModal}>{label}</Button>
+      )}
       <Modal
         style={{
           backdropFilter: "blur(2px)",
@@ -18,7 +42,7 @@ const CustomModal: FC<CustomModalInterface> = ({ children, label }) => {
         open={open}
         onClose={toggleModal}
       >
-        <>{children}</>
+        <Box id="custom-modal-container">{children}</Box>
       </Modal>
     </>
   );

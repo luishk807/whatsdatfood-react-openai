@@ -1,17 +1,17 @@
 import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
-import RatingComponent from "../Rating";
+import RatingComponent from "../RatingModal";
+import { MenuItemType } from "@/types/restaurants";
 interface MenuItemItem {
-  name: string;
-  top_choice: boolean;
+  data: MenuItemType;
 }
 
-const MenuItemTitle = ({ top_choice, name }: MenuItemItem) => {
+const MenuItemTitle = ({ data }: MenuItemItem) => {
   const ratingChanged = () => {};
   return (
     <>
-      {name}
-      {top_choice && <LocalFireDepartmentIcon style={{ fill: "red" }} />}
-      <RatingComponent />
+      {data.name}
+      {data.top_choice && <LocalFireDepartmentIcon style={{ fill: "red" }} />}
+      <RatingComponent data={data} />
     </>
   );
 };

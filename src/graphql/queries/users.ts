@@ -12,7 +12,7 @@ export const ADD_USER_MUTATION = gql`
 `;
 
 export const ADD_USER_RATING = gql`
-  mutation addUserRating($payload: userRatingPayload!) {
+  mutation addUserRating($payload: createUserRatingInput!) {
     addUserRating(input: $payload) {
       id
       rating

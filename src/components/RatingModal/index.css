@@ -1,0 +1,18 @@
+#rating-component-container {
+}
+.rating-content-container {
+  background-color: white;
+  top: 50%;
+  left: 50%;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  -o-transform: translate(-50%, -50%);
+}
+
+.rating-content-container .field-container {
+  margin: 10px 0px;
+  font-size: 1.2em;
+}

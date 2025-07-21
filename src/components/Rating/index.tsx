@@ -1,11 +1,16 @@
 import Rating from "@mui/material/Rating";
 import StarIcon from "@mui/icons-material/Star";
-import { useState } from "react";
 import { Box } from "@mui/material";
+import { useState, useEffect, type FC } from "react";
+import { RatingCustomInterface } from "@/interfaces";
 
-const RatingComponent = () => {
+const RatingCustom: FC<RatingCustomInterface> = ({
+  isDisplay = false,
+  label,
+  defaultValue,
+  onClick,
+}) => {
   const [value, setValue] = useState<number | null>(2);
-  const [hover, setHover] = useState(-1);
   const labels: { [index: string]: string } = {
     0.5: "Useless",
     1: "Useless+",
@@ -23,25 +28,56 @@ const RatingComponent = () => {
     return `${value} Star${value !== 1 ? "s" : ""}, ${labels[value]}`;
   }
 
+  const handleRatingChange = (event: any, newValue: any) => {
+    console.log(newValue);
+    setValue(newValue);
+    onClick && onClick(newValue);
+  };
+
+  useEffect(() => {
+    setValue(defaultValue);
+  }, [defaultValue]);
+
+  if (isDisplay) {
+    return (
+      <div className="flex justify-center flex-row items-center gap-1 cursor-pointer">
+        <Rating
+          name="hover-feedback"
+          value={3}
+          icon={<StarIcon fontSize="inherit" />}
+          precision={0.5}
+          readOnly
+          getLabelText={getLabelText}
+          sx={{
+            "& .MuiRating-iconActive": {
+              transform: "none",
+            },
+          }}
+          emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />}
+        />
+        <Box>({value})</Box>
+      </div>
+    );
+  }
   return (
-    <Box display="flex" alignItems="center" justifyContent="center" gap={1}>
+    <>
+      {label && label}
       <Rating
         name="hover-feedback"
-        value={0}
+        value={value}
+        icon={<StarIcon fontSize="large" />}
         precision={0.5}
-        readOnly={true}
         getLabelText={getLabelText}
-        onChange={(event, newValue) => {
-          setValue(newValue);
+        onChange={handleRatingChange}
+        sx={{
+          "& .MuiRating-iconActive": {
+            transform: "none",
+          },
         }}
-        onChangeActive={(event, newHover) => {
-          setHover(newHover);
-        }}
-        emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />}
+        emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="large" />}
       />
-      <Box>(5.6)</Box>
-    </Box>
+    </>
   );
 };
 
-export default RatingComponent;
+export default RatingCustom;

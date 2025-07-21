@@ -39,6 +39,8 @@ const AccountButton = () => {
       if (role) {
         getMenuType(role.toLowerCase() as keyof dropDownMenuListType);
       }
+    } else {
+      getMenuType("guest");
     }
   }, [user]);
 

@@ -65,7 +65,7 @@ const MenuResults: FC = () => {
   }, [restaurant]);
 
   return (
-    <Grid container>
+    <Grid container className="w-full">
       <LoadingComponent
         showLoading={loading}
         customLoader={SkeletonMenuItem}

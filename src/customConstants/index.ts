@@ -21,8 +21,15 @@ export const FIELD_TYPES = {
   email: "email",
   date: "date",
   password: "password",
+  rating: "rating",
   username: "username",
 } as const;
+
+export const ACCOUNT_TYPE = {
+  guest: "guest",
+  user: "user",
+  admin: "admin",
+};
 
 export const DROPDOWN_MENU = {
   user: [
