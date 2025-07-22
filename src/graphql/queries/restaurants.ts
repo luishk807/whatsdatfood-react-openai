@@ -21,6 +21,12 @@ export const GET_RESTAURANT_BY_SLUG = gql`
       city
       state
       postal_code
+      phone
+      michelin_score
+      description
+      rating
+      delivery_method
+      letter_grade
       restaurantItems {
         id
         name
@@ -28,6 +34,9 @@ export const GET_RESTAURANT_BY_SLUG = gql`
         top_choice
         price
         category
+        ratings {
+          rating
+        }
         images {
           name
         }

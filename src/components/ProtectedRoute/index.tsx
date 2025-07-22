@@ -2,11 +2,12 @@ import { Navigate, Outlet } from "react-router-dom";
 import useAuth from "@/customHooks/useAuth";
 
 const ProtectedRoute = () => {
-  const { user, loading } = useAuth();
+  const { user, checkAuthQuery } = useAuth();
+  const { loading, error } = checkAuthQuery;
   if (loading) {
     return <p>...loading</p>;
   }
-  if (!user) {
+  if (!user || error) {
     return <Navigate to="/sign-in" replace />;
   }
 

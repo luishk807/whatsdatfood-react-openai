@@ -22,7 +22,7 @@ const useUser = () => {
           },
         });
 
-        return _get(resp, "data.checkUsername");
+        return _get(resp, "data.addUserRating");
       } else {
         throw new Error("ERROR: unable to save rating");
       }

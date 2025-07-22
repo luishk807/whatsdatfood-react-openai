@@ -8,6 +8,8 @@ const RatingCustom: FC<RatingCustomInterface> = ({
   isDisplay = false,
   label,
   defaultValue,
+  oneStarMode,
+  sx,
   onClick,
 }) => {
   const [value, setValue] = useState<number | null>(2);
@@ -38,12 +40,21 @@ const RatingCustom: FC<RatingCustomInterface> = ({
     setValue(defaultValue);
   }, [defaultValue]);
 
+  if (oneStarMode) {
+    return (
+      <Box component="span" sx={{ ...((sx as object) || {}) }}>
+        (
+        <StarIcon sx={{ fontSize: "inherti", fill: "orange" }} />
+        {defaultValue})
+      </Box>
+    );
+  }
   if (isDisplay) {
     return (
       <div className="flex justify-center flex-row items-center gap-1 cursor-pointer">
         <Rating
           name="hover-feedback"
-          value={3}
+          value={defaultValue}
           icon={<StarIcon fontSize="inherit" />}
           precision={0.5}
           readOnly
@@ -52,10 +63,11 @@ const RatingCustom: FC<RatingCustomInterface> = ({
             "& .MuiRating-iconActive": {
               transform: "none",
             },
+            ...((sx as object) || {}),
           }}
           emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="inherit" />}
         />
-        <Box>({value})</Box>
+        <Box>({defaultValue})</Box>
       </div>
     );
   }
@@ -73,6 +85,7 @@ const RatingCustom: FC<RatingCustomInterface> = ({
           "& .MuiRating-iconActive": {
             transform: "none",
           },
+          ...((sx as object) || {}),
         }}
         emptyIcon={<StarIcon style={{ opacity: 0.55 }} fontSize="large" />}
       />

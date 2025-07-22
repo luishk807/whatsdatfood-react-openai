@@ -7,8 +7,13 @@ import { UserType } from "@/types/users";
 
 interface AuthProviderInterface {
   user: UserType | null;
-  loading: boolean;
-  error: any;
+  checkAuthQuery: {
+    loading: boolean;
+    error: any;
+  };
+  logoutQuery: {
+    loading: boolean;
+  };
   logout: () => void;
   checkUser: () => void;
 }
@@ -22,7 +27,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     fetchPolicy: "network-only",
   });
 
-  const [logoutMutation] = useMutation(LOGOUT_QUERY);
+  const [logoutMutation, { loading: logoutLoading }] =
+    useMutation(LOGOUT_QUERY);
 
   useEffect(() => {
     checkAuth();
@@ -44,8 +50,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const value = {
     user,
     logout,
-    error,
-    loading,
+    checkAuthQuery: {
+      loading,
+      error,
+    },
+    logoutQuery: {
+      loading: logoutLoading,
+    },
     checkUser: checkAuth,
   };
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

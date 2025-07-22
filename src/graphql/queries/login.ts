@@ -9,8 +9,8 @@ export const LOGIN_QUERY = gql`
 `;
 
 export const LOGOUT_QUERY = gql`
-  mutation login {
-    login {
+  mutation logout {
+    logout {
       success
     }
   }

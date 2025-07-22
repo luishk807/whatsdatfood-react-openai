@@ -1,7 +1,9 @@
 import _ from "lodash";
 import { DEFAULT_CURRENCY } from "@/customConstants";
 import { getTypeFn, getBuiltAddressType } from "@/types";
+import { UserRating } from "@/types/users";
 import { useLocation } from "react-router-dom";
+import { MenuItemType } from "@/types/restaurants";
 export const _get: getTypeFn = <T>(
   obj: any,
   flag: string,
@@ -61,4 +63,15 @@ export const getLabelFromKey = (allFields: any[], fields: any[]) => {
   return allFields
     .filter((item) => fields.includes(item.name))
     .map((item) => item.label);
+};
+
+export const getAverageStarsTotal = (data: UserRating[]) => {
+  if (data.length === 0) return 0;
+  const total = data.reduce((sum, item) => sum + item.rating, 0);
+  const average = total / data.length;
+  return Math.round(average * 2) / 2;
+};
+
+export const getTotalRatings = (data: UserRating[]) => {
+  return data.length;
 };

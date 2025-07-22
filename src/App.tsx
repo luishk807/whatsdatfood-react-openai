@@ -11,6 +11,7 @@ const LazyNotFound = lazy(() => import("@/components/NotFound"));
 const LazySignIN = lazy(() => import("@/components/SignInComponent"));
 const LazyCreateAccount = lazy(() => import("@/components/CreateAccount"));
 const LazyUserAccount = lazy(() => import("@/components/UserAccount"));
+const LazyLogout = lazy(() => import("@/components/Logout"));
 function App() {
   const customStyle = {
     width: "30px",
@@ -24,16 +25,6 @@ function App() {
             <Suspense fallback={<Loading style={customStyle} />}>
               <Layout>
                 <LazyHomepage />
-              </Layout>
-            </Suspense>
-          }
-        />
-        <Route
-          path="/menu-results/:restaurant"
-          element={
-            <Suspense fallback={<Loading style={customStyle} />}>
-              <Layout>
-                <LazyResult />
               </Layout>
             </Suspense>
           }
@@ -54,6 +45,26 @@ function App() {
             <Suspense fallback={<Loading style={customStyle} />}>
               <Layout>
                 <LazyCreateAccount />
+              </Layout>
+            </Suspense>
+          }
+        />
+        <Route
+          path="/logout"
+          element={
+            <Suspense fallback={<Loading style={customStyle} />}>
+              <Layout>
+                <LazyLogout />
+              </Layout>
+            </Suspense>
+          }
+        />
+        <Route
+          path="/menu-results/:restaurant"
+          element={
+            <Suspense fallback={<Loading style={customStyle} />}>
+              <Layout>
+                <LazyResult />
               </Layout>
             </Suspense>
           }

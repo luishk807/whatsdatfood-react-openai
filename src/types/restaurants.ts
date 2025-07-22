@@ -1,3 +1,4 @@
+import { UserRating } from "./users";
 export type MenuItemType = {
   name: string;
   description: string;
@@ -5,6 +6,7 @@ export type MenuItemType = {
   top_choice: boolean;
   price?: number;
   image?: string;
+  ratings?: [UserRating];
 };
 
 export type RestCategoryMenu = {
@@ -22,6 +24,12 @@ export type RestaurantType = {
   postal_code?: string;
   slug?: string;
   state?: string;
+  michelin_score?: number;
+  phone?: string;
+  description?: string;
+  delivery_method?: string;
+  rating?: number;
+  letter_grade?: string;
   updatedAt?: string;
   restaurantItems?: [MenuItemType];
 };

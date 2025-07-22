@@ -1,0 +1,15 @@
+#michelin-star-container {
+}
+
+#michelin-star-container ul {
+  list-style-type: none;
+  padding: 0px;
+  margin: 5px 0px;
+}
+#michelin-star-container ul li {
+  display: inline;
+  margin: 2px;
+}
+#michelin-star-container ul li img {
+  width: 20px;
+}

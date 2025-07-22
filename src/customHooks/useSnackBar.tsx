@@ -33,7 +33,7 @@ const useSnackbarHook = () => {
     />
   );
 
-  return { showSnackBar, SnackbarComponent };
+  return { showSnackBar, SnackbarComponent, closeSnackBar };
 };
 
 export default useSnackbarHook;

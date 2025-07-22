@@ -1,6 +1,12 @@
 import { ReactNode, CSSProperties, ComponentType, FC } from "react";
-import { RestaurantType, MenuInterfaceItemType } from "@/types/restaurants";
+import {
+  MenuItemType,
+  RestaurantType,
+  MenuInterfaceItemType,
+} from "@/types/restaurants";
+import { SxProps, Theme } from "@mui/material";
 import { LoadingType, FormFieldType, SendFriendModalData } from "@/types";
+
 export interface RequestAIInterface {
   restaurant: string;
   address?: string;
@@ -48,6 +54,7 @@ export interface CustomModalInterface {
   children: ReactNode;
   customButton?: ReactNode;
   label?: string;
+  closeOnParent?: boolean;
 }
 
 export interface SendFriendModalInterface {
@@ -65,6 +72,15 @@ export interface TextFieldInterface {
   onChange: (value: string) => void;
 }
 
+export interface RatingComponentInterface {
+  data: MenuItemType;
+}
+export type RatingPayloadType = {
+  rating: number | null;
+  title: string | null;
+  comment: string | null;
+  restaurant_menu_item_id: number;
+};
 export interface FormComponentInterface {
   fields: FormFieldType[];
   title?: string;
@@ -75,6 +91,8 @@ export interface FormComponentInterface {
 export interface RatingCustomInterface {
   defaultValue: number;
   label?: string;
+  sx?: SxProps<Theme>;
+  oneStarMode?: boolean;
   onClick?: (value: number) => void;
   isDisplay?: boolean;
 }

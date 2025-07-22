@@ -51,7 +51,7 @@ export const DROPDOWN_MENU = {
     },
     {
       name: "Logout",
-      url: "",
+      url: "/logout",
     },
   ],
   guest: [

@@ -7,9 +7,9 @@ const CustomModal: FC<CustomModalInterface> = ({
   children,
   label,
   customButton,
+  closeOnParent,
 }) => {
   const [open, setOpen] = useState(false);
-
   const toggleModal = (e: React.MouseEvent<HTMLElement>) => {
     console.log("xxxx");
     e.preventDefault();
@@ -17,6 +17,12 @@ const CustomModal: FC<CustomModalInterface> = ({
 
     setOpen((prev) => !prev);
   };
+
+  useEffect(() => {
+    if (closeOnParent) {
+      setOpen(false);
+    }
+  }, [closeOnParent]);
 
   return (
     <>

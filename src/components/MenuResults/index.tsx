@@ -55,6 +55,11 @@ const MenuResults: FC = () => {
           city: _get(resp, "city"),
           state: _get(resp, "state"),
           postal_code: _get(resp, "postal_code"),
+          michelin_score: _get(resp, "michelin_score"),
+          rating: Number(_get(resp, "rating", 0)),
+          phone: _get(resp, "phone"),
+          letter_grade: _get(resp, "letter_grade"),
+          description: _get(resp, "description"),
         });
       }
     }
