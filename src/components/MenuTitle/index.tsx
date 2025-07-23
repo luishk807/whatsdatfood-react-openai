@@ -1,6 +1,6 @@
 import { type FC } from "react";
 import { Grid, Box } from "@mui/material";
-import { MenuTitleInterface } from "@/interfaces";
+import { MenuTitleInterface } from "@/interfaces/restaurants";
 import "./index.css";
 import { getBuiltAddress, _get } from "@/utils";
 import MichelinStars from "@/components/MichelinStars";

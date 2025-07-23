@@ -1,6 +1,6 @@
 import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
 import RatingComponent from "../RatingModal";
-import { MenuItemType } from "@/types/restaurants";
+import { MenuItemType } from "@/interfaces/restaurants";
 interface MenuItemItem {
   data: MenuItemType;
 }

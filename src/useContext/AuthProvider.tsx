@@ -3,7 +3,7 @@ import { createContext } from "react";
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { CHECK_AUTH, LOGOUT_QUERY } from "@/graphql/queries/login";
 import { useEffect, useState } from "react";
-import { UserType } from "@/types/users";
+import { UserType } from "@/interfaces/users";
 
 interface AuthProviderInterface {
   user: UserType | null;

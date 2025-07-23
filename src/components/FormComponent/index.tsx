@@ -1,6 +1,10 @@
 import { lazy, useState, useMemo, type FC } from "react";
 import { Box, Grid } from "@mui/material";
-import { FormFieldType, formCompObjType, formCompValueType } from "@/types";
+import {
+  FormFieldType,
+  formCompObjType,
+  formCompValueType,
+} from "@/interfaces";
 import { FIELD_TYPES } from "@/customConstants";
 import { FormComponentInterface } from "@/interfaces";
 import "./index.css";

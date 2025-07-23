@@ -1,6 +1,6 @@
 import { Box, Grid } from "@mui/material";
 import FormComponent from "@/components/FormComponent";
-import { FormFieldType } from "@/types";
+import { FormFieldType } from "@/interfaces";
 import { handleCreateUser } from "@/api/users";
 import { CREATE_ACCOUNT } from "@/customConstants/forms";
 import { Link, useNavigate } from "react-router-dom";

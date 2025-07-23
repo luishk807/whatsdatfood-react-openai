@@ -6,11 +6,9 @@ import "./index.css";
 import { Link } from "react-router-dom";
 import useAuth from "@/customHooks/useAuth";
 import { _get } from "@/utils";
-import {
-  dropDownMenuItemType,
-  dropDownMenuListType,
-  dropDownMenuKeyType,
-} from "@/types";
+import { dropDownMenuItemType } from "@/interfaces";
+
+import { dropDownMenuListType, dropDownMenuKeyType } from "@/types";
 
 import { DROPDOWN_MENU } from "@/customConstants";
 

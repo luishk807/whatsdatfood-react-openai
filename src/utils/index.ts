@@ -1,9 +1,9 @@
 import _ from "lodash";
 import { DEFAULT_CURRENCY } from "@/customConstants";
 import { getTypeFn, getBuiltAddressType } from "@/types";
-import { UserRating } from "@/types/users";
+import { UserRating } from "@/interfaces/users";
 import { useLocation } from "react-router-dom";
-import { MenuItemType } from "@/types/restaurants";
+import { MenuItemType } from "@/interfaces/restaurants";
 export const _get: getTypeFn = <T>(
   obj: any,
   flag: string,

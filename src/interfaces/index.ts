@@ -1,20 +1,7 @@
-import { ReactNode, CSSProperties, ComponentType, FC } from "react";
-import {
-  MenuItemType,
-  RestaurantType,
-  MenuInterfaceItemType,
-} from "@/types/restaurants";
-import { SxProps, Theme } from "@mui/material";
-import { LoadingType, FormFieldType, SendFriendModalData } from "@/types";
-
-export interface RequestAIInterface {
-  restaurant: string;
-  address?: string;
-}
-
-export interface MenuTitleInterface {
-  restaurant: RestaurantType | null;
-}
+import { ReactNode, CSSProperties, ComponentType } from "react";
+import { LoadingType } from "@/types";
+import { AlertColor } from "@mui/material";
+import { FieldTypes } from "@/types";
 
 export interface LoadingComponentInterface<T> {
   children: ReactNode;
@@ -30,33 +17,17 @@ export interface LoadingInterface {
   customLoader?: ComponentType;
 }
 
-export interface MenuItemInterface {
-  item: MenuInterfaceItemType;
-  restaurant?: RestaurantType | null;
-}
-
-export interface ImageInterface {
-  url?: string | null;
-  alt?: string | null;
-}
-
-export interface MenuItemImageInterface<T> {
-  data: T | null;
-  onImageChange?: (newImage: string) => void;
-}
 export interface SearchButtonInterface<T> {
   onSubmit: () => void;
   showLoading: boolean;
   data?: T | "";
 }
-
 export interface CustomModalInterface {
   children: ReactNode;
   customButton?: ReactNode;
   label?: string;
   closeOnParent?: boolean;
 }
-
 export interface SendFriendModalInterface {
   data?: SendFriendModalData | null;
 }
@@ -71,16 +42,6 @@ export interface TextFieldInterface {
   showLoaderElement?: ReactNode;
   onChange: (value: string) => void;
 }
-
-export interface RatingComponentInterface {
-  data: MenuItemType;
-}
-export type RatingPayloadType = {
-  rating: number | null;
-  title: string | null;
-  comment: string | null;
-  restaurant_menu_item_id: number;
-};
 export interface FormComponentInterface {
   fields: FormFieldType[];
   title?: string;
@@ -88,11 +49,65 @@ export interface FormComponentInterface {
   onHandleSubmit: (data: any, e?: any) => void;
 }
 
-export interface RatingCustomInterface {
-  defaultValue: number;
-  label?: string;
-  sx?: SxProps<Theme>;
-  oneStarMode?: boolean;
-  onClick?: (value: number) => void;
-  isDisplay?: boolean;
+export interface addressType {
+  address: string;
+  city?: string;
+  state?: string;
+  country?: string;
+  postal_code?: string;
+}
+
+export interface MainSearchInputType {
+  onChange: (search: string) => void;
+  selectedValue: string;
+}
+
+export interface SendFriendModalData {
+  restaurantName: string;
+  address: string;
+  itemName: string;
+  price: string;
+  image?: string;
+}
+
+export interface SuggestionComponentType<T extends { name: string }> {
+  onHandleSelection: (name: string, slug: string) => void;
+  onClose: () => void;
+  suggestions: T[];
+  show: boolean;
+  value: string;
+}
+
+export interface FormFieldType {
+  type: FieldTypes;
+  name: string;
+  label: string;
+  placeholder?: boolean;
+  isRequired?: boolean;
+}
+
+export interface formCompValueType {
+  value: string;
+  label: string;
+  type: string;
+}
+
+export interface formCompObjType {
+  [key: string]: formCompValueType;
+}
+
+export interface snackBarObjType {
+  open: boolean;
+  message: string;
+  severity: AlertColor;
+}
+
+export interface StatusType {
+  id: number;
+  name: string;
+}
+
+export interface dropDownMenuItemType {
+  name: string;
+  url: string;
 }

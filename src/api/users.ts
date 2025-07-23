@@ -1,5 +1,5 @@
 import { _get } from "@/utils";
-import { userRatingPayload, CreateUserInputType } from "@/types/users";
+import { userRatingPayload, CreateUserInputType } from "@/interfaces/users";
 import { ADD_USER_MUTATION, ADD_USER_RATING } from "@/graphql/queries/users";
 import { useMutation } from "@apollo/client";
 

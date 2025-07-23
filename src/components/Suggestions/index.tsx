@@ -3,7 +3,7 @@ import { useRef, useEffect } from "react";
 import clsx from "clsx";
 import { getBuiltAddress, handleHighlightSuggest } from "@/utils";
 import "./index.css";
-import { SuggestionComponentType } from "@/types";
+import { SuggestionComponentType } from "@/interfaces";
 
 const SuggestionsComponent = <T extends { name: string }>({
   suggestions,

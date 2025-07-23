@@ -1,7 +1,7 @@
 import { FC, useEffect } from "react";
 import "./index.css";
 import NoImage from "../NoImage";
-import { ImageInterface } from "@/interfaces";
+import { ImageInterface } from "@/interfaces/restaurants";
 
 const Image: FC<ImageInterface> = ({ url, alt }) => {
   if (!url) {

@@ -1,4 +1,4 @@
-import { snackBarObjType } from "@/types";
+import { snackBarObjType } from "@/interfaces";
 import { AlertColor } from "@mui/material";
 import { useCallback, useState } from "react";
 import SnackBarCustom from "@/components/Snackbar";

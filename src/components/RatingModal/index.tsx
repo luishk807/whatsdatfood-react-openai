@@ -9,7 +9,10 @@ import useUser from "@/customHooks/useUser";
 import { _get } from "@/utils";
 import useSnackbarHook from "@/customHooks/useSnackBar";
 import { getTotalRatings } from "@/utils";
-import { RatingComponentInterface, RatingPayloadType } from "@/interfaces";
+import {
+  RatingComponentInterface,
+  RatingPayloadType,
+} from "@/interfaces/users";
 
 const RatingComponent: FC<RatingComponentInterface> = ({ data }) => {
   const [closeModal, setCloseModal] = useState(false);

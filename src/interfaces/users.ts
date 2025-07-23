@@ -1,14 +1,35 @@
-import { StatusType } from "@/types";
-import { MenuItemType, RestaurantType } from "@/types/restaurants";
+import { SxProps, Theme } from "@mui/material";
+import { MenuItemType, RestaurantType } from "@/interfaces/restaurants";
+import { StatusType } from "@/interfaces";
 
-export type userRatingPayload = {
+export interface RatingCustomInterface {
+  defaultValue: number;
+  label?: string;
+  sx?: SxProps<Theme>;
+  oneStarMode?: boolean;
+  onClick?: (value: number) => void;
+  isDisplay?: boolean;
+}
+
+export interface RatingComponentInterface {
+  data: MenuItemType;
+}
+
+export interface RatingPayloadType {
+  rating: number | null;
+  title: string | null;
+  comment: string | null;
+  restaurant_menu_item_id: number;
+}
+
+export interface userRatingPayload {
   id?: number;
   rating: number;
   user_id: number;
   restaurant_menu_item_id: number;
-};
+}
 
-export type UserRating = {
+export interface UserRating {
   id?: number;
   restaurant_menu_item_id: bigint;
   user_id: bigint;
@@ -17,31 +38,31 @@ export type UserRating = {
   updatedAt?: Date;
   comment?: string;
   restaurantItem?: MenuItemType;
-};
+}
 
-export type UserRoleType = {
+export interface UserRoleType {
   id: number;
   name: string;
-};
+}
 
-export type CreateUserInputType = {
+export interface CreateUserInputType {
   dob: string;
   first_name: string;
   last_name: string;
   email: string;
   password: string;
   phone: string;
-};
+}
 
-export type UserSearchesType = {
+export interface UserSearchesType {
   id: number;
   user_id: number;
   restaurant_id: number;
   restaurant: RestaurantType;
   user: UserType;
-};
+}
 
-export type UserType = {
+export interface UserType {
   id: number;
   first_name: string;
   last_name: string;
@@ -59,4 +80,4 @@ export type UserType = {
   status?: StatusType;
   role?: UserRoleType;
   searches?: [UserSearchesType];
-};
+}

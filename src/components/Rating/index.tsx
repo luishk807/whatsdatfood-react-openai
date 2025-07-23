@@ -2,7 +2,7 @@ import Rating from "@mui/material/Rating";
 import StarIcon from "@mui/icons-material/Star";
 import { Box } from "@mui/material";
 import { useState, useEffect, type FC } from "react";
-import { RatingCustomInterface } from "@/interfaces";
+import { RatingCustomInterface } from "@/interfaces/users";
 
 const RatingCustom: FC<RatingCustomInterface> = ({
   isDisplay = false,

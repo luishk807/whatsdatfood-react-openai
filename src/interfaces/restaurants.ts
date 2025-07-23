@@ -1,5 +1,25 @@
-import { UserRating } from "./users";
-export type MenuItemType = {
+import { UserRating } from "@/interfaces/users";
+
+export interface MenuTitleInterface {
+  restaurant: RestaurantType | null;
+}
+
+export interface MenuItemInterface {
+  item: MenuInterfaceItemType;
+  restaurant?: RestaurantType | null;
+}
+
+export interface ImageInterface {
+  url?: string | null;
+  alt?: string | null;
+}
+
+export interface MenuItemImageInterface<T> {
+  data: T | null;
+  onImageChange?: (newImage: string) => void;
+}
+
+export interface MenuItemType {
   name: string;
   description: string;
   category: string;
@@ -7,13 +27,13 @@ export type MenuItemType = {
   price?: number;
   image?: string;
   ratings?: [UserRating];
-};
+}
 
-export type RestCategoryMenu = {
+export interface RestCategoryMenu {
   [category: string]: MenuItemType[];
-};
+}
 
-export type RestaurantType = {
+export interface RestaurantType {
   id?: number;
   name: string;
   address?: string;
@@ -32,9 +52,9 @@ export type RestaurantType = {
   letter_grade?: string;
   updatedAt?: string;
   restaurantItems?: [MenuItemType];
-};
+}
 
-export type RestaurantItemImageType = {
+export interface RestaurantItemImageType {
   id?: bigint;
   restaurant_menu_item_id: bigint;
   name?: string;
@@ -48,9 +68,9 @@ export type RestaurantItemImageType = {
   updated_at?: Date;
   deleted_at?: Date;
   restaurantItem?: MenuItemType;
-};
+}
 
-export type MenuInterfaceItemType = {
+export interface MenuInterfaceItemType {
   id: number;
   name: string;
   category: string;
@@ -59,4 +79,4 @@ export type MenuInterfaceItemType = {
   image: string;
   price: number;
   restaurant?: RestaurantType;
-};
+}

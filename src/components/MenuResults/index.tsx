@@ -6,7 +6,7 @@ import {
   RestaurantType,
   MenuItemType,
   RestCategoryMenu,
-} from "@/types/restaurants";
+} from "@/interfaces/restaurants";
 import LoadingComponent from "../LoadingComponent";
 import MenuTitle from "@/components/MenuTitle";
 import "./index.css";

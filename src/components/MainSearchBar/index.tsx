@@ -4,7 +4,7 @@ import { Grid } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import MainSearchInput from "@/components/MainSearchInput";
 import "./index.css";
-import { RestaurantType } from "@/types/restaurants";
+import { RestaurantType } from "@/interfaces/restaurants";
 import SearchButton from "../SearchButton";
 import { _get } from "@/utils";
 import SuggestionsComponent from "../Suggestions";

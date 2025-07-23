@@ -1,6 +1,6 @@
 import { Box, Grid } from "@mui/material";
 import FormComponent from "@/components/FormComponent";
-import { FormFieldType } from "@/types";
+import { FormFieldType } from "@/interfaces";
 import "./index.css";
 import { SIGN_IN_FIELDS } from "@/customConstants/forms";
 import { Link } from "react-router-dom";
