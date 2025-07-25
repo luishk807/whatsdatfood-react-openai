@@ -30,7 +30,7 @@ const MenuResults: FC = () => {
       const resp = await getRestaurantListBySlug(restaurant);
 
       if (resp) {
-        const menuItems = _get<MenuItemType[]>(resp, "restaurantItems", []);
+        const menuItems = _get<MenuItemType[]>(resp, "restaurantMenuItems", []);
 
         if (menuItems && menuItems.length) {
           const map = new Map<string, MenuItemType[]>();
@@ -58,8 +58,19 @@ const MenuResults: FC = () => {
           michelin_score: _get(resp, "michelin_score"),
           rating: Number(_get(resp, "rating", 0)),
           phone: _get(resp, "phone"),
+          payment_method: _get(resp, "payment_method"),
+          delivery_method: _get(resp, "delivery_method"),
           letter_grade: _get(resp, "letter_grade"),
           description: _get(resp, "description"),
+          businessHours: _get(resp, "businessHours"),
+          tasting_menu_only: _get(resp, "tasting_menu_only"),
+          tasting_menu_price: _get(resp, "tasting_menu_price"),
+          price_range: _get(resp, "price_range"),
+          drink_pairing_price: _get(resp, "drink_pairing_price"),
+          reservation_required: _get(resp, "reservation_required"),
+          reservation_available: _get(resp, "reservation_available"),
+          website: _get(resp, "website"),
+          email: _get(resp, "email"),
         });
       }
     }

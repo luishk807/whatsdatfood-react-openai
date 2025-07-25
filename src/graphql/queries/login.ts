@@ -40,7 +40,7 @@ export const CHECK_AUTH = gql`
         rating
         comment
         createdAt
-        restaurantItem {
+        restaurantMenuItem {
           name
           restaurant {
             name

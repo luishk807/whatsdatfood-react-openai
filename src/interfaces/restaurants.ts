@@ -1,4 +1,5 @@
 import { UserRating } from "@/interfaces/users";
+import { BusinessHours } from "@/interfaces/businessHours";
 
 export interface MenuTitleInterface {
   restaurant: RestaurantType | null;
@@ -20,6 +21,7 @@ export interface MenuItemImageInterface<T> {
 }
 
 export interface MenuItemType {
+  id?: number;
   name: string;
   description: string;
   category: string;
@@ -48,9 +50,19 @@ export interface RestaurantType {
   phone?: string;
   description?: string;
   delivery_method?: string;
+  payment_method?: string;
   rating?: number;
   letter_grade?: string;
   updatedAt?: string;
+  website?: string;
+  email?: string;
+  tasting_menu_only?: boolean;
+  tasting_menu_price?: number;
+  price_range?: string;
+  drink_pairing_price?: number;
+  reservation_required?: boolean;
+  reservation_available?: boolean;
+  businessHours: [BusinessHours];
   restaurantItems?: [MenuItemType];
 }
 

@@ -24,26 +24,39 @@ const MenuTitle: FC<MenuTitleInterface> = ({ restaurant }) => {
   return (
     <Grid
       container
+      id="menu-results-container"
       width="100%"
       size={12}
       display="flex"
       justifyContent="center"
     >
       <Grid size={12} className="menu-results-main-section">
-        <div className="menu-results-main-title flex justify-center item-center">
+        <Box
+          component="div"
+          sx={{
+            flexDirection: {
+              xs: "column",
+              lg: "row",
+            },
+          }}
+          className="menu-results-main-title flex justify-center item-center"
+        >
           {restaurant?.name || "Restaurant name unavailable"}
 
           <Rating
             oneStarMode={true}
             sx={{
-              display: "flex",
+              display: {
+                xs: "block",
+                lg: "flex",
+              },
               alignItems: "center",
               fontSize: ".5em",
               paddingLeft: "5px",
             }}
             defaultValue={Number(restaurant?.rating)}
           />
-        </div>
+        </Box>
         <Box sx={{ fontSize: "1.3em" }}>{restaurant?.phone}</Box>
         <div className="menu-results-main-address">
           {addressFull || "Address unavailable"}
@@ -51,6 +64,41 @@ const MenuTitle: FC<MenuTitleInterface> = ({ restaurant }) => {
         <div>
           <MichelinStars stars={restaurant?.michelin_score} />
         </div>
+      </Grid>
+      <Grid size={12} className="flex justify-center">
+        {restaurant.description}
+      </Grid>
+      <Grid size={12} className="flex justify-center">
+        <Grid container className="menu-result-info-container">
+          <Grid size={12} className="menu-result-info-title">
+            Payment Method
+          </Grid>
+          <Grid
+            size={12}
+            className="menu-result-info-data"
+            sx={{ textTransform: "capitalize" }}
+          >
+            {restaurant.payment_method || "N/A"}
+          </Grid>
+        </Grid>
+      </Grid>
+      <Grid size={12} className="flex justify-center">
+        <Grid container className="menu-result-info-container">
+          <Grid size={12} className="menu-result-info-title">
+            Delivery Methods
+          </Grid>
+          <Grid size={12} className="menu-result-info-data">
+            {restaurant.delivery_method || "N/A"}
+          </Grid>
+        </Grid>
+      </Grid>
+      <Grid size={12} className="flex justify-center">
+        <Grid container className="menu-result-info-container">
+          <Grid className="menu-result-info-title">Sanitary Grade</Grid>
+          <Grid className="menu-result-info-data">
+            &nbsp;{restaurant.letter_grade || "N/A"}
+          </Grid>
+        </Grid>
       </Grid>
     </Grid>
   );

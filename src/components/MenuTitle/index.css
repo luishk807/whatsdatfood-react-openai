@@ -1,13 +1,24 @@
-.menu-results-main-section {
+#menu-results-container .menu-results-main-section {
   padding: 10px 0px;
   display: flex;
   flex-direction: column;
   justify-content: center;
   width: 100%;
 }
-.menu-results-main-title {
+#menu-results-container .menu-results-main-title {
   font-size: 2.5em;
 }
-.menu-results-main-address {
+#menu-results-container .menu-results-main-address {
   font-size: 1.5em;
+}
+
+#menu-results-container .menu-result-info-container {
+  padding: 5px 0px;
+}
+#menu-results-container .menu-result-info-title {
+  font-weight: bold;
+}
+
+#menu-results-container .menu-result-info-data {
+  text-transform: capitalize;
 }

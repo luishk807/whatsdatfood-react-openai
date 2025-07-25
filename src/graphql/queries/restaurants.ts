@@ -26,8 +26,22 @@ export const GET_RESTAURANT_BY_SLUG = gql`
       description
       rating
       delivery_method
+      payment_method
       letter_grade
-      restaurantItems {
+      website
+      email
+      tasting_menu_only
+      drink_pairing_price
+      tasting_menu_price
+      price_range
+      reservation_required
+      reservation_available
+      businessHours {
+        day_of_week
+        open_time
+        close_time
+      }
+      restaurantMenuItems {
         id
         name
         description
@@ -51,7 +65,7 @@ export const GET_RESTAURANT_IMAGES = gql`
       name
       url_m
       owner
-      restaurantItem {
+      restaurantMenuItem {
         name
         price
         top_choice
