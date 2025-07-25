@@ -18,11 +18,11 @@ const DashingDisplayBox: FC<DashingDisplayBoxInt> = ({ title, data, show }) => {
     >
       {title && <Box className="show-tasting-title">{title}</Box>}
       {data.map((item, indx) => (
-        <Grid container>
-          <Grid size={6} key={indx} className="show-tasting-label">
+        <Grid container key={indx}>
+          <Grid size={6} className="show-tasting-label">
             {item.label}
           </Grid>
-          <Grid size={6} key={indx} className="show-tasting-value">
+          <Grid size={6} className="show-tasting-value">
             {item.value}
           </Grid>
         </Grid>

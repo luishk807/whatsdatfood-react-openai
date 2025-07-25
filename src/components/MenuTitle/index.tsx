@@ -5,7 +5,10 @@ import "./index.css";
 import { getBuiltAddress, _get } from "@/utils";
 import MichelinStars from "@/components/MichelinStars";
 import Rating from "@/components/Rating";
+import BusinessHourDisplay from "../BusinessHoursDisplay";
 import ShowRestaurantDetail from "@/components/ShowRestaurantDetail";
+
+import RestaurantIconMenu from "../RestaurantIconMenu";
 const MenuTitle: FC<MenuTitleInterface> = ({ restaurant }) => {
   console.log("fff", restaurant);
   const addressFull = restaurant
@@ -66,6 +69,31 @@ const MenuTitle: FC<MenuTitleInterface> = ({ restaurant }) => {
           <MichelinStars stars={restaurant?.michelin_score} />
         </div>
       </Grid>
+      <Grid size={12}>
+        <Box
+          sx={{
+            display: {
+              lg: "flex",
+              xs: "none",
+            },
+            justifyContent: {
+              lg: "center",
+            },
+            borderBottom: {
+              xs: "1px solid white",
+            },
+          }}
+        >
+          <RestaurantIconMenu restaurant={restaurant} />
+        </Box>
+      </Grid>
+      <Grid
+        size={12}
+        sx={{ margin: "10px 0px" }}
+        className="flex justify-center"
+      >
+        Price Range: {restaurant.price_range}
+      </Grid>
       <Grid size={12} className="flex justify-center">
         {restaurant.description}
       </Grid>
@@ -84,25 +112,10 @@ const MenuTitle: FC<MenuTitleInterface> = ({ restaurant }) => {
         </Grid>
       </Grid>
       <Grid size={12} className="flex justify-center">
-        <Grid container className="menu-result-info-container">
-          <Grid size={12} className="menu-result-info-title">
-            Delivery Methods
-          </Grid>
-          <Grid size={12} className="menu-result-info-data">
-            {restaurant.delivery_method || "N/A"}
-          </Grid>
-        </Grid>
-      </Grid>
-      <Grid size={12} className="flex justify-center">
-        <Grid container className="menu-result-info-container">
-          <Grid className="menu-result-info-title">Sanitary Grade</Grid>
-          <Grid className="menu-result-info-data">
-            &nbsp;{restaurant.letter_grade || "N/A"}
-          </Grid>
-        </Grid>
+        <BusinessHourDisplay schedules={restaurant.businessHours} />
       </Grid>
       <Grid size={12}>
-        <ShowRestaurantDetail />
+        <ShowRestaurantDetail data={restaurant} />
       </Grid>
     </Grid>
   );

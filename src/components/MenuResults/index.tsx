@@ -18,6 +18,7 @@ import SkeletonMenuItem from "@/components/SkeletonLoaders/MenuResultPage";
 import useRestaurantMutation from "@/customHooks/useRestaurantMutations";
 import DashingDisplayBox from "@/components/DashingDisplayBox";
 import useAuth from "@/customHooks/useAuth";
+import RestaurantIconMenu from "@/components/RestaurantIconMenu";
 const MenuResults: FC = () => {
   const { getRestaurantListBySlug, getRestaurantListBySlugQuery } =
     useRestaurantMutation();
@@ -138,6 +139,16 @@ const MenuResults: FC = () => {
             title="Tasting Menu"
             data={tastingMenuData}
           />
+        </Grid>
+        <Grid
+          size={12}
+          sx={{
+            display: {
+              lg: "none",
+            },
+          }}
+        >
+          <RestaurantIconMenu restaurant={restaurantInfo} />
         </Grid>
         <Grid size={12}>
           {Object.keys(restaurantMenu).map((category, catIndx) => {

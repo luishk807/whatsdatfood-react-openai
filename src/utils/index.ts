@@ -3,13 +3,34 @@ import { DEFAULT_CURRENCY } from "@/customConstants";
 import { getTypeFn, getBuiltAddressType } from "@/types";
 import { UserRating } from "@/interfaces/users";
 import { useLocation } from "react-router-dom";
+import dayjs from "dayjs";
 import { MenuItemType } from "@/interfaces/restaurants";
+import customParseFormat from "dayjs/plugin/customParseFormat";
+dayjs.extend(customParseFormat); // register the plugin
+
 export const _get: getTypeFn = <T>(
   obj: any,
   flag: string,
   defaultvalue?: T,
 ) => {
   return _.get(obj, flag, defaultvalue);
+};
+
+export const getDate = (date?: string, format?: string) => {
+  if (!format) {
+    format = "MM/DD/YYYY";
+  }
+
+  return dayjs(date).isValid()
+    ? dayjs(date).format(format)
+    : dayjs().format(format);
+};
+
+export const convertTimeToLocal = (time: string, format?: string) => {
+  if (!time) {
+    return null;
+  }
+  return dayjs(time, "HH:mm").format(format ? format : "h:mm A");
 };
 
 export const handleHighlightSuggest = (value: string, target: string) => {
