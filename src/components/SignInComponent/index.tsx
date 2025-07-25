@@ -26,7 +26,7 @@ const SignInComponent = () => {
         checkUser();
         showSnackBar("SUCCESS: You are logged in!", "success");
         setTimeout(() => {
-          navigator("/account");
+          navigator("/");
         }, 2000);
       } else {
         showSnackBar("ERROR: unable to log in!", "error");

@@ -5,6 +5,7 @@ import "./index.css";
 import { getBuiltAddress, _get } from "@/utils";
 import MichelinStars from "@/components/MichelinStars";
 import Rating from "@/components/Rating";
+import ShowRestaurantDetail from "@/components/ShowRestaurantDetail";
 const MenuTitle: FC<MenuTitleInterface> = ({ restaurant }) => {
   console.log("fff", restaurant);
   const addressFull = restaurant
@@ -99,6 +100,9 @@ const MenuTitle: FC<MenuTitleInterface> = ({ restaurant }) => {
             &nbsp;{restaurant.letter_grade || "N/A"}
           </Grid>
         </Grid>
+      </Grid>
+      <Grid size={12}>
+        <ShowRestaurantDetail />
       </Grid>
     </Grid>
   );

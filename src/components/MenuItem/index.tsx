@@ -15,6 +15,7 @@ import RatingComponent from "@/components/RatingModal";
 const MenuItem: FC<MenuItemInterface> = ({ item, restaurant }) => {
   const [sendFriendPayload, setSendPayload] =
     useState<SendFriendModalData | null>(null);
+  const [showPrice, setShowPrice] = useState(true);
 
   useEffect(() => {
     let isMounted = false;
@@ -35,6 +36,8 @@ const MenuItem: FC<MenuItemInterface> = ({ item, restaurant }) => {
           postal_code,
           country,
         });
+
+        setShowPrice(!restaurant.tasting_menu_only);
 
         setSendPayload({
           restaurantName: _get(restaurant, "name", ""),
@@ -85,15 +88,16 @@ const MenuItem: FC<MenuItemInterface> = ({ item, restaurant }) => {
               >
                 <MenuItemTitle data={item} />
               </Grid>
-
-              <Grid
-                size={{ xs: 12, md: 2 }}
-                display="flex"
-                justifyContent={{ xs: "center", md: "end" }}
-                className="item-menu-item-price"
-              >
-                {convertCurrency(item.price)}
-              </Grid>
+              {showPrice && (
+                <Grid
+                  size={{ xs: 12, md: 2 }}
+                  display="flex"
+                  justifyContent={{ xs: "center", md: "end" }}
+                  className="item-menu-item-price"
+                >
+                  {convertCurrency(item.price)}
+                </Grid>
+              )}
             </Grid>
           </Grid>
 

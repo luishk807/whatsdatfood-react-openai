@@ -3,8 +3,8 @@ import useAuth from "@/customHooks/useAuth";
 
 const ProtectedRoute = () => {
   const { user, checkAuthQuery } = useAuth();
-  const { loading, error } = checkAuthQuery;
-  if (loading) {
+  const { loading, error, initialized } = checkAuthQuery;
+  if (!initialized) {
     return <p>...loading</p>;
   }
   if (!user || error) {

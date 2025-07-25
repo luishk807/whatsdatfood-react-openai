@@ -11,3 +11,8 @@
 .menu-result-category-container {
   padding: 10px 0px;
 }
+.show-tasting-price-container {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0px;
+}

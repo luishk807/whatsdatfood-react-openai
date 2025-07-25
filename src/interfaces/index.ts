@@ -31,7 +31,6 @@ export interface CustomModalInterface {
 export interface SendFriendModalInterface {
   data?: SendFriendModalData | null;
 }
-
 export interface TextFieldInterface {
   label: string;
   name?: string;
@@ -94,6 +93,17 @@ export interface formCompValueType {
 
 export interface formCompObjType {
   [key: string]: formCompValueType;
+}
+
+export interface CustomKeyPairObj<T> {
+  label: string;
+  value: T;
+}
+
+export interface DashingDisplayBoxInt {
+  show: boolean | undefined;
+  title?: string;
+  data: CustomKeyPairObj<string>[] | null;
 }
 
 export interface snackBarObjType {

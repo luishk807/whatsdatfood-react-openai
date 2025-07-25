@@ -92,3 +92,7 @@ export interface MenuInterfaceItemType {
   price: number;
   restaurant?: RestaurantType;
 }
+
+export interface ShowRestaurantDetailI {
+  data?: RestaurantType | null;
+}

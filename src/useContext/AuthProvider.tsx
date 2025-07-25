@@ -10,6 +10,7 @@ interface AuthProviderInterface {
   checkAuthQuery: {
     loading: boolean;
     error: any;
+    initialized: boolean;
   };
   logoutQuery: {
     loading: boolean;
@@ -23,6 +24,7 @@ export const AuthContext = createContext<AuthProviderInterface | undefined>(
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<UserType | null>(null);
+  const [initialized, setInitialized] = useState(false);
   const [checkAuth, { data, loading, error }] = useLazyQuery(CHECK_AUTH, {
     fetchPolicy: "network-only",
   });
@@ -35,12 +37,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   useEffect(() => {
+    if (data || error) {
+      setInitialized(true);
+    }
+
     if (data?.checkAuth) {
       setUser(data.checkAuth);
     } else {
       setUser(null);
     }
-  }, [data]);
+  }, [data, error]);
 
   const logout = async () => {
     await logoutMutation();
@@ -53,6 +59,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     checkAuthQuery: {
       loading,
       error,
+      initialized,
     },
     logoutQuery: {
       loading: logoutLoading,

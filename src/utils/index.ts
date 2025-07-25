@@ -17,11 +17,9 @@ export const handleHighlightSuggest = (value: string, target: string) => {
   return value.replace(regex, `<b>$1</b>`);
 };
 
-export const convertCurrency = (
-  amount: number,
-  currency: any = DEFAULT_CURRENCY,
-) => {
-  const { code, name } = currency;
+export const convertCurrency = (amount: number, currency?: any) => {
+  const defaultCurrency = currency ? currency : DEFAULT_CURRENCY;
+  const { code, name } = defaultCurrency;
   return new Intl.NumberFormat(code, {
     style: "currency",
     currency: name,
