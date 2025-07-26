@@ -1,26 +1,33 @@
-import { Grid } from "@mui/material";
+import { Grid, Tooltip } from "@mui/material";
 
 import "./index.css";
 import michelinStar from "@/assets/michelin_star.png";
-import { FC, useMemo } from "react";
+import { FC, useMemo, useEffect, useState } from "react";
 interface MichelinStarsInterface {
   stars?: number;
 }
 const MichelinStars: FC<MichelinStarsInterface> = ({ stars = 0 }) => {
-  console.log(stars);
-  const starsBuilder = useMemo(() => {
+  const [starElem, setStarElem] = useState<any[] | null>(null);
+
+  useEffect(() => {
+    const stack = [];
     for (let i = 0; i < stars; i++) {
-      return (
+      console.log("creating", i);
+      stack.push(
         <li key={i}>
           <img alt="michelin star" src={michelinStar} />
-        </li>
+        </li>,
       );
     }
+
+    setStarElem(stack);
   }, [stars]);
 
   return (
     <div id="michelin-star-container">
-      <ul>{starsBuilder}</ul>
+      <Tooltip title={`${stars} Michelin Stars`}>
+        <ul>{starElem && starElem.map((item) => item)}</ul>
+      </Tooltip>
     </div>
   );
 };

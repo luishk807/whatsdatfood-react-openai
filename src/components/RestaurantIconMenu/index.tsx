@@ -3,6 +3,7 @@ import PhoneIphoneRoundedIcon from "@mui/icons-material/PhoneIphoneRounded";
 import LanguageRoundedIcon from "@mui/icons-material/LanguageRounded";
 import IosShareRoundedIcon from "@mui/icons-material/IosShareRounded";
 import MailOutlineRoundedIcon from "@mui/icons-material/MailOutlineRounded";
+import LocalPhoneRoundedIcon from "@mui/icons-material/LocalPhoneRounded";
 import IconLinkButton from "../IconLinkButton";
 import { RestaurantType } from "@/interfaces/restaurants";
 import { type FC } from "react";
@@ -14,7 +15,7 @@ const RestaurantIconMenu: FC<RestaurantIconMenuInt> = ({ restaurant }) => {
   const style = {
     fontSize: {
       lg: "1em",
-      xs: "2.5em",
+      xs: "2em",
     },
     color: {
       xs: "white",
@@ -28,6 +29,9 @@ const RestaurantIconMenu: FC<RestaurantIconMenuInt> = ({ restaurant }) => {
           xs: "black",
           lg: "white",
         },
+        borderBottom: {
+          xs: "1px solid white",
+        },
       }}
     >
       <Grid container>
@@ -37,7 +41,7 @@ const RestaurantIconMenu: FC<RestaurantIconMenuInt> = ({ restaurant }) => {
             component="a"
             href={`tel:${restaurant.phone}`}
           >
-            <PhoneIphoneRoundedIcon sx={style} />
+            <LocalPhoneRoundedIcon sx={style} />
           </IconButton>
           <IconButton
             component="a"

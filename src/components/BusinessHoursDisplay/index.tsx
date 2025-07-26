@@ -69,6 +69,7 @@ const BusinessHourDisplay: FC<BusinessHourDisplayInterface> = ({
       <Box
         sx={{
           margin: "10px 0px",
+          cursor: "pointer",
         }}
       >
         <div className="flex item-center text-[1em]">

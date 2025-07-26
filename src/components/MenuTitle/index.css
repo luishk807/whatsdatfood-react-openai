@@ -22,3 +22,10 @@
 #menu-results-container .menu-result-info-data {
   text-transform: capitalize;
 }
+
+.menu-title-reservation-required {
+  text-transform: uppercase;
+  color: red;
+  font-weight: 500;
+  margin: 10px 0px;
+}

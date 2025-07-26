@@ -50,13 +50,11 @@ const MenuTitle: FC<MenuTitleInterface> = ({ restaurant }) => {
           <Rating
             oneStarMode={true}
             sx={{
-              display: {
-                xs: "block",
-                lg: "flex",
-              },
+              display: "flex",
               alignItems: "center",
               fontSize: ".5em",
               paddingLeft: "5px",
+              justifyContent: "center",
             }}
             defaultValue={Number(restaurant?.rating)}
           />
@@ -87,6 +85,7 @@ const MenuTitle: FC<MenuTitleInterface> = ({ restaurant }) => {
           <RestaurantIconMenu restaurant={restaurant} />
         </Box>
       </Grid>
+
       <Grid
         size={12}
         sx={{ margin: "10px 0px" }}
@@ -114,6 +113,11 @@ const MenuTitle: FC<MenuTitleInterface> = ({ restaurant }) => {
       <Grid size={12} className="flex justify-center">
         <BusinessHourDisplay schedules={restaurant.businessHours} />
       </Grid>
+      {restaurant.reservation_required && (
+        <Grid size={12} className="menu-title-reservation-required">
+          Reservation Required
+        </Grid>
+      )}
       <Grid size={12}>
         <ShowRestaurantDetail data={restaurant} />
       </Grid>
