@@ -23,31 +23,8 @@ export const CHECK_AUTH = gql`
       first_name
       last_name
       email
-      dob
-      createdAt
-      role {
-        name
-      }
-      status {
-        name
-      }
-      searches {
-        restaurant {
-          name
-        }
-      }
-      ratings {
-        rating
-        comment
-        createdAt
-        restaurantMenuItem {
-          name
-          restaurant {
-            name
-            address
-          }
-        }
-      }
+      role_id
+      status_id
     }
   }
 `;

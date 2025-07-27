@@ -33,9 +33,9 @@ const AccountButton = () => {
 
   useEffect(() => {
     if (user) {
-      const role: string = _get(user, "role.name", "");
+      const role: string = _get(user, "role_id", "");
       if (role) {
-        getMenuType(role.toLowerCase() as keyof dropDownMenuListType);
+        getMenuType(role as keyof dropDownMenuListType);
       }
     } else {
       getMenuType("guest");

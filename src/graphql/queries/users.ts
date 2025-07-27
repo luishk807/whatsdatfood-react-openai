@@ -21,20 +21,20 @@ export const UPDATE_USER_MUTATION = gql`
     }
   }
 `;
+
+export const ADD_USER_FAVORITES = gql`
+  mutation addUserFavorites($input: CreateUserFavoritesInput!) {
+    addUserFavorites(input: $input) {
+      id
+    }
+  }
+`;
+
 export const ADD_USER_RATING = gql`
   mutation addUserRating($payload: CreateUserRatingInput!) {
     addUserRating(input: $payload) {
       id
       rating
-    }
-  }
-`;
-
-export const ADD_USER_FAVORITES = gql`
-  mutation addUserFavorites($payload: CreateUserFavoritesInput!) {
-    addUserFavorites(input: $payload) {
-      id
-      restaurant_id
     }
   }
 `;
@@ -47,5 +47,20 @@ export const DELETE_USER_FAVORITES = gql`
 export const CHECK_USERNAME_EXIST = gql`
   query checkUsername($username: String!) {
     checkUsername(username: $username)
+  }
+`;
+
+export const GET_USER_RATING_BY_RESTAURANT_ID = gql`
+  query getRatingByRestItemId($restItemId: ID!) {
+    getRatingByRestItemId(restItemId: $restItemId) {
+      id
+      rating
+      user_id
+      comment
+      title
+      createdAt
+      updatedAt
+      restaurant_menu_item_id
+    }
   }
 `;

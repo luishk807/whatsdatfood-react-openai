@@ -16,6 +16,7 @@ export interface RatingComponentInterface {
 }
 
 export interface RatingPayloadType {
+  id?: number | null;
   rating: number | null;
   title: string | null;
   comment: string | null;

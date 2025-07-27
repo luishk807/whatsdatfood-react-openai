@@ -26,13 +26,13 @@ export const FIELD_TYPES = {
 } as const;
 
 export const ACCOUNT_TYPE = {
-  guest: "guest",
-  user: "user",
-  admin: "admin",
+  guest: "3",
+  user: "1",
+  admin: "2",
 };
 
 export const DROPDOWN_MENU = {
-  user: [
+  "1": [
     {
       name: "Account",
       url: "/account",
@@ -54,7 +54,7 @@ export const DROPDOWN_MENU = {
       url: "/logout",
     },
   ],
-  guest: [
+  "3": [
     {
       name: "Sign In",
       url: "/sign-in",

@@ -70,7 +70,9 @@ const BusinessHourDisplay: FC<BusinessHourDisplayInterface> = ({
             {isTodayOpen ? `Open` : `Closed`} Today
           </Box>
         </div>
-        <div>{`${todaySchedule?.open_time} - ${todaySchedule?.close_time}`}</div>
+        {isTodayOpen && (
+          <div>{`${todaySchedule?.open_time} - ${todaySchedule?.close_time}`}</div>
+        )}
       </Box>
     );
   };
@@ -105,7 +107,7 @@ const BusinessHourDisplay: FC<BusinessHourDisplayInterface> = ({
         setTodaySchedule(todaySch[0]);
       }
 
-      setIsTodayOpen(!!todaySch);
+      setIsTodayOpen(!!todaySch.length);
 
       for (let schedule of capitalizedHours) {
         const key = schedule.day_of_week as WeekDay;

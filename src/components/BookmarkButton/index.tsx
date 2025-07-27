@@ -2,7 +2,7 @@ import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded
 // import BookmarkBorderRoundedIcon from "@mui/icons-material/BookmarkBorderRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import { Grid, Box, Skeleton, IconButton } from "@mui/material";
-import useUser from "@/customHooks/useUser";
+import useUserRating from "@/customHooks/useUserRating";
 import "./index.css";
 import { FC } from "react";
 
@@ -10,11 +10,15 @@ interface BookmarkButtonInt {
   slug: string;
 }
 const BookmarkButton: FC<BookmarkButtonInt> = ({ slug }) => {
-  const { saveFavorites, submitUserFavoritesQuery } = useUser();
+  const { saveFavorites, submitUserFavoritesQuery } = useUserRating();
   const { loading, error } = submitUserFavoritesQuery;
   const handleSaveButton = async () => {
     if (slug) {
       console.log(slug);
+      const resp = await saveFavorites(slug);
+      if (resp) {
+        console.log("resp", resp);
+      }
       //   const resp = await saveFavorites({
       //     user_id: user.id,
       //     restaurant_id: restaurant_id,

@@ -120,5 +120,5 @@ export const getAverageStarsTotal = (data: UserRating[]) => {
 };
 
 export const getTotalRatings = (data: UserRating[]) => {
-  return data.length;
+  return getAverageStarsTotal(data);
 };

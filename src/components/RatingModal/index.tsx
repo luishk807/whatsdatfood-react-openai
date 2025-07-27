@@ -1,22 +1,25 @@
 import RatingCustom from "../Rating";
-import { type FC, useMemo, useState } from "react";
+import { type FC, useEffect, useMemo, useState } from "react";
 import { Box, Grid, TextField } from "@mui/material";
 import "./index.css";
 import Modal from "@/components/Modal";
 // import FormComponent from "@/components/FormComponent";
 import Button from "../Button";
-import useUser from "@/customHooks/useUser";
+import useUserRating from "@/customHooks/useUserRating";
 import { _get } from "@/utils";
 import useSnackbarHook from "@/customHooks/useSnackBar";
 import { getTotalRatings } from "@/utils";
 import {
   RatingComponentInterface,
   RatingPayloadType,
+  UserRating,
 } from "@/interfaces/users";
 
 const RatingComponent: FC<RatingComponentInterface> = ({ data }) => {
   const [closeModal, setCloseModal] = useState(false);
+  const [foundUserRating, setFoundUserRating] = useState(false);
   const [formData, setFormData] = useState<RatingPayloadType>({
+    id: null,
     rating: null,
     title: null,
     comment: null,
@@ -27,12 +30,12 @@ const RatingComponent: FC<RatingComponentInterface> = ({ data }) => {
     return data.ratings ? getTotalRatings(data.ratings) : 0;
   }, [data.ratings]);
 
-  const { saveRating } = useUser();
+  const { saveRating, getUserRatingByItemId, userRatingByRestItemIdQuery } =
+    useUserRating();
+  const { loading } = userRatingByRestItemIdQuery;
   const { showSnackBar, SnackbarComponent, closeSnackBar } = useSnackbarHook();
-  // const formFields: FormFieldType[] = CREATE_RATING;
 
   const handleRateSubmit = async () => {
-    console.log("rest item", formData);
     try {
       const resp = await saveRating(formData);
 
@@ -70,6 +73,29 @@ const RatingComponent: FC<RatingComponentInterface> = ({ data }) => {
       });
     }
   };
+
+  const getUserRating = async (restItemId: number) => {
+    const resp = await getUserRatingByItemId(restItemId);
+    if (resp) {
+      setFoundUserRating(true);
+      setFormData({
+        ...formData,
+        id: _get(resp, "id"),
+        title: _get(resp, "title"),
+        comment: _get(resp, "comment"),
+        rating: _get(resp, "rating"),
+      });
+    } else {
+      setFoundUserRating(false);
+    }
+  };
+  useEffect(() => {
+    const itemId = _get(data, "id");
+    const ratings = _get(data, "ratings.0");
+    if (ratings && itemId && Object.keys(itemId).length) {
+      getUserRating(Number(itemId));
+    }
+  }, [data]);
 
   return (
     <>
@@ -129,7 +155,9 @@ const RatingComponent: FC<RatingComponentInterface> = ({ data }) => {
               />
             </Grid>
             <Grid size={12}>
-              <Button onClick={handleRateSubmit}>Submit Rating</Button>
+              <Button onClick={handleRateSubmit}>
+                {foundUserRating ? "Update Rating" : "Submit Rating"}
+              </Button>
             </Grid>
           </Grid>
         </Box>
