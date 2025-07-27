@@ -1,6 +1,6 @@
 import { useState, type FC, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Grid, Box, Skeleton } from "@mui/material";
+import { Grid, Box, Skeleton, IconButton } from "@mui/material";
 import MenuItem from "@/components/MenuItem";
 import {
   RestaurantType,
@@ -18,7 +18,9 @@ import SkeletonMenuItem from "@/components/SkeletonLoaders/MenuResultPage";
 import useRestaurantMutation from "@/customHooks/useRestaurantMutations";
 import DashingDisplayBox from "@/components/DashingDisplayBox";
 import useAuth from "@/customHooks/useAuth";
-import RestaurantIconMenu from "@/components/RestaurantIconMenu";
+import RestaurantIconMenu from "@/components/RestaurantSocialOptions";
+import BookmarkButton from "../BookmarkButton";
+
 const MenuResults: FC = () => {
   const { getRestaurantListBySlug, getRestaurantListBySlugQuery } =
     useRestaurantMutation();
@@ -32,7 +34,7 @@ const MenuResults: FC = () => {
     null,
   );
 
-  const { checkAuthQuery } = useAuth();
+  const { checkAuthQuery, user } = useAuth();
   const { initialized } = checkAuthQuery;
   const handleFetchRestaurant = async () => {
     if (restaurant) {
@@ -97,6 +99,11 @@ const MenuResults: FC = () => {
             reservation_available: _get(resp, "reservation_available"),
             website: _get(resp, "website"),
             email: _get(resp, "email"),
+            parking_available: _get(resp, "parking_available"),
+            cash_only: _get(resp, "cash_only"),
+            card_payment: _get(resp, "card_payment"),
+            drive_through: _get(resp, "drive_through"),
+            delivery_option: _get(resp, "delivery_option"),
           });
         }
       }
@@ -105,22 +112,11 @@ const MenuResults: FC = () => {
 
   useEffect(() => {
     handleFetchRestaurant();
-  }, [restaurant]);
+  }, [restaurant, user]);
 
   if (!initialized) {
     return (
       <Loading type={LOADING_TYPES.CUSTOM} customLoader={SkeletonMenuItem} />
-    );
-  }
-  if (!restaurantInfo) {
-    return (
-      <Box className="w-full center-full !top-[40%]">
-        <Grid container>
-          <Grid size={12}>
-            <h3>No Data Available</h3>
-          </Grid>
-        </Grid>
-      </Box>
     );
   }
 
@@ -132,11 +128,13 @@ const MenuResults: FC = () => {
         type={LOADING_TYPES.CUSTOM}
         data={restaurantInfo}
       >
+        {restaurantInfo && restaurant && <BookmarkButton slug={restaurant} />}
+
         <MenuTitle restaurant={restaurantInfo} />
         <Grid size={12} className="show-tasting-price-container">
           <DashingDisplayBox
             show={restaurantInfo?.tasting_menu_only}
-            title="Tasting Menu"
+            title="Tasting Menu (Per Person)"
             data={tastingMenuData}
           />
         </Grid>
@@ -148,7 +146,7 @@ const MenuResults: FC = () => {
             },
           }}
         >
-          <RestaurantIconMenu restaurant={restaurantInfo} />
+          {restaurantInfo && <RestaurantIconMenu restaurant={restaurantInfo} />}
         </Grid>
         <Grid size={12}>
           {Object.keys(restaurantMenu).map((category, catIndx) => {

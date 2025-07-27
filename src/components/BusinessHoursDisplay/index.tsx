@@ -3,28 +3,13 @@ import Modal from "@/components/Modal";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import { BusinessHours } from "@/interfaces/businessHours";
 import { useEffect, useMemo, type FC, useState } from "react";
-import { getDate, convertTimeToLocal } from "@/utils";
+import { getDate, convertTimeToLocal, capitalizedWord } from "@/utils";
 import "./index.css";
-
-export interface BusinessHourDisplayInterface {
-  schedules: BusinessHours[];
-}
-
-interface BusinessHour {
-  order: number;
-  open_time?: string;
-  close_time?: string;
-  day_of_week?: string;
-}
-
-export type WeekDay =
-  | "Monday"
-  | "Tuesday"
-  | "Wednesday"
-  | "Thursday"
-  | "Friday"
-  | "Saturday"
-  | "Sunday";
+import {
+  BusinessHourDisplayInterface,
+  BusinessHour,
+} from "@/interfaces/businessHours";
+import { WeekDay } from "@/interfaces";
 
 const BusinessHourDisplay: FC<BusinessHourDisplayInterface> = ({
   schedules,
@@ -91,9 +76,21 @@ const BusinessHourDisplay: FC<BusinessHourDisplayInterface> = ({
   };
 
   useEffect(() => {
-    if (schedules.length) {
+    const capitalizedHours = schedules.map((item) => {
+      const day_of_week = item.day_of_week;
+      let capitalized = "";
+      if (day_of_week) {
+        capitalized = capitalizedWord(day_of_week);
+      }
+
+      return {
+        ...item,
+        day_of_week: capitalized || item.day_of_week,
+      };
+    });
+    if (capitalizedHours.length) {
       const dayWeek = getDate("", "dddd");
-      const todaySch = schedules
+      const todaySch = capitalizedHours
         .filter((item) => item.day_of_week === dayWeek)
         .map((item) => {
           const time1 = convertTimeToLocal(item?.open_time as string);
@@ -110,7 +107,7 @@ const BusinessHourDisplay: FC<BusinessHourDisplayInterface> = ({
 
       setIsTodayOpen(!!todaySch);
 
-      for (let schedule of schedules) {
+      for (let schedule of capitalizedHours) {
         const key = schedule.day_of_week as WeekDay;
         if (key && key in businessHoursFt) {
           const time1 = convertTimeToLocal(schedule?.open_time as string);

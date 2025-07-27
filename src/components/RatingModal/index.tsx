@@ -27,14 +27,14 @@ const RatingComponent: FC<RatingComponentInterface> = ({ data }) => {
     return data.ratings ? getTotalRatings(data.ratings) : 0;
   }, [data.ratings]);
 
-  const { submitRating } = useUser();
+  const { saveRating } = useUser();
   const { showSnackBar, SnackbarComponent, closeSnackBar } = useSnackbarHook();
   // const formFields: FormFieldType[] = CREATE_RATING;
 
   const handleRateSubmit = async () => {
     console.log("rest item", formData);
     try {
-      const resp = await submitRating(formData);
+      const resp = await saveRating(formData);
 
       if (resp) {
         setFormData({

@@ -4,7 +4,7 @@ import { getTypeFn, getBuiltAddressType } from "@/types";
 import { UserRating } from "@/interfaces/users";
 import { useLocation } from "react-router-dom";
 import dayjs from "dayjs";
-import { MenuItemType } from "@/interfaces/restaurants";
+import { MenuItemType, RestaurantType } from "@/interfaces/restaurants";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 dayjs.extend(customParseFormat); // register the plugin
 
@@ -33,6 +33,21 @@ export const convertTimeToLocal = (time: string, format?: string) => {
   return dayjs(time, "HH:mm").format(format ? format : "h:mm A");
 };
 
+export const getRestNameAddress = (restaurant: RestaurantType) => {
+  const address = getBuiltAddress({
+    address: restaurant.address as string,
+    city: restaurant.city,
+    state: restaurant.state,
+    postal_code: restaurant.postal_code,
+    country: restaurant.country,
+  });
+  const name = _get(restaurant, "name");
+  return name + " " + address;
+};
+
+export const capitalizedWord = (word: string) =>
+  !word ? word : word.charAt(0).toUpperCase() + word.toLowerCase().slice(1);
+
 export const handleHighlightSuggest = (value: string, target: string) => {
   const regex = new RegExp("(" + target + ")", "gi");
   return value.replace(regex, `<b>$1</b>`);
@@ -45,6 +60,19 @@ export const convertCurrency = (amount: number, currency?: any) => {
     style: "currency",
     currency: name,
   }).format(amount);
+};
+
+export const removeDashDBName = (name: string) => {
+  if (!name) {
+    return name;
+  }
+
+  const rev = name.split("_");
+  const title = rev.map((item) => {
+    return capitalizedWord(item);
+  });
+
+  return title.join(" ");
 };
 
 export const getBuiltAddress: getBuiltAddressType = (address) => {

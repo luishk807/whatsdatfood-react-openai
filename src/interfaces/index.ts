@@ -117,6 +117,15 @@ export interface StatusType {
   name: string;
 }
 
+export type WeekDay =
+  | "Monday"
+  | "Tuesday"
+  | "Wednesday"
+  | "Thursday"
+  | "Friday"
+  | "Saturday"
+  | "Sunday";
+
 export interface dropDownMenuItemType {
   name: string;
   url: string;

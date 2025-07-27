@@ -7,10 +7,8 @@ import MichelinStars from "@/components/MichelinStars";
 import Rating from "@/components/Rating";
 import BusinessHourDisplay from "../BusinessHoursDisplay";
 import ShowRestaurantDetail from "@/components/ShowRestaurantDetail";
-
-import RestaurantIconMenu from "../RestaurantIconMenu";
+import RestaurantIconMenu from "../RestaurantSocialOptions";
 const MenuTitle: FC<MenuTitleInterface> = ({ restaurant }) => {
-  console.log("fff", restaurant);
   const addressFull = restaurant
     ? getBuiltAddress({
         address: _get(restaurant, "address"),
@@ -25,6 +23,7 @@ const MenuTitle: FC<MenuTitleInterface> = ({ restaurant }) => {
     return;
   }
 
+  console.log("restaurant info", restaurant);
   return (
     <Grid
       container
@@ -86,30 +85,39 @@ const MenuTitle: FC<MenuTitleInterface> = ({ restaurant }) => {
         </Box>
       </Grid>
 
-      <Grid
-        size={12}
-        sx={{ margin: "10px 0px" }}
-        className="flex justify-center"
-      >
-        Price Range: {restaurant.price_range}
-      </Grid>
-      <Grid size={12} className="flex justify-center">
-        {restaurant.description}
-      </Grid>
-      <Grid size={12} className="flex justify-center">
-        <Grid container className="menu-result-info-container">
-          <Grid size={12} className="menu-result-info-title">
-            Payment Method
-          </Grid>
-          <Grid
-            size={12}
-            className="menu-result-info-data"
-            sx={{ textTransform: "capitalize" }}
-          >
-            {restaurant.payment_method || "N/A"}
+      {restaurant.price_range && (
+        <Grid
+          size={12}
+          sx={{ margin: "10px 0px" }}
+          className="flex justify-center"
+        >
+          Price Range: {restaurant.price_range}
+        </Grid>
+      )}
+
+      {restaurant.description && (
+        <Grid size={12} className="flex justify-center italic">
+          &quot;{restaurant.description} &quot;
+        </Grid>
+      )}
+
+      {restaurant.payment_method && (
+        <Grid size={12} className="flex justify-center">
+          <Grid container className="menu-result-info-container">
+            <Grid size={12} className="menu-result-info-title">
+              Payment Method
+            </Grid>
+            <Grid
+              size={12}
+              className="menu-result-info-data"
+              sx={{ textTransform: "capitalize" }}
+            >
+              {restaurant.payment_method || "N/A"}
+            </Grid>
           </Grid>
         </Grid>
-      </Grid>
+      )}
+
       <Grid size={12} className="flex justify-center">
         <BusinessHourDisplay schedules={restaurant.businessHours} />
       </Grid>

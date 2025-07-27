@@ -28,7 +28,7 @@ export interface MenuItemType {
   top_choice: boolean;
   price?: number;
   image?: string;
-  ratings?: [UserRating];
+  ratings?: UserRating[];
 }
 
 export interface RestCategoryMenu {
@@ -62,8 +62,13 @@ export interface RestaurantType {
   drink_pairing_price?: number;
   reservation_required?: boolean;
   reservation_available?: boolean;
-  businessHours: [BusinessHours];
-  restaurantItems?: [MenuItemType];
+  parking_available?: boolean;
+  cash_only?: boolean;
+  card_payment?: boolean;
+  drive_through?: boolean;
+  delivery_option?: boolean;
+  businessHours: BusinessHours[];
+  restaurantItems?: MenuItemType[];
 }
 
 export interface RestaurantItemImageType {
@@ -95,4 +100,8 @@ export interface MenuInterfaceItemType {
 
 export interface ShowRestaurantDetailI {
   data?: RestaurantType | null;
+}
+
+export interface RestaurantAmenitiesIconInt {
+  restaurant: RestaurantType;
 }

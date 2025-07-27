@@ -36,6 +36,11 @@ export const GET_RESTAURANT_BY_SLUG = gql`
       price_range
       reservation_required
       reservation_available
+      parking_available
+      cash_only
+      card_payment
+      drive_through
+      delivery_option
       businessHours {
         day_of_week
         open_time

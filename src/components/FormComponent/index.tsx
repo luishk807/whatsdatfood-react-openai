@@ -1,4 +1,9 @@
-import { lazy, useState, useMemo, type FC } from "react";
+import {
+  lazy,
+  useState,
+  useMemo,
+  type FC,
+} from "react";
 import { Box, Grid } from "@mui/material";
 import {
   FormFieldType,
@@ -95,7 +100,12 @@ const FormComponent: FC<FormComponentInterface> = ({
     }
   };
 
-  const handleSubmit = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSubmit = (
+    e:
+      | React.MouseEvent<HTMLButtonElement>
+      | React.KeyboardEvent
+      | React.FormEvent<HTMLFormElement>,
+  ) => {
     e.preventDefault();
     e.stopPropagation();
     setErrors([]);
@@ -216,41 +226,46 @@ const FormComponent: FC<FormComponentInterface> = ({
     [fields],
   );
   return (
-    <Box>
-      <Grid
-        container
-        id="form-component-container"
-        sx={{
-          padding: {
-            lg: "0px",
-            xs: "10px",
-          },
-        }}
-      >
-        {title && (
-          <Grid className="field-title" size={12}>
-            {title}
-          </Grid>
-        )}
-        {!!errors.length && (
-          <Grid>
-            <ul>
-              {errors.map((item, indx) => (
-                <li key={indx}>{item}</li>
-              ))}
-            </ul>
-          </Grid>
-        )}
-        {fields.map((item, indx) => getFieldType(item, indx))}
-        {submitLabel && (
-          <Grid size={12} className="field-container">
-            <LazyButton type="button" onClick={handleSubmit}>
-              {submitLabel}
-            </LazyButton>
-          </Grid>
-        )}
-      </Grid>
-    </Box>
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit(e);
+      }}
+    >
+      <Box>
+        <Grid
+          container
+          id="form-component-container"
+          sx={{
+            padding: {
+              lg: "0px",
+              xs: "10px",
+            },
+          }}
+        >
+          {title && (
+            <Grid className="field-title" size={12}>
+              {title}
+            </Grid>
+          )}
+          {!!errors.length && (
+            <Grid>
+              <ul>
+                {errors.map((item, indx) => (
+                  <li key={indx}>{item}</li>
+                ))}
+              </ul>
+            </Grid>
+          )}
+          {fields.map((item, indx) => getFieldType(item, indx))}
+          {submitLabel && (
+            <Grid size={12} className="field-container">
+              <LazyButton type="submit">{submitLabel}</LazyButton>
+            </Grid>
+          )}
+        </Grid>
+      </Box>
+    </form>
   );
 };
 

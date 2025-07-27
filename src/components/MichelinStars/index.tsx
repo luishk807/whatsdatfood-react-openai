@@ -12,7 +12,6 @@ const MichelinStars: FC<MichelinStarsInterface> = ({ stars = 0 }) => {
   useEffect(() => {
     const stack = [];
     for (let i = 0; i < stars; i++) {
-      console.log("creating", i);
       stack.push(
         <li key={i}>
           <img alt="michelin star" src={michelinStar} />
