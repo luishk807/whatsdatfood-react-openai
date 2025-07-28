@@ -30,6 +30,12 @@ export const ADD_USER_FAVORITES = gql`
   }
 `;
 
+export const CHECK_IF_FAVORITES = gql`
+  query checkUserFavoriteBySlug($input: CreateUserFavoritesInput!) {
+    checkUserFavoriteBySlug(input: $input)
+  }
+`;
+
 export const ADD_USER_RATING = gql`
   mutation addUserRating($payload: CreateUserRatingInput!) {
     addUserRating(input: $payload) {

@@ -1,6 +1,6 @@
 import { snackBarObjType } from "@/interfaces";
 import { AlertColor } from "@mui/material";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import SnackBarCustom from "@/components/Snackbar";
 const useSnackbarHook = () => {
   const [snackbarObj, setSnackbarObj] = useState<snackBarObjType>({
@@ -19,6 +19,14 @@ const useSnackbarHook = () => {
     },
     [],
   );
+
+  useEffect(() => {
+    if (snackbarObj.open) {
+      setTimeout(() => {
+        closeSnackBar();
+      }, 3000);
+    }
+  }, [snackbarObj]);
 
   const closeSnackBar = useCallback(() => {
     setSnackbarObj((prev) => ({ ...prev, open: false }));

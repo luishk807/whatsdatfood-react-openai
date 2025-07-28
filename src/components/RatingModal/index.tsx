@@ -33,7 +33,7 @@ const RatingComponent: FC<RatingComponentInterface> = ({ data }) => {
   const { saveRating, getUserRatingByItemId, userRatingByRestItemIdQuery } =
     useUserRating();
   const { loading } = userRatingByRestItemIdQuery;
-  const { showSnackBar, SnackbarComponent, closeSnackBar } = useSnackbarHook();
+  const { showSnackBar, SnackbarComponent } = useSnackbarHook();
 
   const handleRateSubmit = async () => {
     try {
@@ -49,9 +49,6 @@ const RatingComponent: FC<RatingComponentInterface> = ({ data }) => {
         showSnackBar("Your rating was saved", "success");
         setCloseModal(true);
         setTimeout(() => setCloseModal(false), 500);
-        setTimeout(() => {
-          closeSnackBar();
-        }, 2000);
       }
     } catch (err) {
       if (err instanceof Error) {
