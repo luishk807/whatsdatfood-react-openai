@@ -31,8 +31,8 @@ export const ADD_USER_FAVORITES = gql`
 `;
 
 export const CHECK_IF_FAVORITES = gql`
-  query checkUserFavoriteBySlug($input: CreateUserFavoritesInput!) {
-    checkUserFavoriteBySlug(input: $input)
+  query checkUserFavoriteBySlug($slug: String!) {
+    checkUserFavoriteBySlug(slug: $slug)
   }
 `;
 

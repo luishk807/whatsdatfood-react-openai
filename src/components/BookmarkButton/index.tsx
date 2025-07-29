@@ -24,32 +24,25 @@ const BookmarkButton: FC<BookmarkButtonInt> = ({ slug, defaultValue }) => {
 
   const handleSaveButton = async () => {
     if (slug) {
-      console.log(slug);
       try {
         const resp = await saveFavorites(slug);
         if (resp) {
-          console.log("resp", resp);
           showSnackBar("Restaurant Saved!", "success");
-          setIsSaved(true);
         } else {
           showSnackBar("Unable to save favorite", "error");
         }
       } catch (err) {
         showSnackBar("Unable to save favorite", "error");
+      } finally {
+        await checkUserFavorite();
       }
-
-      //   const resp = await saveFavorites({
-      //     user_id: user.id,
-      //     restaurant_id: restaurant_id,
-      //   });
     }
   };
 
   const checkUserFavorite = async () => {
     const resp = await isUserFavorite(slug);
-    if (resp) {
-      console.log(resp);
-    }
+    console.log("is saved:", resp);
+    setIsSaved(!!resp);
   };
   useEffect(() => {
     if (slug) {

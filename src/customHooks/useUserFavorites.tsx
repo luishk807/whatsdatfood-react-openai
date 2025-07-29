@@ -6,7 +6,7 @@ import {
 import { _get } from "@/utils";
 import useAuth from "./useAuth";
 
-const useUserRating = () => {
+const useUserFavorite = () => {
   const { user } = useAuth();
   const [
     createUserFavorites,
@@ -24,7 +24,9 @@ const useUserRating = () => {
       error: checkUserFavoriteError,
       data: checkUserFavoriteData,
     },
-  ] = useLazyQuery(CHECK_IF_FAVORITES);
+  ] = useLazyQuery(CHECK_IF_FAVORITES, {
+    fetchPolicy: "network-only",
+  });
 
   const saveFavorites = async (slug: string) => {
     try {
@@ -54,9 +56,7 @@ const useUserRating = () => {
     try {
       const resp = await checkIfUserFavorite({
         variables: {
-          input: {
-            slug: slug,
-          },
+          slug: slug,
         },
       });
 
@@ -85,4 +85,4 @@ const useUserRating = () => {
   };
 };
 
-export default useUserRating;
+export default useUserFavorite;

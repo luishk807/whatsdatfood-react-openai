@@ -25,9 +25,7 @@ const useRestaurantMutation = () => {
       loading: restaurantSlugLoading,
       error: restaurantSlugError,
     },
-  ] = useLazyQuery(GET_RESTAURANT_BY_SLUG, {
-    fetchPolicy: "network-only",
-  });
+  ] = useLazyQuery(GET_RESTAURANT_BY_SLUG);
 
   const [
     GetAiRestaurantByImageById,
@@ -36,9 +34,7 @@ const useRestaurantMutation = () => {
       loading: restaurantImageLoading,
       error: restaurantImageError,
     },
-  ] = useLazyQuery(GET_RESTAURANT_IMAGES, {
-    fetchPolicy: "network-only",
-  });
+  ] = useLazyQuery(GET_RESTAURANT_IMAGES);
 
   const getRestaurantListByName = async (name: string) => {
     const resp = await GetAiRestaurantByName({
