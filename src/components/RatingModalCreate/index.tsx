@@ -10,12 +10,16 @@ import { _get } from "@/utils";
 import useSnackbarHook from "@/customHooks/useSnackBar";
 import { getTotalRatings } from "@/utils";
 import {
-  RatingComponentInterface,
+  RatingModalCreateInterface,
   RatingPayloadType,
   UserRating,
 } from "@/interfaces/users";
 
-const RatingComponent: FC<RatingComponentInterface> = ({ data }) => {
+const RatingModalCreate: FC<RatingModalCreateInterface> = ({
+  data,
+  label,
+  type,
+}) => {
   const [closeModal, setCloseModal] = useState(false);
   const [foundUserRating, setFoundUserRating] = useState(false);
   const [formData, setFormData] = useState<RatingPayloadType>({
@@ -98,9 +102,17 @@ const RatingComponent: FC<RatingComponentInterface> = ({ data }) => {
     <>
       <Modal
         closeOnParent={closeModal}
-        customButton={
-          <RatingCustom isDisplay={true} defaultValue={Number(ratingNumbers)} />
-        }
+        type={type}
+        {...(!label
+          ? {
+              customButton: (
+                <RatingCustom
+                  isDisplay={true}
+                  defaultValue={Number(ratingNumbers)}
+                />
+              ),
+            }
+          : { label: label })}
       >
         <Box
           className="rating-content-container w-full"
@@ -163,4 +175,4 @@ const RatingComponent: FC<RatingComponentInterface> = ({ data }) => {
     </>
   );
 };
-export default RatingComponent;
+export default RatingModalCreate;

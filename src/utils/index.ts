@@ -16,7 +16,7 @@ export const _get: getTypeFn = <T>(
   return _.get(obj, flag, defaultvalue);
 };
 
-export const getDate = (date?: string, format?: string) => {
+export const getDate = (date?: string | Date, format?: string) => {
   if (!format) {
     format = "MM/DD/YYYY";
   }

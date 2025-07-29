@@ -70,3 +70,31 @@ export const GET_USER_RATING_BY_RESTAURANT_ID = gql`
     }
   }
 `;
+
+export const GET_ALL_USER_RATING_BY_ITEM_ID = gql`
+  query allRatingsByItemId($restItemId: ID!, $page: Int!, $limit: Int) {
+    allRatingsByItemId(restItemId: $restItemId, page: $page, limit: $limit) {
+      data {
+        id
+        rating
+        user_id
+        title
+        comment
+        restaurant_menu_item_id
+        createdAt
+        updatedAt
+        restaurantMenuItem {
+          id
+          name
+        }
+        user {
+          first_name
+          last_name
+        }
+      }
+      totalPages
+      totalItems
+      currentPage
+    }
+  }
+`;

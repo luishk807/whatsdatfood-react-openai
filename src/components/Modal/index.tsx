@@ -3,20 +3,52 @@ import { useState, useEffect, type FC, useMemo, ChangeEvent } from "react";
 import { CustomModalInterface } from "@/interfaces";
 import Button from "@/components/Button";
 import "./index.css";
+import { Link } from "react-router-dom";
 const CustomModal: FC<CustomModalInterface> = ({
   children,
   label,
+  type,
   customButton,
   closeOnParent,
 }) => {
   const [open, setOpen] = useState(false);
   const toggleModal = (e: React.MouseEvent<HTMLElement>) => {
-    console.log("xxxx");
     e.preventDefault();
     e.stopPropagation();
 
     setOpen((prev) => !prev);
   };
+
+  const determineType = useMemo(() => {
+    return customButton ? "custom" : type || "button";
+  }, [customButton]);
+
+  const ModalButton = useMemo(() => {
+    switch (determineType) {
+      case "button":
+        return <Button onClick={toggleModal}>{label}</Button>;
+      case "text":
+        return <span>{label || "link label"}</span>;
+      case "link":
+        return <Link to="/">{label || "link label"}</Link>;
+      case "custom":
+        return (
+          <Box
+            component="div"
+            role="button"
+            tabIndex={0}
+            onClick={toggleModal} // <- this is what was missing
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") toggleModal(e as any);
+            }}
+          >
+            {customButton}
+          </Box>
+        );
+      default:
+        return <Button onClick={toggleModal}>{label}</Button>;
+    }
+  }, [determineType]);
 
   useEffect(() => {
     if (closeOnParent) {
@@ -26,21 +58,7 @@ const CustomModal: FC<CustomModalInterface> = ({
 
   return (
     <>
-      {customButton ? (
-        <Box
-          component="div"
-          role="button"
-          tabIndex={0}
-          onClick={toggleModal} // <- this is what was missing
-          onKeyDown={(e) => {
-            if (e.key === "Enter" || e.key === " ") toggleModal(e as any);
-          }}
-        >
-          {customButton}
-        </Box>
-      ) : (
-        <Button onClick={toggleModal}>{label}</Button>
-      )}
+      {ModalButton}
       <Modal
         style={{
           backdropFilter: "blur(2px)",

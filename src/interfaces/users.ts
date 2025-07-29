@@ -1,6 +1,6 @@
 import { SxProps, Theme } from "@mui/material";
 import { MenuItemType, RestaurantType } from "@/interfaces/restaurants";
-import { StatusType } from "@/interfaces";
+import { StatusType, ModalType } from "@/interfaces";
 
 export interface RatingCustomInterface {
   defaultValue: number;
@@ -9,10 +9,6 @@ export interface RatingCustomInterface {
   oneStarMode?: boolean;
   onClick?: (value: number) => void;
   isDisplay?: boolean;
-}
-
-export interface RatingComponentInterface {
-  data: MenuItemType;
 }
 
 export interface RatingPayloadType {
@@ -35,10 +31,13 @@ export interface UserRating {
   restaurant_menu_item_id: bigint;
   user_id: bigint;
   rating: number;
+  title: string;
   createdAt?: Date;
   updatedAt?: Date;
   comment?: string;
   restaurantItem?: MenuItemType;
+  user: UserType;
+  status: StatusType;
 }
 
 export interface UserRoleType {
@@ -81,4 +80,21 @@ export interface UserType {
   status?: StatusType;
   role?: UserRoleType;
   searches?: [UserSearchesType];
+}
+
+export interface UserRatingListResp {
+  data: UserRating[];
+  totalPages: number;
+  totalItems: number;
+  currentPage: number;
+}
+
+export interface UserRatingItemInt {
+  data: UserRating;
+}
+
+export interface RatingModalCreateInterface {
+  data: MenuItemType;
+  label?: string;
+  type?: ModalType;
 }

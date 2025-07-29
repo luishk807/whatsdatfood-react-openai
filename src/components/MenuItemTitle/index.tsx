@@ -1,6 +1,7 @@
 import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
-import RatingComponent from "../RatingModal";
 import { MenuItemType } from "@/interfaces/restaurants";
+const LazyRatingLIst = lazy(() => import("@/components/RatingModalList"));
+import { lazy } from "react";
 interface MenuItemItem {
   data: MenuItemType;
 }
@@ -11,7 +12,7 @@ const MenuItemTitle = ({ data }: MenuItemItem) => {
     <>
       {data.name}
       {data.top_choice && <LocalFireDepartmentIcon style={{ fill: "red" }} />}
-      <RatingComponent data={data} />
+      <LazyRatingLIst data={data} />
     </>
   );
 };

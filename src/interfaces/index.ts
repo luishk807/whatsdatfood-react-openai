@@ -2,6 +2,7 @@ import { ReactNode, CSSProperties, ComponentType } from "react";
 import { LoadingType } from "@/types";
 import { AlertColor } from "@mui/material";
 import { FieldTypes } from "@/types";
+import { MODAL_TYPE } from "@/customConstants";
 
 export interface LoadingComponentInterface<T> {
   children: ReactNode;
@@ -26,6 +27,7 @@ export interface CustomModalInterface {
   children: ReactNode;
   customButton?: ReactNode;
   label?: string;
+  type?: ModalType;
   closeOnParent?: boolean;
 }
 export interface SendFriendModalInterface {
@@ -130,3 +132,5 @@ export interface dropDownMenuItemType {
   name: string;
   url: string;
 }
+
+export type ModalType = (typeof MODAL_TYPE)[number];

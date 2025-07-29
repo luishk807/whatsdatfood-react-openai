@@ -1,0 +1,33 @@
+import { type FC } from "react";
+import { UserRatingItemInt } from "@/interfaces/users";
+import RatingCustom from "@/components/Rating";
+import { _get, getDate } from "@/utils";
+import "./index.css";
+
+const UserRatingItem: FC<UserRatingItemInt> = ({ data }) => {
+  const user = _get(data, "user", null);
+  const fullName = user
+    ? _get(user, "first_name", "") + " " + _get(user, "last_name", "")
+    : null;
+  const { rating: score, title, comment, updatedAt } = data;
+  console.log("user", user);
+  console.log("raitng", data);
+  return (
+    <div className="w-full">
+      <div className="w-full flex justify-between">
+        <div>{fullName}</div>
+        <div>{getDate(updatedAt)}</div>
+      </div>
+      <div className="w-full flex">
+        <div>
+          <RatingCustom defaultValue={score} isDisplay={true} />
+        </div>
+        <div>{title}</div>
+      </div>
+
+      <div>{comment}</div>
+    </div>
+  );
+};
+
+export default UserRatingItem;

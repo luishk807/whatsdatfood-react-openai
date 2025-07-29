@@ -10,7 +10,7 @@ import MenuItemTitle from "@/components/MenuItemTitle";
 import "./index.css";
 import Button from "@/components/Button";
 import SendFriendModal from "@/components/SendFriendModal";
-import RatingComponent from "@/components/RatingModal";
+import RatingComponent from "@/components/RatingModalCreate";
 
 const MenuItem: FC<MenuItemInterface> = ({ item, restaurant }) => {
   const [sendFriendPayload, setSendPayload] =

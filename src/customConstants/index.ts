@@ -66,6 +66,8 @@ export const DROPDOWN_MENU = {
   ],
 };
 
+export const MODAL_TYPE = ["button", "text", "custom", "link"] as const;
+
 export const RESTAURANT_AMENITIES_OPTIONS = [
   "parking_available",
   "cash_only",

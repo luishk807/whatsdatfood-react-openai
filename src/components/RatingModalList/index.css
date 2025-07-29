@@ -1,0 +1,22 @@
+.rating-modal-list-container {
+  background-color: white;
+  top: 50%;
+  left: 50%;
+  position: absolute;
+  transform: translate(-50%, -50%);
+  -webkit-transform: translate(-50%, -50%);
+  -moz-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  -o-transform: translate(-50%, -50%);
+  overflow-y: auto;
+}
+
+.user-rating-item-container {
+  margin: 10px 0px;
+  padding-top: 5px;
+  width: 100%;
+}
+
+.user-rating-item-container:not(:first-child) {
+  border-top: 1px solid rgba(0, 0, 0, 0.09);
+}

@@ -1,24 +1,16 @@
 import { useLazyQuery, useMutation } from "@apollo/client";
 import {
   ADD_USER_RATING,
-  ADD_USER_FAVORITES,
   GET_USER_RATING_BY_RESTAURANT_ID,
+  GET_ALL_USER_RATING_BY_ITEM_ID,
 } from "@/graphql/queries/users";
 import { _get } from "@/utils";
-import useAuth from "./useAuth";
-
+import useAuth from "@/customHooks/useAuth";
+import { UserRatingListResp } from "@/interfaces/users";
 const useUserRating = () => {
   const { user } = useAuth();
   const [createRating, { loading: submitRatingLoading, error, data }] =
     useMutation(ADD_USER_RATING);
-  const [
-    createUserFavorites,
-    {
-      loading: createUserFavoritesLoading,
-      error: createUserFavoritesError,
-      data: createUserFavoritesData,
-    },
-  ] = useMutation(ADD_USER_FAVORITES);
 
   const [
     getUserRatingByRestItemId,
@@ -27,7 +19,20 @@ const useUserRating = () => {
       error: useRatingByRestItemIdError,
       data: useRatingByRestItemIdData,
     },
-  ] = useLazyQuery(GET_USER_RATING_BY_RESTAURANT_ID);
+  ] = useLazyQuery(GET_USER_RATING_BY_RESTAURANT_ID, {
+    fetchPolicy: "network-only",
+  });
+
+  const [
+    getAllUserRatingByRestItemId,
+    {
+      loading: useAllRatingByRestItemIdLoading,
+      error: useAllRatingByRestItemIdError,
+      data: useAllRatingByRestItemIdData,
+    },
+  ] = useLazyQuery(GET_ALL_USER_RATING_BY_ITEM_ID, {
+    fetchPolicy: "network-only",
+  });
 
   const saveRating = async (payload: any) => {
     try {
@@ -77,39 +82,46 @@ const useUserRating = () => {
     }
   };
 
-  const saveFavorites = async (payload: any) => {
+  const getAllRatingsByItemId = async (
+    restItemId: number,
+    page: number,
+    limit?: number,
+  ): Promise<UserRatingListResp> => {
     try {
       if (user) {
-        const resp = await createUserFavorites({
+        const resp = await getAllUserRatingByRestItemId({
           variables: {
-            payload: payload,
+            restItemId: restItemId,
+            page: page,
+            limit: limit,
           },
         });
 
-        return _get(resp, "data.addUserFavorites");
+        return _get(resp, "data.allRatingsByItemId");
       } else {
-        throw new Error("ERROR: unable to save user favorites");
+        throw new Error("ERROR: unable to get rating");
       }
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(err.message);
       }
-      throw new Error("ERROR: unable to save user favorites");
+      throw new Error("ERROR: unable to get rating");
     }
   };
+
   return {
     saveRating,
-    saveFavorites,
     getUserRatingByItemId,
+    getAllRatingsByItemId,
     submitRatingQuery: {
       loading: submitRatingLoading,
       error: error,
       data: data,
     },
-    submitUserFavoritesQuery: {
-      loading: createUserFavoritesLoading,
-      error: createUserFavoritesError,
-      data: createUserFavoritesData,
+    allUserRatingByRestItemIdQuery: {
+      loading: useAllRatingByRestItemIdLoading,
+      error: useAllRatingByRestItemIdError,
+      data: useAllRatingByRestItemIdData,
     },
     userRatingByRestItemIdQuery: {
       loading: useRatingByRestItemIdLoading,
