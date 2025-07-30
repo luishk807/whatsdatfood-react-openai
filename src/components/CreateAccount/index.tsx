@@ -1,14 +1,16 @@
 import { Box, Grid } from "@mui/material";
 import FormComponent from "@/components/FormComponent";
 import { FormFieldType } from "@/interfaces";
-import { handleCreateUser } from "@/api/users";
 import { CREATE_ACCOUNT } from "@/customConstants/forms";
 import { Link, useNavigate } from "react-router-dom";
 import useSnackbarHook from "@/customHooks/useSnackBar";
+import useUser from "@/customHooks/useUser";
 import "./index.css";
 
 const CreateAccount = () => {
   const navigate = useNavigate();
+  const { createUser, submitUserQuery } = useUser();
+  const { loading, data } = submitUserQuery;
   const { SnackbarComponent, showSnackBar } = useSnackbarHook();
 
   const handleSubmit = async (formData: any) => {
@@ -16,13 +18,15 @@ const CreateAccount = () => {
     console.log(payload);
 
     try {
-      await handleCreateUser(payload);
+      const resp = await createUser(payload);
+
       showSnackBar("SUCCESS: Account is created!", "success");
 
       setTimeout(() => {
         navigate("/sign-in");
-      }, 2000);
+      }, 3000);
     } catch (err) {
+      console.log("err", err);
       showSnackBar("ERROR: Unable to create account!", "error");
     }
   };

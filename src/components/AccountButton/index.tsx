@@ -10,7 +10,7 @@ import { dropDownMenuItemType } from "@/interfaces";
 
 import { dropDownMenuListType, dropDownMenuKeyType } from "@/types";
 
-import { DROPDOWN_MENU } from "@/customConstants";
+import { DROPDOWN_MENU, ACCOUNT_TYPE } from "@/customConstants";
 
 const AccountButton = () => {
   const { user } = useAuth();
@@ -26,6 +26,7 @@ const AccountButton = () => {
   const DropDownMenuList: dropDownMenuListType = DROPDOWN_MENU;
 
   const getMenuType = (role: dropDownMenuKeyType) => {
+    console.log("role", role);
     if (DropDownMenuList[role]) {
       setDropDownMenus(DropDownMenuList[role]);
     }
@@ -38,7 +39,7 @@ const AccountButton = () => {
         getMenuType(role as keyof dropDownMenuListType);
       }
     } else {
-      getMenuType("guest");
+      getMenuType(ACCOUNT_TYPE.guest);
     }
   }, [user]);
 

@@ -9,6 +9,8 @@ import { FIELD_TYPES } from "@/customConstants";
 import { FormComponentInterface } from "@/interfaces";
 import "./index.css";
 import { getMissingField, getLabelFromKey } from "@/utils";
+import FormTextfieldSkeleton from "@/components/SkeletonLoaders/FormTextfield";
+import FormRatingSkeleton from "@/components/SkeletonLoaders/Rating";
 const LazyRating = lazy(() => import("@/components/Rating"));
 const LazyTextField = lazy(() => import("@/components/TextField"));
 const LazyTextFieldDebounce = lazy(
@@ -22,8 +24,10 @@ const FormComponent: FC<FormComponentInterface> = ({
   submitLabel,
   onHandleSubmit,
   onPrevious,
+  showLoadingSubmit,
 }) => {
   const [formData, setFormData] = useState<formCompObjType>({});
+  const [isSubmitLoading, setIsSubmitLoading] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [errorFields, setErrorFields] = useState<string[]>([]);
   const handleOnChange = (key: string, item: formCompValueType) => {
@@ -51,6 +55,7 @@ const FormComponent: FC<FormComponentInterface> = ({
     switch (item.type) {
       case FIELD_TYPES.textfield:
       case FIELD_TYPES.date:
+      case FIELD_TYPES.username:
         return item.value ? "" : `${item.label} can't be empty`;
       case FIELD_TYPES.email:
         return item.value && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(item.value)
@@ -134,6 +139,7 @@ const FormComponent: FC<FormComponentInterface> = ({
       }
 
       onHandleSubmit && onHandleSubmit(Object.fromEntries(payloadMap));
+      setFormData({});
     } else {
       setErrors(Array.from(new Set(errorList)));
     }
@@ -151,7 +157,7 @@ const FormComponent: FC<FormComponentInterface> = ({
             className="field-container"
             key={`${key}-${field.name}`}
           >
-            <Suspense fallback={<h1>...loading</h1>}>
+            <Suspense fallback={<FormTextfieldSkeleton />}>
               <LazyTextField
                 name={field.name}
                 type={field.type}
@@ -176,7 +182,7 @@ const FormComponent: FC<FormComponentInterface> = ({
             className="field-container"
             key={`${key}-${field.name}`}
           >
-            <Suspense fallback={<h1>...loading</h1>}>
+            <Suspense fallback={<FormTextfieldSkeleton />}>
               <LazyTextFieldDebounce
                 name={field.name}
                 type={field.type}
@@ -201,7 +207,7 @@ const FormComponent: FC<FormComponentInterface> = ({
             className="field-container flex flex-col"
             key={`${key}-${field.name}`}
           >
-            <Suspense fallback={<h1>...loading</h1>}>
+            <Suspense fallback={<FormRatingSkeleton />}>
               <LazyRating
                 defaultValue={0}
                 label={field.label}
@@ -273,7 +279,9 @@ const FormComponent: FC<FormComponentInterface> = ({
             {submitLabel && (
               <Grid size={onPrevious ? 5 : 12} className="field-container">
                 <Suspense fallback={<h1>....loading</h1>}>
-                  <LazyButton type="submit">{submitLabel}</LazyButton>
+                  <LazyButton disabled={isSubmitLoading} type="submit">
+                    {submitLabel}
+                  </LazyButton>
                 </Suspense>
               </Grid>
             )}

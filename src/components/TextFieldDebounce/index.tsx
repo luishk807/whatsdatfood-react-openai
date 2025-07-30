@@ -12,6 +12,7 @@ const TextFieldDebounce: FC<TextFieldInterface> = ({
   isError,
   type = "text",
   isPlaceholder,
+  onChange,
 }) => {
   const [inputValue, setInputValue] = useState("");
   const [loaderElement, setLoaderElement] = useState<ReactNode | null>(null);
@@ -37,6 +38,10 @@ const TextFieldDebounce: FC<TextFieldInterface> = ({
             <Box className="loader-message success">Username is available!</Box>
           ),
         );
+
+        if (!resp) {
+          onChange && onChange(inputValue);
+        }
       } catch (err) {
         setLoaderElement(
           <Box className="loader-message success">
@@ -45,7 +50,7 @@ const TextFieldDebounce: FC<TextFieldInterface> = ({
         );
       }
     }, 1000),
-    [checkValidUsername],
+    [inputValue],
   );
 
   useEffect(() => {

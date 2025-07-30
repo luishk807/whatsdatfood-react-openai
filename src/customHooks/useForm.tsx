@@ -3,12 +3,8 @@ import { _get } from "@/utils";
 import { useLazyQuery } from "@apollo/client";
 
 const useFormHook = () => {
-  const [checkUsername, { data, loading, error }] = useLazyQuery(
-    CHECK_USERNAME_EXIST,
-    {
-      fetchPolicy: "network-only",
-    },
-  );
+  const [checkUsername, { data, loading, error }] =
+    useLazyQuery(CHECK_USERNAME_EXIST);
 
   const checkValidUsername = async (username: string): Promise<boolean> => {
     try {

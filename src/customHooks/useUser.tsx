@@ -28,17 +28,13 @@ const useUser = () => {
 
   const createUser = async (payload: any) => {
     try {
-      if (user) {
-        const resp = await createUserGraphql({
-          variables: {
-            payload: payload,
-          },
-        });
+      const resp = await createUserGraphql({
+        variables: {
+          payload: payload,
+        },
+      });
 
-        return _get(resp, "data.updateUser");
-      } else {
-        throw new Error("ERROR: unable to save user");
-      }
+      return _get(resp, "data.addUser");
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(err.message);
