@@ -28,7 +28,7 @@ const CustomModal: FC<CustomModalInterface> = ({
       case "button":
         return <Button onClick={toggleModal}>{label}</Button>;
       case "text":
-        return <span>{label || "link label"}</span>;
+        return <Link to="/">{label || "link label"}</Link>;
       case "link":
         return <Link to="/">{label || "link label"}</Link>;
       case "custom":

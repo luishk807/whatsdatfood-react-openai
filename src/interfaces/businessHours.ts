@@ -9,7 +9,7 @@ export interface BusinessHours {
 export interface BusinessHourDisplayInterface {
   schedules: BusinessHours[];
 }
-export interface BusinessHour {
+export interface BusinessHourFt {
   order: number;
   open_time?: string;
   close_time?: string;

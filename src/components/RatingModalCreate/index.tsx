@@ -8,7 +8,7 @@ import Button from "../Button";
 import useUserRating from "@/customHooks/useUserRating";
 import { _get } from "@/utils";
 import useSnackbarHook from "@/customHooks/useSnackBar";
-import { getTotalRatings } from "@/utils";
+import { getTotalRatings } from "@/utils/numbers";
 import {
   RatingModalCreateInterface,
   RatingPayloadType,

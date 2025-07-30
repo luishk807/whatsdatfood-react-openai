@@ -4,8 +4,8 @@ import { Box, Grid, TextField } from "@mui/material";
 import "./index.css";
 import Modal from "@/components/Modal";
 import useUserRating from "@/customHooks/useUserRating";
-import { _get, getDate } from "@/utils";
-import { getTotalRatings } from "@/utils";
+import { _get } from "@/utils";
+import { getTotalRatings } from "@/utils/numbers";
 import { UserRating } from "@/interfaces/users";
 
 import { MenuItemType } from "@/interfaces/restaurants";
@@ -65,19 +65,38 @@ const RatingModalListComponent: FC<RatingComponentListInterface> = ({
             },
           }}
         >
-          <div className="w-full flex justify-between">
+          <Box
+            sx={{
+              height: "50px",
+            }}
+            className="w-full flex justify-between"
+          >
             <div>All Rating for {data.name}</div>
             <div>
-              <RatingModalCreate data={data} type="link" label="Testing This" />
+              <RatingModalCreate
+                data={data}
+                type="link"
+                label="Write your review"
+              />
             </div>
-          </div>
-          {ratingLists.map((rating: UserRating, indx) => {
-            return (
-              <Box className="user-rating-item-container" key={indx}>
-                <UserRatingItem data={rating} />
-              </Box>
-            );
-          })}
+          </Box>
+          <Box
+            sx={{
+              height: {
+                lg: "540px",
+                xs: "100vh",
+              },
+            }}
+            className="rating-model-list-ratings"
+          >
+            {ratingLists.map((rating: UserRating, indx) => {
+              return (
+                <Box className="user-rating-item-container" key={indx}>
+                  <UserRatingItem data={rating} />
+                </Box>
+              );
+            })}
+          </Box>
         </Box>
       </Modal>
     </>

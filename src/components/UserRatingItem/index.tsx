@@ -1,7 +1,9 @@
 import { type FC } from "react";
 import { UserRatingItemInt } from "@/interfaces/users";
 import RatingCustom from "@/components/Rating";
-import { _get, getDate } from "@/utils";
+import { _get } from "@/utils";
+import { getDate } from "@/utils/time";
+
 import "./index.css";
 
 const UserRatingItem: FC<UserRatingItemInt> = ({ data }) => {

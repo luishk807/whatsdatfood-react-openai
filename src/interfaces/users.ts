@@ -1,6 +1,7 @@
 import { SxProps, Theme } from "@mui/material";
 import { MenuItemType, RestaurantType } from "@/interfaces/restaurants";
-import { StatusType, ModalType } from "@/interfaces";
+import { StatusType } from "@/interfaces";
+import { ModalType } from "@/types";
 
 export interface RatingCustomInterface {
   defaultValue: number;

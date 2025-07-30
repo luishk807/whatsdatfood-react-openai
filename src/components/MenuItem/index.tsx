@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type FC } from "react";
 import { Grid, Skeleton, Box } from "@mui/material";
 import { _get, getBuiltAddress } from "@/utils";
-import { convertCurrency } from "@/utils";
+import { convertCurrency } from "@/utils/numbers";
 import { MenuItemInterface } from "@/interfaces/restaurants";
 import { SendFriendModalData } from "@/interfaces";
 import { MenuInterfaceItemType } from "@/interfaces/restaurants";

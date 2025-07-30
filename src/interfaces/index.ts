@@ -1,8 +1,6 @@
 import { ReactNode, CSSProperties, ComponentType } from "react";
-import { LoadingType } from "@/types";
 import { AlertColor } from "@mui/material";
-import { FieldTypes } from "@/types";
-import { MODAL_TYPE } from "@/customConstants";
+import { FieldTypes, ModalType, LoadingType } from "@/types";
 
 export interface LoadingComponentInterface<T> {
   children: ReactNode;
@@ -119,18 +117,11 @@ export interface StatusType {
   name: string;
 }
 
-export type WeekDay =
-  | "Monday"
-  | "Tuesday"
-  | "Wednesday"
-  | "Thursday"
-  | "Friday"
-  | "Saturday"
-  | "Sunday";
-
 export interface dropDownMenuItemType {
   name: string;
   url: string;
 }
 
-export type ModalType = (typeof MODAL_TYPE)[number];
+export interface localTimeInt {
+  [key: string]: string;
+}

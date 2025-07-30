@@ -3,13 +3,14 @@ import Modal from "@/components/Modal";
 import ScheduleIcon from "@mui/icons-material/Schedule";
 import { BusinessHours } from "@/interfaces/businessHours";
 import { useEffect, useMemo, type FC, useState } from "react";
-import { getDate, convertTimeToLocal, capitalizedWord } from "@/utils";
+import { capitalizedWord } from "@/utils";
+import { getDate, getLocalHours, checkIfStoreOpen } from "@/utils/time";
 import "./index.css";
 import {
   BusinessHourDisplayInterface,
-  BusinessHour,
+  BusinessHourFt,
 } from "@/interfaces/businessHours";
-import { WeekDay } from "@/interfaces";
+import { WeekDay } from "@/types";
 
 const BusinessHourDisplay: FC<BusinessHourDisplayInterface> = ({
   schedules,
@@ -25,7 +26,7 @@ const BusinessHourDisplay: FC<BusinessHourDisplayInterface> = ({
     return getDate("", "dddd");
   }, [schedules]);
 
-  const businessHoursFt: Record<WeekDay, BusinessHour> = {
+  const businessHoursFt: Record<WeekDay, BusinessHourFt> = {
     Monday: {
       order: 1,
     },
@@ -67,7 +68,7 @@ const BusinessHourDisplay: FC<BusinessHourDisplayInterface> = ({
               fontWeight: "bold",
             }}
           >
-            {isTodayOpen ? `Open` : `Closed`} Today
+            {isTodayOpen ? `Open` : `Closed`} Now
           </Box>
         </div>
         {isTodayOpen && (
@@ -95,8 +96,11 @@ const BusinessHourDisplay: FC<BusinessHourDisplayInterface> = ({
       const todaySch = capitalizedHours
         .filter((item) => item.day_of_week === dayWeek)
         .map((item) => {
-          const time1 = convertTimeToLocal(item?.open_time as string);
-          const time2 = convertTimeToLocal(item?.close_time as string);
+          const { time1, time2 } = getLocalHours({
+            time1: item?.open_time as string,
+            time2: item?.close_time as string,
+          });
+
           return {
             ...item,
             ...(time1 && { open_time: time1 }),
@@ -107,13 +111,17 @@ const BusinessHourDisplay: FC<BusinessHourDisplayInterface> = ({
         setTodaySchedule(todaySch[0]);
       }
 
-      setIsTodayOpen(!!todaySch.length);
+      const isOpen = checkIfStoreOpen(todaySch[0]);
+      setIsTodayOpen(isOpen);
 
       for (let schedule of capitalizedHours) {
         const key = schedule.day_of_week as WeekDay;
         if (key && key in businessHoursFt) {
-          const time1 = convertTimeToLocal(schedule?.open_time as string);
-          const time2 = convertTimeToLocal(schedule?.close_time as string);
+          const { time1, time2 } = getLocalHours({
+            time1: schedule?.open_time as string,
+            time2: schedule?.close_time as string,
+          });
+
           const value = businessHoursFt[key];
           businessHoursFt[key] = {
             ...value,
