@@ -46,6 +46,7 @@ export interface FormComponentInterface {
   title?: string;
   submitLabel?: string;
   onHandleSubmit: (data: any, e?: any) => void;
+  onPrevious?: () => void;
 }
 
 export interface addressType {

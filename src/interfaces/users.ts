@@ -1,4 +1,4 @@
-import { SxProps, Theme } from "@mui/material";
+import { SxProps, Theme, AlertColor } from "@mui/material";
 import { MenuItemType, RestaurantType } from "@/interfaces/restaurants";
 import { StatusType } from "@/interfaces";
 import { ModalType } from "@/types";
@@ -105,6 +105,7 @@ export interface RatingFormCreateInterface {
   label?: string;
   type?: ModalType;
   onPrevious?: () => void;
+  onSubmit?: (message: string, severity: AlertColor) => void;
 }
 
 export interface RatingListComponentInterface {

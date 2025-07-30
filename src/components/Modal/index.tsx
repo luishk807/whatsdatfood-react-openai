@@ -1,9 +1,10 @@
-import { Modal, Box } from "@mui/material";
+import { Modal, Box, Grid, IconButton } from "@mui/material";
 import { useState, useEffect, type FC, useMemo, ChangeEvent } from "react";
 import { CustomModalInterface } from "@/interfaces";
 import Button from "@/components/Button";
 import "./index.css";
 import { Link } from "react-router-dom";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 const CustomModal: FC<CustomModalInterface> = ({
   children,
   label,
@@ -84,6 +85,11 @@ const CustomModal: FC<CustomModalInterface> = ({
             },
           }}
         >
+          <Grid size={12} className="flex justify-end">
+            <IconButton onClick={() => setOpen(false)}>
+              <CloseRoundedIcon />
+            </IconButton>
+          </Grid>
           {children}
         </Box>
       </Modal>

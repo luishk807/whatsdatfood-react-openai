@@ -1,9 +1,4 @@
-import {
-  lazy,
-  useState,
-  useMemo,
-  type FC,
-} from "react";
+import { lazy, useState, useMemo, type FC, Suspense } from "react";
 import { Box, Grid } from "@mui/material";
 import {
   FormFieldType,
@@ -26,6 +21,7 @@ const FormComponent: FC<FormComponentInterface> = ({
   title,
   submitLabel,
   onHandleSubmit,
+  onPrevious,
 }) => {
   const [formData, setFormData] = useState<formCompObjType>({});
   const [errors, setErrors] = useState<string[]>([]);
@@ -155,20 +151,22 @@ const FormComponent: FC<FormComponentInterface> = ({
             className="field-container"
             key={`${key}-${field.name}`}
           >
-            <LazyTextField
-              name={field.name}
-              type={field.type}
-              label={field.label}
-              isError={errorFields.includes(field.name)}
-              isPlaceholder={field.placeholder}
-              onChange={(value: string) =>
-                handleOnChange(field.name, {
-                  label: field.label,
-                  type: field.type,
-                  value,
-                })
-              }
-            />
+            <Suspense fallback={<h1>...loading</h1>}>
+              <LazyTextField
+                name={field.name}
+                type={field.type}
+                label={field.label}
+                isError={errorFields.includes(field.name)}
+                isPlaceholder={field.placeholder}
+                onChange={(value: string) =>
+                  handleOnChange(field.name, {
+                    label: field.label,
+                    type: field.type,
+                    value,
+                  })
+                }
+              />
+            </Suspense>
           </Grid>
         );
       case FIELD_TYPES.username:
@@ -178,20 +176,22 @@ const FormComponent: FC<FormComponentInterface> = ({
             className="field-container"
             key={`${key}-${field.name}`}
           >
-            <LazyTextFieldDebounce
-              name={field.name}
-              type={field.type}
-              label={field.label}
-              isError={errorFields.includes(field.name)}
-              isPlaceholder={field.placeholder}
-              onChange={(value: string) =>
-                handleOnChange(field.name, {
-                  label: field.label,
-                  type: field.type,
-                  value,
-                })
-              }
-            />
+            <Suspense fallback={<h1>...loading</h1>}>
+              <LazyTextFieldDebounce
+                name={field.name}
+                type={field.type}
+                label={field.label}
+                isError={errorFields.includes(field.name)}
+                isPlaceholder={field.placeholder}
+                onChange={(value: string) =>
+                  handleOnChange(field.name, {
+                    label: field.label,
+                    type: field.type,
+                    value,
+                  })
+                }
+              />
+            </Suspense>
           </Grid>
         );
       case FIELD_TYPES.rating:
@@ -201,17 +201,19 @@ const FormComponent: FC<FormComponentInterface> = ({
             className="field-container flex flex-col"
             key={`${key}-${field.name}`}
           >
-            <LazyRating
-              defaultValue={0}
-              label={field.label}
-              onClick={(value: number) =>
-                handleOnChange(field.name, {
-                  label: field.label,
-                  type: field.type,
-                  value: String(value),
-                })
-              }
-            />
+            <Suspense fallback={<h1>...loading</h1>}>
+              <LazyRating
+                defaultValue={0}
+                label={field.label}
+                onClick={(value: number) =>
+                  handleOnChange(field.name, {
+                    label: field.label,
+                    type: field.type,
+                    value: String(value),
+                  })
+                }
+              />
+            </Suspense>
           </Grid>
         );
     }
@@ -258,11 +260,24 @@ const FormComponent: FC<FormComponentInterface> = ({
             </Grid>
           )}
           {fields.map((item, indx) => getFieldType(item, indx))}
-          {submitLabel && (
-            <Grid size={12} className="field-container">
-              <LazyButton type="submit">{submitLabel}</LazyButton>
-            </Grid>
-          )}
+          <Grid size={12} className="form-component-button-container">
+            {onPrevious && (
+              <Grid size={5} spacing={1} className="field-container">
+                <Suspense fallback={<h1>....loading</h1>}>
+                  <LazyButton type="button" onClick={onPrevious}>
+                    Back
+                  </LazyButton>
+                </Suspense>
+              </Grid>
+            )}
+            {submitLabel && (
+              <Grid size={onPrevious ? 5 : 12} className="field-container">
+                <Suspense fallback={<h1>....loading</h1>}>
+                  <LazyButton type="submit">{submitLabel}</LazyButton>
+                </Suspense>
+              </Grid>
+            )}
+          </Grid>
         </Grid>
       </Box>
     </form>

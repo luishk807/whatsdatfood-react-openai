@@ -2,25 +2,26 @@ import RatingCustom from "../Rating";
 import { type FC, useEffect, useMemo, useState } from "react";
 import { Box, Grid, TextField } from "@mui/material";
 import "./index.css";
-import Modal from "@/components/Modal";
-// import FormComponent from "@/components/FormComponent";
+import FormComponent from "@/components/FormComponent";
 import Button from "../Button";
 import useUserRating from "@/customHooks/useUserRating";
 import { _get } from "@/utils";
 import useSnackbarHook from "@/customHooks/useSnackBar";
-import { getTotalRatings } from "@/utils/numbers";
 import {
-  RatingModalCreateInterface,
+  RatingFormCreateInterface,
   RatingPayloadType,
   UserRating,
 } from "@/interfaces/users";
 
-const RatingModalCreate: FC<RatingModalCreateInterface> = ({
+import { CREATE_RATING } from "@/customConstants/forms";
+
+const RatingFormCreate: FC<RatingFormCreateInterface> = ({
   data,
   label,
   type,
+  onPrevious,
+  onSubmit,
 }) => {
-  const [closeModal, setCloseModal] = useState(false);
   const [foundUserRating, setFoundUserRating] = useState(false);
   const [formData, setFormData] = useState<RatingPayloadType>({
     id: null,
@@ -30,14 +31,11 @@ const RatingModalCreate: FC<RatingModalCreateInterface> = ({
     restaurant_menu_item_id: _get(data, "id"),
   });
 
-  const ratingNumbers = useMemo(() => {
-    return data.ratings ? getTotalRatings(data.ratings) : 0;
-  }, [data.ratings]);
-
+  const formFields = CREATE_RATING;
   const { saveRating, getUserRatingByItemId, userRatingByRestItemIdQuery } =
     useUserRating();
   const { loading } = userRatingByRestItemIdQuery;
-  const { showSnackBar, SnackbarComponent } = useSnackbarHook();
+  const { showSnackBar, SnackbarComponent, closeSnackBar } = useSnackbarHook();
 
   const handleRateSubmit = async () => {
     try {
@@ -50,9 +48,15 @@ const RatingModalCreate: FC<RatingModalCreateInterface> = ({
           title: null,
           comment: null,
         });
-        showSnackBar("Your rating was saved", "success");
-        setCloseModal(true);
-        setTimeout(() => setCloseModal(false), 500);
+
+        if (onSubmit) {
+          onSubmit("Your rating was saved", "success");
+        } else {
+          showSnackBar("Your rating was saved", "success");
+          setTimeout(() => {
+            closeSnackBar();
+          }, 3000);
+        }
       }
     } catch (err) {
       if (err instanceof Error) {
@@ -100,71 +104,15 @@ const RatingModalCreate: FC<RatingModalCreateInterface> = ({
 
   return (
     <>
-      {/* <Modal
-        closeOnParent={closeModal}
-        type={type}
-        {...(!label
-          ? {
-              customButton: (
-                <RatingCustom
-                  isDisplay={true}
-                  defaultValue={Number(ratingNumbers)}
-                />
-              ),
-            }
-          : { label: label })}
-      > */}
-      {/* TODO: using this component is much better
-          but for some reason is causing re-render */}
-      {/* <FormComponent
-            submitLabel="Send My Rate"
-            onHandleSubmit={handleRateSubmit}
-            fields={formFields}
-            title={`Rate ${data.name}`}
-          /> */}
-      <Grid container spacing={2} className="w-full">
-        <Grid size={12} className="w-full flex display justify-center">
-          <h2>Rate {data.name}</h2>
-        </Grid>
-        <Grid size={12} className="flex justify-center flex-col">
-          Your Review
-          <RatingCustom
-            label="Your Review"
-            defaultValue={Number(formData.rating)}
-            onClick={(value: number) => handleRatingChange(value, "rating")}
-          />
-        </Grid>
-        <Grid size={12} className="flex flex-col">
-          Subject
-          <input
-            onChange={(e) => handleRatingChange(e.target.value, "title")}
-            value={formData.title || ""}
-            name="title"
-            className="field-container"
-            type="text"
-          />
-        </Grid>
-        <Grid size={12} className="flex flex-col">
-          Comment
-          <TextField
-            value={formData.comment || ""}
-            onChange={(e) => handleRatingChange(e.target.value, "comment")}
-            minRows={2}
-            name="comment"
-            className="field-container"
-            placeholder="Write something"
-            fullWidth
-          />
-        </Grid>
-        <Grid size={12}>
-          <Button onClick={handleRateSubmit}>
-            {foundUserRating ? "Update Rating" : "Submit Rating"}
-          </Button>
-        </Grid>
-      </Grid>
-      {/* </Modal> */}
+      <FormComponent
+        submitLabel="Send My Rate"
+        onPrevious={onPrevious}
+        onHandleSubmit={handleRateSubmit}
+        fields={formFields}
+        title={`Rate ${data.name}`}
+      />
       {SnackbarComponent}
     </>
   );
 };
-export default RatingModalCreate;
+export default RatingFormCreate;

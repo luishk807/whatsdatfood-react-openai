@@ -1,12 +1,11 @@
 import { type FC, useEffect, useState } from "react";
-import { Box, Link } from "@mui/material";
+import { Box, Grid, Link } from "@mui/material";
 import "./index.css";
 import useUserRating from "@/customHooks/useUserRating";
 import { _get } from "@/utils";
 import { UserRating, RatingListComponentInterface } from "@/interfaces/users";
 import UserRatingItem from "@/components/UserRatingItem";
 import "./index.css";
-import Button from "@/components/Button";
 
 const RatingListComponent: FC<RatingListComponentInterface> = ({
   data,
@@ -37,30 +36,37 @@ const RatingListComponent: FC<RatingListComponentInterface> = ({
 
   return (
     <>
-      <Box
-        sx={{
-          height: "50px",
-          margin: {
-            xs: "10px 0px",
-          },
-        }}
-        className="w-full flex justify-between"
-      >
-        {/* <Box>X</Box> */}
-        <Box sx={{ fontWeight: { xs: "bold" }, padding: { xs: "10px" } }}>
-          All Rating for {data.name}
-        </Box>
-        <Box sx={{ padding: { xs: "10px" } }}>
-          <Link href="#" onClick={onOpenCreate} underline="hover">
-            Write you review
-          </Link>
-        </Box>
+      <Box className="w-full flex justify-between">
+        <Grid container className="w-full">
+          <Grid
+            size={7}
+            sx={{
+              justifyContent: "space-between",
+              fontWeight: { xs: "bold" },
+              padding: { xs: "10px" },
+            }}
+          >
+            All Rating for {data.name}
+          </Grid>
+          <Grid
+            size={5}
+            sx={{
+              justifyContent: "end",
+              display: "flex",
+              padding: { xs: "10px" },
+            }}
+          >
+            <Link href="#" onClick={onOpenCreate} underline="hover">
+              Write you review
+            </Link>
+          </Grid>
+        </Grid>
       </Box>
       <Box
         sx={{
           height: {
             lg: "540px",
-            xs: "100vh",
+            xs: "80vh",
           },
           padding: {
             xs: "20px",

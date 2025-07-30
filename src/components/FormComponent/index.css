@@ -11,3 +11,7 @@
 #form-component-container .field-container {
   margin: 10px 0px;
 }
+#form-component-container .form-component-button-container {
+  display: flex;
+  justify-content: space-between;
+}
