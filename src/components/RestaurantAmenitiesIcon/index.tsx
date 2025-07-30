@@ -71,7 +71,12 @@ const RestaurantAmenitiesIcon: FC<RestaurantAmenitiesIconInt> = ({
         gap: "1rem",
       }}
     >
-      {elementList && elementList.map((element, indx) => element)}
+      {elementList &&
+        elementList.map((element, indx) => (
+          <Box key={indx} sx={indx % 2 !== 0 ? { justifySelf: "end" } : {}}>
+            {element}
+          </Box>
+        ))}
     </Box>
   );
 };

@@ -66,7 +66,26 @@ const CustomModal: FC<CustomModalInterface> = ({
         open={open}
         onClose={toggleModal}
       >
-        <Box id="custom-modal-container">{children}</Box>
+        <Box
+          id="custom-modal-container"
+          sx={{
+            padding: { lg: "20px", xs: "0px" },
+            width: { lg: "500px", xs: "100%" },
+            height: {
+              lg: "auto",
+              xs: "100vh",
+            },
+            minHeight: {
+              lg: "200px",
+            },
+            borderRadius: {
+              lg: "10px",
+              xs: "0px",
+            },
+          }}
+        >
+          {children}
+        </Box>
       </Modal>
     </>
   );

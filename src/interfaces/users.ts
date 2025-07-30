@@ -99,3 +99,15 @@ export interface RatingModalCreateInterface {
   label?: string;
   type?: ModalType;
 }
+
+export interface RatingFormCreateInterface {
+  data: MenuItemType;
+  label?: string;
+  type?: ModalType;
+  onPrevious?: () => void;
+}
+
+export interface RatingListComponentInterface {
+  data: MenuItemType;
+  onOpenCreate?: () => void;
+}

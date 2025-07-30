@@ -24,7 +24,7 @@ const UserRatingItem: FC<UserRatingItemInt> = ({ data }) => {
         <div>
           <RatingCustom defaultValue={score} isDisplay={true} />
         </div>
-        <div>{title}</div>
+        <div>&nbsp;{title}</div>
       </div>
 
       <div>{comment}</div>

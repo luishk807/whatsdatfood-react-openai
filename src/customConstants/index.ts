@@ -78,3 +78,5 @@ export const RESTAURANT_AMENITIES_OPTIONS = [
   "drive_through",
   "delivery_option",
 ];
+
+export const RATING_TYPE = ["list", "create"];

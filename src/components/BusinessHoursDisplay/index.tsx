@@ -150,33 +150,29 @@ const BusinessHourDisplay: FC<BusinessHourDisplayInterface> = ({
   return (
     formatSchedule && (
       <Modal customButton={<CustomButton />}>
-        <Box
-          className="center-full bg-white-shawdow"
-          sx={{
-            padding: { lg: "10px", xs: "0px" },
-            width: { lg: "400px", xs: "100%" },
-          }}
-        >
-          <Grid className="w-full" container>
-            <Grid className="w-full display flex justify-center">
-              <h3>Business Hours</h3>
-            </Grid>
-            {formatSchedule.map((item) => {
-              const hours =
-                item.open_time && item.close_time
-                  ? `${item.open_time} - ${item.close_time}`
-                  : "CLOSED";
-              return (
-                <Grid className="w-full">
-                  <Grid container>
-                    <Grid size={6}>{item.day_of_week}</Grid>
-                    <Grid size={6}>{hours}</Grid>
+        <Grid className="w-full" container>
+          <Grid className="w-full display flex justify-center">
+            <h3>Business Hours</h3>
+          </Grid>
+          {formatSchedule.map((item) => {
+            const hours =
+              item.open_time && item.close_time
+                ? `${item.open_time} - ${item.close_time}`
+                : "CLOSED";
+            return (
+              <Grid className="w-full">
+                <Grid container>
+                  <Grid size={6} className="flex justify-start">
+                    {item.day_of_week}
+                  </Grid>
+                  <Grid size={6} className="flex justify-end">
+                    {hours}
                   </Grid>
                 </Grid>
-              );
-            })}
-          </Grid>
-        </Box>
+              </Grid>
+            );
+          })}
+        </Grid>
       </Modal>
     )
   );

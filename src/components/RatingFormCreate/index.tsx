@@ -2,23 +2,25 @@ import RatingCustom from "../Rating";
 import { type FC, useEffect, useMemo, useState } from "react";
 import { Box, Grid, TextField } from "@mui/material";
 import "./index.css";
+import Modal from "@/components/Modal";
 // import FormComponent from "@/components/FormComponent";
 import Button from "../Button";
 import useUserRating from "@/customHooks/useUserRating";
 import { _get } from "@/utils";
 import useSnackbarHook from "@/customHooks/useSnackBar";
+import { getTotalRatings } from "@/utils/numbers";
 import {
-  RatingFormCreateInterface,
+  RatingModalCreateInterface,
   RatingPayloadType,
   UserRating,
 } from "@/interfaces/users";
 
-const RatingFormCreate: FC<RatingFormCreateInterface> = ({
+const RatingModalCreate: FC<RatingModalCreateInterface> = ({
   data,
   label,
   type,
-  onPrevious,
 }) => {
+  const [closeModal, setCloseModal] = useState(false);
   const [foundUserRating, setFoundUserRating] = useState(false);
   const [formData, setFormData] = useState<RatingPayloadType>({
     id: null,
@@ -27,6 +29,10 @@ const RatingFormCreate: FC<RatingFormCreateInterface> = ({
     comment: null,
     restaurant_menu_item_id: _get(data, "id"),
   });
+
+  const ratingNumbers = useMemo(() => {
+    return data.ratings ? getTotalRatings(data.ratings) : 0;
+  }, [data.ratings]);
 
   const { saveRating, getUserRatingByItemId, userRatingByRestItemIdQuery } =
     useUserRating();
@@ -45,6 +51,8 @@ const RatingFormCreate: FC<RatingFormCreateInterface> = ({
           comment: null,
         });
         showSnackBar("Your rating was saved", "success");
+        setCloseModal(true);
+        setTimeout(() => setCloseModal(false), 500);
       }
     } catch (err) {
       if (err instanceof Error) {
@@ -92,6 +100,28 @@ const RatingFormCreate: FC<RatingFormCreateInterface> = ({
 
   return (
     <>
+      {/* <Modal
+        closeOnParent={closeModal}
+        type={type}
+        {...(!label
+          ? {
+              customButton: (
+                <RatingCustom
+                  isDisplay={true}
+                  defaultValue={Number(ratingNumbers)}
+                />
+              ),
+            }
+          : { label: label })}
+      > */}
+      {/* TODO: using this component is much better
+          but for some reason is causing re-render */}
+      {/* <FormComponent
+            submitLabel="Send My Rate"
+            onHandleSubmit={handleRateSubmit}
+            fields={formFields}
+            title={`Rate ${data.name}`}
+          /> */}
       <Grid container spacing={2} className="w-full">
         <Grid size={12} className="w-full flex display justify-center">
           <h2>Rate {data.name}</h2>
@@ -126,20 +156,15 @@ const RatingFormCreate: FC<RatingFormCreateInterface> = ({
             fullWidth
           />
         </Grid>
-        {onPrevious && (
-          <Grid size={6}>
-            <Button onClick={onPrevious}>Back To List</Button>
-          </Grid>
-        )}
-
-        <Grid size={onPrevious ? 6 : 12}>
+        <Grid size={12}>
           <Button onClick={handleRateSubmit}>
             {foundUserRating ? "Update Rating" : "Submit Rating"}
           </Button>
         </Grid>
       </Grid>
+      {/* </Modal> */}
       {SnackbarComponent}
     </>
   );
 };
-export default RatingFormCreate;
+export default RatingModalCreate;

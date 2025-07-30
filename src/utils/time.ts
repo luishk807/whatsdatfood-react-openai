@@ -42,5 +42,5 @@ export const checkIfStoreOpen = (businessHours: BusinessHours) => {
   const open_time = dayjs(businessHours.open_time, "h:mm A");
   const close_time = dayjs(businessHours.close_time, "h:mm A");
 
-  return open_time > now && now < close_time ? true : false;
+  return now > open_time && now < close_time ? true : false;
 };
