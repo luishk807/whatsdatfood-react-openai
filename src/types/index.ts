@@ -10,7 +10,7 @@ export type dropDownMenuKeyType =
 
 export type ModalType = (typeof MODAL_TYPE)[number];
 
-export type RatingToogleType = (typeof RATING_TYPE)[number];
+export type RatingToogleType =  (typeof RATING_TYPE)[keyof typeof RATING_TYPE];
 
 export type dropDownMenuListType = Partial<
   Record<dropDownMenuKeyType, dropDownMenuItemType[]>

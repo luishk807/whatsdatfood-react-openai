@@ -1,4 +1,4 @@
-import { lazy, useState, useMemo, type FC, Suspense } from "react";
+import { lazy, useState, useMemo, type FC, Suspense, useEffect } from "react";
 import { Box, Grid } from "@mui/material";
 import {
   FormFieldType,
@@ -11,6 +11,7 @@ import "./index.css";
 import { getMissingField, getLabelFromKey } from "@/utils";
 import FormTextfieldSkeleton from "@/components/SkeletonLoaders/FormTextfield";
 import FormRatingSkeleton from "@/components/SkeletonLoaders/Rating";
+import FormButtonSkeleton from "../SkeletonLoaders/FormButton";
 const LazyRating = lazy(() => import("@/components/Rating"));
 const LazyTextField = lazy(() => import("@/components/TextField"));
 const LazyTextFieldDebounce = lazy(
@@ -27,7 +28,9 @@ const FormComponent: FC<FormComponentInterface> = ({
   showLoadingSubmit,
 }) => {
   const [formData, setFormData] = useState<formCompObjType>({});
-  const [isSubmitLoading, setIsSubmitLoading] = useState(false);
+  const [isSubmitLoading, setIsSubmitLoading] = useState(
+    showLoadingSubmit || false,
+  );
   const [errors, setErrors] = useState<string[]>([]);
   const [errorFields, setErrorFields] = useState<string[]>([]);
   const handleOnChange = (key: string, item: formCompValueType) => {
@@ -50,6 +53,12 @@ const FormComponent: FC<FormComponentInterface> = ({
       });
     }
   };
+
+  useEffect(() => {
+    if (showLoadingSubmit) {
+      setIsSubmitLoading(showLoadingSubmit);
+    }
+  }, [showLoadingSubmit]);
 
   const getFieldError = (item: formCompValueType) => {
     switch (item.type) {
@@ -269,7 +278,7 @@ const FormComponent: FC<FormComponentInterface> = ({
           <Grid size={12} className="form-component-button-container">
             {onPrevious && (
               <Grid size={5} spacing={1} className="field-container">
-                <Suspense fallback={<h1>....loading</h1>}>
+                <Suspense fallback={<FormButtonSkeleton />}>
                   <LazyButton type="button" onClick={onPrevious}>
                     Back
                   </LazyButton>
@@ -278,7 +287,7 @@ const FormComponent: FC<FormComponentInterface> = ({
             )}
             {submitLabel && (
               <Grid size={onPrevious ? 5 : 12} className="field-container">
-                <Suspense fallback={<h1>....loading</h1>}>
+                <Suspense fallback={<FormButtonSkeleton />}>
                   <LazyButton disabled={isSubmitLoading} type="submit">
                     {submitLabel}
                   </LazyButton>

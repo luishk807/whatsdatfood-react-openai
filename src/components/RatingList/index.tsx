@@ -5,7 +5,6 @@ import useUserRating from "@/customHooks/useUserRating";
 import { _get } from "@/utils";
 import { UserRating, RatingListComponentInterface } from "@/interfaces/users";
 import UserRatingItem from "@/components/UserRatingItem";
-import "./index.css";
 
 const RatingListComponent: FC<RatingListComponentInterface> = ({
   data,
@@ -46,7 +45,7 @@ const RatingListComponent: FC<RatingListComponentInterface> = ({
               padding: { xs: "10px" },
             }}
           >
-            All Rating for {data.name}
+            {data.name}
           </Grid>
           <Grid
             size={5}
@@ -81,6 +80,12 @@ const RatingListComponent: FC<RatingListComponentInterface> = ({
             </Box>
           );
         })}
+
+        {!!!ratingLists.length && !loading && (
+          <Box className="user-rating-item-container flex justify-center">
+            <h3>No ratings found for this item.</h3>
+          </Box>
+        )}
       </Box>
     </>
   );

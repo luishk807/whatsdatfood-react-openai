@@ -79,4 +79,10 @@ export const RESTAURANT_AMENITIES_OPTIONS = [
   "delivery_option",
 ];
 
-export const RATING_TYPE = ["list", "create"];
+export const RATING_TYPE = {
+  list: "list",
+  create: "create",
+  rating: "rating",
+  edit: "edit",
+  delete: "delete",
+};

@@ -49,6 +49,7 @@ const CreateAccount = () => {
           title="Create Account"
           submitLabel="Register"
           onHandleSubmit={handleSubmit}
+          showLoadingSubmit={loading}
         />
         <Grid container>
           <Grid size={12} className="flex justify-start">
