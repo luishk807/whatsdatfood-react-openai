@@ -59,11 +59,7 @@ const UserFriendLists: FC<UserFriendListsInt> = ({ onCreate }) => {
       {!!friends.length ? (
         friends.map((friend, indx) => {
           return (
-            <Grid
-              key={indx}
-              size={12}
-              className="w-full user-account-item-separator"
-            >
+            <Grid key={indx} size={12} className="w-full line-separator-top">
               <Grid container className="w-full">
                 <Grid size={4}>{friend.name}</Grid>
                 <Grid size={3}>{friend.email}</Grid>

@@ -44,7 +44,7 @@ const UserFavoritesSection: FC = () => {
             <Grid
               size={12}
               key={indx}
-              className="user-favorite-item user-account-item-separator"
+              className="user-favorite-item line-separator-top"
             >
               <Grid container>
                 <Grid size={6} className="flex justify-start">

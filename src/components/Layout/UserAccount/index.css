@@ -45,7 +45,3 @@
   text-transform: capitalize;
   border-bottom: 1px solid #ccc;
 }
-
-.user-account-item-separator:not(:first-child) {
-  border-top: 1px solid rbga(0, 0, 0, 0.09);
-}
