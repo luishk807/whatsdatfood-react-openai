@@ -1,5 +1,6 @@
 import { Suspense, lazy, useEffect } from "react";
-import Layout from "@/components/Layout";
+import Layout from "@/components/Layout/Main";
+import UserAccountLayout from "./components/Layout/UserAccount";
 import { Routes, Route } from "react-router-dom";
 import "./App.css";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -11,6 +12,14 @@ const LazySignIN = lazy(() => import("@/components/SignInComponent"));
 const LazyCreateAccount = lazy(() => import("@/components/CreateAccount"));
 const LazyUserAccount = lazy(() => import("@/components/UserAccount"));
 const LazyLogout = lazy(() => import("@/components/Logout"));
+const LazyUserFriendSection = lazy(
+  () => import("@/components/UserFriendSection"),
+);
+const LazyUserRatings = lazy(() => import("@/components/UserRatings"));
+const LazyUserSettings = lazy(() => import("@/components/UserSettings"));
+const LazyUserSearch = lazy(() => import("@/components/UserSearches"));
+const LazyUserFavorites = lazy(() => import("@/components/UserFavorites"));
+
 function App() {
   const customStyle = {
     width: "30px",
@@ -56,7 +65,69 @@ function App() {
             element={
               <Suspense fallback={<Loading style={customStyle} />}>
                 <Layout>
-                  <LazyUserAccount />
+                  <UserAccountLayout sectionTitle="Account">
+                    <LazyUserAccount />
+                  </UserAccountLayout>
+                </Layout>
+              </Suspense>
+            }
+          />
+          <Route
+            path="/friends"
+            element={
+              <Suspense fallback={<Loading style={customStyle} />}>
+                <Layout>
+                  <UserAccountLayout sectionTitle="Friends">
+                    <LazyUserFriendSection />
+                  </UserAccountLayout>
+                </Layout>
+              </Suspense>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <Suspense fallback={<Loading style={customStyle} />}>
+                <Layout>
+                  <UserAccountLayout sectionTitle="Settings">
+                    <LazyUserSettings />
+                  </UserAccountLayout>
+                </Layout>
+              </Suspense>
+            }
+          />
+          <Route
+            path="/ratings"
+            element={
+              <Suspense fallback={<Loading style={customStyle} />}>
+                <Layout>
+                  <UserAccountLayout sectionTitle="Ratings">
+                    <LazyUserRatings />
+                  </UserAccountLayout>
+                </Layout>
+              </Suspense>
+            }
+          />
+          <Route
+            path="/searches"
+            element={
+              <Suspense fallback={<Loading style={customStyle} />}>
+                <Layout>
+                  <UserAccountLayout sectionTitle="Searches">
+                    <LazyUserSearch />
+                  </UserAccountLayout>
+                </Layout>
+              </Suspense>
+            }
+          />
+          <Route
+            path="/favorites"
+            element={
+              <Suspense fallback={<Loading style={customStyle} />}>
+                <Layout>
+                  <UserAccountLayout sectionTitle="Favorites">
+                    <LazyUserFavorites />
+                  </UserAccountLayout>
                 </Layout>
               </Suspense>
             }

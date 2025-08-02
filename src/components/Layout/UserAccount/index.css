@@ -1,0 +1,51 @@
+#user-account-layout {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+#user-account-layout .user-account-layout-dropdown {
+  padding-top: 10px;
+}
+
+#user-account-layout .user-account-layout-dropdown ul {
+  list-style: none;
+  padding: 0px;
+  margin: 0px;
+  display: flex;
+  flex-direction: column;
+}
+
+#user-account-layout .user-account-layout-dropdown ul li a {
+  padding: 5px 10px;
+  text-decoration: none;
+  color: inherit;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  font-size: 1.5em;
+}
+
+#user-account-layout .user-account-layout-dropdown ul li a:hover {
+  font-weight: 700;
+}
+#user-account-layout .user-account-layout-content {
+  justify-content: center;
+  display: flex;
+  border-left: 1px solid #ccc;
+}
+
+#user-account-layout .user-account-layout-content-inner {
+  margin-bottom: 50px;
+}
+
+#user-account-layout .user-account-layout-header {
+  display: flex;
+  justify-content: start;
+  text-transform: capitalize;
+  border-bottom: 1px solid #ccc;
+}
+
+.user-account-item-separator:not(:first-child) {
+  border-top: 1px solid rbga(0, 0, 0, 0.09);
+}

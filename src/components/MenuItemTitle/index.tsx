@@ -1,18 +1,18 @@
 import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
-import { MenuItemType } from "@/interfaces/restaurants";
+import { MenuItemItem } from "@/interfaces/restaurants";
+import { lazy, Suspense } from "react";
+import { RATING_TYPE } from "@/customConstants";
+import RectangleSkeleton from "@/components/SkeletonLoaders/Rectangle";
 const LazyRatingLIst = lazy(() => import("@/components/RatingModalList"));
-import { lazy } from "react";
-interface MenuItemItem {
-  data: MenuItemType;
-}
 
 const MenuItemTitle = ({ data }: MenuItemItem) => {
-  const ratingChanged = () => {};
   return (
     <>
       {data.name}
       {data.top_choice && <LocalFireDepartmentIcon style={{ fill: "red" }} />}
-      <LazyRatingLIst data={data} />
+      <Suspense fallback={<RectangleSkeleton />}>
+        <LazyRatingLIst data={data} defaultType={RATING_TYPE.list} />
+      </Suspense>
     </>
   );
 };

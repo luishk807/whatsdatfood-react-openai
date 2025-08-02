@@ -31,6 +31,10 @@ export interface MenuItemType {
   ratings?: UserRating[];
 }
 
+export interface MenuItemItem {
+  data: MenuItemType;
+}
+
 export interface RestCategoryMenu {
   [category: string]: MenuItemType[];
 }

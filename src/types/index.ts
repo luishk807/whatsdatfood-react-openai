@@ -1,7 +1,11 @@
 import { FIELD_TYPES, LOADING_TYPES, ACCOUNT_TYPE } from "@/customConstants";
 import { AlertColor } from "@mui/material";
 import { dropDownMenuItemType, addressType } from "@/interfaces";
-import { MODAL_TYPE, RATING_TYPE } from "@/customConstants";
+import {
+  MODAL_TYPE,
+  RATING_TYPE,
+  UserFriendSectionWindows,
+} from "@/customConstants";
 
 export type FieldTypes = (typeof FIELD_TYPES)[keyof typeof FIELD_TYPES];
 
@@ -10,7 +14,10 @@ export type dropDownMenuKeyType =
 
 export type ModalType = (typeof MODAL_TYPE)[number];
 
-export type RatingToogleType =  (typeof RATING_TYPE)[keyof typeof RATING_TYPE];
+export type RatingToogleType = (typeof RATING_TYPE)[keyof typeof RATING_TYPE];
+
+export type UserFriendSectionWindowTypes =
+  (typeof UserFriendSectionWindows)[keyof typeof UserFriendSectionWindows];
 
 export type dropDownMenuListType = Partial<
   Record<dropDownMenuKeyType, dropDownMenuItemType[]>

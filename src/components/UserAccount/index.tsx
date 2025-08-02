@@ -1,5 +1,8 @@
-const UserAccount = () => {
-  return <h1>test</h1>;
+import { type FC } from "react";
+import "./index.css";
+
+const UserAccount: FC = () => {
+  return <div></div>;
 };
 
 export default UserAccount;

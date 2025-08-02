@@ -2,6 +2,10 @@ export const DEFAULT_CURRENCY = {
   code: "en-US",
   name: "USD",
 };
+
+export const PAGE_DEFAULT = 1;
+export const LIMIT_DEFAULT = 10;
+
 export const BACKEND_URL: string | undefined =
   process.env.REACT_APP_BACKEND_URL;
 export const BACKEND_GRAPHQL_URL: string | undefined =
@@ -34,20 +38,24 @@ export const ACCOUNT_TYPE = {
 export const DROPDOWN_MENU = {
   "1": [
     {
-      name: "Account",
-      url: "/account",
+      name: "Setting",
+      url: "/settings",
     },
     {
-      name: "My Profile",
-      url: "/profile",
+      name: "Friends",
+      url: "/friends",
     },
     {
       name: "Ratings",
-      url: "/my-ratings",
+      url: "/ratings",
     },
     {
       name: "Searches",
-      url: "/search-history",
+      url: "/searches",
+    },
+    {
+      name: "Favorites",
+      url: "/favorites",
     },
     {
       name: "Logout",
@@ -85,4 +93,13 @@ export const RATING_TYPE = {
   rating: "rating",
   edit: "edit",
   delete: "delete",
+};
+
+export const ACCOUNT_MENU_LIST =
+  DROPDOWN_MENU[ACCOUNT_TYPE.user as keyof typeof DROPDOWN_MENU];
+
+export const UserFriendSectionWindows = {
+  create: "create",
+  edit: "edit",
+  list: "list",
 };

@@ -26,7 +26,6 @@ const AccountButton = () => {
   const DropDownMenuList: dropDownMenuListType = DROPDOWN_MENU;
 
   const getMenuType = (role: dropDownMenuKeyType) => {
-    console.log("role", role);
     if (DropDownMenuList[role]) {
       setDropDownMenus(DropDownMenuList[role]);
     }

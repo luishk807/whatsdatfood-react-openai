@@ -11,7 +11,7 @@ import "./index.css";
 import { getMissingField, getLabelFromKey } from "@/utils";
 import FormTextfieldSkeleton from "@/components/SkeletonLoaders/FormTextfield";
 import FormRatingSkeleton from "@/components/SkeletonLoaders/Rating";
-import FormButtonSkeleton from "../SkeletonLoaders/FormButton";
+import FormButtonSkeleton from "../SkeletonLoaders/Rectangle";
 const LazyRating = lazy(() => import("@/components/Rating"));
 const LazyTextField = lazy(() => import("@/components/TextField"));
 const LazyTextFieldDebounce = lazy(
@@ -26,6 +26,7 @@ const FormComponent: FC<FormComponentInterface> = ({
   onHandleSubmit,
   onPrevious,
   showLoadingSubmit,
+  defaultValue,
 }) => {
   const [formData, setFormData] = useState<formCompObjType>({});
   const [isSubmitLoading, setIsSubmitLoading] = useState(

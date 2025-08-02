@@ -1,7 +1,11 @@
 import { SxProps, Theme, AlertColor } from "@mui/material";
 import { MenuItemType, RestaurantType } from "@/interfaces/restaurants";
 import { StatusType } from "@/interfaces";
-import { ModalType } from "@/types";
+import {
+  ModalType,
+  RatingToogleType,
+  UserFriendSectionWindowTypes,
+} from "@/types";
 
 export interface RatingCustomInterface {
   defaultValue: number;
@@ -41,6 +45,25 @@ export interface UserRating {
   status: StatusType;
 }
 
+export interface UserFriend {
+  id: number;
+  name: string;
+  email: string;
+  phone: string;
+  user_id: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+  user: UserType;
+}
+export interface UserFavorites {
+  id: number;
+  restaurant_id: number;
+  user_id: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+  restaurant: RestaurantType;
+  user: UserType;
+}
 export interface UserRoleType {
   id: number;
   name: string;
@@ -81,6 +104,7 @@ export interface UserType {
   status?: StatusType;
   role?: UserRoleType;
   searches?: [UserSearchesType];
+  friends?: [UserFriend];
 }
 
 export interface UserRatingListResp {
@@ -90,7 +114,7 @@ export interface UserRatingListResp {
   currentPage: number;
 }
 
-export interface UserRatingItemInt {
+export interface RatingItemInt {
   data: UserRating;
 }
 
@@ -111,4 +135,20 @@ export interface RatingFormCreateInterface {
 export interface RatingListComponentInterface {
   data: MenuItemType;
   onOpenCreate?: () => void;
+}
+
+export interface RatingModalListComponentInt {
+  data: MenuItemType;
+  defaultType?: RatingToogleType;
+  onClose?: () => void;
+}
+
+export interface UserAccountLayoutInterface {
+  children?: React.ReactNode;
+  sectionTitle?: string;
+}
+
+export interface UserFriendCreateInt {
+  type: UserFriendSectionWindowTypes;
+  onPrevious?: () => void;
 }

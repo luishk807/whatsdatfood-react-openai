@@ -1,5 +1,5 @@
 import { Box, Skeleton } from "@mui/material";
-const FormButtonSkeleton = () => {
+const RectangleSkeleton = () => {
   return (
     <Box
       sx={{
@@ -12,4 +12,4 @@ const FormButtonSkeleton = () => {
   );
 };
 
-export default FormButtonSkeleton;
+export default RectangleSkeleton;

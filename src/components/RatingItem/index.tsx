@@ -1,12 +1,12 @@
 import { type FC } from "react";
-import { UserRatingItemInt } from "@/interfaces/users";
+import { RatingItemInt } from "@/interfaces/users";
 import RatingCustom from "@/components/Rating";
 import { _get } from "@/utils";
 import { getDate } from "@/utils/time";
 
 import "./index.css";
 
-const UserRatingItem: FC<UserRatingItemInt> = ({ data }) => {
+const RatingItem: FC<RatingItemInt> = ({ data }) => {
   const user = _get(data, "user", null);
   const fullName = user
     ? _get(user, "first_name", "") + " " + _get(user, "last_name", "")
@@ -32,4 +32,4 @@ const UserRatingItem: FC<UserRatingItemInt> = ({ data }) => {
   );
 };
 
-export default UserRatingItem;
+export default RatingItem;

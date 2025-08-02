@@ -4,7 +4,7 @@ import "./index.css";
 import useUserRating from "@/customHooks/useUserRating";
 import { _get } from "@/utils";
 import { UserRating, RatingListComponentInterface } from "@/interfaces/users";
-import UserRatingItem from "@/components/UserRatingItem";
+import UserRatingItem from "@/components/RatingItem";
 
 const RatingListComponent: FC<RatingListComponentInterface> = ({
   data,

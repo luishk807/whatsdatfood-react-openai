@@ -84,3 +84,24 @@ export const CREATE_RATING = [
     type: FIELD_TYPES.textfield,
   },
 ];
+
+export const CREATE_USER_FRIEND = [
+  {
+    name: "name",
+    label: "Name",
+    isRequired: true,
+    type: FIELD_TYPES.textfield,
+  },
+  {
+    name: "email",
+    label: "Email",
+    isRequired: true,
+    type: FIELD_TYPES.email,
+  },
+  {
+    name: "phone",
+    label: "Phone",
+    isRequired: true,
+    type: FIELD_TYPES.textfield,
+  },
+];

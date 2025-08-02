@@ -46,6 +46,7 @@ export interface FormComponentInterface {
   title?: string;
   submitLabel?: string;
   showLoadingSubmit?: boolean;
+  defaultValue?: any;
   onHandleSubmit: (data: any, e?: any) => void;
   onPrevious?: () => void;
 }
