@@ -15,7 +15,7 @@ const LazyLogout = lazy(() => import("@/components/Logout"));
 const LazyUserFriendSection = lazy(
   () => import("@/components/UserFriendSection"),
 );
-const LazyUserRatings = lazy(() => import("@/components/UserRatings"));
+const LazyUserRatings = lazy(() => import("@/components/UserRatingSection"));
 const LazyUserSettings = lazy(() => import("@/components/UserSettings"));
 const LazyUserSearch = lazy(() => import("@/components/UserSearches"));
 const LazyUserFavorites = lazy(() => import("@/components/UserFavorites"));

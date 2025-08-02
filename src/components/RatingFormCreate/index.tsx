@@ -14,6 +14,7 @@ import {
 } from "@/interfaces/users";
 
 import { CREATE_RATING } from "@/customConstants/forms";
+import { LIMIT_DEFAULT, PAGE_DEFAULT } from "@/customConstants";
 
 const RatingFormCreate: FC<RatingFormCreateInterface> = ({
   data,
@@ -31,10 +32,13 @@ const RatingFormCreate: FC<RatingFormCreateInterface> = ({
     restaurant_menu_item_id: _get(data, "id"),
   });
 
+  const page = PAGE_DEFAULT;
+  const limit = LIMIT_DEFAULT;
+
   const formFields = CREATE_RATING;
-  const { saveRating, getUserRatingByItemId, userRatingByRestItemIdQuery } =
+  const { saveRating, getUserRatingsByItemId, getAllRatingByRestItemIdQuery } =
     useUserRating();
-  const { loading } = userRatingByRestItemIdQuery;
+  const { loading } = getAllRatingByRestItemIdQuery;
   const { showSnackBar, SnackbarComponent, closeSnackBar } = useSnackbarHook();
 
   const handleRateSubmit = async () => {
@@ -80,7 +84,7 @@ const RatingFormCreate: FC<RatingFormCreateInterface> = ({
   };
 
   const getUserRating = async (restItemId: number) => {
-    const resp = await getUserRatingByItemId(restItemId);
+    const resp = await getUserRatingsByItemId(restItemId, page, limit);
     if (resp) {
       setFoundUserRating(true);
       setFormData({

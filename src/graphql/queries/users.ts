@@ -146,24 +146,40 @@ export const GET_FRIENDS_BY_USER = gql`
   }
 `;
 
-export const GET_USER_RATING_BY_RESTAURANT_ID = gql`
-  query getRatingByRestItemId($restItemId: ID!) {
-    getRatingByRestItemId(restItemId: $restItemId) {
-      id
-      rating
-      user_id
-      comment
-      title
-      createdAt
-      updatedAt
-      restaurant_menu_item_id
+export const GET_RATINGS_BY_USER = gql`
+  query getRatingsByUser($page: Int!, $limit: Int) {
+    getRatingsByUser(page: $page, limit: $limit) {
+      data {
+        id
+        rating
+        user_id
+        comment
+        title
+        createdAt
+        updatedAt
+        restaurant_menu_item_id
+        restaurantMenuItem {
+          id
+          name
+          restaurant {
+            name
+          }
+          images {
+            url_m
+            name
+          }
+        }
+      }
+      totalItems
+      totalPages
+      currentPage
     }
   }
 `;
 
-export const GET_ALL_USER_RATING_BY_ITEM_ID = gql`
-  query allRatingsByItemId($restItemId: ID!, $page: Int!, $limit: Int) {
-    allRatingsByItemId(restItemId: $restItemId, page: $page, limit: $limit) {
+export const GET_RATINGS_BY_REST_ITEM_ID = gql`
+  query getRatingsByItemId($restItemId: ID!, $page: Int!, $limit: Int) {
+    getRatingsByItemId(restItemId: $restItemId, page: $page, limit: $limit) {
       data {
         id
         rating

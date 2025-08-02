@@ -13,7 +13,7 @@ import { LIMIT_DEFAULT, PAGE_DEFAULT } from "@/customConstants";
 import { _get } from "@/utils";
 import Button from "@/components/Button";
 const UserFriendLists = lazy(() => import("@/components/UserFriendLists"));
-const UserFriendCreate = lazy(() => import("@/components/UserFriendCreate"));
+const UserFriendCreate = lazy(() => import("@/components/UserFriendEdit"));
 import { UserFriendSectionWindowTypes } from "@/types";
 import { UserFriendSectionWindows } from "@/customConstants";
 

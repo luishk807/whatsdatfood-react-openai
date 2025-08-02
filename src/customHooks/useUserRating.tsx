@@ -1,8 +1,8 @@
 import { useLazyQuery, useMutation } from "@apollo/client";
 import {
   ADD_USER_RATING,
-  GET_USER_RATING_BY_RESTAURANT_ID,
-  GET_ALL_USER_RATING_BY_ITEM_ID,
+  GET_RATINGS_BY_REST_ITEM_ID,
+  GET_RATINGS_BY_USER,
 } from "@/graphql/queries/users";
 import { _get } from "@/utils";
 import useAuth from "@/customHooks/useAuth";
@@ -13,24 +13,24 @@ const useUserRating = () => {
     useMutation(ADD_USER_RATING);
 
   const [
-    getUserRatingByRestItemId,
+    getAllRatingByRestItemId,
     {
-      loading: useRatingByRestItemIdLoading,
-      error: useRatingByRestItemIdError,
-      data: useRatingByRestItemIdData,
+      loading: getUserRatingByRestItemIdLoading,
+      error: getUserRatingByRestItemIdError,
+      data: getUserRatingByRestItemIdData,
     },
-  ] = useLazyQuery(GET_USER_RATING_BY_RESTAURANT_ID, {
+  ] = useLazyQuery(GET_RATINGS_BY_REST_ITEM_ID, {
     fetchPolicy: "network-only",
   });
 
   const [
-    getAllUserRatingByRestItemId,
+    getAllUserRatingByUser,
     {
-      loading: useAllRatingByRestItemIdLoading,
-      error: useAllRatingByRestItemIdError,
-      data: useAllRatingByRestItemIdData,
+      loading: getAllUserRatingByUserLoading,
+      error: getAllUserRatingByUserError,
+      data: getAllUserRatingByUserData,
     },
-  ] = useLazyQuery(GET_ALL_USER_RATING_BY_ITEM_ID, {
+  ] = useLazyQuery(GET_RATINGS_BY_USER, {
     fetchPolicy: "network-only",
   });
 
@@ -61,16 +61,17 @@ const useUserRating = () => {
     }
   };
 
-  const getUserRatingByItemId = async (restItemId: number) => {
+  const getUserRatingsByUser = async (page: number, limit?: number) => {
     try {
       if (user) {
-        const resp = await getUserRatingByRestItemId({
+        const resp = await getAllUserRatingByUser({
           variables: {
-            restItemId: restItemId,
+            page,
+            limit,
           },
         });
 
-        return _get(resp, "data.getRatingByRestItemId");
+        return _get(resp, "data.getRatingsByUser");
       } else {
         throw new Error("ERROR: unable to get rating");
       }
@@ -82,14 +83,14 @@ const useUserRating = () => {
     }
   };
 
-  const getAllRatingsByItemId = async (
+  const getUserRatingsByItemId = async (
     restItemId: number,
     page: number,
     limit?: number,
   ): Promise<UserRatingListResp> => {
     try {
       if (user) {
-        const resp = await getAllUserRatingByRestItemId({
+        const resp = await getAllRatingByRestItemId({
           variables: {
             restItemId: restItemId,
             page: page,
@@ -97,7 +98,7 @@ const useUserRating = () => {
           },
         });
 
-        return _get(resp, "data.allRatingsByItemId");
+        return _get(resp, "data.getRatingsByItemId");
       } else {
         throw new Error("ERROR: unable to get rating");
       }
@@ -111,22 +112,22 @@ const useUserRating = () => {
 
   return {
     saveRating,
-    getUserRatingByItemId,
-    getAllRatingsByItemId,
+    getUserRatingsByUser,
+    getUserRatingsByItemId,
     submitRatingQuery: {
       loading: submitRatingLoading,
       error: error,
       data: data,
     },
-    allUserRatingByRestItemIdQuery: {
-      loading: useAllRatingByRestItemIdLoading,
-      error: useAllRatingByRestItemIdError,
-      data: useAllRatingByRestItemIdData,
+    getAllUserRatingByUserQuery: {
+      loading: getAllUserRatingByUserLoading,
+      error: getAllUserRatingByUserError,
+      data: getAllUserRatingByUserData,
     },
-    userRatingByRestItemIdQuery: {
-      loading: useRatingByRestItemIdLoading,
-      error: useRatingByRestItemIdError,
-      data: useRatingByRestItemIdData,
+    getAllRatingByRestItemIdQuery: {
+      loading: getUserRatingByRestItemIdLoading,
+      error: getUserRatingByRestItemIdError,
+      data: getUserRatingByRestItemIdData,
     },
   };
 };

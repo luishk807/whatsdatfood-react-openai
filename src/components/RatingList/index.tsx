@@ -5,6 +5,7 @@ import useUserRating from "@/customHooks/useUserRating";
 import { _get } from "@/utils";
 import { UserRating, RatingListComponentInterface } from "@/interfaces/users";
 import UserRatingItem from "@/components/RatingItem";
+import { LIMIT_DEFAULT, PAGE_DEFAULT } from "@/customConstants";
 
 const RatingListComponent: FC<RatingListComponentInterface> = ({
   data,
@@ -12,12 +13,14 @@ const RatingListComponent: FC<RatingListComponentInterface> = ({
 }) => {
   const [ratingLists, setRatingLists] = useState<UserRating[]>([]);
 
-  const { getAllRatingsByItemId, allUserRatingByRestItemIdQuery } =
+  const page = PAGE_DEFAULT;
+  const limit = LIMIT_DEFAULT;
+  const { getUserRatingsByItemId, getAllRatingByRestItemIdQuery } =
     useUserRating();
-  const { loading } = allUserRatingByRestItemIdQuery;
+  const { loading } = getAllRatingByRestItemIdQuery;
 
   const getAllUserRating = async (restItemId: number) => {
-    const resp = await getAllRatingsByItemId(restItemId, 1);
+    const resp = await getUserRatingsByItemId(restItemId, page, limit);
     if (resp) {
       const { data } = resp;
       console.log("ratings", data);

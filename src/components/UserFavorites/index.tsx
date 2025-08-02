@@ -5,15 +5,18 @@ import { UserFavorites } from "@/interfaces/users";
 import useUserFavorite from "@/customHooks/useUserFavorites";
 import { _get } from "@/utils";
 import { getDate } from "@/utils/time";
+import { LIMIT_DEFAULT, PAGE_DEFAULT } from "@/customConstants";
 
 const UserFavoritesSection: FC = () => {
   const [favorites, setFavorites] = useState<UserFavorites[]>();
   const { getAllUserFavorites, getAllUserFavoritesQuery } = useUserFavorite();
   const { data, loading, error } = getAllUserFavoritesQuery;
+  const page = PAGE_DEFAULT;
+  const limit = LIMIT_DEFAULT;
 
   useEffect(() => {
     const fetchAllFavorites = async () => {
-      const resp = await getAllUserFavorites(1, 0);
+      const resp = await getAllUserFavorites(page, limit);
       if (resp) {
         console.log("Fetched favorites:", resp);
         const data = _get(resp, "data");

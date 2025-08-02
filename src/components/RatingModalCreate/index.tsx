@@ -14,6 +14,7 @@ import {
   RatingPayloadType,
   UserRating,
 } from "@/interfaces/users";
+import { LIMIT_DEFAULT, PAGE_DEFAULT } from "@/customConstants";
 
 const RatingModalCreate: FC<RatingModalCreateInterface> = ({
   data,
@@ -30,13 +31,16 @@ const RatingModalCreate: FC<RatingModalCreateInterface> = ({
     restaurant_menu_item_id: _get(data, "id"),
   });
 
+  const page = PAGE_DEFAULT;
+  const limit = LIMIT_DEFAULT;
+
   const ratingNumbers = useMemo(() => {
     return data.ratings ? getTotalRatings(data.ratings) : 0;
   }, [data.ratings]);
 
-  const { saveRating, getUserRatingByItemId, userRatingByRestItemIdQuery } =
+  const { saveRating, getUserRatingsByItemId, getAllRatingByRestItemIdQuery } =
     useUserRating();
-  const { loading } = userRatingByRestItemIdQuery;
+  const { loading } = getAllRatingByRestItemIdQuery;
   const { showSnackBar, SnackbarComponent } = useSnackbarHook();
 
   const handleRateSubmit = async () => {
@@ -76,7 +80,7 @@ const RatingModalCreate: FC<RatingModalCreateInterface> = ({
   };
 
   const getUserRating = async (restItemId: number) => {
-    const resp = await getUserRatingByItemId(restItemId);
+    const resp = await getUserRatingsByItemId(restItemId, page, limit);
     if (resp) {
       setFoundUserRating(true);
       setFormData({
