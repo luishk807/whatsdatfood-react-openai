@@ -109,11 +109,11 @@ function App() {
             }
           />
           <Route
-            path="/searches"
+            path="/history"
             element={
               <Suspense fallback={<Loading style={customStyle} />}>
                 <Layout>
-                  <UserAccountLayout sectionTitle="Searches">
+                  <UserAccountLayout sectionTitle="History">
                     <LazyUserSearch />
                   </UserAccountLayout>
                 </Layout>

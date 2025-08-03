@@ -50,8 +50,8 @@ export const DROPDOWN_MENU = {
       url: "/ratings",
     },
     {
-      name: "Searches",
-      url: "/searches",
+      name: "History",
+      url: "/history",
     },
     {
       name: "Favorites",
