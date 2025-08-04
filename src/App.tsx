@@ -17,7 +17,7 @@ const LazyUserFriendSection = lazy(
 );
 const LazyUserRatings = lazy(() => import("@/components/UserRatingSection"));
 const LazyUserSettings = lazy(() => import("@/components/UserSettings"));
-const LazyUserSearch = lazy(() => import("@/components/UserSearches"));
+const LazyUserHistory = lazy(() => import("@/components/UserHistory"));
 const LazyUserFavorites = lazy(() => import("@/components/UserFavorites"));
 
 function App() {
@@ -114,7 +114,7 @@ function App() {
               <Suspense fallback={<Loading style={customStyle} />}>
                 <Layout>
                   <UserAccountLayout sectionTitle="History">
-                    <LazyUserSearch />
+                    <LazyUserHistory />
                   </UserAccountLayout>
                 </Layout>
               </Suspense>

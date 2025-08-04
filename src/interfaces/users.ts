@@ -50,11 +50,31 @@ export interface UserFriend {
   name: string;
   email: string;
   phone: string;
+  user_id?: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+  user?: UserType;
+}
+
+export interface UserSearch {
+  id: number;
+  name: string;
   user_id: number;
   createdAt?: Date;
   updatedAt?: Date;
   user: UserType;
 }
+
+export interface UserView {
+  id: number;
+  restaurant_id: number;
+  user_id: number;
+  createdAt?: Date;
+  updatedAt?: Date;
+  user: UserType;
+  restaurant: RestaurantType;
+}
+
 export interface UserFavorites {
   id: number;
   restaurant_id: number;
@@ -78,14 +98,6 @@ export interface CreateUserInputType {
   phone: string;
 }
 
-export interface UserSearchesType {
-  id: number;
-  user_id: number;
-  restaurant_id: number;
-  restaurant: RestaurantType;
-  user: UserType;
-}
-
 export interface UserType {
   id: number;
   first_name: string;
@@ -103,7 +115,8 @@ export interface UserType {
   ratings?: [UserRating];
   status?: StatusType;
   role?: UserRoleType;
-  searches?: [UserSearchesType];
+  searches?: [UserSearch];
+  views?: [UserView];
   friends?: [UserFriend];
 }
 
@@ -151,4 +164,13 @@ export interface UserAccountLayoutInterface {
 export interface UserFriendCreateInt {
   type: UserFriendSectionWindowTypes;
   onPrevious?: () => void;
+  onSubmit: (
+    data: CreateUserFriend,
+    type: UserFriendSectionWindowTypes,
+  ) => void;
 }
+
+export interface CreateUserFriend
+  extends Partial<
+    Omit<UserFriend, "id" | "user_id" | "createdAt" | "updatedAt">
+  > {}

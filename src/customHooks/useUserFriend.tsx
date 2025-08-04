@@ -61,7 +61,7 @@ const useUserFriend = () => {
   const addNewUserFriend = async (payload: any) => {
     try {
       const response = await addUserFriend({
-        variables: { input: { payload } },
+        variables: { payload: { ...payload } },
       });
       return response.data.addUserFriend;
     } catch (err) {

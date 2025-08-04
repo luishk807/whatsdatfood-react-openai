@@ -61,13 +61,14 @@ const UserRatingsSection: FC = () => {
                 <Grid size={4}>
                   <Image url={images.url_m} />
                 </Grid>
-                <Grid size={6}>
+                <Grid size={4}>
                   <div>{item.name}</div>
                   <div>{data.title}</div>
                   <div>
                     <Rating defaultValue={data.rating} isDisplay={true} />
                   </div>
                 </Grid>
+                <Grid size={2}>{data.status.name}</Grid>
                 <Grid size={2}>
                   <ul>
                     <li>delete</li>

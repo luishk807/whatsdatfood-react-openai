@@ -35,6 +35,11 @@ export const ACCOUNT_TYPE = {
   admin: "2",
 };
 
+export const LOGOUT_MENU = {
+  name: "Logout",
+  url: "/logout",
+};
+
 export const DROPDOWN_MENU = {
   "1": [
     {
@@ -56,10 +61,6 @@ export const DROPDOWN_MENU = {
     {
       name: "Favorites",
       url: "/favorites",
-    },
-    {
-      name: "Logout",
-      url: "/logout",
     },
   ],
   "3": [

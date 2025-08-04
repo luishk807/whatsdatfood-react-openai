@@ -28,11 +28,11 @@ export const ADD_USER_RATING = gql`
 `;
 
 export const ADD_USER_FRIEND = gql`
-  mutation addUserFriend($payload: CreateUserFriendInput!) {
+  mutation addUserFriend($payload: CreateUserFriendsInput!) {
     addUserFriend(input: $payload) {
       id
-      first_name
-      last_name
+      name
+      phone
       email
     }
   }
@@ -127,6 +127,44 @@ export const GET_USER_DETAIL = gql`
   }
 `;
 
+export const GET_USER_SEARCH = gql`
+  query getUserSearchesByUser($page: Int, $limit: Int) {
+    getUserSearchesByUser(page: $page, limit: $limit) {
+      data {
+        id
+        name
+        createdAt
+        updatedAt
+      }
+      totalItems
+      totalPages
+      currentPage
+    }
+  }
+`;
+
+export const GET_USER_VIEWED = gql`
+  query getUserViewsByUser($page: Int, $limit: Int) {
+    getUserViewsByUser(page: $page, limit: $limit) {
+      data {
+        id
+        restaurant_id
+        user_id
+        createdAt
+        updatedAt
+        restaurant {
+          id
+          name
+          slug
+        }
+      }
+      totalItems
+      totalPages
+      currentPage
+    }
+  }
+`;
+
 export const GET_FRIENDS_BY_USER = gql`
   query getFriendsByUser($page: Int, $limit: Int) {
     getFriendsByUser(page: $page, limit: $limit) {
@@ -158,6 +196,9 @@ export const GET_RATINGS_BY_USER = gql`
         createdAt
         updatedAt
         restaurant_menu_item_id
+        status {
+          name
+        }
         restaurantMenuItem {
           id
           name
@@ -189,6 +230,9 @@ export const GET_RATINGS_BY_REST_ITEM_ID = gql`
         restaurant_menu_item_id
         createdAt
         updatedAt
+        status {
+          name
+        }
         restaurantMenuItem {
           id
           name

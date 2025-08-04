@@ -10,7 +10,7 @@ import { dropDownMenuItemType } from "@/interfaces";
 
 import { dropDownMenuListType, dropDownMenuKeyType } from "@/types";
 
-import { DROPDOWN_MENU, ACCOUNT_TYPE } from "@/customConstants";
+import { DROPDOWN_MENU, ACCOUNT_TYPE, LOGOUT_MENU } from "@/customConstants";
 
 const AccountButton = () => {
   const { user } = useAuth();
@@ -92,6 +92,14 @@ const AccountButton = () => {
               {item.name}
             </MenuItem>
           ))}
+        <MenuItem
+          key="dropdown-menu-logout"
+          component={Link}
+          className="dropdown-link"
+          to={LOGOUT_MENU.url}
+        >
+          {LOGOUT_MENU.name}
+        </MenuItem>
       </Menu>
     </>
   );

@@ -2,7 +2,7 @@ import { useEffect, useState, type FC } from "react";
 import { Grid, Box } from "@mui/material";
 import { Link } from "react-router-dom";
 import { UserAccountLayoutInterface, UserType } from "@/interfaces/users";
-import { ACCOUNT_MENU_LIST } from "@/customConstants/index";
+import { ACCOUNT_MENU_LIST, LOGOUT_MENU } from "@/customConstants/index";
 import useAuth from "@/customHooks/useAuth";
 import "./index.css";
 
@@ -59,7 +59,11 @@ const UserAccountLayout: FC<UserAccountLayoutInterface> = ({
                 </li>
               ))}
             </ul>
+            <Grid size={12} className="user-account-logout line-separator-top">
+              <Link to={LOGOUT_MENU.url}>{LOGOUT_MENU.name}</Link>
+            </Grid>
           </Grid>
+
           <Grid
             size={{
               md: 10,

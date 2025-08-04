@@ -45,3 +45,21 @@
   text-transform: capitalize;
   border-bottom: 1px solid #ccc;
 }
+
+#user-account-layout .user-account-logout {
+  margin-top: 10px;
+}
+
+#user-account-layout .user-account-logout a {
+  padding: 5px 10px;
+  text-decoration: none;
+  color: inherit;
+  background-color: white;
+  display: flex;
+  justify-content: center;
+  font-size: 1.5em;
+}
+
+#user-account-layout .user-account-logout a:hover {
+  font-weight: 700;
+}
