@@ -6,14 +6,15 @@ import { debounce } from "lodash";
 import TextField from "@/components/TextField";
 import useFormHook from "@/customHooks/useForm";
 
-const TextFieldDebounce: FC<TextFieldInterface> = ({
+const TextFieldDebounce = <T,>({
   label,
   name,
   isError,
   type = "text",
   isPlaceholder,
   onChange,
-}) => {
+  defaultValue,
+}: TextFieldInterface<T>) => {
   const [inputValue, setInputValue] = useState("");
   const [loaderElement, setLoaderElement] = useState<ReactNode | null>(null);
 
@@ -72,6 +73,7 @@ const TextFieldDebounce: FC<TextFieldInterface> = ({
       showLoaderElement={loaderElement}
       isPlaceholder={isPlaceholder}
       name={name}
+      defaultValue={defaultValue}
       label={label}
       isError={isError}
       type={type}

@@ -1,6 +1,5 @@
 import RatingCustom from "@/components/Rating";
-import { type FC, useMemo, useState, lazy, Suspense } from "react";
-import "./index.css";
+import { type FC, useMemo, useState, lazy, Suspense, useCallback } from "react";
 import Modal from "@/components/Modal";
 import { _get } from "@/utils";
 import { getTotalRatings } from "@/utils/numbers";
@@ -22,7 +21,7 @@ const RatingModalListComponent: FC<RatingModalListComponentInt> = ({
   const [ratingType, setRatingType] = useState<RatingToogleType>(
     RATING_TYPE.list,
   );
-  const [closeModal, setCloseModal] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const { showSnackBar, SnackbarComponent, closeSnackBar } = useSnackbarHook();
   const ratingNumbers = useMemo(() => {
@@ -31,12 +30,10 @@ const RatingModalListComponent: FC<RatingModalListComponentInt> = ({
 
   const handleRatingCreate = (message: string, severity: AlertColor) => {
     showSnackBar(message, severity);
-    setTimeout(() => {
-      closeSnackBar();
-    }, 3000);
+    closeSnackBar();
   };
 
-  const toggleRatingMode = () => {
+  const toggleRatingMode = useCallback(() => {
     switch (ratingType) {
       case "create":
         return (
@@ -50,22 +47,21 @@ const RatingModalListComponent: FC<RatingModalListComponentInt> = ({
         );
       default:
         return (
-          <>
-            <Suspense fallback={<SkeletonRatingListing />}>
-              <LazyRatingList
-                data={data}
-                onOpenCreate={() => setRatingType(RATING_TYPE.create)}
-              />
-            </Suspense>
-          </>
+          <Suspense fallback={<SkeletonRatingListing />}>
+            <LazyRatingList
+              data={data}
+              onOpenCreate={() => setRatingType(RATING_TYPE.create)}
+            />
+          </Suspense>
         );
     }
-  };
+  }, [ratingType, data]);
+
   return (
     <>
       {SnackbarComponent}
       <Modal
-        closeOnParent={closeModal}
+        closeOnParent={open}
         customButton={
           <RatingCustom isDisplay={true} defaultValue={Number(ratingNumbers)} />
         }

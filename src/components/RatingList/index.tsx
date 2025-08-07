@@ -76,15 +76,15 @@ const RatingListComponent: FC<RatingListComponentInterface> = ({
         }}
         className="rating-model-list-ratings"
       >
-        {ratingLists.map((rating: UserRating, indx) => {
-          return (
-            <Box className="user-rating-item-container" key={indx}>
-              <UserRatingItem data={rating} />
-            </Box>
-          );
-        })}
-
-        {!!!ratingLists.length && !loading && (
+        {ratingLists && !!ratingLists.length ? (
+          ratingLists.map((rating: UserRating, indx) => {
+            return (
+              <Box className="user-rating-item-container" key={indx}>
+                <UserRatingItem data={rating} />
+              </Box>
+            );
+          })
+        ) : (
           <Box className="user-rating-item-container flex justify-center">
             <h3>No ratings found for this item.</h3>
           </Box>

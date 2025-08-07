@@ -39,9 +39,10 @@ const UserSettings: FC = () => {
   }, []);
 
   return (
-    <FormComponent
+    <FormComponent<UserType>
       submitLabel="Save Information"
       onHandleSubmit={handleSubmit}
+      defaultValue={userInfo}
       fields={fields}
     />
   );

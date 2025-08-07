@@ -8,7 +8,7 @@ import {
 import { FIELD_TYPES } from "@/customConstants";
 import { FormComponentInterface } from "@/interfaces";
 import "./index.css";
-import { getMissingField, getLabelFromKey } from "@/utils";
+import { getMissingField, getLabelFromKey, _get } from "@/utils";
 import FormTextfieldSkeleton from "@/components/SkeletonLoaders/FormTextfield";
 import FormRatingSkeleton from "@/components/SkeletonLoaders/Rating";
 import FormButtonSkeleton from "../SkeletonLoaders/Rectangle";
@@ -19,7 +19,7 @@ const LazyTextFieldDebounce = lazy(
 );
 const LazyButton = lazy(() => import("@/components/Button"));
 
-const FormComponent: FC<FormComponentInterface> = ({
+const FormComponent = <T,>({
   fields,
   title,
   submitLabel,
@@ -27,7 +27,7 @@ const FormComponent: FC<FormComponentInterface> = ({
   onPrevious,
   showLoadingSubmit,
   defaultValue,
-}) => {
+}: FormComponentInterface<T>) => {
   const [formData, setFormData] = useState<formCompObjType>({});
   const [isSubmitLoading, setIsSubmitLoading] = useState(
     showLoadingSubmit || false,
@@ -156,6 +156,7 @@ const FormComponent: FC<FormComponentInterface> = ({
   };
 
   const getFieldType = (field: FormFieldType, key: number) => {
+    const deftValue = defaultValue ? _get(defaultValue, field.name) : null;
     switch (field.type) {
       case FIELD_TYPES.textfield:
       case FIELD_TYPES.date:
@@ -172,6 +173,7 @@ const FormComponent: FC<FormComponentInterface> = ({
                 name={field.name}
                 type={field.type}
                 label={field.label}
+                defaultValue={deftValue}
                 isError={errorFields.includes(field.name)}
                 isPlaceholder={field.placeholder}
                 onChange={(value: string) =>
@@ -197,6 +199,7 @@ const FormComponent: FC<FormComponentInterface> = ({
                 name={field.name}
                 type={field.type}
                 label={field.label}
+                defaultValue={deftValue}
                 isError={errorFields.includes(field.name)}
                 isPlaceholder={field.placeholder}
                 onChange={(value: string) =>

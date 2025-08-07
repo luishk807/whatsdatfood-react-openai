@@ -61,7 +61,7 @@ const UserRatingsSection: FC = () => {
                 <Grid size={4}>
                   <Image url={images.url_m} />
                 </Grid>
-                <Grid size={4}>
+                <Grid size={6}>
                   <div>{item.name}</div>
                   <div>{data.title}</div>
                   <div>
@@ -69,12 +69,6 @@ const UserRatingsSection: FC = () => {
                   </div>
                 </Grid>
                 <Grid size={2}>{data.status.name}</Grid>
-                <Grid size={2}>
-                  <ul>
-                    <li>delete</li>
-                    <li>edit</li>
-                  </ul>
-                </Grid>
               </Grid>
             </Grid>
           );

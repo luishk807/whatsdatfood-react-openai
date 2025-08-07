@@ -31,7 +31,7 @@ export interface CustomModalInterface {
 export interface SendFriendModalInterface {
   data?: SendFriendModalData | null;
 }
-export interface TextFieldInterface {
+export interface TextFieldInterface<T> {
   label: string;
   name?: string;
   isError?: boolean;
@@ -39,14 +39,15 @@ export interface TextFieldInterface {
   isPlaceholder?: boolean;
   showLoader?: boolean;
   showLoaderElement?: ReactNode;
+  defaultValue?: T;
   onChange: (value: string) => void;
 }
-export interface FormComponentInterface {
+export interface FormComponentInterface<T> {
   fields: FormFieldType[];
   title?: string;
   submitLabel?: string;
   showLoadingSubmit?: boolean;
-  defaultValue?: any;
+  defaultValue?: T;
   onHandleSubmit: (data: any, e?: any) => void;
   onPrevious?: () => void;
 }

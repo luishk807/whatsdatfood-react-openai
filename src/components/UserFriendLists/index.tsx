@@ -41,7 +41,7 @@ const UserFriendLists: FC<UserFriendListsInt> = ({ onCreate }) => {
     <Grid container className="w-full">
       <Grid size={12} className="user-friends-button-section">
         <Grid container className="flex w-full justify-end">
-          <Grid size={3}>
+          <Grid size={3} className="flex justify-end py-[10px]">
             <Button
               onClick={onCreate}
               sx={{
@@ -59,16 +59,20 @@ const UserFriendLists: FC<UserFriendListsInt> = ({ onCreate }) => {
       {!!friends.length ? (
         friends.map((friend, indx) => {
           return (
-            <Grid key={indx} size={12} className="w-full line-separator-top">
-              <Grid container className="w-full">
-                <Grid size={4}>{friend.name}</Grid>
-                <Grid size={3}>{friend.email}</Grid>
-                <Grid size={3}>{friend.phone}</Grid>
-                <Grid size={2}>
-                  <ul>
-                    <li>Delete</li>
-                    <li>Edit</li>
-                  </ul>
+            <Grid
+              key={indx}
+              size={12}
+              className="w-full py-[10px] line-separator-top flex"
+            >
+              <Grid container className="w-full flex">
+                <Grid size={5} className="flex justify-start">
+                  {friend.name}
+                </Grid>
+                <Grid size={4} className="flex justify-center">
+                  {friend.email}
+                </Grid>
+                <Grid size={3} className="flex justify-end">
+                  {friend.phone}
                 </Grid>
               </Grid>
             </Grid>

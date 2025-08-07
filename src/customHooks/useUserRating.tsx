@@ -98,7 +98,7 @@ const useUserRating = () => {
           },
         });
 
-        return _get(resp, "data.getRatingsByItemId");
+        return _get(resp, "data.getRatingByRestItemId");
       } else {
         throw new Error("ERROR: unable to get rating");
       }

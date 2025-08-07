@@ -219,8 +219,8 @@ export const GET_RATINGS_BY_USER = gql`
 `;
 
 export const GET_RATINGS_BY_REST_ITEM_ID = gql`
-  query getRatingsByItemId($restItemId: ID!, $page: Int!, $limit: Int) {
-    getRatingsByItemId(restItemId: $restItemId, page: $page, limit: $limit) {
+  query getRatingByRestItemId($restItemId: ID!, $page: Int!, $limit: Int) {
+    getRatingByRestItemId(restItemId: $restItemId, page: $page, limit: $limit) {
       data {
         id
         rating

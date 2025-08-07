@@ -1,11 +1,11 @@
 import { Box, Grid } from "@mui/material";
-import { ChangeEvent, useState, type FC } from "react";
+import { ChangeEvent, useEffect, useState, type FC } from "react";
 import "./index.css";
 import { TextFieldInterface } from "@/interfaces";
 import Loading from "../Loading";
 import { LOADING_TYPES } from "@/customConstants";
 
-const TextField: FC<TextFieldInterface> = ({
+const TextField = <T,>({
   label,
   onChange,
   name,
@@ -14,14 +14,16 @@ const TextField: FC<TextFieldInterface> = ({
   isPlaceholder,
   showLoader = false,
   showLoaderElement,
-}) => {
-  const [inputValue, setInputValue] = useState<string>("");
+  defaultValue,
+}: TextFieldInterface<T>) => {
+  const [inputValue, setInputValue] = useState<string>(defaultValue as string);
 
   const onChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setInputValue(value);
     onChange && onChange(value);
   };
+
   return (
     <Box id="textfield-container">
       <Grid container className="w-full">
@@ -37,6 +39,7 @@ const TextField: FC<TextFieldInterface> = ({
             name={name}
             type={type}
             value={inputValue}
+            defaultValue={defaultValue as string}
             autoComplete={name}
             onChange={onChangeInput}
             {...(isPlaceholder && { placeholder: label })}
