@@ -26,6 +26,17 @@ export const DISH_LABELS = {
   reportPrompt: "What is wrong with this photo?",
   cancel: "Cancel",
   signInToHelp: "Sign in to vote or report",
+  orderedThis: "I ordered this",
+  youOrderedThis: "You ordered this",
+  signInToRecordOrder: "Sign in to record what you ordered",
+} as const;
+
+export const ORDER_LABELS = {
+  /** The line no venue-level competitor can produce. */
+  share: (percent: number) => `${percent}% of people here order this`,
+  count: (count: number) =>
+    count === 1 ? "1 person ordered this" : `${count} people ordered this`,
+  mostOrdered: "Most ordered here",
 } as const;
 
 export const RANKING_LABELS = {

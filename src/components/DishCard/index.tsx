@@ -10,7 +10,12 @@ import {
   getDishPhotoCredit,
 } from "@/utils/dish";
 import { BADGE_TONE } from "@/customConstants/images";
-import { DISH_LABELS, RANKING_LABELS } from "@/customConstants/labels";
+import {
+  DISH_LABELS,
+  RANKING_LABELS,
+  ORDER_LABELS,
+} from "@/customConstants/labels";
+import { shareOfDiners } from "@/utils/orders";
 import { VoteValue } from "@/types";
 
 /**
@@ -28,12 +33,14 @@ const DishCard: FC<DishCardInterface> = ({
   onAddPhoto,
   onVisible,
   uploadingDishId,
+  dinerCount,
 }) => {
   const url = getDishPhotoUrl(item);
   const source = getDishPhotoSource(item);
   const credit = getDishPhotoCredit(item);
   const uploading = Number(item?.id ?? 0) === Number(uploadingDishId ?? -1);
   const showTopBadge = score?.isRanked || item.top_choice;
+  const orderShare = shareOfDiners(item.order_count, dinerCount);
 
   const handleVote = (value: VoteValue) => onVote && onVote(item, value);
 
@@ -94,6 +101,14 @@ const DishCard: FC<DishCardInterface> = ({
       <h3 className="text-sm font-semibold leading-snug text-neutral-900 dark:text-neutral-100">
         {item.name}
       </h3>
+
+      {/* Popularity, kept separate from the vote-based ranking so neither
+          signal hides behind the other. */}
+      {orderShare !== null && orderShare > 0 && (
+        <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400">
+          {ORDER_LABELS.share(orderShare)}
+        </p>
+      )}
 
       {/* Below the vote threshold we show the count, never a rank — a wrong
           "top dish" costs more trust than saying nothing. */}

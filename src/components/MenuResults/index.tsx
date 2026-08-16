@@ -32,6 +32,7 @@ import useDishVotes from "@/customHooks/useDishVotes";
 import useDishPhotoLookup from "@/customHooks/useDishPhotoLookup";
 import useDishPhotoUpload from "@/customHooks/useDishPhotoUpload";
 import useDishPhotos from "@/customHooks/useDishPhotos";
+import useDishOrders from "@/customHooks/useDishOrders";
 import DishPhotoGallery from "@/components/DishPhotoGallery";
 import useSnackbarHook from "@/customHooks/useSnackBar";
 import { groupDishesByCategory, getDishPhotoUrl } from "@/utils/dish";
@@ -39,6 +40,7 @@ import {
   MENU_LABELS,
   RANKING_LABELS,
   DISH_LABELS,
+  ORDER_LABELS,
 } from "@/customConstants/labels";
 import { RatingToogleType, VoteValue } from "@/types";
 import { MenuItemPhoto } from "@/interfaces/restaurants";
@@ -59,6 +61,7 @@ const MenuResults: FC = () => {
   const [restaurantInfo, setRestaurantInfo] = useState<RestaurantType | null>(
     null,
   );
+  const [dinerCount, setDinerCount] = useState(0);
   const [selectedDish, setSelectedDish] = useState<MenuItemType | null>(null);
   const [detailMode, setDetailMode] = useState<RatingToogleType>(
     RATING_TYPE.list,
@@ -84,6 +87,7 @@ const MenuResults: FC = () => {
     loading: photosLoading,
   } = useDishPhotos();
   const [dishPhotos, setDishPhotos] = useState<MenuItemPhoto[]>([]);
+  const { toggle: toggleOrdered, canRecord } = useDishOrders();
 
   /** Dishes with any photo found on this page view folded back in. */
   const dishes = useMemo<MenuItemType[]>(
@@ -129,6 +133,8 @@ const MenuResults: FC = () => {
         if (items && items.length) {
           setMenuItems(items);
         }
+
+        setDinerCount(Number(_get(resp, "diner_count", 0)) || 0);
 
         if (resp instanceof Object && Object.keys(resp).length) {
           const tastingMenu = _get(resp, "tasting_menu_only");
@@ -289,6 +295,7 @@ const MenuResults: FC = () => {
               onVisible={handleDishVisible}
               onAddPhoto={handleAddPhoto}
               uploadingDishId={uploadingDishId}
+              dinerCount={dinerCount}
               title={
                 isRanked
                   ? RANKING_LABELS.topStripTitle
@@ -311,6 +318,7 @@ const MenuResults: FC = () => {
                   onVisible={handleDishVisible}
                   onAddPhoto={handleAddPhoto}
                   uploadingDishId={uploadingDishId}
+                  dinerCount={dinerCount}
                 />
               </section>
             ))}
@@ -339,6 +347,35 @@ const MenuResults: FC = () => {
             {selectedDish.description && (
               <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
                 {selectedDish.description}
+              </p>
+            )}
+
+            <button
+              type="button"
+              disabled={!canRecord}
+              aria-pressed={!!selectedDish.ordered_by_me}
+              title={
+                canRecord ? undefined : DISH_LABELS.signInToRecordOrder
+              }
+              onClick={async () => {
+                await toggleOrdered(selectedDish);
+                // Bypass the cache: the share and the toggle both move.
+                handleFetchRestaurant(true);
+              }}
+              className={
+                selectedDish.ordered_by_me
+                  ? "self-start rounded-full border border-emerald-600 bg-emerald-600 px-3 py-1 text-xs font-medium text-white disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                  : "self-start rounded-full border border-neutral-300 px-3 py-1 text-xs font-medium text-neutral-700 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:border-neutral-700 dark:text-neutral-200"
+              }
+            >
+              {selectedDish.ordered_by_me
+                ? DISH_LABELS.youOrderedThis
+                : DISH_LABELS.orderedThis}
+            </button>
+
+            {!!selectedDish.order_count && (
+              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                {ORDER_LABELS.count(selectedDish.order_count)}
               </p>
             )}
 

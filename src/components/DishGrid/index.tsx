@@ -17,6 +17,7 @@ const DishGrid: FC<DishGridInterface> = ({
   onAddPhoto,
   onVisible,
   uploadingDishId,
+  dinerCount,
 }) => (
   <div className="grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-3 lg:grid-cols-4">
     {items.map((item, index) => {
@@ -35,6 +36,7 @@ const DishGrid: FC<DishGridInterface> = ({
           onAddPhoto={onAddPhoto}
           onVisible={onVisible}
           uploadingDishId={uploadingDishId}
+          dinerCount={dinerCount}
         />
       );
     })}

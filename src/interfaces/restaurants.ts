@@ -37,6 +37,9 @@ export interface MenuItemType {
   image?: string;
   images?: MenuItemPhoto[];
   ratings?: UserRating[];
+  /** Distinct people who said they ordered this. */
+  order_count?: number;
+  ordered_by_me?: boolean;
   restaurant?: RestaurantType;
 }
 
@@ -82,6 +85,8 @@ export interface RestaurantType {
   delivery_option?: boolean;
   businessHours: BusinessHours[];
   restaurantItems?: MenuItemType[];
+  /** Denominator for the order share. */
+  diner_count?: number;
 }
 
 export interface RestaurantItemImageType {

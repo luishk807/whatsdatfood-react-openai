@@ -60,6 +60,8 @@ export interface DishCardInterface {
   onVisible?: (item: MenuItemType) => void;
   /** Dish currently being uploaded, so the tile can show progress. */
   uploadingDishId?: number | null;
+  /** Denominator for the order share, from the restaurant. */
+  dinerCount?: number;
 }
 
 export interface DishGridInterface

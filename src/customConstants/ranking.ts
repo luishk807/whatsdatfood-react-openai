@@ -25,3 +25,11 @@ export const RANKING = {
   /** Used as the prior when a restaurant has no votes at all yet. */
   FALLBACK_MEAN: 3,
 } as const;
+
+export const ORDERS = {
+  /**
+   * Below this many diners a percentage is noise dressed as a fact. Kept in
+   * step with the server, which withholds the share for the same reason.
+   */
+  MIN_DINERS_FOR_SHARE: 5,
+} as const;

@@ -62,6 +62,7 @@ export const GET_RESTAURANT_BY_SLUG = gql`
         open_time
         close_time
       }
+      diner_count
       restaurantMenuItems {
         id
         name
@@ -69,6 +70,8 @@ export const GET_RESTAURANT_BY_SLUG = gql`
         top_choice
         price
         category
+        order_count
+        ordered_by_me
         ratings {
           id
           rating
@@ -129,5 +132,17 @@ export const VOTE_DISH_PHOTO = gql`
 export const REPORT_DISH_PHOTO = gql`
   mutation reportDishPhoto($imageId: ID!, $reason: String!, $note: String) {
     reportDishPhoto(imageId: $imageId, reason: $reason, note: $note)
+  }
+`;
+
+export const RECORD_DISH_ORDERS = gql`
+  mutation recordDishOrders($dishIds: [ID!]!) {
+    recordDishOrders(dishIds: $dishIds)
+  }
+`;
+
+export const FORGET_DISH_ORDER = gql`
+  mutation forgetDishOrder($dishId: ID!) {
+    forgetDishOrder(dishId: $dishId)
   }
 `;
