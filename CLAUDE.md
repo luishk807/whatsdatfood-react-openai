@@ -17,8 +17,12 @@ npm test           # jest
 npm run verify     # typecheck + test — run this before saying work is done
 ```
 
-The backend is `whatsdatfood-python` (Node version is being retired). The URL
-comes from `.env`: `REACT_APP_GRAPHQL_BACKEND_URL`.
+The backend is **`whatsdatfood-python` on :8081**. `whatsdatfood-node` is retired
+— the whole app flow was verified with it stopped. The URL comes from `.env`:
+`REACT_APP_GRAPHQL_BACKEND_URL`; `.env.node-backup` holds the old settings.
+
+The GraphQL contract is unchanged, so every document here and the Apollo
+`typePolicies` work against Python exactly as they did against Node.
 
 ## Testing is required, not optional
 
@@ -67,7 +71,7 @@ minute. Design for the phone and let desktop be the override, never the reverse.
 - Vote controls sit in the lower third, within thumb reach.
 - Detail opens as a bottom sheet, not a route change.
 - Dark mode matters; restaurants are dim.
-- Target a main bundle under 250 KiB (currently ~663 KiB).
+- Target a main bundle under 250 KiB (currently ~688 KiB).
 
 ## Architecture worth knowing
 

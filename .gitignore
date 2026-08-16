@@ -23,4 +23,7 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Every env variant, including backups like .env.node-backup.
 .env
+.env.*
+!.env.example
