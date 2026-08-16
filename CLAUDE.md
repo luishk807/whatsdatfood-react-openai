@@ -9,6 +9,9 @@ scope. Friends, favorites-as-a-destination, search history and venue metadata
 
 ## Commands
 
+CI runs `npm run verify`, the build and `npm audit` on every push, so the
+testing rule below is enforced rather than remembered.
+
 ```bash
 npm start          # webpack dev server on :3000
 npm run build      # production build
@@ -17,7 +20,9 @@ npm test           # jest
 npm run verify     # typecheck + test — run this before saying work is done
 ```
 
-The backend is **`whatsdatfood-python` on :8081**. `whatsdatfood-node` is retired
+The backend is **`whatsdatfood-python` on :8081**. Search and photo uploads
+are rate limited there, so expect `TOO_MANY_REQUESTS` under a hammering.
+ `whatsdatfood-node` is retired
 — the whole app flow was verified with it stopped. The URL comes from `.env`:
 `REACT_APP_GRAPHQL_BACKEND_URL`; `.env.node-backup` holds the old settings.
 

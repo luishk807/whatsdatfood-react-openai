@@ -1,0 +1,37 @@
+name: frontend
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      # Typecheck and tests. CLAUDE.md makes this the gate before work counts
+      # as done; running it here means that is enforced rather than remembered.
+      - run: npm run verify
+
+      - run: npm run build
+
+      # The bundle is the mobile experience. It is 689 KiB today against a
+      # 250 KiB target, so this reports rather than fails - it exists to make
+      # a regression visible in the diff.
+      - name: Report bundle size
+        run: |
+          size=$(stat -c%s dist/bundle.js)
+          echo "bundle.js: $((size / 1024)) KiB" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Audit
+        run: npm audit --audit-level=high
