@@ -9,7 +9,8 @@ import {
 } from "@/interfaces/restaurants";
 import { CustomKeyPairObj } from "@/interfaces";
 import LoadingComponent from "@/components/LoadingComponent";
-import MenuTitle from "@/components/MenuTitle";
+import RestaurantHeader from "@/components/RestaurantHeader";
+import RestaurantDetailsSheet from "@/components/RestaurantDetailsSheet";
 import "./index.css";
 import Loading from "@/components/Loading";
 import { _get } from "@/utils";
@@ -19,9 +20,7 @@ import SkeletonMenuItem from "@/components/SkeletonLoaders/MenuResultPage";
 import SkeletonRatingListing from "@/components/SkeletonLoaders/RatingModalListing";
 import SkeletonRatingCreate from "@/components/SkeletonLoaders/RatingCreateForm";
 import useRestaurantMutation from "@/customHooks/useRestaurantMutations";
-import DashingDisplayBox from "@/components/DashingDisplayBox";
 import useAuth from "@/customHooks/useAuth";
-import RestaurantIconMenu from "@/components/RestaurantSocialOptions";
 import BookmarkButton from "../BookmarkButton";
 import ClaimRestaurantButton from "@/components/ClaimRestaurantButton";
 import TopDishStrip from "@/components/TopDishStrip";
@@ -43,6 +42,7 @@ import {
   RANKING_LABELS,
   DISH_LABELS,
   ORDER_LABELS,
+  OWNER_LABELS,
 } from "@/customConstants/labels";
 import { RatingToogleType, VoteValue } from "@/types";
 import { MenuItemPhoto } from "@/interfaces/restaurants";
@@ -56,6 +56,7 @@ const MenuResults: FC = () => {
   const { loading } = getRestaurantListBySlugQuery;
   const { restaurant } = useParams();
 
+  const [showDetails, setShowDetails] = useState(false);
   const [menuItems, setMenuItems] = useState<MenuItemType[]>([]);
   const [tastingMenuData, setTastingMenuData] = useState<
     CustomKeyPairObj<string>[] | null
@@ -269,28 +270,20 @@ const MenuResults: FC = () => {
         type={LOADING_TYPES.CUSTOM}
         data={restaurantInfo}
       >
-        {restaurantInfo && restaurant && <BookmarkButton slug={restaurant} />}
-
-        <MenuTitle restaurant={restaurantInfo} />
-
-        <Grid size={12} className="px-4">
-          <ClaimRestaurantButton slug={restaurant} />
-        </Grid>
-
-        <Grid size={12} className="show-tasting-price-container">
-          <DashingDisplayBox
-            show={restaurantInfo?.tasting_menu_only}
-            title={MENU_LABELS.tastingMenuTitle}
-            data={tastingMenuData}
+        <Grid size={12}>
+          <RestaurantHeader
+            restaurant={restaurantInfo}
+            onOpenDetails={() => setShowDetails(true)}
+            action={
+              restaurantInfo && restaurant ? (
+                <BookmarkButton slug={restaurant} />
+              ) : null
+            }
           />
         </Grid>
 
-        <Grid size={12} sx={{ display: { lg: "none" } }}>
-          {restaurantInfo && <RestaurantIconMenu restaurant={restaurantInfo} />}
-        </Grid>
-
         <Grid size={12}>
-          <div className="flex flex-col gap-8 px-4 pb-16 pt-2">
+          <div className="mx-auto flex max-w-4xl flex-col gap-8 px-4 pb-16 pt-4">
             <TopDishStrip
               items={topDishes}
               scores={scores}
@@ -311,9 +304,17 @@ const MenuResults: FC = () => {
 
             {categories.map((category) => (
               <section key={category} className="flex flex-col gap-3">
-                <h2 className="text-base font-semibold text-ink">
-                  {category}
-                </h2>
+                {/* Left-aligned with the grid, and counted. Centred headings
+                    over a long menu give the eye nothing to run down. */}
+                <div className="flex items-baseline justify-between gap-3 border-b border-line pb-2">
+                  <h2 className="text-base font-semibold text-ink">
+                    {category}
+                  </h2>
+                  <span className="shrink-0 text-xs tabular-nums text-ink-muted">
+                    {restaurantMenu[category].length}{" "}
+                    {restaurantMenu[category].length === 1 ? "item" : "items"}
+                  </span>
+                </div>
                 <DishGrid
                   items={restaurantMenu[category]}
                   scores={scores}
@@ -328,9 +329,25 @@ const MenuResults: FC = () => {
                 />
               </section>
             ))}
+
+            <section className="flex flex-col items-start gap-2 border-t border-line pt-6">
+              <h2 className="text-sm font-semibold text-ink">
+                {OWNER_LABELS.claimTitle}
+              </h2>
+              <p className="max-w-prose text-sm text-ink-muted">
+                {OWNER_LABELS.claimBlurb}
+              </p>
+              <ClaimRestaurantButton slug={restaurant} />
+            </section>
           </div>
         </Grid>
       </LoadingComponent>
+
+      <RestaurantDetailsSheet
+        restaurant={restaurantInfo}
+        open={showDetails}
+        onClose={() => setShowDetails(false)}
+      />
 
       <BottomSheet
         open={!!selectedDish}

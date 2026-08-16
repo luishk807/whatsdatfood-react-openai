@@ -1,97 +1,143 @@
-import { Link } from "react-router-dom";
-import "./index.css";
-import MenuIcon from "@mui/icons-material/Menu";
-import { Grid, Box } from "@mui/material";
-import { useState } from "react";
-import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
-import AccountButton from "../AccountButton";
-import IconButton from "@mui/material/IconButton";
-import ThemeToggle from "../ThemeToggle";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import useAuth from "@/customHooks/useAuth";
+import ThemeToggle from "@/components/ThemeToggle";
+import AccountButton from "@/components/AccountButton";
+import { ROUTES } from "@/customConstants/routes";
+import { SITE_LABELS } from "@/customConstants/labels";
 
-interface MenuLinksProps {
-  /** The mobile sheet has room for labels; the top bar does not. */
-  expanded?: boolean;
-}
-
+/**
+ * Mobile first: a wordmark and one 44px target. Everything else lives in the
+ * sheet behind it, because five links across a phone is five links nobody can
+ * hit. Desktop gets the same links laid out flat.
+ *
+ * The old header carried About and Contact, neither of which went anywhere,
+ * and an unlabelled person icon that meant "sign in" only if you already knew.
+ */
 const Header = () => {
-  const [showMenu, setShowMenu] = useState(false);
+  const { user } = useAuth();
+  const location = useLocation();
+  const [open, setOpen] = useState(false);
 
-  const toggleMenu = () => setShowMenu(!showMenu);
+  // A menu that survives navigation is a menu covering the page you asked for.
+  useEffect(() => setOpen(false), [location.pathname]);
 
-  const MenuLinks = ({ expanded = false }: MenuLinksProps) => {
-    return (
-      <ul className="header-list-ul">
-        <li className="header-list-ul-li">
-          <Box sx={{ display: { xs: "none", sm: "block" } }}>
-            <AccountButton />
-          </Box>
-        </li>
-        <li className="header-list-ul-li">About</li>
-        <li className="header-list-ul-li">Contact</li>
-        <li className="header-list-ul-li">
-          <ThemeToggle expanded={expanded} />
-        </li>
-        <li className="header-list-ul-li">
-          <Box sx={{ display: { xs: "block", sm: "none" } }}>
-            <Link to="/sign-in" className="link-text">
-              Sign In
-            </Link>
-          </Box>
-        </li>
-        <li className="header-list-ul-li">
-          <Box sx={{ display: { xs: "block", sm: "none" } }}>
-            <Link to="/create-account" className="link-text">
-              Create Account
-            </Link>
-          </Box>
-        </li>
-      </ul>
-    );
-  };
+  useEffect(() => {
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = open ? "hidden" : previous;
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [open]);
+
+  const signedIn = Boolean(user);
+
   return (
-    <>
-      <Grid container id="header-container">
-        <Grid className="header-logo" size={{ lg: 2, xs: 6 }}>
-          <Link to="/">What's that food</Link>
-        </Grid>
-        <Grid
-          size={{ lg: 10 }}
-          sx={{
-            display: {
-              md: "flex",
-              xs: "none",
-            },
-          }}
-          className="header-list-menu"
+    <header className="sticky top-0 z-40 border-b border-line bg-surface/95 backdrop-blur">
+      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-3 px-4">
+        <Link
+          to={ROUTES.home}
+          className="text-base font-semibold tracking-tight text-ink"
         >
-          <MenuLinks />
-        </Grid>
-        <Grid
-          size={{ xs: 6 }}
-          sx={{
-            justifyContent: "end",
-            display: {
-              xs: "flex",
-              md: "none",
-            },
-          }}
+          {SITE_LABELS.brand}
+        </Link>
+
+        <div className="hidden items-center gap-1 md:flex">
+          {signedIn ? (
+            <AccountButton />
+          ) : (
+            <Link
+              to={ROUTES.signIn}
+              className="rounded-full px-3 py-2 text-sm text-ink-muted hover:text-ink"
+            >
+              {SITE_LABELS.signIn}
+            </Link>
+          )}
+          <ThemeToggle />
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setOpen(true)}
+          aria-label={SITE_LABELS.menu}
+          aria-expanded={open}
+          className="-mr-2 flex h-11 w-11 items-center justify-center rounded-full text-ink-muted hover:text-ink md:hidden"
         >
-          <IconButton onClick={toggleMenu}>
-            <MenuIcon />
-          </IconButton>
-        </Grid>
-      </Grid>
-      <Grid container className={`header-big-menu ${showMenu ? "active" : ""}`}>
-        <Grid className="header-big-menu-icon">
-          <IconButton onClick={toggleMenu} size="small">
-            <CloseRoundedIcon sx={{ fontSize: "24px" }} />
-          </IconButton>
-        </Grid>
-        <Grid className="header-big-menu-list">
-          <MenuLinks expanded />
-        </Grid>
-      </Grid>
-    </>
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            aria-hidden="true"
+          >
+            <path d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+        </button>
+      </div>
+
+      {open && (
+        <div className="fixed inset-0 z-50 md:hidden" role="dialog" aria-modal="true">
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setOpen(false)}
+            aria-hidden="true"
+          />
+
+          <nav className="absolute inset-x-0 top-0 flex flex-col gap-1 bg-surface p-4 shadow-sheet">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-base font-semibold text-ink">
+                {SITE_LABELS.brand}
+              </span>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label={SITE_LABELS.closeMenu}
+                className="-mr-2 flex h-11 w-11 items-center justify-center rounded-full text-ink-muted hover:text-ink"
+              >
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  aria-hidden="true"
+                >
+                  <path d="M6 6l12 12M18 6L6 18" />
+                </svg>
+              </button>
+            </div>
+
+            {signedIn ? (
+              <AccountButton />
+            ) : (
+              <>
+                <Link
+                  to={ROUTES.signIn}
+                  className="rounded-lg px-2 py-3 text-base text-ink hover:bg-surface-sunken"
+                >
+                  {SITE_LABELS.signIn}
+                </Link>
+                <Link
+                  to={ROUTES.createAccount}
+                  className="rounded-lg px-2 py-3 text-base text-ink hover:bg-surface-sunken"
+                >
+                  {SITE_LABELS.createAccount}
+                </Link>
+              </>
+            )}
+
+            <div className="mt-2 border-t border-line pt-3">
+              <ThemeToggle expanded />
+            </div>
+          </nav>
+        </div>
+      )}
+    </header>
   );
 };
 

@@ -9,6 +9,13 @@ import {
   THEME_STORAGE_KEY,
 } from "@/customConstants/theme";
 
+/** Collapsed, the three choices live behind one button in the header. The
+ *  expanded variant carries the same label on its group, so match the button. */
+const openMenu = async () => {
+  const [trigger] = screen.getAllByRole("button", { name: THEME_LABELS.toggle });
+  await userEvent.click(trigger);
+};
+
 const listeners: Array<(event: MediaQueryListEvent) => void> = [];
 
 const mockMatchMedia = (prefersDark: boolean) => {
@@ -33,8 +40,9 @@ describe("ThemeToggle", () => {
     resetThemeStore();
   });
 
-  it("starts on system, so nobody is pinned to a theme they never chose", () => {
+  it("starts on system, so nobody is pinned to a theme they never chose", async () => {
     render(<ThemeToggle />);
+    await openMenu();
 
     expect(screen.getByLabelText(THEME_LABELS.system)).toHaveAttribute(
       "aria-pressed",
@@ -56,11 +64,15 @@ describe("ThemeToggle", () => {
 
   it("applies and remembers an explicit choice", async () => {
     render(<ThemeToggle />);
+    await openMenu();
 
     await userEvent.click(screen.getByLabelText(THEME_LABELS.dark));
 
     expect(document.documentElement.getAttribute(THEME_ATTRIBUTE)).toBe(THEME.dark);
     expect(localStorage.getItem(THEME_STORAGE_KEY)).toBe(THEME.dark);
+
+    // Choosing closes the menu, so reopen to see which option is marked.
+    await openMenu();
     expect(screen.getByLabelText(THEME_LABELS.dark)).toHaveAttribute(
       "aria-pressed",
       "true",
@@ -71,6 +83,7 @@ describe("ThemeToggle", () => {
     mockMatchMedia(true);
     resetThemeStore();
     render(<ThemeToggle />);
+    await openMenu();
 
     await userEvent.click(screen.getByLabelText(THEME_LABELS.light));
 
@@ -89,6 +102,8 @@ describe("ThemeToggle", () => {
       </>,
     );
 
+    // The bar's toggle is collapsed; the sheet's is expanded and flat.
+    await openMenu();
     const [barDark] = screen.getAllByLabelText(THEME_LABELS.dark);
     await userEvent.click(barDark);
 
@@ -97,12 +112,23 @@ describe("ThemeToggle", () => {
     });
   });
 
-  it("shows labels only when expanded", () => {
+  it("collapses to one button until asked, and is flat when expanded", () => {
+    // Three controls in the header is three controls of noise for something
+    // touched once; the mobile sheet has room to show all of them.
     const { rerender } = render(<ThemeToggle />);
     expect(screen.queryByText(THEME_LABELS.dark)).not.toBeInTheDocument();
+    expect(screen.getByLabelText(THEME_LABELS.toggle)).toBeInTheDocument();
 
     rerender(<ThemeToggle expanded />);
     expect(screen.getByText(THEME_LABELS.dark)).toBeInTheDocument();
+  });
+
+  it("closes the menu once a theme is chosen", async () => {
+    render(<ThemeToggle />);
+    await openMenu();
+    await userEvent.click(screen.getByLabelText(THEME_LABELS.dark));
+
+    expect(screen.queryByRole("menu")).not.toBeInTheDocument();
   });
 
   it("repaints when the OS switches under a system preference", () => {

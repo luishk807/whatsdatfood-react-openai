@@ -73,8 +73,11 @@ export const DIETARY_LABELS = {
 
 export const OWNER_LABELS = {
   consoleTitle: "Restaurants you manage",
-  claimTitle: "Manage this restaurant",
-  claimCta: "I run this restaurant",
+  claimTitle: "Own this restaurant?",
+  claimBlurb:
+    "Claim this page to keep the menu and details right. Claims are " +
+    "reviewed before anything can be changed.",
+  claimCta: "Claim this restaurant",
   claimPending: "Waiting for review",
   claimApproved: "You manage this",
   claimRejected: "Not approved",
@@ -103,4 +106,51 @@ export const ADMIN_LABELS = {
   keepPhoto: "Keep",
   removePhoto: "Remove",
   removeWarning: "Removing a photo is the only way one disappears.",
+} as const;
+/**
+ * The restaurant screen.
+ *
+ * Everything that is not food lives behind one button. A person holding a
+ * phone at the table has already chosen the restaurant - they are sitting in
+ * it - so the address, the hours and the payment methods are answers to
+ * questions nobody at that table is asking.
+ */
+export const VENUE_LABELS = {
+  details: "Details",
+  detailsSheetTitle: "Restaurant details",
+  back: "Back",
+  address: "Address",
+  phone: "Phone",
+  hours: "Opening hours",
+  priceRange: "Price range",
+  payment: "Payment",
+  website: "Website",
+  reservationRequired: "Reservation required",
+  michelin: "Michelin",
+  tastingMenu: "Tasting menu only",
+  noDetails: "Nothing on file for this restaurant yet.",
+} as const;
+
+export const SEARCH_LABELS = {
+  title: "See it before you order it",
+  subtitle: "Photos and rankings from the people who ate there.",
+  placeholder: "Search a restaurant",
+  submit: "Search",
+  searching: "Looking…",
+  // Not "no results": the app can generate a menu for a restaurant it has
+  // never seen, so an empty list means the lookup itself came back empty.
+  nothingFound: "Nothing found for that name. Try the full name, or add a city.",
+  hint: "Press enter to look it up",
+} as const;
+
+export const SITE_LABELS = {
+  brand: "What's dat food",
+  tagline: "Know what to order.",
+  menu: "Menu",
+  closeMenu: "Close menu",
+  signIn: "Sign in",
+  createAccount: "Create account",
+  account: "Account",
+  contact: "Contact",
+  copyright: "© 2026 What's dat food",
 } as const;

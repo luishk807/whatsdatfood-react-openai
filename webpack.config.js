@@ -55,7 +55,11 @@ module.exports = {
   },
   devServer: {
     historyApiFallback: true,
-    static: path.resolve(__dirname, "public"),
+    // Deliberately no `static: public`. It used to serve public/index.html
+    // verbatim, which shadowed the one HtmlWebpackPlugin generates - and that
+    // template no longer carries a script tag, so the dev server handed back a
+    // page with no JavaScript in it. CopyWebpackPlugin puts the same files in
+    // the output, which the dev server serves from memory.
     port: 3000,
     hot: true,
   },

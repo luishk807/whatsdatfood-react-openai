@@ -1,78 +1,106 @@
-import { _get } from "@/utils";
 import { useRef, useEffect } from "react";
-import clsx from "clsx";
-import { getBuiltAddress, handleHighlightSuggest } from "@/utils";
-import "./index.css";
-import { SuggestionComponentType } from "@/interfaces";
+import { fullAddress } from "@/utils/venue";
+import { splitOnMatch } from "@/utils/search";
+import { SearchSuggestionsInterface } from "@/interfaces/search";
+import { SEARCH_LABELS } from "@/customConstants/labels";
+import { RestaurantType } from "@/interfaces/restaurants";
 
-const SuggestionsComponent = <T extends { name: string }>({
+/** The address, short enough to survive a phone: street, city, state. */
+const secondaryLine = (restaurant: RestaurantType): string =>
+  [restaurant.address, restaurant.city, restaurant.state]
+    .map((part) => part?.trim())
+    .filter(Boolean)
+    .join(" · ") || fullAddress(restaurant) || "";
+
+const SuggestionsComponent = ({
   suggestions,
-  onHandleSelection,
+  query,
   show,
-  value,
+  searching,
+  searched,
+  onSelect,
   onClose,
-}: SuggestionComponentType<T>) => {
-  const suggestionRef = useRef<HTMLDivElement>(null);
+}: SearchSuggestionsInterface) => {
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
+    const handleClickOutside = (event: MouseEvent) => {
       if (
-        suggestionRef.current &&
-        !suggestionRef.current.contains(e.target as Node)
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
       ) {
         onClose();
       }
     };
 
     document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [onClose]);
 
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [suggestionRef]);
+  if (!show) {
+    return null;
+  }
+
   return (
     <div
-      ref={suggestionRef}
-      className={clsx("main-search-suggestions-container", {
-        "suggestions-container-show": show,
-        "suggestions-container-hide": !show,
-      })}
+      ref={containerRef}
+      className="absolute left-0 right-0 top-full z-40 mt-2 overflow-hidden rounded-card border border-line bg-surface-raised shadow-tile"
     >
-      <div className="main-suggestion-container">
-        <ul>
-          {suggestions.map((suggestion, indx) => {
-            if (suggestion.name === "-1") {
-              return (
-                <li key={indx} className="no-found">
-                  Nothing Found
-                </li>
-              );
-            }
-            const rest_name = _get<string>(suggestion, "name");
-            const slugName = _get<string>(suggestion, "slug");
-            const address = getBuiltAddress({
-              address: _get<string>(suggestion, "address"),
-              city: _get<string>(suggestion, "city"),
-              state: _get<string>(suggestion, "state"),
-              country: _get<string>(suggestion, "country"),
-              postal_code: _get<string>(suggestion, "postal_code"),
-            });
+      {searching && (
+        <p className="px-4 py-3 text-sm text-ink-muted">
+          {SEARCH_LABELS.searching}
+        </p>
+      )}
 
-            const complete_name = address
-              ? `${rest_name} ${address}`
-              : rest_name;
+      {!searching && searched && suggestions.length === 0 && (
+        <p className="px-4 py-3 text-sm text-ink-muted">
+          {SEARCH_LABELS.nothingFound}
+        </p>
+      )}
 
-            const new_suggest = handleHighlightSuggest(complete_name, value);
-            return (
-              <li
-                onClick={() => onHandleSelection(complete_name, slugName)}
-                key={indx}
-                dangerouslySetInnerHTML={{ __html: new_suggest }}
-              />
-            );
-          })}
+      {!searching && suggestions.length > 0 && (
+        <ul role="listbox" className="max-h-72 overflow-y-auto">
+          {suggestions.map((restaurant) => (
+            <li
+              key={restaurant.slug ?? restaurant.name}
+              className="border-b border-line last:border-b-0"
+            >
+              {/* One tap goes straight through. Selecting a restaurant and
+                  then having to press a second button was a step that existed
+                  only because the input needed filling in. */}
+              {/* The whole row is the target, and it is 64px tall: this is
+                  tapped with a thumb, in a restaurant, one-handed. */}
+              <button
+                type="button"
+                role="option"
+                aria-selected="false"
+                onClick={() => onSelect(restaurant)}
+                className="flex min-h-16 w-full flex-col justify-center gap-0.5 px-4 py-3 text-left hover:bg-surface-sunken"
+              >
+                <span className="truncate text-[15px] leading-snug text-ink">
+                  {splitOnMatch(restaurant.name, query).map((segment, index) =>
+                    segment.match ? (
+                      // Marked, not shouted: bolding the matched fragment
+                      // hard makes the rest of the name look secondary.
+                      <span key={index} className="font-semibold">
+                        {segment.text}
+                      </span>
+                    ) : (
+                      <span key={index}>{segment.text}</span>
+                    ),
+                  )}
+                </span>
+
+                {secondaryLine(restaurant) && (
+                  <span className="truncate text-xs text-ink-muted">
+                    {secondaryLine(restaurant)}
+                  </span>
+                )}
+              </button>
+            </li>
+          ))}
         </ul>
-      </div>
+      )}
     </div>
   );
 };
