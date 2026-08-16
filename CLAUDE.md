@@ -91,6 +91,23 @@ minute. Design for the phone and let desktop be the override, never the reverse.
   view, with a session-level negative cache. Every dish firing a lookup on every
   load is what made a single page view cost 21 image searches.
 
+## Photo uploads
+
+The empty photo tile *is* the upload funnel: it appears on exactly the dishes
+that need one, and `capture="environment"` opens the camera in one tap, because
+the person who can take the photo is sitting at the table.
+
+- `utils/image.ts` resizes and square-crops in the browser first. A 12MP phone
+  photo is ~4MB; this sends roughly a tenth. On restaurant wifi that is the
+  difference between an upload that finishes and one that is abandoned.
+  `computeSquareCrop` is pure and tested; the canvas work around it is thin.
+- The file goes as multipart to `POST /uploads/dish/{id}` via
+  `useDishPhotoUpload`, not through GraphQL. Image bytes do not belong in a
+  JSON transport.
+- Community photos are credited through the existing `owner` field.
+- An empty tile does not open the detail sheet — it carries the upload button,
+  and a button cannot be nested inside another button.
+
 ## Dependencies
 
 `npm audit` must stay at **0 vulnerabilities**. It was 34 (4 critical) before

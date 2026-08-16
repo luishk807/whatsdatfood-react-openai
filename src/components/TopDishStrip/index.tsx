@@ -17,6 +17,7 @@ const TopDishStrip: FC<TopDishStripInterface> = ({
   onOpen,
   onAddPhoto,
   onVisible,
+  uploadingDishId,
 }) => {
   if (!items.length) {
     return null;
@@ -47,6 +48,7 @@ const TopDishStrip: FC<TopDishStripInterface> = ({
                 onOpen={onOpen}
                 onAddPhoto={onAddPhoto}
                 onVisible={onVisible}
+          uploadingDishId={uploadingDishId}
               />
             </div>
           );

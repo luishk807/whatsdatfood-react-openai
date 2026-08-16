@@ -4,7 +4,11 @@ import Badge from "@/components/Badge";
 import VoteButton from "@/components/VoteButton";
 import { DishCardInterface } from "@/interfaces/ranking";
 import { convertCurrency } from "@/utils/numbers";
-import { getDishPhotoUrl, getDishPhotoSource } from "@/utils/dish";
+import {
+  getDishPhotoUrl,
+  getDishPhotoSource,
+  getDishPhotoCredit,
+} from "@/utils/dish";
 import { BADGE_TONE } from "@/customConstants/images";
 import { DISH_LABELS, RANKING_LABELS } from "@/customConstants/labels";
 import { VoteValue } from "@/types";
@@ -23,9 +27,12 @@ const DishCard: FC<DishCardInterface> = ({
   onOpen,
   onAddPhoto,
   onVisible,
+  uploadingDishId,
 }) => {
   const url = getDishPhotoUrl(item);
   const source = getDishPhotoSource(item);
+  const credit = getDishPhotoCredit(item);
+  const uploading = Number(item?.id ?? 0) === Number(uploadingDishId ?? -1);
   const showTopBadge = score?.isRanked || item.top_choice;
 
   const handleVote = (value: VoteValue) => onVote && onVote(item, value);
@@ -39,7 +46,10 @@ const DishCard: FC<DishCardInterface> = ({
   return (
     <article className="flex flex-col gap-2">
       <div className="relative">
-        {onOpen ? (
+        {/* Only a tile that has something to show opens the detail sheet.
+            An empty tile carries the upload button, and a button cannot be
+            nested inside another button. */}
+        {onOpen && url ? (
           <button
             type="button"
             onClick={() => onOpen(item)}
@@ -51,7 +61,9 @@ const DishCard: FC<DishCardInterface> = ({
               alt={item.name}
               source={source}
               eager={eager}
-              onAddPhoto={onAddPhoto ? () => onAddPhoto(item) : undefined}
+              onAddPhoto={onAddPhoto ? (file) => onAddPhoto(item, file) : undefined}
+              credit={credit}
+              uploading={uploading}
               onVisible={onVisible ? handleVisible : undefined}
             />
           </button>
@@ -61,7 +73,9 @@ const DishCard: FC<DishCardInterface> = ({
             alt={item.name}
             source={source}
             eager={eager}
-            onAddPhoto={onAddPhoto ? () => onAddPhoto(item) : undefined}
+            onAddPhoto={onAddPhoto ? (file) => onAddPhoto(item, file) : undefined}
+            credit={credit}
+            uploading={uploading}
             onVisible={onVisible ? handleVisible : undefined}
           />
         )}

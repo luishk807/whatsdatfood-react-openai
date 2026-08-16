@@ -9,6 +9,12 @@ export const DISH_LABELS = {
   voteDown: "Would not order again",
   signInToVote: "Sign in to vote",
   signInToReview: "Sign in to read and write reviews for this dish.",
+  signInToUpload: "Sign in to add a photo",
+  uploadFailed: "That photo could not be uploaded",
+  uploading: "Uploading…",
+  photoBy: (username: string) => `Photo by @${username}`,
+  helpful: "Helpful",
+  reportPhoto: "Report this photo",
 } as const;
 
 export const RANKING_LABELS = {

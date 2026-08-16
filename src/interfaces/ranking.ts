@@ -31,9 +31,13 @@ export interface DishPhotoInterface {
   source?: ImageSourceType;
   /** Skips lazy loading for the handful of photos above the fold. */
   eager?: boolean;
-  onAddPhoto?: () => void;
+  /** Receives the chosen file; the tile owns the picker so the camera is one tap. */
+  onAddPhoto?: (file: File) => void;
   /** Fires once when a photo-less tile scrolls into view. */
   onVisible?: () => void;
+  /** Username to credit, shown on community photos. */
+  credit?: string | null;
+  uploading?: boolean;
 }
 
 export interface VoteButtonInterface {
@@ -51,9 +55,11 @@ export interface DishCardInterface {
   canVote?: boolean;
   onVote?: (item: MenuItemType, value: VoteValue) => void;
   onOpen?: (item: MenuItemType) => void;
-  onAddPhoto?: (item: MenuItemType) => void;
+  onAddPhoto?: (item: MenuItemType, file: File) => void;
   /** Fires once when a dish with no photo scrolls into view. */
   onVisible?: (item: MenuItemType) => void;
+  /** Dish currently being uploaded, so the tile can show progress. */
+  uploadingDishId?: number | null;
 }
 
 export interface DishGridInterface

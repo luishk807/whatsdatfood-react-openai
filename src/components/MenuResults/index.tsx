@@ -30,6 +30,7 @@ import BottomSheet from "@/components/BottomSheet";
 import useDishRanking from "@/customHooks/useDishRanking";
 import useDishVotes from "@/customHooks/useDishVotes";
 import useDishPhotoLookup from "@/customHooks/useDishPhotoLookup";
+import useDishPhotoUpload from "@/customHooks/useDishPhotoUpload";
 import useSnackbarHook from "@/customHooks/useSnackBar";
 import { groupDishesByCategory, getDishPhotoUrl } from "@/utils/dish";
 import {
@@ -65,6 +66,12 @@ const MenuResults: FC = () => {
   const { showSnackBar, SnackbarComponent } = useSnackbarHook();
 
   const { found, lookup } = useDishPhotoLookup();
+  const {
+    upload,
+    uploadingDishId,
+    error: uploadError,
+    clearError: clearUploadError,
+  } = useDishPhotoUpload();
 
   /** Dishes with any photo found on this page view folded back in. */
   const dishes = useMemo<MenuItemType[]>(
@@ -90,6 +97,15 @@ const MenuResults: FC = () => {
   );
 
   const handleDishVisible = (item: MenuItemType) => lookup(item?.id);
+
+  const handleAddPhoto = async (item: MenuItemType, file: File) => {
+    const uploaded = await upload(item, file);
+
+    if (uploaded) {
+      // Bypass the cache so the new photo actually appears.
+      handleFetchRestaurant(true);
+    }
+  };
 
   const handleFetchRestaurant = async (forceNetwork?: boolean) => {
     if (restaurant) {
@@ -157,6 +173,13 @@ const MenuResults: FC = () => {
     handleFetchRestaurant();
   }, [restaurant, user]);
 
+  useEffect(() => {
+    if (uploadError) {
+      showSnackBar(uploadError, "error");
+      clearUploadError();
+    }
+  }, [uploadError]);
+
   const handleVote = async (item: MenuItemType, value: VoteValue) => {
     try {
       await submitVote(item, value);
@@ -219,6 +242,8 @@ const MenuResults: FC = () => {
               onVote={handleVote}
               onOpen={handleOpenDish}
               onVisible={handleDishVisible}
+              onAddPhoto={handleAddPhoto}
+              uploadingDishId={uploadingDishId}
               title={
                 isRanked
                   ? RANKING_LABELS.topStripTitle
@@ -239,6 +264,8 @@ const MenuResults: FC = () => {
                   onVote={handleVote}
                   onOpen={handleOpenDish}
                   onVisible={handleDishVisible}
+                  onAddPhoto={handleAddPhoto}
+                  uploadingDishId={uploadingDishId}
                 />
               </section>
             ))}

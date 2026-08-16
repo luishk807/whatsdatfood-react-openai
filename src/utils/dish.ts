@@ -8,14 +8,29 @@ export const getDishPhoto = (item: MenuItemType): MenuItemPhoto | undefined =>
 export const getDishPhotoUrl = (item: MenuItemType): string | null =>
   getDishPhoto(item)?.url_m ?? item.image ?? null;
 
-/**
- * Every photo in the database today came from an image search, so nothing is
- * community-sourced yet. Uploads will set this per photo.
- */
+/** What the server says the photo is; stock is the fallback for older rows. */
 export const getDishPhotoSource = (
   item: MenuItemType,
-): ImageSourceType | undefined =>
-  getDishPhotoUrl(item) ? IMAGE_SOURCE.stock : undefined;
+): ImageSourceType | undefined => {
+  if (!getDishPhotoUrl(item)) {
+    return undefined;
+  }
+
+  return getDishPhoto(item)?.source === IMAGE_SOURCE.community
+    ? IMAGE_SOURCE.community
+    : IMAGE_SOURCE.stock;
+};
+
+/** Uploader to credit, when the photo came from the community. */
+export const getDishPhotoCredit = (item: MenuItemType): string | null => {
+  const photo = getDishPhoto(item);
+
+  if (!photo || photo.source !== IMAGE_SOURCE.community) {
+    return null;
+  }
+
+  return photo.owner ?? null;
+};
 
 /**
  * Categories come back from the AI with inconsistent casing ("Appetizers" and

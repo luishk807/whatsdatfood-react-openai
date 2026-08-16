@@ -86,6 +86,10 @@ export interface RestaurantType {
 
 export interface RestaurantItemImageType {
   id?: bigint;
+  /** "community" once someone uploads it; "stock" for image-search results. */
+  source?: string;
+  is_primary?: boolean;
+  helpful_count?: number;
   restaurant_menu_item_id: bigint;
   name?: string;
   url_m?: string;

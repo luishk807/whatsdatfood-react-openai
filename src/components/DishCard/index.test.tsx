@@ -86,12 +86,60 @@ describe("DishCard", () => {
 
   it("offers an upload when there is no photo yet", async () => {
     const onAddPhoto = jest.fn();
-    render(<DishCard item={dish()} onAddPhoto={onAddPhoto} />);
+    const { container } = render(
+      <DishCard item={dish()} onAddPhoto={onAddPhoto} />,
+    );
 
     expect(screen.getByText(DISH_LABELS.noPhoto)).toBeInTheDocument();
 
-    await userEvent.click(screen.getByText(DISH_LABELS.addPhoto));
-    expect(onAddPhoto).toHaveBeenCalledWith(dish());
+    const picker = container.querySelector(
+      'input[type="file"]',
+    ) as HTMLInputElement;
+    await userEvent.upload(
+      picker,
+      new File(["b"], "dinner.jpg", { type: "image/jpeg" }),
+    );
+
+    expect(onAddPhoto).toHaveBeenCalledTimes(1);
+    expect(onAddPhoto.mock.calls[0][0]).toMatchObject({ id: 42 });
+    expect(onAddPhoto.mock.calls[0][1]).toBeInstanceOf(File);
+  });
+
+  it("does not open the detail sheet from an empty tile", () => {
+    // The empty tile carries the upload button; a button cannot be nested
+    // inside another button, and tapping it should not open an empty sheet.
+    const onOpen = jest.fn();
+    render(<DishCard item={dish()} onOpen={onOpen} onAddPhoto={jest.fn()} />);
+
+    expect(
+      screen.queryByRole("button", { name: "Single Steak" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("credits the uploader of a community photo", () => {
+    render(
+      <DishCard
+        item={dish({
+          images: [
+            {
+              url_m: "https://example.test/steak.jpg",
+              source: "community",
+              owner: "luis",
+            } as MenuItemPhoto,
+          ],
+        })}
+      />,
+    );
+
+    expect(screen.getByText(DISH_LABELS.photoBy("luis"))).toBeInTheDocument();
+  });
+
+  it("shows progress on the dish being uploaded", () => {
+    render(<DishCard item={dish()} onAddPhoto={jest.fn()} uploadingDishId={42} />);
+
+    expect(
+      screen.getByRole("button", { name: DISH_LABELS.uploading }),
+    ).toBeDisabled();
   });
 
   it("passes the dish back with the vote", async () => {
@@ -103,12 +151,13 @@ describe("DishCard", () => {
     expect(onVote).toHaveBeenCalledWith(dish(), VOTE.up);
   });
 
-  it("opens the detail view when the photo is tapped", async () => {
+  it("opens the detail view when a photo is tapped", async () => {
     const onOpen = jest.fn();
-    render(<DishCard item={dish()} onOpen={onOpen} />);
+    const item = dish({ images: [photo("https://example.test/steak.jpg")] });
+    render(<DishCard item={item} onOpen={onOpen} />);
 
     await userEvent.click(screen.getByRole("button", { name: "Single Steak" }));
 
-    expect(onOpen).toHaveBeenCalledWith(dish());
+    expect(onOpen).toHaveBeenCalledWith(item);
   });
 });

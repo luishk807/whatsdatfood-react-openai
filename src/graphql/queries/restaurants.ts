@@ -75,10 +75,14 @@ export const GET_RESTAURANT_BY_SLUG = gql`
           user_id
         }
         images {
+          id
           name
           url_m
           url_s
           owner
+          source
+          is_primary
+          helpful_count
         }
       }
     }
