@@ -7,8 +7,8 @@
 
 .footer-subpage {
   min-height: 250px;
-  background-color: #28282b;
-  color: white;
+  background-color: var(--color-ink);
+  color: var(--color-surface);
 }
 
 .footer-list-container {

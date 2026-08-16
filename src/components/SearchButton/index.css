@@ -9,12 +9,12 @@
   -o-border-radius: 20px;
 }
 #main-search-button-container .main-search-button.inactive {
-  background-color: #ccc !important;
+  background-color: var(--color-line) !important;
 }
 
 #main-search-button-container .main-search-button.active {
-  background-color: rgba(0, 0, 255) !important;
+  background-color: var(--color-brand) !important;
 }
 #main-search-button-container .main-search-button .main-search-button-icon {
-  fill: white !important;
+  fill: var(--color-surface-raised) !important;
 }

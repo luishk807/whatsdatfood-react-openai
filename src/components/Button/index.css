@@ -1,11 +1,11 @@
 .item-menu-item-btn {
   margin-bottom: 5px;
-  border: 1px solid black;
-  color: black;
+  border: 1px solid var(--color-line);
+  color: var(--color-ink);
   width: 100%;
 }
 
 .item-menu-item-btn:hover {
-  background-color: black;
-  color: white;
+  background-color: var(--color-ink);
+  color: var(--color-surface);
 }

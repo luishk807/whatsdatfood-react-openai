@@ -6,12 +6,19 @@ import { useState } from "react";
 import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import AccountButton from "../AccountButton";
 import IconButton from "@mui/material/IconButton";
+import ThemeToggle from "../ThemeToggle";
+
+interface MenuLinksProps {
+  /** The mobile sheet has room for labels; the top bar does not. */
+  expanded?: boolean;
+}
+
 const Header = () => {
   const [showMenu, setShowMenu] = useState(false);
 
   const toggleMenu = () => setShowMenu(!showMenu);
 
-  const MenuLinks = () => {
+  const MenuLinks = ({ expanded = false }: MenuLinksProps) => {
     return (
       <ul className="header-list-ul">
         <li className="header-list-ul-li">
@@ -21,6 +28,9 @@ const Header = () => {
         </li>
         <li className="header-list-ul-li">About</li>
         <li className="header-list-ul-li">Contact</li>
+        <li className="header-list-ul-li">
+          <ThemeToggle expanded={expanded} />
+        </li>
         <li className="header-list-ul-li">
           <Box sx={{ display: { xs: "block", sm: "none" } }}>
             <Link to="/sign-in" className="link-text">
@@ -78,7 +88,7 @@ const Header = () => {
           </IconButton>
         </Grid>
         <Grid className="header-big-menu-list">
-          <MenuLinks />
+          <MenuLinks expanded />
         </Grid>
       </Grid>
     </>

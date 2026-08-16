@@ -4,8 +4,8 @@
   display: flex;
   justify-content: start;
   padding: 5px;
-  background-color: #28282b;
-  color: white;
+  background-color: var(--color-ink);
+  color: var(--color-surface);
 }
 
 .menu-result-category-container {

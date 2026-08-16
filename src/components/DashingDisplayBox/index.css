@@ -1,5 +1,5 @@
 #show-tasting-price-box {
-  border: 1px dashed black;
+  border: 1px dashed var(--color-line);
   display: flex;
   flex-direction: column;
   justify-content: center;

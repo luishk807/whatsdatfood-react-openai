@@ -1,6 +1,14 @@
 @import "tailwindcss";
 
 /**
+ * Dark follows an explicit attribute, not prefers-color-scheme directly.
+ * A small script in index.html resolves the system preference into that
+ * attribute before first paint, so "follow my OS" and "I chose light" are
+ * the same mechanism and cannot disagree with each other.
+ */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/**
  * Design tokens.
  *
  * Tailwind 4 is configured in CSS, not JavaScript — the old tailwind.config.js
@@ -46,36 +54,38 @@
 }
 
 /**
- * Dark is the important theme here, not an afterthought: restaurants are dim,
- * and a dark ground makes food photography look better than any styling around
- * it can.
+ * Dark matters here - restaurants are dim, and a dark ground flatters food
+ * photography - but it is a choice, not an imposition. These are plain custom
+ * property overrides rather than a media query, so the toggle controls them.
  */
-@media (prefers-color-scheme: dark) {
-  @theme {
-    --color-surface: oklch(16% 0.008 60);
-    --color-surface-raised: oklch(20% 0.009 60);
-    --color-surface-sunken: oklch(13% 0.008 60);
-    --color-line: oklch(28% 0.009 60);
-    --color-ink: oklch(95% 0.006 80);
-    --color-ink-muted: oklch(70% 0.01 70);
+[data-theme="dark"] {
+  --color-surface: oklch(16% 0.008 60);
+  --color-surface-raised: oklch(20% 0.009 60);
+  --color-surface-sunken: oklch(13% 0.008 60);
+  --color-line: oklch(28% 0.009 60);
+  --color-ink: oklch(95% 0.006 80);
+  --color-ink-muted: oklch(70% 0.01 70);
 
-    --color-brand: oklch(72% 0.14 155);
-    --color-brand-strong: oklch(78% 0.14 155);
-    --color-brand-soft: oklch(28% 0.06 155);
+  --color-brand: oklch(72% 0.14 155);
+  --color-brand-strong: oklch(78% 0.14 155);
+  --color-brand-soft: oklch(28% 0.06 155);
 
-    --color-warn: oklch(80% 0.13 70);
-    --color-warn-soft: oklch(30% 0.06 70);
-    --color-danger: oklch(68% 0.17 25);
-    --color-spice: oklch(78% 0.14 30);
-    --color-spice-soft: oklch(30% 0.07 30);
+  --color-warn: oklch(80% 0.13 70);
+  --color-warn-soft: oklch(30% 0.06 70);
+  --color-danger: oklch(68% 0.17 25);
+  --color-spice: oklch(78% 0.14 30);
+  --color-spice-soft: oklch(30% 0.07 30);
 
-    --shadow-tile: 0 1px 2px oklch(0% 0 0 / 40%), 0 6px 16px oklch(0% 0 0 / 30%);
-  }
+  --shadow-tile: 0 1px 2px oklch(0% 0 0 / 40%), 0 6px 16px oklch(0% 0 0 / 30%);
 }
 
 @layer base {
   html {
-    color-scheme: light dark;
+    color-scheme: light;
+  }
+
+  html[data-theme="dark"] {
+    color-scheme: dark;
   }
 
   body {

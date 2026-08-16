@@ -7,9 +7,16 @@ import {
   UserFriendSectionWindows,
 } from "@/customConstants";
 import { VOTE } from "@/customConstants/ranking";
+import { THEME } from "@/customConstants/theme";
 import { IMAGE_SOURCE, BADGE_TONE } from "@/customConstants/images";
 
 export type VoteValue = (typeof VOTE)[keyof typeof VOTE];
+
+/** What the viewer asked for, including deferring to their OS. */
+export type ThemePreference = (typeof THEME)[keyof typeof THEME];
+
+/** What is actually rendered; "system" has been resolved away. */
+export type ResolvedTheme = typeof THEME.light | typeof THEME.dark;
 
 export type ImageSourceType = (typeof IMAGE_SOURCE)[keyof typeof IMAGE_SOURCE];
 

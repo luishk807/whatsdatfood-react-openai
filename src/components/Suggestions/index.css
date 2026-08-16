@@ -1,10 +1,11 @@
 .main-search-suggestions-container {
   width: 100%;
   position: absolute;
-  background: white;
+  background: var(--color-surface-raised);
+  color: var(--color-ink);
   top: 60px;
   border-radius: 10px;
-  box-shadow: 0px 5px 14px rgba(0, 0, 255, 0.3);
+  box-shadow: var(--shadow-tile);
   -webkit-border-radius: 10px;
   -moz-border-radius: 10px;
   -ms-border-radius: 10px;

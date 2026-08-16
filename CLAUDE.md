@@ -89,6 +89,23 @@ A token flips with the theme, so `bg-surface-raised` replaces
 `bg-white dark:bg-neutral-900`. **Do not add `dark:` variants for neutrals** —
 they are the half somebody forgets to update, and the token already handles it.
 
+### Which theme is showing
+
+`data-theme="light" | "dark"` on `<html>` is the single source of truth. An
+inline script in `public/index.html` resolves the stored preference — or the OS,
+when it is `system` — before first paint, so the page never flashes the wrong
+theme. `useTheme` owns it from there; nothing else should write the attribute or
+read `prefers-color-scheme` directly.
+
+The preference is `light | dark | system` and defaults to `system`. That third
+value is the reason the switch is three-way: a two-state toggle pins the viewer
+to one theme the moment they touch it.
+
+**Never hardcode `white`, `black`, or a hex in CSS.** A white panel with
+inherited text colour is invisible in dark mode — that bug shipped in the search
+suggestions, both modals and the account menu. Use the tokens; they are
+available to plain CSS as `var(--color-surface-raised)` and friends.
+
 Focus is styled once globally on `:focus-visible`; components do not need their
 own ring utilities. Reduced motion is honoured globally too.
 
