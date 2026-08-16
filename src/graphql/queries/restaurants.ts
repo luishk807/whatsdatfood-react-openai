@@ -99,3 +99,35 @@ export const GET_RESTAURANT_IMAGES = gql`
     }
   }
 `;
+
+/** Every photo for a dish, hero first. Public — browsing needs no session. */
+export const GET_DISH_PHOTOS = gql`
+  query dishPhotos($itemId: ID!) {
+    dishPhotos(itemId: $itemId) {
+      id
+      url_m
+      url_s
+      owner
+      source
+      is_primary
+      helpful_count
+      createdAt
+    }
+  }
+`;
+
+export const VOTE_DISH_PHOTO = gql`
+  mutation voteDishPhoto($imageId: ID!) {
+    voteDishPhoto(imageId: $imageId) {
+      id
+      helpful_count
+      is_primary
+    }
+  }
+`;
+
+export const REPORT_DISH_PHOTO = gql`
+  mutation reportDishPhoto($imageId: ID!, $reason: String!, $note: String) {
+    reportDishPhoto(imageId: $imageId, reason: $reason, note: $note)
+  }
+`;

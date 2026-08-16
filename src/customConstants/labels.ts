@@ -15,6 +15,17 @@ export const DISH_LABELS = {
   photoBy: (username: string) => `Photo by @${username}`,
   helpful: "Helpful",
   reportPhoto: "Report this photo",
+  photosTitle: "Photos of this dish",
+  noPhotosYet: "No photos yet. Be the first.",
+  markHelpful: "Mark this photo helpful",
+  markedHelpful: "You found this helpful",
+  helpfulCount: (count: number) =>
+    count === 1 ? "1 person found this helpful" : `${count} found this helpful`,
+  heroPhoto: "Shown on the menu",
+  reportSubmitted: "Thanks — someone will take a look",
+  reportPrompt: "What is wrong with this photo?",
+  cancel: "Cancel",
+  signInToHelp: "Sign in to vote or report",
 } as const;
 
 export const RANKING_LABELS = {

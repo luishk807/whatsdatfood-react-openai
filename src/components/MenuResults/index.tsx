@@ -31,6 +31,8 @@ import useDishRanking from "@/customHooks/useDishRanking";
 import useDishVotes from "@/customHooks/useDishVotes";
 import useDishPhotoLookup from "@/customHooks/useDishPhotoLookup";
 import useDishPhotoUpload from "@/customHooks/useDishPhotoUpload";
+import useDishPhotos from "@/customHooks/useDishPhotos";
+import DishPhotoGallery from "@/components/DishPhotoGallery";
 import useSnackbarHook from "@/customHooks/useSnackBar";
 import { groupDishesByCategory, getDishPhotoUrl } from "@/utils/dish";
 import {
@@ -39,6 +41,7 @@ import {
   DISH_LABELS,
 } from "@/customConstants/labels";
 import { RatingToogleType, VoteValue } from "@/types";
+import { MenuItemPhoto } from "@/interfaces/restaurants";
 
 const LazyRatingCreate = lazy(() => import("@/components/RatingFormCreate"));
 const LazyRatingList = lazy(() => import("@/components/RatingList"));
@@ -72,6 +75,15 @@ const MenuResults: FC = () => {
     error: uploadError,
     clearError: clearUploadError,
   } = useDishPhotoUpload();
+  const {
+    load: loadPhotos,
+    voteHelpful,
+    report: reportPhoto,
+    hasVoted,
+    canParticipate,
+    loading: photosLoading,
+  } = useDishPhotos();
+  const [dishPhotos, setDishPhotos] = useState<MenuItemPhoto[]>([]);
 
   /** Dishes with any photo found on this page view folded back in. */
   const dishes = useMemo<MenuItemType[]>(
@@ -188,9 +200,42 @@ const MenuResults: FC = () => {
     }
   };
 
+  const refreshPhotos = async (item: MenuItemType | null) => {
+    setDishPhotos(item ? await loadPhotos(item.id) : []);
+  };
+
   const handleOpenDish = (item: MenuItemType) => {
     setDetailMode(RATING_TYPE.list);
     setSelectedDish(item);
+    refreshPhotos(item);
+  };
+
+  const handleVotePhoto = async (imageId: string | number) => {
+    await voteHelpful(imageId);
+    // Reload: a vote can move which photo is the hero.
+    refreshPhotos(selectedDish);
+  };
+
+  const handleReportPhoto = async (
+    imageId: string | number,
+    reason: string,
+  ) => {
+    const sent = await reportPhoto(imageId, reason);
+
+    if (sent) {
+      showSnackBar(DISH_LABELS.reportSubmitted, "success");
+    }
+  };
+
+  const handleAddPhotoFromSheet = async (file: File) => {
+    if (!selectedDish) {
+      return;
+    }
+
+    if (await upload(selectedDish, file)) {
+      refreshPhotos(selectedDish);
+      handleFetchRestaurant(true);
+    }
   };
 
   const handleReviewSubmitted = (message: string, severity: AlertColor) => {
@@ -276,7 +321,10 @@ const MenuResults: FC = () => {
       <BottomSheet
         open={!!selectedDish}
         title={selectedDish?.name}
-        onClose={() => setSelectedDish(null)}
+        onClose={() => {
+          setSelectedDish(null);
+          setDishPhotos([]);
+        }}
       >
         {selectedDish && (
           <div className="flex flex-col gap-4">
@@ -293,6 +341,17 @@ const MenuResults: FC = () => {
                 {selectedDish.description}
               </p>
             )}
+
+            <DishPhotoGallery
+              photos={dishPhotos}
+              loading={photosLoading}
+              canParticipate={canParticipate}
+              hasVoted={hasVoted}
+              onVote={handleVotePhoto}
+              onReport={handleReportPhoto}
+              onAddPhoto={canParticipate ? handleAddPhotoFromSheet : undefined}
+              uploading={uploadingDishId === Number(selectedDish.id)}
+            />
 
             {/* Reviews need a session, so a visitor browsing anonymously is
                 invited to sign in rather than shown a failing request. */}

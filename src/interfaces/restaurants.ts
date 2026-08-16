@@ -85,12 +85,14 @@ export interface RestaurantType {
 }
 
 export interface RestaurantItemImageType {
-  id?: bigint;
+  // GraphQL serialises ID as a string; `bigint` described the database column,
+  // not what actually arrives over the wire.
+  id?: string | number;
   /** "community" once someone uploads it; "stock" for image-search results. */
   source?: string;
   is_primary?: boolean;
   helpful_count?: number;
-  restaurant_menu_item_id: bigint;
+  restaurant_menu_item_id?: string | number;
   name?: string;
   url_m?: string;
   url_s?: string;

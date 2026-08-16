@@ -35,3 +35,16 @@ export const BADGE_TONE = {
   stock: "stock",
   top: "top",
 } as const;
+
+
+/**
+ * Why someone flags a photo. Kept in step with the server's list — an unknown
+ * reason is refused there.
+ */
+export const REPORT_REASONS = [
+  { value: "wrong_dish", label: "That is not this dish" },
+  { value: "not_this_restaurant", label: "Not from this restaurant" },
+  { value: "offensive", label: "Offensive" },
+  { value: "spam", label: "Spam" },
+  { value: "other", label: "Something else" },
+] as const;
