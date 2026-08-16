@@ -10,6 +10,8 @@ export const ROUTES = {
   history: "/history",
   favorites: "/favorites",
   menuResults: "/menu-results/:restaurant",
+  manage: "/manage",
+  admin: "/admin",
   notFound: "*",
 } as const;
 

@@ -20,6 +20,8 @@ const LazyUserRatings = lazy(() => import("@/components/UserRatingSection"));
 const LazyUserSettings = lazy(() => import("@/components/UserSettings"));
 const LazyUserHistory = lazy(() => import("@/components/UserHistory"));
 const LazyUserFavorites = lazy(() => import("@/components/UserFavorites"));
+const LazyOwnerConsole = lazy(() => import("@/components/OwnerConsole"));
+const LazyAdminConsole = lazy(() => import("@/components/AdminConsole"));
 
 function App() {
   const customStyle = {
@@ -116,6 +118,30 @@ function App() {
                 <Layout>
                   <UserAccountLayout sectionTitle="History">
                     <LazyUserHistory />
+                  </UserAccountLayout>
+                </Layout>
+              </Suspense>
+            }
+          />
+          <Route
+            path={ROUTES.manage}
+            element={
+              <Suspense fallback={<Loading style={customStyle} />}>
+                <Layout>
+                  <UserAccountLayout sectionTitle="Manage">
+                    <LazyOwnerConsole />
+                  </UserAccountLayout>
+                </Layout>
+              </Suspense>
+            }
+          />
+          <Route
+            path={ROUTES.admin}
+            element={
+              <Suspense fallback={<Loading style={customStyle} />}>
+                <Layout>
+                  <UserAccountLayout sectionTitle="Review">
+                    <LazyAdminConsole />
                   </UserAccountLayout>
                 </Layout>
               </Suspense>

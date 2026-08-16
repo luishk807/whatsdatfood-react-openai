@@ -70,3 +70,37 @@ export const DIETARY_LABELS = {
    */
   disclaimer: "Always check with the restaurant if you have an allergy.",
 } as const;
+
+export const OWNER_LABELS = {
+  consoleTitle: "Restaurants you manage",
+  claimTitle: "Manage this restaurant",
+  claimCta: "I run this restaurant",
+  claimPending: "Waiting for review",
+  claimApproved: "You manage this",
+  claimRejected: "Not approved",
+  claimSent: "Sent — someone will review it",
+  noClaims: "You have not claimed a restaurant yet.",
+  /** Said plainly, because it is the reason anyone should trust the numbers. */
+  boundary:
+    "You can correct facts about your restaurant — prices, descriptions, " +
+    "what is on the menu. You cannot change reviews, photos or ratings, and " +
+    "nobody at this company can do that on your behalf either.",
+  editFacts: "Correct the details",
+  saved: "Saved",
+  discontinue: "No longer on the menu",
+  discontinued: "Taken off the menu",
+  confirmDiscontinue: "Take this off the menu? Its reviews and photos stay.",
+} as const;
+
+export const ADMIN_LABELS = {
+  title: "Review queue",
+  claims: "Ownership claims",
+  reports: "Reported photos",
+  noClaims: "No claims waiting.",
+  noReports: "Nothing reported.",
+  approve: "Approve",
+  reject: "Reject",
+  keepPhoto: "Keep",
+  removePhoto: "Remove",
+  removeWarning: "Removing a photo is the only way one disappears.",
+} as const;

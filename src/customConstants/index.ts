@@ -64,6 +64,10 @@ export const DROPDOWN_MENU = {
       name: "Favorites",
       url: ROUTES.favorites,
     },
+    {
+      name: "Manage",
+      url: ROUTES.manage,
+    },
   ],
   "3": [
     {

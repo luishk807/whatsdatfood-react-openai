@@ -23,6 +23,7 @@ import DashingDisplayBox from "@/components/DashingDisplayBox";
 import useAuth from "@/customHooks/useAuth";
 import RestaurantIconMenu from "@/components/RestaurantSocialOptions";
 import BookmarkButton from "../BookmarkButton";
+import ClaimRestaurantButton from "@/components/ClaimRestaurantButton";
 import TopDishStrip from "@/components/TopDishStrip";
 import DishGrid from "@/components/DishGrid";
 import DishPhoto from "@/components/DishPhoto";
@@ -271,6 +272,10 @@ const MenuResults: FC = () => {
         {restaurantInfo && restaurant && <BookmarkButton slug={restaurant} />}
 
         <MenuTitle restaurant={restaurantInfo} />
+
+        <Grid size={12} className="px-4">
+          <ClaimRestaurantButton slug={restaurant} />
+        </Grid>
 
         <Grid size={12} className="show-tasting-price-container">
           <DashingDisplayBox
