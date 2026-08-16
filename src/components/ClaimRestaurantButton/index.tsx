@@ -55,7 +55,7 @@ const ClaimRestaurantButton: FC<ClaimRestaurantButtonInterface> = ({ slug }) => 
 
   if (status) {
     return (
-      <span className="text-xs text-neutral-500 dark:text-neutral-400">
+      <span className="text-xs text-ink-muted">
         {STATUS_LABEL[status]}
       </span>
     );
@@ -69,7 +69,7 @@ const ClaimRestaurantButton: FC<ClaimRestaurantButtonInterface> = ({ slug }) => 
         await claim(slug);
         setStatus("pending");
       }}
-      className="inline-flex items-center gap-1 rounded-full border border-neutral-300 px-3 py-1 text-xs font-medium text-neutral-700 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:border-neutral-700 dark:text-neutral-200"
+      className="inline-flex items-center gap-1 rounded-full border border-line px-3 py-1 text-xs font-medium text-ink disabled:opacity-50"
     >
       <StorefrontOutlinedIcon sx={{ fontSize: 14 }} />
       {OWNER_LABELS.claimCta}

@@ -62,7 +62,7 @@ const DishCard: FC<DishCardInterface> = ({
             type="button"
             onClick={() => onOpen(item)}
             aria-label={item.name}
-            className="block w-full rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+            className="block w-full rounded-card"
           >
             <DishPhoto
               url={url}
@@ -99,7 +99,7 @@ const DishCard: FC<DishCardInterface> = ({
         )}
       </div>
 
-      <h3 className="text-sm font-semibold leading-snug text-neutral-900 dark:text-neutral-100">
+      <h3 className="text-sm font-semibold leading-snug text-ink">
         {item.name}
       </h3>
 
@@ -108,7 +108,7 @@ const DishCard: FC<DishCardInterface> = ({
       {/* Popularity, kept separate from the vote-based ranking so neither
           signal hides behind the other. */}
       {orderShare !== null && orderShare > 0 && (
-        <p className="text-xs font-medium text-emerald-700 dark:text-emerald-400">
+        <p className="text-xs font-medium text-brand">
           {ORDER_LABELS.share(orderShare)}
         </p>
       )}
@@ -116,14 +116,14 @@ const DishCard: FC<DishCardInterface> = ({
       {/* Below the vote threshold we show the count, never a rank — a wrong
           "top dish" costs more trust than saying nothing. */}
       {score && score.voteCount > 0 && !score.isRanked && (
-        <p className="text-xs text-neutral-500 dark:text-neutral-400">
+        <p className="text-xs text-ink-muted">
           {RANKING_LABELS.voteCount(score.voteCount)}
         </p>
       )}
 
       <div className="flex items-center justify-between gap-2">
         {item.price !== undefined && item.price !== null ? (
-          <span className="text-sm tabular-nums text-neutral-700 dark:text-neutral-300">
+          <span className="text-sm tabular-nums text-ink">
             {convertCurrency(Number(item.price))}
           </span>
         ) : (

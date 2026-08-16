@@ -53,7 +53,7 @@ const SkeletonMenuItem = () => {
                   />
                 </Box>
                 {/* content section */}
-                <Box className="flex flex-col  w-4/5">
+                <Box className="flex flex-col w-4/5">
                   <Box className="flex mb-7 w-full">
                     <Skeleton
                       variant="rectangular"

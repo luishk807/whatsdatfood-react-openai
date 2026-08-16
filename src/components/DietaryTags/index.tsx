@@ -40,8 +40,8 @@ const DietaryTags: FC<DietaryTagsInterface> = ({ item, showDisclaimer }) => {
             className={clsx(
               "rounded-full px-2 py-0.5 text-[11px] font-medium",
               tag.tone === "warning"
-                ? "bg-amber-100 text-amber-900 dark:bg-amber-900/40 dark:text-amber-200"
-                : "bg-emerald-100 text-emerald-900 dark:bg-emerald-900/40 dark:text-emerald-200",
+                ? "bg-warn-soft text-warn"
+                : "bg-brand-soft text-brand",
             )}
           >
             {tag.label}
@@ -49,21 +49,21 @@ const DietaryTags: FC<DietaryTagsInterface> = ({ item, showDisclaimer }) => {
         ))}
 
         {spice && (
-          <li className="inline-flex items-center gap-0.5 rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-medium text-red-900 dark:bg-red-900/40 dark:text-red-200">
+          <li className="inline-flex items-center gap-0.5 rounded-full bg-spice-soft px-2 py-0.5 text-[11px] font-medium text-spice">
             <LocalFireDepartmentOutlinedIcon sx={{ fontSize: 12 }} />
             {spice}
           </li>
         )}
 
         {isConfirmedByRestaurant(item) && (
-          <li className="text-[11px] text-neutral-500 dark:text-neutral-400">
+          <li className="text-[11px] text-ink-muted">
             {DIETARY_LABELS.confirmedByRestaurant}
           </li>
         )}
       </ul>
 
       {showDisclaimer && (
-        <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
+        <p className="text-[11px] text-ink-muted">
           {DIETARY_LABELS.disclaimer}
         </p>
       )}

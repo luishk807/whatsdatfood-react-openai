@@ -8,7 +8,7 @@ import { DISH_LABELS } from "@/customConstants/labels";
 import { VoteValue } from "@/types";
 
 const BASE_CLASSES =
-  "inline-flex h-9 w-9 items-center justify-center rounded-full border transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 disabled:opacity-40 motion-reduce:transition-none";
+  "inline-flex h-9 w-9 items-center justify-center rounded-full border transition-colors disabled:opacity-40 motion-reduce:transition-none";
 
 /**
  * One tap, two options. Deliberately not a star rating: fine-grained scores
@@ -35,8 +35,8 @@ const VoteButton: FC<VoteButtonInterface> = ({
         className={clsx(
           BASE_CLASSES,
           value === VOTE.up
-            ? "border-emerald-600 bg-emerald-600 text-white"
-            : "border-neutral-300 text-neutral-600 hover:border-emerald-600 hover:text-emerald-700 dark:border-neutral-700 dark:text-neutral-300",
+            ? "border-brand bg-brand text-white"
+            : "border-line text-ink-muted hover:border-brand hover:text-brand",
         )}
       >
         <ThumbUpAltOutlinedIcon sx={{ fontSize: 17 }} />
@@ -52,15 +52,15 @@ const VoteButton: FC<VoteButtonInterface> = ({
         className={clsx(
           BASE_CLASSES,
           value === VOTE.down
-            ? "border-neutral-800 bg-neutral-800 text-white"
-            : "border-neutral-300 text-neutral-600 hover:border-neutral-800 dark:border-neutral-700 dark:text-neutral-300",
+            ? "border-ink bg-ink text-white"
+            : "border-line text-ink-muted hover:border-neutral-800",
         )}
       >
         <ThumbDownAltOutlinedIcon sx={{ fontSize: 17 }} />
       </button>
 
       {!!upCount && (
-        <span className="text-xs tabular-nums text-neutral-500 dark:text-neutral-400">
+        <span className="text-xs tabular-nums text-ink-muted">
           {upCount}
         </span>
       )}

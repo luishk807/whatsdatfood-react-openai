@@ -57,11 +57,11 @@ const BottomSheet: FC<BottomSheetInterface> = ({
       <div
         ref={panelRef}
         tabIndex={-1}
-        className="relative z-10 max-h-[85vh] w-full overflow-y-auto rounded-t-2xl bg-white p-4 shadow-xl outline-none sm:max-w-lg sm:rounded-2xl dark:bg-neutral-900"
+        className="relative z-10 max-h-[85vh] w-full overflow-y-auto rounded-t-card bg-surface-raised p-4 shadow-sheet outline-none sm:max-w-lg sm:rounded-card"
       >
         <div className="mb-3 flex items-start justify-between gap-3">
           {title && (
-            <h2 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
+            <h2 className="text-base font-semibold text-ink">
               {title}
             </h2>
           )}
@@ -69,7 +69,7 @@ const BottomSheet: FC<BottomSheetInterface> = ({
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="-mr-1 -mt-1 shrink-0 rounded-full p-1 text-neutral-500 hover:text-neutral-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:text-neutral-400 dark:hover:text-neutral-100"
+            className="-mr-1 -mt-1 shrink-0 rounded-full p-1 text-ink-muted hover:text-ink"
           >
             <CloseRoundedIcon fontSize="small" />
           </button>

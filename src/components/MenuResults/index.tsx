@@ -311,7 +311,7 @@ const MenuResults: FC = () => {
 
             {categories.map((category) => (
               <section key={category} className="flex flex-col gap-3">
-                <h2 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
+                <h2 className="text-base font-semibold text-ink">
                   {category}
                 </h2>
                 <DishGrid
@@ -353,7 +353,7 @@ const MenuResults: FC = () => {
             <DietaryTags item={selectedDish} showDisclaimer />
 
             {selectedDish.description && (
-              <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
+              <p className="text-sm leading-relaxed text-ink-muted">
                 {selectedDish.description}
               </p>
             )}
@@ -372,8 +372,8 @@ const MenuResults: FC = () => {
               }}
               className={
                 selectedDish.ordered_by_me
-                  ? "self-start rounded-full border border-emerald-600 bg-emerald-600 px-3 py-1 text-xs font-medium text-white disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
-                  : "self-start rounded-full border border-neutral-300 px-3 py-1 text-xs font-medium text-neutral-700 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:border-neutral-700 dark:text-neutral-200"
+                  ? "self-start rounded-full border border-brand bg-emerald-600 px-3 py-1 text-xs font-medium text-white disabled:opacity-50"
+                  : "self-start rounded-full border border-line px-3 py-1 text-xs font-medium text-ink disabled:opacity-50"
               }
             >
               {selectedDish.ordered_by_me
@@ -382,7 +382,7 @@ const MenuResults: FC = () => {
             </button>
 
             {!!selectedDish.order_count && (
-              <p className="text-xs text-neutral-500 dark:text-neutral-400">
+              <p className="text-xs text-ink-muted">
                 {ORDER_LABELS.count(selectedDish.order_count)}
               </p>
             )}
@@ -401,7 +401,7 @@ const MenuResults: FC = () => {
             {/* Reviews need a session, so a visitor browsing anonymously is
                 invited to sign in rather than shown a failing request. */}
             {!user ? (
-              <p className="text-sm text-neutral-500 dark:text-neutral-400">
+              <p className="text-sm text-ink-muted">
                 {DISH_LABELS.signInToReview}
               </p>
             ) : detailMode === RATING_TYPE.create ? (

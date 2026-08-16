@@ -67,8 +67,32 @@ the vote threshold is what keeps a barely-voted dish out of the ranking.
 - **New styling is Tailwind.** The codebase is migrating off MUI + ~60
   per-component `index.css` files. Do not add new CSS files.
 
-## Design
+## Design system
 
+Tailwind 4 is configured **in CSS** (`src/index.css`), not JavaScript. The old
+`tailwind.config.js` was being ignored entirely — its theme extensions never
+existed — and the v3 `@tailwind` directives meant **no `dark:` rule was ever
+generated**, so dark mode silently did nothing across the whole app. Both are
+fixed; do not reintroduce a JS config.
+
+Style through the semantic tokens, not raw palette classes:
+
+| Token | Use |
+|---|---|
+| `surface` / `surface-raised` / `surface-sunken` | page, panels, wells |
+| `ink` / `ink-muted` | primary and secondary text |
+| `line` | borders |
+| `brand` / `brand-soft` | the vote, and nothing that competes with it |
+| `warn` / `danger` / `spice` | allergens, destructive actions, heat |
+
+A token flips with the theme, so `bg-surface-raised` replaces
+`bg-white dark:bg-neutral-900`. **Do not add `dark:` variants for neutrals** —
+they are the half somebody forgets to update, and the token already handles it.
+
+Focus is styled once globally on `:focus-visible`; components do not need their
+own ring utilities. Reduced motion is honoured globally too.
+
+## Design
 Mobile-first: one hand, dim room, cellular in a basement, deciding in under a
 minute. Design for the phone and let desktop be the override, never the reverse.
 

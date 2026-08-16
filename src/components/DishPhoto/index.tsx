@@ -84,10 +84,10 @@ const DishPhoto: FC<DishPhotoInterface> = ({
   return (
     <div
       ref={containerRef}
-      className="relative aspect-square w-full overflow-hidden rounded-lg bg-neutral-200 dark:bg-neutral-800"
+      className="relative aspect-square w-full overflow-hidden rounded-card bg-surface-sunken"
     >
       {isEmpty ? (
-        <div className="flex h-full w-full flex-col items-center justify-center gap-2 p-3 text-center text-neutral-500 dark:text-neutral-400">
+        <div className="flex h-full w-full flex-col items-center justify-center gap-2 p-3 text-center text-ink-muted">
           <NoPhotographyOutlinedIcon fontSize="small" />
           <span className="text-xs">
             {failed ? DISH_LABELS.photoFailed : DISH_LABELS.noPhoto}
@@ -110,7 +110,7 @@ const DishPhoto: FC<DishPhotoInterface> = ({
                 type="button"
                 disabled={uploading}
                 onClick={() => fileRef.current?.click()}
-                className="mt-1 inline-flex items-center gap-1 rounded-full bg-neutral-900/90 px-3 py-1 text-xs font-medium text-white disabled:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:bg-white/90 dark:text-black"
+                className="mt-1 inline-flex items-center gap-1 rounded-full bg-ink px-3 py-1 text-xs font-medium text-surface disabled:opacity-60"
               >
                 <AddAPhotoOutlinedIcon sx={{ fontSize: 14 }} />
                 {uploading ? DISH_LABELS.uploading : DISH_LABELS.addPhoto}

@@ -43,17 +43,17 @@ const AdminConsole: FC = () => {
 
   return (
     <section className="flex w-full flex-col gap-8 px-4 py-4">
-      <h1 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+      <h1 className="text-lg font-semibold text-ink">
         {ADMIN_LABELS.title}
       </h1>
 
       <div className="flex flex-col gap-3">
-        <h2 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+        <h2 className="text-sm font-semibold text-ink">
           {ADMIN_LABELS.claims}
         </h2>
 
         {!loading && !claims.length && (
-          <p className="text-sm text-neutral-500 dark:text-neutral-400">
+          <p className="text-sm text-ink-muted">
             {ADMIN_LABELS.noClaims}
           </p>
         )}
@@ -62,13 +62,13 @@ const AdminConsole: FC = () => {
           {claims.map((claim) => (
             <li
               key={claim.id}
-              className="flex items-center justify-between gap-3 rounded-lg border border-neutral-200 p-3 dark:border-neutral-800"
+              className="flex items-center justify-between gap-3 rounded-card border border-line p-3"
             >
               <div className="flex min-w-0 flex-col">
-                <span className="truncate text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                <span className="truncate text-sm font-medium text-ink">
                   {claim.restaurant?.name}
                 </span>
-                <span className="truncate text-xs text-neutral-500 dark:text-neutral-400">
+                <span className="truncate text-xs text-ink-muted">
                   {claim.verification_method ?? "no verification offered"}
                   {claim.note ? ` · ${claim.note}` : ""}
                 </span>
@@ -81,7 +81,7 @@ const AdminConsole: FC = () => {
                     await decideClaim(claim.id, true);
                     refresh();
                   }}
-                  className="rounded-full bg-emerald-600 px-3 py-1 text-xs font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
+                  className="rounded-full bg-emerald-600 px-3 py-1 text-xs font-medium text-white"
                 >
                   {ADMIN_LABELS.approve}
                 </button>
@@ -91,7 +91,7 @@ const AdminConsole: FC = () => {
                     await decideClaim(claim.id, false);
                     refresh();
                   }}
-                  className="rounded-full border border-neutral-300 px-3 py-1 text-xs font-medium text-neutral-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:border-neutral-700 dark:text-neutral-200"
+                  className="rounded-full border border-line px-3 py-1 text-xs font-medium text-ink"
                 >
                   {ADMIN_LABELS.reject}
                 </button>
@@ -102,15 +102,15 @@ const AdminConsole: FC = () => {
       </div>
 
       <div className="flex flex-col gap-3">
-        <h2 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+        <h2 className="text-sm font-semibold text-ink">
           {ADMIN_LABELS.reports}
         </h2>
-        <p className="text-xs text-neutral-500 dark:text-neutral-400">
+        <p className="text-xs text-ink-muted">
           {ADMIN_LABELS.removeWarning}
         </p>
 
         {!loading && !reports.length && (
-          <p className="text-sm text-neutral-500 dark:text-neutral-400">
+          <p className="text-sm text-ink-muted">
             {ADMIN_LABELS.noReports}
           </p>
         )}
@@ -119,7 +119,7 @@ const AdminConsole: FC = () => {
           {reports.map((report) => (
             <li
               key={report.id}
-              className="flex items-center gap-3 rounded-lg border border-neutral-200 p-3 dark:border-neutral-800"
+              className="flex items-center gap-3 rounded-card border border-line p-3"
             >
               {report.photo?.url_m && (
                 <img
@@ -130,10 +130,10 @@ const AdminConsole: FC = () => {
               )}
 
               <div className="flex min-w-0 flex-1 flex-col">
-                <span className="text-sm font-medium text-neutral-900 dark:text-neutral-100">
+                <span className="text-sm font-medium text-ink">
                   {report.reason}
                 </span>
-                <span className="truncate text-xs text-neutral-500 dark:text-neutral-400">
+                <span className="truncate text-xs text-ink-muted">
                   {report.photo?.owner ? `@${report.photo.owner}` : "unattributed"}
                   {report.note ? ` · ${report.note}` : ""}
                 </span>
@@ -146,7 +146,7 @@ const AdminConsole: FC = () => {
                     await resolveReport(report.id, false);
                     refresh();
                   }}
-                  className="rounded-full border border-neutral-300 px-3 py-1 text-xs font-medium text-neutral-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:border-neutral-700 dark:text-neutral-200"
+                  className="rounded-full border border-line px-3 py-1 text-xs font-medium text-ink"
                 >
                   {ADMIN_LABELS.keepPhoto}
                 </button>
@@ -156,7 +156,7 @@ const AdminConsole: FC = () => {
                     await resolveReport(report.id, true);
                     refresh();
                   }}
-                  className="rounded-full bg-red-600 px-3 py-1 text-xs font-medium text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                  className="rounded-full bg-red-600 px-3 py-1 text-xs font-medium text-white"
                 >
                   {ADMIN_LABELS.removePhoto}
                 </button>

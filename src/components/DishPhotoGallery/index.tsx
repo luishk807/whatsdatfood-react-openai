@@ -44,7 +44,7 @@ const DishPhotoGallery: FC<DishPhotoGalleryInterface> = ({
   return (
     <section className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
+        <h3 className="text-sm font-semibold text-ink">
           {DISH_LABELS.photosTitle}
         </h3>
 
@@ -64,7 +64,7 @@ const DishPhotoGallery: FC<DishPhotoGalleryInterface> = ({
               type="button"
               disabled={uploading}
               onClick={() => fileRef.current?.click()}
-              className="inline-flex items-center gap-1 rounded-full bg-neutral-900/90 px-3 py-1 text-xs font-medium text-white disabled:opacity-60 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:bg-white/90 dark:text-black"
+              className="inline-flex items-center gap-1 rounded-full bg-ink px-3 py-1 text-xs font-medium text-surface disabled:opacity-60"
             >
               <AddAPhotoOutlinedIcon sx={{ fontSize: 14 }} />
               {uploading ? DISH_LABELS.uploading : DISH_LABELS.addPhoto}
@@ -74,13 +74,13 @@ const DishPhotoGallery: FC<DishPhotoGalleryInterface> = ({
       </div>
 
       {loading && (
-        <p className="text-xs text-neutral-500 dark:text-neutral-400">
+        <p className="text-xs text-ink-muted">
           {DISH_LABELS.uploading.replace("…", "")}…
         </p>
       )}
 
       {!loading && !photos.length && (
-        <p className="text-sm text-neutral-500 dark:text-neutral-400">
+        <p className="text-sm text-ink-muted">
           {DISH_LABELS.noPhotosYet}
         </p>
       )}
@@ -92,7 +92,7 @@ const DishPhotoGallery: FC<DishPhotoGalleryInterface> = ({
 
           return (
             <li key={id} className="flex flex-col gap-2">
-              <div className="relative overflow-hidden rounded-lg">
+              <div className="relative overflow-hidden rounded-card">
                 <img
                   src={photo.url_m ?? ""}
                   alt={photo.name ?? DISH_LABELS.photosTitle}
@@ -107,7 +107,7 @@ const DishPhotoGallery: FC<DishPhotoGalleryInterface> = ({
               </div>
 
               <div className="flex items-center justify-between gap-2">
-                <span className="text-xs text-neutral-500 dark:text-neutral-400">
+                <span className="text-xs text-ink-muted">
                   {photo.owner
                     ? DISH_LABELS.photoBy(photo.owner)
                     : DISH_LABELS.stockPhoto}
@@ -128,10 +128,10 @@ const DishPhotoGallery: FC<DishPhotoGalleryInterface> = ({
                     }
                     onClick={() => onVote?.(id)}
                     className={clsx(
-                      "inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs transition-colors disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 motion-reduce:transition-none",
+                      "inline-flex items-center gap-1 rounded-full border px-2 py-1 text-xs transition-colors disabled:opacity-50 motion-reduce:transition-none",
                       voted
-                        ? "border-emerald-600 bg-emerald-600 text-white"
-                        : "border-neutral-300 text-neutral-600 dark:border-neutral-700 dark:text-neutral-300",
+                        ? "border-brand bg-brand text-white"
+                        : "border-line text-ink-muted",
                     )}
                   >
                     <ThumbUpAltOutlinedIcon sx={{ fontSize: 14 }} />
@@ -152,7 +152,7 @@ const DishPhotoGallery: FC<DishPhotoGalleryInterface> = ({
                     onClick={() =>
                       setReportingId((prev) => (prev === id ? null : id))
                     }
-                    className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-neutral-300 text-neutral-500 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:border-neutral-700 dark:text-neutral-400"
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-line text-ink-muted disabled:opacity-50"
                   >
                     <FlagOutlinedIcon sx={{ fontSize: 14 }} />
                   </button>
@@ -160,8 +160,8 @@ const DishPhotoGallery: FC<DishPhotoGalleryInterface> = ({
               </div>
 
               {reportingId === id && (
-                <div className="flex flex-col gap-1 rounded-lg bg-neutral-100 p-2 dark:bg-neutral-800">
-                  <span className="text-xs font-medium text-neutral-700 dark:text-neutral-200">
+                <div className="flex flex-col gap-1 rounded-card bg-surface-sunken p-2">
+                  <span className="text-xs font-medium text-ink">
                     {DISH_LABELS.reportPrompt}
                   </span>
                   {REPORT_REASONS.map((reason) => (
@@ -172,7 +172,7 @@ const DishPhotoGallery: FC<DishPhotoGalleryInterface> = ({
                         onReport?.(id, reason.value);
                         setReportingId(null);
                       }}
-                      className="rounded px-2 py-1 text-left text-xs text-neutral-700 hover:bg-neutral-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:text-neutral-200 dark:hover:bg-neutral-700"
+                      className="rounded px-2 py-1 text-left text-xs text-ink hover:bg-surface-sunken"
                     >
                       {reason.label}
                     </button>
@@ -180,7 +180,7 @@ const DishPhotoGallery: FC<DishPhotoGalleryInterface> = ({
                   <button
                     type="button"
                     onClick={() => setReportingId(null)}
-                    className="rounded px-2 py-1 text-left text-xs text-neutral-500 hover:bg-neutral-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 dark:text-neutral-400 dark:hover:bg-neutral-700"
+                    className="rounded px-2 py-1 text-left text-xs text-ink-muted hover:bg-surface-sunken"
                   >
                     {DISH_LABELS.cancel}
                   </button>

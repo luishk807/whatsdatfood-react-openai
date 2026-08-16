@@ -1,17 +1,130 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/**
+ * Design tokens.
+ *
+ * Tailwind 4 is configured in CSS, not JavaScript — the old tailwind.config.js
+ * was being ignored entirely, which is why its theme extensions never worked.
+ *
+ * The palette is built for the room this app is used in: someone holding a
+ * phone in a dim restaurant, deciding in under a minute. Surfaces stay quiet so
+ * the food is the brightest thing on screen.
+ */
+@theme {
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica,
+    Arial, sans-serif;
+
+  /* Neutrals carry a slight warm cast so photographed food does not sit on a
+     clinical blue-grey. */
+  --color-surface: oklch(99% 0.004 80);
+  --color-surface-raised: oklch(100% 0 0);
+  --color-surface-sunken: oklch(96.5% 0.005 80);
+  --color-line: oklch(90% 0.006 80);
+  --color-ink: oklch(22% 0.01 60);
+  --color-ink-muted: oklch(52% 0.012 60);
+
+  /* One accent, used sparingly: the vote, and nothing else competes with it. */
+  --color-brand: oklch(58% 0.14 155);
+  --color-brand-strong: oklch(50% 0.15 155);
+  --color-brand-soft: oklch(94% 0.04 155);
+
+  --color-warn: oklch(72% 0.15 70);
+  --color-warn-soft: oklch(95% 0.05 70);
+  --color-danger: oklch(58% 0.19 25);
+  --color-spice: oklch(50% 0.17 30);
+  --color-spice-soft: oklch(94% 0.05 30);
+
+  --radius-card: 0.75rem;
+  --radius-pill: 999px;
+
+  /* Soft and low: a menu is a list of photographs, not a stack of cards. */
+  --shadow-tile: 0 1px 2px oklch(0% 0 0 / 6%), 0 6px 16px oklch(0% 0 0 / 6%);
+  --shadow-sheet: 0 -8px 40px oklch(0% 0 0 / 18%);
+
+  --ease-out-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+/**
+ * Dark is the important theme here, not an afterthought: restaurants are dim,
+ * and a dark ground makes food photography look better than any styling around
+ * it can.
+ */
+@media (prefers-color-scheme: dark) {
+  @theme {
+    --color-surface: oklch(16% 0.008 60);
+    --color-surface-raised: oklch(20% 0.009 60);
+    --color-surface-sunken: oklch(13% 0.008 60);
+    --color-line: oklch(28% 0.009 60);
+    --color-ink: oklch(95% 0.006 80);
+    --color-ink-muted: oklch(70% 0.01 70);
+
+    --color-brand: oklch(72% 0.14 155);
+    --color-brand-strong: oklch(78% 0.14 155);
+    --color-brand-soft: oklch(28% 0.06 155);
+
+    --color-warn: oklch(80% 0.13 70);
+    --color-warn-soft: oklch(30% 0.06 70);
+    --color-danger: oklch(68% 0.17 25);
+    --color-spice: oklch(78% 0.14 30);
+    --color-spice-soft: oklch(30% 0.07 30);
+
+    --shadow-tile: 0 1px 2px oklch(0% 0 0 / 40%), 0 6px 16px oklch(0% 0 0 / 30%);
+  }
+}
+
+@layer base {
+  html {
+    color-scheme: light dark;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Stops iOS enlarging text in landscape and breaking the grid. */
+    text-size-adjust: 100%;
+  }
+
+  /* Headings are set tight; the photographs carry the page, so the type does
+     not need to shout. */
+  h1,
+  h2,
+  h3 {
+    letter-spacing: -0.011em;
+    text-wrap: balance;
+  }
+
+  /* One focus treatment everywhere, visible on both grounds. */
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* Never the default blue tap flash over a photograph. */
+  button,
+  a,
+  [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  img {
+    /* A broken third-party photo should not stretch its tile. */
+    max-width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

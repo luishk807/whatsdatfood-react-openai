@@ -26,7 +26,7 @@ const TopDishStrip: FC<TopDishStripInterface> = ({
 
   return (
     <section className="flex flex-col gap-3">
-      <h2 className="text-base font-semibold text-neutral-900 dark:text-neutral-100">
+      <h2 className="text-base font-semibold text-ink">
         {title}
       </h2>
 
