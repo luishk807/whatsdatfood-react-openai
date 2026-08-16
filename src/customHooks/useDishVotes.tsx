@@ -1,9 +1,12 @@
 import { useMemo, useState, useCallback } from "react";
+import { useApolloClient } from "@apollo/client";
 import useAuth from "@/customHooks/useAuth";
 import useUserRating from "@/customHooks/useUserRating";
 import { MenuItemType } from "@/interfaces/restaurants";
+import { MENU_ITEM_RATINGS_FRAGMENT } from "@/graphql/queries/restaurants";
 import { VOTE, VOTE_MIDPOINT } from "@/customConstants/ranking";
 import { VoteValue } from "@/types";
+import { _get } from "@/utils";
 
 type VoteMap = Record<number, VoteValue | null>;
 
@@ -16,7 +19,59 @@ type VoteMap = Record<number, VoteValue | null>;
 const useDishVotes = (items: MenuItemType[]) => {
   const { user } = useAuth();
   const { saveRating, submitRatingQuery } = useUserRating();
+  const client = useApolloClient();
   const [pending, setPending] = useState<VoteMap>({});
+
+  /**
+   * Writes the vote into the normalised cache for that one dish, so the count
+   * and the ranking move immediately. Refetching the whole menu instead would
+   * risk a cold regeneration on the server.
+   */
+  const writeVoteToCache = useCallback(
+    (dishId: number, ratingId: unknown, value: VoteValue) => {
+      const cacheId = client.cache.identify({
+        __typename: "RestaurantMenuItem",
+        id: dishId,
+      });
+
+      if (!cacheId || !user) {
+        return;
+      }
+
+      client.cache.updateFragment(
+        {
+          id: cacheId,
+          fragment: MENU_ITEM_RATINGS_FRAGMENT,
+          fragmentName: "MenuItemRatings",
+        },
+        (data: any) => {
+          if (!data) {
+            return data;
+          }
+
+          const existing = data.ratings ?? [];
+          const isMine = (entry: any) =>
+            Number(_get(entry, "user_id")) === Number(user.id);
+          const mine = existing.find(isMine);
+
+          const next = {
+            __typename: "UserRating",
+            id: mine?.id ?? ratingId,
+            rating: value,
+            user_id: user.id,
+          };
+
+          return {
+            ...data,
+            ratings: mine
+              ? existing.map((entry: any) => (isMine(entry) ? next : entry))
+              : [...existing, next],
+          };
+        },
+      );
+    },
+    [client, user],
+  );
 
   const votes = useMemo<VoteMap>(() => {
     const fromServer = items.reduce<VoteMap>((acc, item) => {
@@ -54,10 +109,12 @@ const useDishVotes = (items: MenuItemType[]) => {
       setPending((prev) => ({ ...prev, [id]: value }));
 
       try {
-        await saveRating({
+        const saved = (await saveRating({
           restaurant_menu_item_id: id,
           rating: value,
-        });
+        })) as { id?: string | number } | null;
+
+        writeVoteToCache(id, saved?.id, value);
       } catch (err) {
         setPending((prev) => {
           const next = { ...prev };
@@ -67,7 +124,7 @@ const useDishVotes = (items: MenuItemType[]) => {
         throw err;
       }
     },
-    [user, saveRating],
+    [user, saveRating, writeVoteToCache],
   );
 
   return {

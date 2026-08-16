@@ -40,7 +40,7 @@ const cache = new InMemoryCache({
     RestaurantMenuItemImages: {
       keyFields: false,
     },
-    BusinessHours: {
+    RestaurantBusinessHours: {
       keyFields: false,
     },
     Query: {

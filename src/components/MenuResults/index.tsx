@@ -91,9 +91,9 @@ const MenuResults: FC = () => {
 
   const handleDishVisible = (item: MenuItemType) => lookup(item?.id);
 
-  const handleFetchRestaurant = async () => {
+  const handleFetchRestaurant = async (forceNetwork?: boolean) => {
     if (restaurant) {
-      const resp = await getRestaurantListBySlug(restaurant);
+      const resp = await getRestaurantListBySlug(restaurant, forceNetwork);
 
       if (resp) {
         const items = _get<MenuItemType[]>(resp, "restaurantMenuItems", []);
@@ -173,7 +173,9 @@ const MenuResults: FC = () => {
   const handleReviewSubmitted = (message: string, severity: AlertColor) => {
     showSnackBar(message, severity);
     setDetailMode(RATING_TYPE.list);
-    handleFetchRestaurant();
+    // Must bypass the cache: the menu is cache-first, so a plain refetch would
+    // return the very data the new review was meant to replace.
+    handleFetchRestaurant(true);
   };
 
   if (!initialized) {

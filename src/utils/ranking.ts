@@ -48,8 +48,12 @@ export const getRestaurantMean = (items: MenuItemType[]): number => {
  * score = (v/(v+m))·R + (m/(v+m))·C
  *
  * With few votes the score sits near the restaurant mean C; as votes accumulate
- * it converges on the dish's own mean R. Without this a single five-star vote
- * would outrank a dish with fifty good ones.
+ * it converges on the dish's own mean R.
+ *
+ * Shrinkage narrows the gap but does not on its own guarantee ordering: where
+ * the house mean is already high, a shrunk single 5.0 can still edge past a
+ * dish averaging 4.6 across fifty votes. Keeping a barely-voted dish out of the
+ * ranking is the vote threshold's job, not this function's.
  */
 export const scoreDish = (
   item: MenuItemType,

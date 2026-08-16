@@ -90,12 +90,8 @@ export const GET_RESTAURANT_IMAGES = gql`
     getRestaurantImage(id: $restItemId) {
       name
       url_m
+      url_s
       owner
-      restaurantMenuItem {
-        name
-        price
-        top_choice
-      }
     }
   }
 `;

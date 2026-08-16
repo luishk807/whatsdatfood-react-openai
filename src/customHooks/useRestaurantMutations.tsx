@@ -14,8 +14,11 @@ const useRestaurantMutation = () => {
       loading: restaurantNameLoading,
       error: restaurantNameError,
     },
+    // Cached result shows immediately, then refreshes in the background.
+    // network-only made every repeat search wait on a round trip.
   ] = useLazyQuery(GET_RESTAURANTS_BY_NAME, {
-    fetchPolicy: "network-only",
+    fetchPolicy: "cache-and-network",
+    nextFetchPolicy: "cache-first",
   });
 
   const [
@@ -47,11 +50,19 @@ const useRestaurantMutation = () => {
     return Array.isArray(data) ? data : [];
   };
 
-  const getRestaurantListBySlug = async (slug: string) => {
+  /**
+   * Served from cache by default — a menu costs the backend an AI call when it
+   * is cold. Pass forceNetwork after a write so the change is actually seen.
+   */
+  const getRestaurantListBySlug = async (
+    slug: string,
+    forceNetwork?: boolean,
+  ) => {
     const resp = await GetAiRestaurantBySlug({
       variables: {
         slug,
       },
+      ...(forceNetwork && { fetchPolicy: "network-only" as const }),
     });
 
     const data = _get(resp, "data.aiRestaurantBySlug");
