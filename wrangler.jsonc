@@ -5,6 +5,14 @@
   "name": "whatsdatfood-react-openai",
   "compatibility_date": "2026-08-01",
 
+  // Named explicitly because the deploy token cannot list accounts, and
+  // wrangler otherwise stops to ask which one - after uploading every
+  // asset, which is why the build log ends on a success line.
+  //
+  // Not a secret: an account id identifies, it does not authorise. It is
+  // already public in every R2 bucket URL this account serves.
+  "account_id": "06d6586d0ccf011be8c9da86b943ff40",
+
   "assets": {
     "directory": "./dist",
 
