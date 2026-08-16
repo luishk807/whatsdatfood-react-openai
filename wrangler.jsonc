@@ -1,0 +1,16 @@
+{
+  // Cloudflare deploys this as a Worker serving static assets, which is the
+  // path that replaced Pages for new projects. There is no server-side code
+  // here - the Worker exists only to hand out the built bundle.
+  "name": "whatsdatfood-react-openai",
+  "compatibility_date": "2026-08-01",
+
+  "assets": {
+    "directory": "./dist",
+
+    // Client-side routing. Without this, every deep link and every refresh
+    // away from "/" is a 404 from the edge: the router never runs, because
+    // the host refused the URL before any JavaScript loaded.
+    "not_found_handling": "single-page-application"
+  }
+}
