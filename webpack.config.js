@@ -81,7 +81,10 @@ module.exports = {
     }),
 
     // Everything else in `public/` that the HTML does not reference itself:
-    // the manifest, the icons, and `_redirects` for client-side routing.
+    // the manifest and the icons. Client-side routing is handled by
+    // `not_found_handling` in wrangler.jsonc, not by a `_redirects` file -
+    // Workers validates that file strictly and reads `/* /index.html 200` as a
+    // rule that redirects to itself forever.
     new CopyWebpackPlugin({
       patterns: [
         {
