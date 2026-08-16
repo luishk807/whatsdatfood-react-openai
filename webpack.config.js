@@ -1,11 +1,17 @@
 require("dotenv").config();
 const path = require("path");
 const webpack = require("webpack");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 module.exports = {
   entry: path.resolve(__dirname, "src", "index.tsx"),
   output: {
-    filename: "bundle.js",
+    // Hashed, so a deploy cannot serve last week's JavaScript out of a CDN
+    // cache. The HTML is generated with the right name, so nothing has to
+    // reference these by hand.
+    filename: "[name].[contenthash:8].js",
+    chunkFilename: "[name].[contenthash:8].chunk.js",
     path: path.resolve(__dirname, "dist"),
     publicPath: "/",
     clean: true,
@@ -64,6 +70,26 @@ module.exports = {
       "process.env.REACT_APP_GRAPHQL_BACKEND_URL": JSON.stringify(
         process.env.REACT_APP_GRAPHQL_BACKEND_URL || "",
       ),
+    }),
+
+    // Without this the build emitted JavaScript and no page at all. It worked
+    // locally only because the dev server serves `public/` alongside it; a
+    // static host gets the bundles and nothing to load them.
+    new HtmlWebpackPlugin({
+      template: path.resolve(__dirname, "public", "index.html"),
+      favicon: path.resolve(__dirname, "public", "favicon.ico"),
+    }),
+
+    // Everything else in `public/` that the HTML does not reference itself:
+    // the manifest, the icons, and `_redirects` for client-side routing.
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.resolve(__dirname, "public"),
+          to: path.resolve(__dirname, "dist"),
+          globOptions: { ignore: ["**/index.html", "**/favicon.ico"] },
+        },
+      ],
     }),
   ],
 };
