@@ -15,11 +15,6 @@ export interface ImageInterface {
   alt?: string | null;
 }
 
-export interface MenuItemImageInterface<T> {
-  data: T | null;
-  onImageChange?: (newImage: string) => void;
-}
-
 /** A photo attached to a menu item, as returned nested in the menu query. */
 export type MenuItemPhoto = Partial<RestaurantItemImageType>;
 
@@ -51,10 +46,6 @@ export interface MenuItemType {
   /** "owner" or "ai" — whose answer this is. */
   dietary_source?: string | null;
   restaurant?: RestaurantType;
-}
-
-export interface MenuItemItem {
-  data: MenuItemType;
 }
 
 export interface RestCategoryMenu {
