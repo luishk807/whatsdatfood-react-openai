@@ -40,6 +40,16 @@ export interface MenuItemType {
   /** Distinct people who said they ordered this. */
   order_count?: number;
   ordered_by_me?: boolean;
+  /** Null means nobody has said. Never render that as a reassurance. */
+  is_vegetarian?: boolean | null;
+  is_vegan?: boolean | null;
+  is_gluten_free?: boolean | null;
+  contains_nuts?: boolean | null;
+  contains_shellfish?: boolean | null;
+  contains_dairy?: boolean | null;
+  spice_level?: number | null;
+  /** "owner" or "ai" — whose answer this is. */
+  dietary_source?: string | null;
   restaurant?: RestaurantType;
 }
 

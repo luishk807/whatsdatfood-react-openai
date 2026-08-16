@@ -54,3 +54,19 @@ export const MENU_LABELS = {
   drinkPairingPrice: "Drinking Pairing Price",
   tastingMenuPrice: "Tasting Menu Price",
 } as const;
+
+export const DIETARY_LABELS = {
+  vegetarian: "Vegetarian",
+  vegan: "Vegan",
+  glutenFree: "Gluten free",
+  containsNuts: "Contains nuts",
+  containsShellfish: "Contains shellfish",
+  containsDairy: "Contains dairy",
+  spice: ["", "Mild", "Medium", "Hot"],
+  confirmedByRestaurant: "Confirmed by the restaurant",
+  /**
+   * Shown wherever dietary information appears. Absence of a warning is not a
+   * guarantee, and someone with an allergy needs to be told that plainly.
+   */
+  disclaimer: "Always check with the restaurant if you have an allergy.",
+} as const;

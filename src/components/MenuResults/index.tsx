@@ -34,6 +34,7 @@ import useDishPhotoUpload from "@/customHooks/useDishPhotoUpload";
 import useDishPhotos from "@/customHooks/useDishPhotos";
 import useDishOrders from "@/customHooks/useDishOrders";
 import DishPhotoGallery from "@/components/DishPhotoGallery";
+import DietaryTags from "@/components/DietaryTags";
 import useSnackbarHook from "@/customHooks/useSnackBar";
 import { groupDishesByCategory, getDishPhotoUrl } from "@/utils/dish";
 import {
@@ -343,6 +344,8 @@ const MenuResults: FC = () => {
                 eager
               />
             </div>
+
+            <DietaryTags item={selectedDish} showDisclaimer />
 
             {selectedDish.description && (
               <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">

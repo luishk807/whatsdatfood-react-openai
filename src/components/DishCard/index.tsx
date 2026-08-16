@@ -2,6 +2,7 @@ import { FC, useCallback } from "react";
 import DishPhoto from "@/components/DishPhoto";
 import Badge from "@/components/Badge";
 import VoteButton from "@/components/VoteButton";
+import DietaryTags from "@/components/DietaryTags";
 import { DishCardInterface } from "@/interfaces/ranking";
 import { convertCurrency } from "@/utils/numbers";
 import {
@@ -101,6 +102,8 @@ const DishCard: FC<DishCardInterface> = ({
       <h3 className="text-sm font-semibold leading-snug text-neutral-900 dark:text-neutral-100">
         {item.name}
       </h3>
+
+      <DietaryTags item={item} />
 
       {/* Popularity, kept separate from the vote-based ranking so neither
           signal hides behind the other. */}

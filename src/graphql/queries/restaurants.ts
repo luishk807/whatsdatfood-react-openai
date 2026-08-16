@@ -72,6 +72,14 @@ export const GET_RESTAURANT_BY_SLUG = gql`
         category
         order_count
         ordered_by_me
+        is_vegetarian
+        is_vegan
+        is_gluten_free
+        contains_nuts
+        contains_shellfish
+        contains_dairy
+        spice_level
+        dietary_source
         ratings {
           id
           rating
