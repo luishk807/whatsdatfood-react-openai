@@ -5,6 +5,7 @@ import { Routes, Route } from "react-router-dom";
 import "./App.css";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Loading from "@/components/Loading";
+import { ROUTES } from "@/customConstants/routes";
 const LazyHomepage = lazy(() => import("@/components/Homepage"));
 const LazyResult = lazy(() => import("@/components/MenuResults"));
 const LazyNotFound = lazy(() => import("@/components/NotFound"));
@@ -29,7 +30,7 @@ function App() {
     <div className="App">
       <Routes>
         <Route
-          path="/sign-in"
+          path={ROUTES.signIn}
           element={
             <Suspense fallback={<Loading style={customStyle} />}>
               <Layout>
@@ -39,7 +40,7 @@ function App() {
           }
         />
         <Route
-          path="/create-account"
+          path={ROUTES.createAccount}
           element={
             <Suspense fallback={<Loading style={customStyle} />}>
               <Layout>
@@ -49,7 +50,7 @@ function App() {
           }
         />
         <Route
-          path="/logout"
+          path={ROUTES.logout}
           element={
             <Suspense fallback={<Loading style={customStyle} />}>
               <Layout>
@@ -61,7 +62,7 @@ function App() {
 
         <Route element={<ProtectedRoute />}>
           <Route
-            path="/account"
+            path={ROUTES.account}
             element={
               <Suspense fallback={<Loading style={customStyle} />}>
                 <Layout>
@@ -73,7 +74,7 @@ function App() {
             }
           />
           <Route
-            path="/friends"
+            path={ROUTES.friends}
             element={
               <Suspense fallback={<Loading style={customStyle} />}>
                 <Layout>
@@ -85,7 +86,7 @@ function App() {
             }
           />
           <Route
-            path="/settings"
+            path={ROUTES.settings}
             element={
               <Suspense fallback={<Loading style={customStyle} />}>
                 <Layout>
@@ -97,7 +98,7 @@ function App() {
             }
           />
           <Route
-            path="/ratings"
+            path={ROUTES.ratings}
             element={
               <Suspense fallback={<Loading style={customStyle} />}>
                 <Layout>
@@ -109,7 +110,7 @@ function App() {
             }
           />
           <Route
-            path="/history"
+            path={ROUTES.history}
             element={
               <Suspense fallback={<Loading style={customStyle} />}>
                 <Layout>
@@ -121,7 +122,7 @@ function App() {
             }
           />
           <Route
-            path="/favorites"
+            path={ROUTES.favorites}
             element={
               <Suspense fallback={<Loading style={customStyle} />}>
                 <Layout>
@@ -132,27 +133,30 @@ function App() {
               </Suspense>
             }
           />
-          <Route
-            path="/menu-results/:restaurant"
-            element={
-              <Suspense fallback={<Loading style={customStyle} />}>
-                <Layout>
-                  <LazyResult />
-                </Layout>
-              </Suspense>
-            }
-          />
-          <Route
-            path="/"
-            element={
-              <Suspense fallback={<Loading style={customStyle} />}>
-                <Layout>
-                  <LazyHomepage />
-                </Layout>
-              </Suspense>
-            }
-          />
         </Route>
+
+        {/* Browsing is public. A visitor can search and read a menu before
+            signing up; voting and reviewing still prompt for a session. */}
+        <Route
+          path={ROUTES.menuResults}
+          element={
+            <Suspense fallback={<Loading style={customStyle} />}>
+              <Layout>
+                <LazyResult />
+              </Layout>
+            </Suspense>
+          }
+        />
+        <Route
+          path={ROUTES.home}
+          element={
+            <Suspense fallback={<Loading style={customStyle} />}>
+              <Layout>
+                <LazyHomepage />
+              </Layout>
+            </Suspense>
+          }
+        />
 
         <Route
           path="*"

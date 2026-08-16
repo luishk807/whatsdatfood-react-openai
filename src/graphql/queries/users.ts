@@ -46,13 +46,13 @@ export const DELETE_USER_FRIEND = gql`
 
 export const DELETE_USER_FAVORITES = gql`
   mutation deleteUserFavorites($payload: ID!) {
-    deleteUserRating(id: $payload)
+    deleteUserFavorites(id: $payload)
   }
 `;
 
 export const UPDATE_USER_MUTATION = gql`
   mutation updateUser($payload: UpdateUserInput!) {
-    addUser(input: $payload) {
+    updateUser(input: $payload) {
       first_name
       last_name
       phone

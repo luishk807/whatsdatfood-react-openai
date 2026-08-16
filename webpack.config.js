@@ -53,17 +53,16 @@ module.exports = {
     port: 3000,
     hot: true,
   },
-  mode: "development",
   plugins: [
+    // NODE_ENV is deliberately not defined here: webpack's `mode` already
+    // defines it, and defining it twice made the two collide so React was
+    // bundled in development mode even for a production build.
     new webpack.DefinePlugin({
       "process.env.REACT_APP_BACKEND_URL": JSON.stringify(
         process.env.REACT_APP_BACKEND_URL || "",
       ),
       "process.env.REACT_APP_GRAPHQL_BACKEND_URL": JSON.stringify(
         process.env.REACT_APP_GRAPHQL_BACKEND_URL || "",
-      ),
-      "process.env.NODE_ENV": JSON.stringify(
-        process.env.NODE_ENV || "development",
       ),
     }),
   ],

@@ -13,9 +13,25 @@ export const GET_RESTAURANTS_BY_NAME = gql`
   }
 `;
 
+/**
+ * Ratings are selected alongside the dish so a vote can be written straight
+ * into the normalised cache without refetching the whole menu.
+ */
+export const MENU_ITEM_RATINGS_FRAGMENT = gql`
+  fragment MenuItemRatings on RestaurantMenuItem {
+    id
+    ratings {
+      id
+      rating
+      user_id
+    }
+  }
+`;
+
 export const GET_RESTAURANT_BY_SLUG = gql`
   query getRestaurantBySlug($slug: String) {
     aiRestaurantBySlug(slug: $slug) {
+      slug
       name
       address
       city
@@ -54,10 +70,15 @@ export const GET_RESTAURANT_BY_SLUG = gql`
         price
         category
         ratings {
+          id
           rating
+          user_id
         }
         images {
           name
+          url_m
+          url_s
+          owner
         }
       }
     }

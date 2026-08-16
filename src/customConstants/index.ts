@@ -1,3 +1,5 @@
+import { ROUTES } from "@/customConstants/routes";
+
 export const DEFAULT_CURRENCY = {
   code: "en-US",
   name: "USD",
@@ -37,40 +39,40 @@ export const ACCOUNT_TYPE = {
 
 export const LOGOUT_MENU = {
   name: "Logout",
-  url: "/logout",
+  url: ROUTES.logout,
 };
 
 export const DROPDOWN_MENU = {
   "1": [
     {
       name: "Setting",
-      url: "/settings",
+      url: ROUTES.settings,
     },
     {
       name: "Friends",
-      url: "/friends",
+      url: ROUTES.friends,
     },
     {
       name: "Ratings",
-      url: "/ratings",
+      url: ROUTES.ratings,
     },
     {
       name: "History",
-      url: "/history",
+      url: ROUTES.history,
     },
     {
       name: "Favorites",
-      url: "/favorites",
+      url: ROUTES.favorites,
     },
   ],
   "3": [
     {
       name: "Sign In",
-      url: "/sign-in",
+      url: ROUTES.signIn,
     },
     {
       name: "Create Account",
-      url: "/create-account",
+      url: ROUTES.createAccount,
     },
   ],
 };

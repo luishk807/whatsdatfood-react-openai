@@ -6,7 +6,7 @@ export interface MenuTitleInterface {
 }
 
 export interface MenuItemInterface {
-  item: MenuInterfaceItemType;
+  item: MenuItemType;
   restaurant?: RestaurantType | null;
 }
 
@@ -20,6 +20,13 @@ export interface MenuItemImageInterface<T> {
   onImageChange?: (newImage: string) => void;
 }
 
+/** A photo attached to a menu item, as returned nested in the menu query. */
+export type MenuItemPhoto = Partial<RestaurantItemImageType>;
+
+/**
+ * The canonical dish shape. Fields are optional because that is what the API
+ * actually guarantees — a dish may have no photo, no price and no votes.
+ */
 export interface MenuItemType {
   id?: number;
   name: string;
@@ -28,7 +35,9 @@ export interface MenuItemType {
   top_choice: boolean;
   price?: number;
   image?: string;
+  images?: MenuItemPhoto[];
   ratings?: UserRating[];
+  restaurant?: RestaurantType;
 }
 
 export interface MenuItemItem {
@@ -91,15 +100,14 @@ export interface RestaurantItemImageType {
   restaurantItem?: MenuItemType;
 }
 
-export interface MenuInterfaceItemType {
+/**
+ * A dish once we know it came from the database and carries a photo — narrows
+ * MenuItemType rather than restating it, so the two cannot drift apart again.
+ */
+export interface MenuInterfaceItemType extends MenuItemType {
   id: number;
-  name: string;
-  category: string;
-  description: string;
-  top_choice: boolean;
   image: string;
   price: number;
-  restaurant?: RestaurantType;
 }
 
 export interface ShowRestaurantDetailI {

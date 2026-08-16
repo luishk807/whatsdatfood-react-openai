@@ -4,7 +4,7 @@ import { _get, getBuiltAddress } from "@/utils";
 import { convertCurrency } from "@/utils/numbers";
 import { MenuItemInterface } from "@/interfaces/restaurants";
 import { SendFriendModalData } from "@/interfaces";
-import { MenuInterfaceItemType } from "@/interfaces/restaurants";
+import { MenuItemType } from "@/interfaces/restaurants";
 import MenuItemImage from "@/components/MenuItemImage";
 import MenuItemTitle from "@/components/MenuItemTitle";
 import "./index.css";
@@ -71,7 +71,7 @@ const MenuItem: FC<MenuItemInterface> = ({ item, restaurant }) => {
         <MenuItemTitle data={item} />
       </Grid>
       <Grid size={{ xs: 12, md: 2 }} className="item-menu-item-img">
-        <MenuItemImage<MenuInterfaceItemType>
+        <MenuItemImage<MenuItemType>
           data={item}
           onImageChange={handleUpdateImage}
         />
@@ -88,14 +88,14 @@ const MenuItem: FC<MenuItemInterface> = ({ item, restaurant }) => {
               >
                 <MenuItemTitle data={item} />
               </Grid>
-              {showPrice && (
+              {showPrice && item.price !== undefined && item.price !== null && (
                 <Grid
                   size={{ xs: 12, md: 2 }}
                   display="flex"
                   justifyContent={{ xs: "center", md: "end" }}
                   className="item-menu-item-price"
                 >
-                  {convertCurrency(item.price)}
+                  {convertCurrency(Number(item.price))}
                 </Grid>
               )}
             </Grid>

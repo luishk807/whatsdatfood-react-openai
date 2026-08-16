@@ -6,6 +6,14 @@ import {
   RATING_TYPE,
   UserFriendSectionWindows,
 } from "@/customConstants";
+import { VOTE } from "@/customConstants/ranking";
+import { IMAGE_SOURCE, BADGE_TONE } from "@/customConstants/images";
+
+export type VoteValue = (typeof VOTE)[keyof typeof VOTE];
+
+export type ImageSourceType = (typeof IMAGE_SOURCE)[keyof typeof IMAGE_SOURCE];
+
+export type BadgeToneType = (typeof BADGE_TONE)[keyof typeof BADGE_TONE];
 
 export type FieldTypes = (typeof FIELD_TYPES)[keyof typeof FIELD_TYPES];
 
