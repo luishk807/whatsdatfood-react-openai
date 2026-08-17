@@ -163,16 +163,26 @@ describe("getTopDishes", () => {
     ]);
   });
 
-  it("falls back to the AI top_choice flag when nothing is voted on yet", () => {
+  it("ignores the AI top_choice flag entirely", () => {
+    // It used to fill the strip from this flag under the heading "Popular
+    // picks · not yet voted on". A dish nobody has voted on is not a popular
+    // pick, and saying so spends the credibility the real ranking needs.
     const items = [
       dish(1, "Suggested", [], { top_choice: true }),
       dish(2, "Ordinary"),
     ];
 
-    expect(getTopDishes(items).map((item) => item.name)).toEqual(["Suggested"]);
+    expect(getTopDishes(items)).toEqual([]);
   });
 
-  it("returns nothing when there are neither votes nor suggestions", () => {
+  it("still ignores it when the flagged dish has a vote or two", () => {
+    // One vote short of the threshold is still not a recommendation.
+    const items = [dish(1, "Suggested", [5, 5], { top_choice: true })];
+
+    expect(getTopDishes(items)).toEqual([]);
+  });
+
+  it("returns nothing when no dish has cleared the threshold", () => {
     expect(getTopDishes([dish(1, "A"), dish(2, "B")])).toEqual([]);
   });
 

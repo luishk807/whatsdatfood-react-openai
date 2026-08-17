@@ -37,7 +37,15 @@ import DishPhotoGallery from "@/components/DishPhotoGallery";
 import DishRecommendation from "@/components/DishRecommendation";
 import DietaryTags from "@/components/DietaryTags";
 import useSnackbarHook from "@/customHooks/useSnackBar";
-import { groupDishesByCategory, getDishPhotoUrl } from "@/utils/dish";
+import {
+  groupDishesByCategory,
+  getDishPhotoUrl,
+  sectionId,
+  TOP_SECTION_ID,
+} from "@/utils/dish";
+import CategoryNav from "@/components/CategoryNav";
+import useActiveSection from "@/customHooks/useActiveSection";
+import { MenuSection } from "@/interfaces/ranking";
 import {
   MENU_LABELS,
   RANKING_LABELS,
@@ -108,13 +116,39 @@ const MenuResults: FC = () => {
     [dishes],
   );
 
-  const { scores, topDishes, isRanked } = useDishRanking(dishes);
+  // isRanked is no longer read here: topDishes is empty unless something has
+  // been ranked, so the strip's own presence is the signal.
+  const { scores, topDishes } = useDishRanking(dishes);
   const { votes, submitVote, canVote } = useDishVotes(dishes);
 
   const categories = useMemo(
     () => Object.keys(restaurantMenu),
     [restaurantMenu],
   );
+
+  /** Jump targets for the sticky bar: the strip when it exists, then sections. */
+  const sections = useMemo<MenuSection[]>(
+    () => [
+      ...(topDishes.length
+        ? [{ id: TOP_SECTION_ID, label: RANKING_LABELS.topStripNav }]
+        : []),
+      ...categories.map((category) => ({
+        id: sectionId(category),
+        label: category,
+      })),
+    ],
+    [topDishes.length, categories],
+  );
+
+  const activeSection = useActiveSection(
+    useMemo(() => sections.map((section) => section.id), [sections]),
+  );
+
+  const handleJump = (id: string) => {
+    document
+      .getElementById(id)
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   const handleDishVisible = (item: MenuItemType) => lookup(item?.id);
 
@@ -285,27 +319,43 @@ const MenuResults: FC = () => {
         />
 
         <div className="w-full">
-          <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 pb-16 pt-4">
-            <TopDishStrip
-              items={topDishes}
-              scores={scores}
-              votes={votes}
-              canVote={canVote}
-              onVote={handleVote}
-              onOpen={handleOpenDish}
-              onVisible={handleDishVisible}
-              onAddPhoto={handleAddPhoto}
-              uploadingDishId={uploadingDishId}
-              dinerCount={dinerCount}
-              title={
-                isRanked
-                  ? RANKING_LABELS.topStripTitle
-                  : RANKING_LABELS.suggestedTitle
-              }
+          <div className="mx-auto w-full max-w-5xl px-4">
+            <CategoryNav
+              sections={sections}
+              activeId={activeSection}
+              onJump={handleJump}
             />
+          </div>
+
+          <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 pb-16 pt-4">
+            {/* Only when it has been earned. There is no heading here at all
+                until some dish clears the vote threshold - a recommendation
+                section that appears before it can recommend anything reprints
+                the top of the menu directly above the menu. */}
+            {topDishes.length > 0 && (
+              <TopDishStrip
+                id={TOP_SECTION_ID}
+                items={topDishes}
+                scores={scores}
+                votes={votes}
+                canVote={canVote}
+                onVote={handleVote}
+                onOpen={handleOpenDish}
+                onVisible={handleDishVisible}
+                onAddPhoto={handleAddPhoto}
+                uploadingDishId={uploadingDishId}
+                dinerCount={dinerCount}
+              />
+            )}
 
             {categories.map((category) => (
-              <section key={category} className="flex flex-col gap-3">
+              <section
+                key={category}
+                id={sectionId(category)}
+                // Clears the sticky bar, which would otherwise cover the
+                // heading of whichever section was just jumped to.
+                className="flex scroll-mt-16 flex-col gap-3"
+              >
                 {/* Left-aligned with the grid, and counted. Centred headings
                     over a long menu give the eye nothing to run down. */}
                 <div className="flex items-baseline justify-between gap-3 border-b border-line pb-2">

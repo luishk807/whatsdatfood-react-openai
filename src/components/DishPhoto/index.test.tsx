@@ -41,7 +41,7 @@ describe("DishPhoto", () => {
     expect(screen.queryByText(DISH_LABELS.addPhoto)).not.toBeInTheDocument();
 
     rerender(<DishPhoto onAddPhoto={jest.fn()} />);
-    expect(screen.getByText(DISH_LABELS.addPhoto)).toBeInTheDocument();
+    expect(screen.getByText(DISH_LABELS.addPhotoShort)).toBeInTheDocument();
     expect(pickerFor(container)).toBeInTheDocument();
   });
 

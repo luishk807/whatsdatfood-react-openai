@@ -57,3 +57,40 @@ export const groupDishesByCategory = (
     acc[category] = acc[category] ? [...acc[category], item] : [item];
     return acc;
   }, {});
+
+/**
+ * A dish's price, or null when the menu did not give one.
+ *
+ * Menus arrive from an AI extraction that leaves price null or zero often
+ * enough that this is a normal case. Running that through a currency formatter
+ * printed `$0.00` on most of the menu, which does not read as missing data — it
+ * reads as a claim that the dish is free.
+ *
+ * Zero is treated as absent rather than free. A genuinely free item is rare
+ * enough, and mislabelling one as unpriced is a far smaller error than telling
+ * someone a $180 omakase costs nothing.
+ */
+export const dishPrice = (item: MenuItemType): number | null => {
+  const price = Number(item?.price);
+
+  if (!Number.isFinite(price) || price <= 0) {
+    return null;
+  }
+
+  return price;
+};
+
+/** The anchor id for the "most loved here" strip. */
+export const TOP_SECTION_ID = "menu-top-dishes";
+
+/**
+ * A DOM id for a category heading, so the sticky nav can jump to it.
+ *
+ * Categories come from an AI extraction and arrive as free text - "Small
+ * Plates", "Chef's Choice (Omakase)" - so they cannot be used as ids directly.
+ */
+export const sectionId = (category: string): string =>
+  `menu-section-${category
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")}`;

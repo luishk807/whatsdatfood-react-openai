@@ -25,6 +25,7 @@ const VoteButton: FC<VoteButtonInterface> = ({
   upCount,
   disabled,
   compact,
+  metric,
   onVote,
 }) => {
   const handleVote = (next: VoteValue) => () => onVote && onVote(next);
@@ -40,14 +41,24 @@ const VoteButton: FC<VoteButtonInterface> = ({
         disabled={disabled}
         onClick={handleVote(VOTE.up)}
         className={clsx(
-          "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs transition-colors disabled:opacity-40 motion-reduce:transition-none",
+          "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 transition-colors disabled:opacity-40 motion-reduce:transition-none",
+          // A dish with a real number carries it in brand weight, because that
+          // number is the answer to "what should I order". A dish with nothing
+          // to show stays quiet rather than printing a zero.
+          metric ? "text-sm font-semibold" : "text-xs",
           recommended
             ? "border-brand bg-brand-soft text-brand"
-            : "border-line text-ink-muted hover:border-brand hover:text-brand",
+            : metric
+              ? "border-line text-brand hover:border-brand"
+              : "border-line text-ink-muted hover:border-brand hover:text-brand",
         )}
       >
-        <ThumbUpAltOutlinedIcon sx={{ fontSize: 14 }} />
-        {!!upCount && <span className="tabular-nums">{upCount}</span>}
+        <ThumbUpAltOutlinedIcon sx={{ fontSize: metric ? 15 : 14 }} />
+        {metric ? (
+          <span className="tabular-nums">{metric}</span>
+        ) : (
+          !!upCount && <span className="tabular-nums text-xs">{upCount}</span>
+        )}
       </button>
     );
   }

@@ -128,6 +128,20 @@
   }
 }
 
+/* A horizontal strip of dishes is swiped on a phone, where no scrollbar is
+   drawn anyway. On desktop the bar rendered as a wide grey desktop UI control
+   under the food, which is the wrong affordance entirely - a partly visible next
+   card and an arrow say "this scrolls" without drawing a widget. The content
+   still scrolls, and still keyboard-scrolls; only the bar is hidden. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

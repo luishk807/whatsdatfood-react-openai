@@ -1,10 +1,17 @@
 export const DISH_LABELS = {
   noPhoto: "No photo yet",
   addPhoto: "Add the first photo",
+  /** Short form for the card, where the tile is small and quiet. */
+  addPhotoShort: "Add a photo",
   photoFailed: "Photo unavailable",
   stockPhoto: "Stock photo",
   communityPhoto: "Community photo",
-  popularUnverified: "Popular",
+  /**
+   * No price at all rather than a fabricated one. Menus routinely arrive
+   * without prices, and formatting a missing number as $0.00 tells the reader
+   * the dish is free.
+   */
+  priceUnavailable: "—",
   recommend: "Recommend",
   recommended: "Recommended",
   voteUp: "Would order again",
@@ -43,8 +50,16 @@ export const ORDER_LABELS = {
 
 export const RANKING_LABELS = {
   topStripTitle: "Most loved here",
-  /** Used while the strip is AI suggestions rather than real votes. */
-  suggestedTitle: "Popular picks · not yet voted on",
+  /**
+   * The badge on a ranked dish inside the category grid. Short because it sits
+   * over a photograph next to the stock-photo disclosure, and the full heading
+   * collided with it on a narrow card.
+   */
+  topBadge: "Most loved",
+  /** Says whose opinion this is, so the heading is not just a superlative. */
+  topStripSubtitle: "What diners recommend most",
+  /** The chip that jumps back up to the strip. */
+  topStripNav: "Most loved",
   notEnoughVotes: "Not enough votes yet",
   /** Vote counts read honestly rather than as a rank while data is thin. */
   voteCount: (count: number) =>

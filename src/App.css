@@ -1,6 +1,9 @@
-.App {
-  text-align: center;
-}
+/* `.App { text-align: center }` used to live here - Create React App's default,
+   inherited by the entire tree. It kept surfacing as a bug rather than a style:
+   the restaurant name and the "Most loved here" heading both centred themselves
+   the moment they sat in a full-width block, and it was invisible until then
+   because a flex item shrink-wraps to its text. Alignment is a per-component
+   decision now, set with Tailwind where it is wanted. */
 html,
 body {
   height: 100%;

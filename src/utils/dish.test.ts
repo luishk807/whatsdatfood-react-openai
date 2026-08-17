@@ -4,6 +4,9 @@ import {
   getDishPhotoSource,
   normalizeCategory,
   groupDishesByCategory,
+  dishPrice,
+  sectionId,
+  TOP_SECTION_ID,
 } from "@/utils/dish";
 import { IMAGE_SOURCE } from "@/customConstants/images";
 import { MenuItemType, MenuItemPhoto } from "@/interfaces/restaurants";
@@ -109,5 +112,66 @@ describe("groupDishesByCategory", () => {
       "First",
       "Second",
     ]);
+  });
+});
+
+describe("dishPrice", () => {
+  it("returns the price when the menu gave one", () => {
+    expect(dishPrice(dish("Steak", "Mains", { price: 42.5 }))).toBe(42.5);
+  });
+
+  it("treats a missing price as missing", () => {
+    expect(dishPrice(dish("Steak", "Mains"))).toBeNull();
+    expect(dishPrice(dish("Steak", "Mains", { price: undefined }))).toBeNull();
+    expect(
+      dishPrice(dish("Steak", "Mains", { price: null as unknown as number })),
+    ).toBeNull();
+  });
+
+  it("treats zero as missing rather than free", () => {
+    // The AI extraction leaves price at zero across most of a menu. Formatting
+    // that as $0.00 told the reader a $180 omakase was free.
+    expect(dishPrice(dish("Omakase", "Sushi", { price: 0 }))).toBeNull();
+  });
+
+  it("refuses a price that is not a number", () => {
+    expect(
+      dishPrice(dish("Steak", "Mains", { price: "market" as unknown as number })),
+    ).toBeNull();
+    expect(
+      dishPrice(dish("Steak", "Mains", { price: NaN as unknown as number })),
+    ).toBeNull();
+  });
+
+  it("refuses a negative price", () => {
+    expect(dishPrice(dish("Steak", "Mains", { price: -5 }))).toBeNull();
+  });
+});
+
+describe("sectionId", () => {
+  it("makes a usable id from a category name", () => {
+    expect(sectionId("Appetizers")).toBe("menu-section-appetizers");
+  });
+
+  it("survives the punctuation an AI-extracted menu actually contains", () => {
+    // Real categories from the dataset: "Chef's Choice (Omakase)", "Small
+    // Plates". These cannot be used as DOM ids directly.
+    expect(sectionId("Chef's Choice (Omakase)")).toBe(
+      "menu-section-chef-s-choice-omakase",
+    );
+    expect(sectionId("Small Plates")).toBe("menu-section-small-plates");
+  });
+
+  it("leaves no leading or trailing separator", () => {
+    expect(sectionId("  Sides  ")).toBe("menu-section-sides");
+    expect(sectionId("(Specials)")).toBe("menu-section-specials");
+  });
+
+  it("does not collide with the top-dish anchor", () => {
+    expect(sectionId("Top Dishes")).not.toBe(TOP_SECTION_ID);
+  });
+
+  it("gives two different categories two different ids", () => {
+    expect(sectionId("Appetizer")).not.toBe(sectionId("Appetizers"));
   });
 });

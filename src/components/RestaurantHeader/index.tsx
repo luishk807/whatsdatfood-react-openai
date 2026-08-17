@@ -46,51 +46,57 @@ const RestaurantHeader: FC<RestaurantHeaderInterface> = ({
 
   return (
     <div className="w-full border-b border-line bg-surface">
-      <div className="mx-auto w-full max-w-5xl px-4 pb-4 pt-2">
-        <button
-          type="button"
-          onClick={goBack}
-          aria-label={VENUE_LABELS.back}
-          className="-ml-2 mb-1 flex h-10 w-10 items-center justify-center rounded-full text-ink-muted hover:text-ink"
-        >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden="true"
+      {/* Tight on purpose. Someone arrives here from a search, wanting the
+          menu; the restaurant's identity has to be unambiguous and then get out
+          of the way. The back arrow used to own a row to itself, which pushed
+          the first dish most of a screen further down. */}
+      <div className="mx-auto w-full max-w-5xl px-4 pb-3 pt-2">
+        <div className="flex w-full items-start gap-1">
+          <button
+            type="button"
+            onClick={goBack}
+            aria-label={VENUE_LABELS.back}
+            className="-ml-2 flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-ink-muted hover:text-ink"
           >
-            <path d="M15 18l-6-6 6-6" />
-          </svg>
-        </button>
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          </button>
 
-        <div className="flex w-full items-start justify-between gap-4">
-          <h1 className="text-xl font-semibold leading-tight tracking-tight text-ink sm:text-2xl">
-            {restaurant?.name}
-          </h1>
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl font-semibold leading-tight tracking-tight text-ink sm:text-2xl">
+              {restaurant?.name}
+            </h1>
+
+            <p className="mt-0.5 text-sm text-ink-muted">
+              {meta.join(" · ")}
+              {showDetails && (
+                <>
+                  {meta.length > 0 && " · "}
+                  <button
+                    type="button"
+                    onClick={onOpenDetails}
+                    className="underline underline-offset-2 hover:text-ink"
+                  >
+                    {VENUE_LABELS.details}
+                  </button>
+                </>
+              )}
+            </p>
+          </div>
 
           {action && <div className="shrink-0">{action}</div>}
         </div>
-
-        <p className="mt-1 text-sm text-ink-muted">
-          {meta.join(" · ")}
-          {showDetails && (
-            <>
-              {meta.length > 0 && " · "}
-              <button
-                type="button"
-                onClick={onOpenDetails}
-                className="underline underline-offset-2 hover:text-ink"
-              >
-                {VENUE_LABELS.details}
-              </button>
-            </>
-          )}
-        </p>
       </div>
     </div>
   );

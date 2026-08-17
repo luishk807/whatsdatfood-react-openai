@@ -52,6 +52,13 @@ export interface VoteButtonInterface {
   disabled?: boolean;
   /** One control on a card; both on the detail sheet, where there is room. */
   compact?: boolean;
+  /**
+   * The number worth reading beside the thumb — "94%" once a dish has enough
+   * votes to have a share, otherwise the raw count. Voting is the product's
+   * ranking mechanism, so on a card this is information first and a control
+   * second; a bare pale icon in the corner said nothing at all.
+   */
+  metric?: string;
   onVote?: (value: VoteValue) => void;
 }
 
@@ -70,6 +77,12 @@ export interface DishCardInterface {
   uploadingDishId?: number | null;
   /** Denominator for the order share, from the restaurant. */
   dinerCount?: number;
+  /**
+   * Suppresses the "most loved" badge. Inside the strip of most-loved dishes the
+   * badge repeats the section heading on every card, and stacks on top of the
+   * stock-photo disclosure in the same corner.
+   */
+  hideRankBadge?: boolean;
 }
 
 export interface DishGridInterface
@@ -84,6 +97,9 @@ export interface DishGridInterface
 export interface TopDishStripInterface
   extends Omit<DishGridInterface, "eagerCount"> {
   title?: string;
+  subtitle?: string;
+  /** Anchor for the sticky category bar to jump to. */
+  id?: string;
 }
 
 /**
@@ -107,4 +123,18 @@ export interface PhotoWallInterface {
   loading?: boolean;
   /** How many tiles skip lazy loading; the rest are below the fold. */
   eagerCount?: number;
+}
+
+/** One jump target in the sticky category bar. */
+export interface MenuSection {
+  /** Stable id used for the anchor and for scroll tracking. */
+  id: string;
+  label: string;
+}
+
+export interface CategoryNavInterface {
+  sections: MenuSection[];
+  /** Which section the reader is currently inside. */
+  activeId?: string | null;
+  onJump: (id: string) => void;
 }

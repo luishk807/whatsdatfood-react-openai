@@ -92,8 +92,15 @@ export const buildDishScores = (items: MenuItemType[]): DishScoreMap => {
 
 /**
  * Dishes for the "most loved here" strip. Only dishes with enough votes to be
- * ranked honestly qualify; when none do we fall back to the AI's top_choice
- * flag, which the UI labels as unverified so it never reads as a real ranking.
+ * ranked honestly qualify — and when none do, this is empty and the strip does
+ * not render.
+ *
+ * It used to fall back to the AI's `top_choice` flag under the heading
+ * "Popular picks · not yet voted on", which is a contradiction: a dish nobody
+ * has voted on is not a popular pick. It also reprinted the top of the menu
+ * directly above the menu, so the first two screens were the same dishes
+ * twice. A recommendation section that appears before it has anything to
+ * recommend spends the credibility that the real ranking needs.
  */
 export const getTopDishes = (
   items: MenuItemType[],
@@ -101,18 +108,13 @@ export const getTopDishes = (
 ): MenuItemType[] => {
   const restaurantMean = getRestaurantMean(items);
 
-  const ranked = items
+  return items
     .filter((item) => getVoteCount(item) >= RANKING.MIN_VOTES_TO_RANK)
     .sort(
       (a, b) =>
         scoreDish(b, restaurantMean).score - scoreDish(a, restaurantMean).score,
-    );
-
-  if (ranked.length) {
-    return ranked.slice(0, size);
-  }
-
-  return items.filter((item) => item.top_choice).slice(0, size);
+    )
+    .slice(0, size);
 };
 
 /** True once any dish has cleared the vote threshold. */

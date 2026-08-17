@@ -1,14 +1,10 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import DishCard from "@/components/DishCard";
 import { MenuItemType, MenuItemPhoto } from "@/interfaces/restaurants";
 import { DishScore } from "@/interfaces/ranking";
 import { VOTE, RANKING } from "@/customConstants/ranking";
-import {
-  DISH_LABELS,
-  RANKING_LABELS,
-  RECOMMEND_LABELS,
-} from "@/customConstants/labels";
+import { DISH_LABELS, RANKING_LABELS } from "@/customConstants/labels";
 
 const photo = (url: string): MenuItemPhoto => ({ url_m: url }) as MenuItemPhoto;
 
@@ -48,11 +44,13 @@ describe("DishCard", () => {
   it("shows a vote count instead of a rank while votes are thin", () => {
     render(<DishCard item={dish()} score={score({ voteCount: 3 })} />);
 
+    // The count is on the thumb now, but the rule is unchanged: below the
+    // threshold a dish gets a number, never a rank.
     expect(
-      screen.getByText(RANKING_LABELS.voteCount(3)),
-    ).toBeInTheDocument();
+      screen.getByRole("button", { name: DISH_LABELS.recommend }),
+    ).toHaveTextContent("3");
     expect(
-      screen.queryByText(RANKING_LABELS.topStripTitle),
+      screen.queryByText(RANKING_LABELS.topBadge),
     ).not.toBeInTheDocument();
   });
 
@@ -64,15 +62,19 @@ describe("DishCard", () => {
       />,
     );
 
-    expect(screen.getByText(RANKING_LABELS.topStripTitle)).toBeInTheDocument();
+    expect(screen.getByText(RANKING_LABELS.topBadge)).toBeInTheDocument();
   });
 
-  it("marks an AI suggestion as unverified rather than ranked", () => {
+  it("does not badge an AI suggestion as popular at all", () => {
+    // It used to badge this "Popular". A dish nobody has voted on is not
+    // popular, and the badge was appearing on the same page whose heading said
+    // there were no votes yet.
     render(<DishCard item={dish({ top_choice: true })} />);
 
     expect(
-      screen.getByText(DISH_LABELS.popularUnverified),
-    ).toBeInTheDocument();
+      screen.queryByText(RANKING_LABELS.topBadge),
+    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Popular")).not.toBeInTheDocument();
   });
 
   it("renders the photo when the menu carried one", () => {
@@ -98,7 +100,7 @@ describe("DishCard", () => {
     // than a "no photo" apology - a menu with few photos was otherwise a
     // screen of identical grey boxes saying nothing useful.
     expect(
-      screen.getByRole("button", { name: DISH_LABELS.addPhoto }),
+      screen.getByRole("button", { name: DISH_LABELS.addPhotoShort }),
     ).toBeInTheDocument();
     expect(screen.queryByText(DISH_LABELS.noPhoto)).not.toBeInTheDocument();
 
@@ -172,8 +174,9 @@ describe("DishCard", () => {
   });
 
   it("shows the recommend share once enough people have voted", () => {
-    // The same metric the strip and the detail sheet use, so the product
-    // answers one question one way.
+    // On the thumb rather than as its own sentence. Voting is the ranking
+    // mechanism, so the number belongs on the control that produces it - a pale
+    // icon in the corner of the card said nothing at all.
     const item = dish({
       ratings: [5, 5, 5, 5, 1].map((rating, index) => ({
         id: `${index}`,
@@ -184,7 +187,25 @@ describe("DishCard", () => {
 
     render(<DishCard item={item} />);
 
-    expect(screen.getByText(RECOMMEND_LABELS.share(80))).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: DISH_LABELS.recommend }),
+    ).toHaveTextContent("80%");
+  });
+
+  it("shows a bare count rather than a share while votes are thin", () => {
+    // The threshold is the whole point: "100% recommend" from one person is a
+    // lie with a number attached.
+    render(
+      <DishCard
+        item={dish()}
+        score={{ id: 1, score: 4, average: 4, voteCount: 2, isRanked: false }}
+      />,
+    );
+
+    const vote = screen.getByRole("button", { name: DISH_LABELS.recommend });
+
+    expect(vote).toHaveTextContent("2");
+    expect(vote).not.toHaveTextContent("%");
   });
 
   it("says how many people have voted", () => {
@@ -206,5 +227,120 @@ describe("DishCard", () => {
     await userEvent.click(screen.getByRole("button", { name: "Single Steak" }));
 
     expect(onOpen).toHaveBeenCalledWith(item);
+  });
+
+  it("never prints a fabricated price", () => {
+    // The AI extraction leaves price at zero across most of a menu, and
+    // formatting that as $0.00 told the reader a $180 omakase was free.
+    render(<DishCard item={dish({ price: 0 })} />);
+
+    expect(screen.getByText(DISH_LABELS.priceUnavailable)).toBeInTheDocument();
+    expect(screen.queryByText(/\$0\.00/)).not.toBeInTheDocument();
+  });
+
+  it("prints a real price", () => {
+    render(<DishCard item={dish({ price: 42 })} />);
+
+    expect(screen.getByText("$42.00")).toBeInTheDocument();
+  });
+
+  it("stops opening the detail sheet once the photo turns out to be broken", () => {
+    // The tile had a URL, so it rendered inside the open-the-sheet button. When
+    // the host 403s it becomes an empty tile carrying the upload button, and the
+    // browser reported a button nested inside a button.
+    const onOpen = jest.fn();
+    render(
+      <DishCard
+        item={dish({ images: [photo("https://example.test/gone.jpg")] })}
+        onOpen={onOpen}
+        onAddPhoto={jest.fn()}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Single Steak" }),
+    ).toBeInTheDocument();
+
+    fireEvent.error(screen.getByAltText("Single Steak"));
+
+    expect(
+      screen.queryByRole("button", { name: "Single Steak" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("never nests the upload button inside the detail button", () => {
+    const { container } = render(
+      <DishCard
+        item={dish({ images: [photo("https://example.test/gone.jpg")] })}
+        onOpen={jest.fn()}
+        onAddPhoto={jest.fn()}
+      />,
+    );
+
+    fireEvent.error(screen.getByAltText("Single Steak"));
+
+    expect(container.querySelector("button button")).toBeNull();
+  });
+
+  it("gives the tile another chance when the photo changes", () => {
+    // A lookup can find a working photo later in the session; the card must not
+    // stay permanently marked as broken.
+    const onOpen = jest.fn();
+    const { rerender } = render(
+      <DishCard
+        item={dish({ images: [photo("https://example.test/gone.jpg")] })}
+        onOpen={onOpen}
+      />,
+    );
+
+    fireEvent.error(screen.getByAltText("Single Steak"));
+    expect(
+      screen.queryByRole("button", { name: "Single Steak" }),
+    ).not.toBeInTheDocument();
+
+    rerender(
+      <DishCard
+        item={dish({ images: [photo("https://example.test/found.jpg")] })}
+        onOpen={onOpen}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", { name: "Single Steak" }),
+    ).toBeInTheDocument();
+  });
+
+  it("keeps the open control a sibling of the tile, never its parent", () => {
+    // Structural, not behavioural: wrapping the tile means one commit somewhere
+    // renders the upload button inside this one, and reacting after the fact
+    // cannot unrender invalid DOM. Siblings are valid in every frame.
+    render(
+      <DishCard
+        item={dish({ images: [photo("https://example.test/steak.jpg")] })}
+        onOpen={jest.fn()}
+        onAddPhoto={jest.fn()}
+      />,
+    );
+
+    const open = screen.getByRole("button", { name: "Single Steak" });
+
+    expect(open.querySelector("img")).toBeNull();
+    expect(open.querySelector("button")).toBeNull();
+  });
+
+  it("drops the badge where the section heading already says it", () => {
+    // Inside the most-loved strip the badge repeated the heading on every card
+    // and stacked on top of the stock-photo disclosure in the same corner.
+    render(
+      <DishCard
+        item={dish()}
+        score={score({ voteCount: RANKING.MIN_VOTES_TO_RANK, isRanked: true })}
+        hideRankBadge
+      />,
+    );
+
+    expect(
+      screen.queryByText(RANKING_LABELS.topBadge),
+    ).not.toBeInTheDocument();
   });
 });

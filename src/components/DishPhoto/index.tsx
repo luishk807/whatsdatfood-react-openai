@@ -102,19 +102,20 @@ const DishPhoto: FC<DishPhotoInterface> = ({
       ref={containerRef}
       className={clsx(
         "relative w-full overflow-hidden rounded-card bg-surface-sunken",
-        // A dish with no photo takes a fraction of the height of one that
-        // has. Square empty tiles gave a menu like Peter Luger's sides a
-        // full screen of identical grey boxes, which buried the food that
-        // does have photography - the opposite of the point.
-        isEmpty ? "h-20" : "aspect-square",
+        // Always square, photo or not. A short tile where its neighbour is
+        // square drags a whole grid column out of line with the one beside it,
+        // and the page reads as broken rather than as a missing picture. The
+        // cost is that a menu with little photography is a lot of empty squares
+        // - which is why the empty state below is as quiet as it is.
+        "aspect-square",
       )}
     >
       {isEmpty ? (
-        <div className="flex h-full w-full flex-col items-center justify-center gap-1 px-2 text-center text-ink-muted">
+        <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 px-2 text-center text-ink-muted">
           {!onAddPhoto && (
             <>
-              <NoPhotographyOutlinedIcon fontSize="small" />
-              <span className="text-xs">
+              <NoPhotographyOutlinedIcon sx={{ fontSize: 18, opacity: 0.5 }} />
+              <span className="text-[11px] opacity-70">
                 {failed ? DISH_LABELS.photoFailed : DISH_LABELS.noPhoto}
               </span>
             </>
@@ -133,17 +134,19 @@ const DishPhoto: FC<DishPhotoInterface> = ({
                 aria-hidden="true"
                 tabIndex={-1}
               />
-              {/* Quiet rather than black-on-grey. It is still the upload
-                  funnel - it appears on exactly the dishes that need one -
-                  but it no longer shouts over the photographs. */}
+              {/* A placeholder that happens to be tappable, not a call to
+                  action. Bordered pills reading "Add the first photo" on two
+                  thirds of a menu made the upload funnel the loudest thing on
+                  the page, competing with the photographs it exists to
+                  collect. */}
               <button
                 type="button"
                 disabled={uploading}
                 onClick={() => fileRef.current?.click()}
-                className="inline-flex items-center gap-1 rounded-full border border-line px-3 py-1 text-xs text-ink-muted hover:border-ink hover:text-ink disabled:opacity-60"
+                className="flex flex-col items-center gap-1 text-[11px] text-ink-muted opacity-60 transition-opacity hover:opacity-100 disabled:opacity-40 motion-reduce:transition-none"
               >
-                <AddAPhotoOutlinedIcon sx={{ fontSize: 14 }} />
-                {uploading ? DISH_LABELS.uploading : DISH_LABELS.addPhoto}
+                <AddAPhotoOutlinedIcon sx={{ fontSize: 18 }} />
+                {uploading ? DISH_LABELS.uploading : DISH_LABELS.addPhotoShort}
               </button>
             </>
           )}

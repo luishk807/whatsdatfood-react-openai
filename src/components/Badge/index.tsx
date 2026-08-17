@@ -7,7 +7,11 @@ import { BadgeToneType } from "@/types";
 const TONE_CLASSES: Record<BadgeToneType, string> = {
   [BADGE_TONE.neutral]: "bg-black/60 text-white",
   [BADGE_TONE.community]: "bg-emerald-600/90 text-white",
-  [BADGE_TONE.stock]: "bg-black/50 text-white/80",
+  // Disclosure, not a label. Where a photo did not come from a diner the reader
+  // is entitled to know, but a grid of grey pills reads like an admin console
+  // and it is competing with the food to say something nobody came here to
+  // read.
+  [BADGE_TONE.stock]: "bg-black/35 text-white/70",
   [BADGE_TONE.top]: "bg-amber-500/95 text-black",
 };
 

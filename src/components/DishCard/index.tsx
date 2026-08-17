@@ -1,4 +1,5 @@
-import { FC, useCallback } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
+import clsx from "clsx";
 import DishPhoto from "@/components/DishPhoto";
 import Badge from "@/components/Badge";
 import VoteButton from "@/components/VoteButton";
@@ -9,13 +10,13 @@ import {
   getDishPhotoUrl,
   getDishPhotoSource,
   getDishPhotoCredit,
+  dishPrice,
 } from "@/utils/dish";
 import { BADGE_TONE } from "@/customConstants/images";
 import {
   DISH_LABELS,
   RANKING_LABELS,
   ORDER_LABELS,
-  RECOMMEND_LABELS,
 } from "@/customConstants/labels";
 import { shareOfDiners } from "@/utils/orders";
 import { recommendShare } from "@/utils/ranking";
@@ -37,14 +38,28 @@ const DishCard: FC<DishCardInterface> = ({
   onVisible,
   uploadingDishId,
   dinerCount,
+  hideRankBadge,
 }) => {
   const url = getDishPhotoUrl(item);
   const source = getDishPhotoSource(item);
   const credit = getDishPhotoCredit(item);
   const uploading = Number(item?.id ?? 0) === Number(uploadingDishId ?? -1);
-  const showTopBadge = score?.isRanked || item.top_choice;
+  // Only an earned badge. It used to fall back to the AI's top_choice flag and
+  // label it "Popular", so dishes nobody had voted on were badged as popular on
+  // a page whose own heading admitted there were no votes.
+  const showTopBadge = !!score?.isRanked && !hideRankBadge;
   const orderShare = shareOfDiners(item.order_count, dinerCount);
   const share = recommendShare(item);
+  const price = dishPrice(item);
+
+  // The thumb is the ranking mechanism, so it carries the number: a share once
+  // there are enough votes to have one, otherwise the raw count.
+  const metric =
+    share !== null
+      ? `${share}%`
+      : score?.voteCount
+        ? String(score.voteCount)
+        : undefined;
 
   const handleVote = (value: VoteValue) => onVote && onVote(item, value);
 
@@ -54,50 +69,52 @@ const DishCard: FC<DishCardInterface> = ({
     [onVisible, item],
   );
 
+  // The tile had a URL but the host refused it, so it is now an empty tile and
+  // must stop pretending it can open a detail sheet.
+  const [unavailable, setUnavailable] = useState(false);
+  const handleUnavailable = useCallback(() => setUnavailable(true), []);
+
+  useEffect(() => {
+    setUnavailable(false);
+  }, [url]);
+
   return (
-    <article className="flex flex-col gap-2">
+    // Full height with the footer pushed down, so that in a grid every card's
+    // price and vote line up across the row however long the dish names are.
+    <article className="flex h-full flex-col gap-2">
       <div className="relative">
-        {/* Only a tile that has something to show opens the detail sheet.
-            An empty tile carries the upload button, and a button cannot be
-            nested inside another button. */}
-        {onOpen && url ? (
+        <DishPhoto
+          url={url}
+          alt={item.name}
+          source={source}
+          eager={eager}
+          onAddPhoto={onAddPhoto ? (file) => onAddPhoto(item, file) : undefined}
+          credit={credit}
+          uploading={uploading}
+          onVisible={onVisible ? handleVisible : undefined}
+          onUnavailable={handleUnavailable}
+        />
+
+        {/* A sibling overlay rather than a wrapper, so the upload button an
+            empty tile carries can never end up inside this one.
+
+            Wrapping was the obvious shape and it was wrong: a third-party host
+            returning 403 turns a tile that had a URL into an empty one, and the
+            commit that swaps in the upload button still has the wrapper around
+            it. Reacting to that after the fact cannot help - the invalid DOM has
+            already been rendered once. Siblings are valid in every frame. */}
+        {onOpen && url && !unavailable && (
           <button
             type="button"
             onClick={() => onOpen(item)}
             aria-label={item.name}
-            className="block w-full rounded-card"
-          >
-            <DishPhoto
-              url={url}
-              alt={item.name}
-              source={source}
-              eager={eager}
-              onAddPhoto={onAddPhoto ? (file) => onAddPhoto(item, file) : undefined}
-              credit={credit}
-              uploading={uploading}
-              onVisible={onVisible ? handleVisible : undefined}
-            />
-          </button>
-        ) : (
-          <DishPhoto
-            url={url}
-            alt={item.name}
-            source={source}
-            eager={eager}
-            onAddPhoto={onAddPhoto ? (file) => onAddPhoto(item, file) : undefined}
-            credit={credit}
-            uploading={uploading}
-            onVisible={onVisible ? handleVisible : undefined}
+            className="absolute inset-0 rounded-card"
           />
         )}
 
         {showTopBadge && (
           <div className="pointer-events-none absolute right-2 top-2">
-            <Badge tone={score?.isRanked ? BADGE_TONE.top : BADGE_TONE.neutral}>
-              {score?.isRanked
-                ? RANKING_LABELS.topStripTitle
-                : DISH_LABELS.popularUnverified}
-            </Badge>
+            <Badge tone={BADGE_TONE.top}>{RANKING_LABELS.topBadge}</Badge>
           </div>
         )}
       </div>
@@ -116,36 +133,28 @@ const DishCard: FC<DishCardInterface> = ({
         </p>
       )}
 
-      {/* One metric across the card, the strip and the detail sheet, so the
-          product answers "would people order this again" the same way
-          everywhere. Below the vote threshold there is no percentage - a
-          wrong "top dish" costs more trust than saying nothing. */}
-      {share !== null ? (
-        <p className="text-xs font-medium tabular-nums text-brand">
-          {RECOMMEND_LABELS.share(share)}
-        </p>
-      ) : (
-        score &&
-        score.voteCount > 0 && (
-          <p className="text-xs text-ink-muted">
-            {RANKING_LABELS.voteCount(score.voteCount)}
-          </p>
-        )
-      )}
-
-      <div className="flex items-center justify-between gap-2">
-        {item.price !== undefined && item.price !== null ? (
-          <span className="text-sm tabular-nums text-ink">
-            {convertCurrency(Number(item.price))}
-          </span>
-        ) : (
-          <span />
-        )}
+      {/* Price and the vote on one line, always present in that shape, so every
+          card in a grid has the same footprint whatever data it has. The
+          recommend share used to sit above this as its own sentence; it now
+          rides on the thumb, which is both where the eye lands and the control
+          that produces it. */}
+      <div className="mt-auto flex items-center justify-between gap-2">
+        <span
+          className={clsx(
+            "text-sm tabular-nums",
+            price !== null ? "text-ink" : "text-ink-muted",
+          )}
+        >
+          {price !== null
+            ? convertCurrency(price)
+            : DISH_LABELS.priceUnavailable}
+        </span>
 
         <VoteButton
           compact
           value={vote}
           upCount={score?.voteCount}
+          metric={metric}
           disabled={!canVote}
           onVote={onVote ? handleVote : undefined}
         />
