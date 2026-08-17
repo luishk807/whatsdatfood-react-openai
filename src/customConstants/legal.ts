@@ -85,7 +85,9 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
     heading: "Deleting things",
     paragraphs: [
       "You can delete your own reviews, favourites, saved friends and order records from your account pages at any time.",
-      "There is not yet a button to delete your whole account. Until there is, email us and we will delete your account and everything listed here. Photos you have uploaded will also be removed unless we are required to keep a copy while a report about them is being reviewed.",
+      "You can also delete the whole account, from Settings. That removes your profile and sign-in details, your reviews and votes, the dishes you marked as ordered, your favourites, saved friends and search history, and the photos you uploaded — the image files themselves, not only the records pointing at them. It is immediate and cannot be undone.",
+      "One thing is kept. If you reported a photo, the report stays so the decision about that photo remains reviewable, but your name is removed from it. Nothing in a kept report identifies you.",
+      "If you would rather we did it, email us instead.",
     ],
   },
   {

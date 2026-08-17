@@ -248,3 +248,13 @@ export const GET_RATINGS_BY_REST_ITEM_ID = gql`
     }
   }
 `;
+
+/**
+ * Erases the caller's account. Takes no id on purpose — the server derives who
+ * is asking from the session, so this cannot be pointed at somebody else.
+ */
+export const DELETE_ACCOUNT = gql`
+  mutation deleteAccount {
+    deleteAccount
+  }
+`;

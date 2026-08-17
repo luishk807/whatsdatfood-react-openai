@@ -113,11 +113,27 @@ describe("what the documents actually commit to", () => {
     expect(privacyText).toMatch(/GPS/);
   });
 
-  it("does not promise a delete button the product does not have", () => {
-    // There is no account-deletion mutation. Claiming one would be a false
-    // published statement, so the policy points at email instead.
-    expect(privacyText).toMatch(/not yet a button to delete your whole account/i);
+  it("describes the account deletion the product actually has", () => {
+    // This test used to assert the opposite - that the policy admitted there
+    // was no delete button - and it failed the moment the button shipped, which
+    // is the whole reason for pinning a published claim to the code.
+    expect(privacyText).toMatch(/delete the whole account, from Settings/i);
+    expect(privacyText).not.toMatch(/not yet a button/i);
     expect(privacyText).toContain(LEGAL_CONTACT);
+  });
+
+  it("says photo files go, not just the records pointing at them", () => {
+    // The foreign key is ON DELETE SET NULL: without explicit removal the
+    // photograph stays public and merely loses its credit.
+    expect(privacyText).toMatch(/image files themselves/i);
+  });
+
+  it("declares the one thing deletion keeps", () => {
+    // A report survives a leaver so a moderation decision stays reviewable.
+    // An undisclosed exception to "we delete everything" is the exception that
+    // makes the rest of the sentence untrue.
+    expect(privacyText).toMatch(/report stays/i);
+    expect(privacyText).toMatch(/your name is removed/i);
   });
 
   it("discloses that friends' details belong to people who did not consent", () => {

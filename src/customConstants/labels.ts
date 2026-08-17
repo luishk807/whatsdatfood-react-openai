@@ -188,6 +188,26 @@ export const SEARCH_LABELS = {
   failed: "Search is unavailable for a moment. Try again shortly.",
 } as const;
 
+export const ACCOUNT_LABELS = {
+  deleteTitle: "Delete your account",
+  deleteBlurb:
+    "This removes your account and everything we hold about you. It cannot " +
+    "be undone.",
+  deleteCta: "Delete my account",
+  deleteConfirm: "Deleting your account will permanently remove:",
+  /** Named, not summarised. "Are you sure?" tells a reader nothing. */
+  deleteConsequences: [
+    "Your sign-in details, email address and profile.",
+    "Every review, vote and dish you marked as ordered.",
+    "Your favourites, saved friends and search history.",
+    "Every photo you uploaded, including the files themselves.",
+  ],
+  deleteConfirmCta: "Yes, delete everything",
+  deleteCancel: "Keep my account",
+  deleting: "Deleting…",
+  deleteFailed: "That did not work. Nothing has been deleted — try again.",
+} as const;
+
 export const LEGAL_LABELS = {
   privacy: "Privacy",
   terms: "Terms",

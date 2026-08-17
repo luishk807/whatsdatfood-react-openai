@@ -2,6 +2,7 @@ import { useEffect, useState, type FC } from "react";
 import useUser from "@/customHooks/useUser";
 import { UserType } from "@/interfaces/users";
 import FormComponent from "@/components/FormComponent";
+import DeleteAccount from "@/components/DeleteAccount";
 import { Grid } from "@mui/material";
 import { CREATE_ACCOUNT } from "@/customConstants/forms";
 import "./index.css";
@@ -37,12 +38,17 @@ const UserSettings: FC = () => {
   }, []);
 
   return (
-    <FormComponent<UserType>
-      submitLabel="Save Information"
-      onHandleSubmit={handleSubmit}
-      defaultValue={userInfo}
-      fields={fields}
-    />
+    <>
+      <FormComponent<UserType>
+        submitLabel="Save Information"
+        onHandleSubmit={handleSubmit}
+        defaultValue={userInfo}
+        fields={fields}
+      />
+      {/* Below the form and behind a confirmation: this is the one control here
+          that cannot be undone. */}
+      <DeleteAccount />
+    </>
   );
 };
 
