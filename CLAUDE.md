@@ -139,6 +139,20 @@ minute. Design for the phone and let desktop be the override, never the reverse.
   only when scrolled near, at most `PHOTO_LOOKUP.MAX_PER_PAGE_VIEW` per page
   view, with a session-level negative cache. Every dish firing a lookup on every
   load is what made a single page view cost 21 image searches.
+- **"Most loved here" only exists when it has been earned.** `getTopDishes` is
+  empty until a dish clears `MIN_VOTES_TO_RANK`, and the page then renders no
+  strip at all. It used to fall back to the AI's `top_choice` flag under the
+  heading "Popular picks · not yet voted on" — a contradiction, printed above a
+  copy of the top of the menu. Do not reintroduce a fallback: the ranking is the
+  product, and claiming it early is what makes it untrustworthy.
+- **A missing price is `—`, never `$0.00`.** Use `dishPrice`, which treats zero
+  as absent. The extraction leaves price null or zero across most of a menu, and
+  a currency formatter turns that into a claim that a $180 omakase is free.
+- **The sticky category bar is the long-menu answer.** `CategoryNav` plus
+  `useActiveSection`. Two rules learned the hard way: never call
+  `scrollIntoView` to keep the active chip visible — it scrolls the page too and
+  cancels the jump the reader just asked for; and the last section can sit below
+  the maximum scroll offset, so "at the bottom" has to select it explicitly.
 - **The homepage wall is `recentDishPhotos`** — one cheap server query, no AI
   call, cache-first, and every tile links into that restaurant's menu. The
   server returns one photo per dish and no repeated URL; without that the wall
@@ -148,9 +162,12 @@ minute. Design for the phone and let desktop be the override, never the reverse.
 - **A tile whose photo the host refuses is dropped, not shown empty.**
   `DishPhoto` reports it via `onUnavailable`. On a menu the empty tile is the
   upload funnel and belongs there; on the front door it is a hole in the one
-  thing the page shows, and it is shorter than a photo so it pulls its column
-  out of line. Third-party hosts 403 often — this is a normal case, not an edge
-  one.
+  thing the page shows. Third-party hosts 403 often — this is a normal case, not
+  an edge one.
+- **Never wrap `DishPhoto` in a button.** A 403 turns a tile that had a URL into
+  an empty one carrying the upload button, and that commit still has the wrapper
+  around it — a button inside a button, which no after-the-fact state update can
+  unrender. The open-the-sheet control is an absolutely positioned sibling.
 
 ## Photo uploads
 
