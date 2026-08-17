@@ -1,6 +1,5 @@
-import { ChangeEvent, FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import clsx from "clsx";
-import AddAPhotoOutlinedIcon from "@mui/icons-material/AddAPhotoOutlined";
 import NoPhotographyOutlinedIcon from "@mui/icons-material/NoPhotographyOutlined";
 import Badge from "@/components/Badge";
 import { DishPhotoInterface } from "@/interfaces/ranking";
@@ -10,6 +9,8 @@ import {
   PHOTO_LOOKUP,
 } from "@/customConstants/images";
 import { DISH_LABELS } from "@/customConstants/labels";
+import PhotoUploadAction from "@/components/PhotoUploadAction";
+import { UPLOAD_VARIANT } from "@/interfaces/photos";
 
 /**
  * Aspect-locked so a grid of photos from many sources stays uniform, and it
@@ -33,7 +34,6 @@ const DishPhoto: FC<DishPhotoInterface> = ({
   const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const fileRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     setLoaded(false);
@@ -86,16 +86,6 @@ const DishPhoto: FC<DishPhotoInterface> = ({
     return () => observer.disconnect();
   }, [isEmpty, onVisible]);
 
-  const handleFile = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-
-    if (file && onAddPhoto) {
-      onAddPhoto(file);
-    }
-
-    // Reset so choosing the same file twice still fires.
-    event.target.value = "";
-  };
 
   return (
     <div
@@ -120,35 +110,18 @@ const DishPhoto: FC<DishPhotoInterface> = ({
               </span>
             </>
           )}
+          {/* A placeholder that happens to be tappable, not a call to action.
+              Bordered pills reading "Add the first photo" on two thirds of a
+              menu made the upload funnel the loudest thing on the page,
+              competing with the photographs it exists to collect. */}
           {onAddPhoto && (
-            <>
-              <input
-                ref={fileRef}
-                type="file"
-                accept="image/*"
-                // Opens the camera directly on a phone, which is the whole
-                // point: the person who can take the photo is at the table.
-                capture="environment"
-                onChange={handleFile}
-                className="hidden"
-                aria-hidden="true"
-                tabIndex={-1}
-              />
-              {/* A placeholder that happens to be tappable, not a call to
-                  action. Bordered pills reading "Add the first photo" on two
-                  thirds of a menu made the upload funnel the loudest thing on
-                  the page, competing with the photographs it exists to
-                  collect. */}
-              <button
-                type="button"
-                disabled={uploading}
-                onClick={() => fileRef.current?.click()}
-                className="flex flex-col items-center gap-1 text-[11px] text-ink-muted opacity-60 transition-opacity hover:opacity-100 disabled:opacity-40 motion-reduce:transition-none"
-              >
-                <AddAPhotoOutlinedIcon sx={{ fontSize: 18 }} />
-                {uploading ? DISH_LABELS.uploading : DISH_LABELS.addPhotoShort}
-              </button>
-            </>
+            <PhotoUploadAction
+              variant={UPLOAD_VARIANT.tile}
+              onSelect={onAddPhoto}
+              label={DISH_LABELS.addPhotoShort}
+              uploadingLabel={DISH_LABELS.uploading}
+              uploading={uploading}
+            />
           )}
         </div>
       ) : (

@@ -40,9 +40,13 @@ import useSnackbarHook from "@/customHooks/useSnackBar";
 import {
   groupDishesByCategory,
   getDishPhotoUrl,
+  getDishPhotoSource,
   sectionId,
   TOP_SECTION_ID,
 } from "@/utils/dish";
+import PhotoUploadAction from "@/components/PhotoUploadAction";
+import { UPLOAD_VARIANT } from "@/interfaces/photos";
+import { IMAGE_SOURCE } from "@/customConstants/images";
 import CategoryNav from "@/components/CategoryNav";
 import useActiveSection from "@/customHooks/useActiveSection";
 import { MenuSection } from "@/interfaces/ranking";
@@ -74,7 +78,15 @@ const MenuResults: FC = () => {
     null,
   );
   const [dinerCount, setDinerCount] = useState(0);
-  const [selectedDish, setSelectedDish] = useState<MenuItemType | null>(null);
+  /**
+   * The open sheet is identified, not copied.
+   *
+   * It used to hold the dish object itself, which made the sheet a snapshot
+   * taken when it opened: recording an order refetched the menu and the sheet
+   * went on showing the old row, so the button still said "I ordered this" and
+   * the recommend share never moved until it was closed and reopened.
+   */
+  const [selectedDishId, setSelectedDishId] = useState<number | null>(null);
   const [detailMode, setDetailMode] = useState<RatingToogleType>(
     RATING_TYPE.list,
   );
@@ -142,6 +154,15 @@ const MenuResults: FC = () => {
 
   const activeSection = useActiveSection(
     useMemo(() => sections.map((section) => section.id), [sections]),
+  );
+
+  /** Always the current row for the open dish, never the one it opened with. */
+  const selectedDish = useMemo(
+    () =>
+      selectedDishId === null
+        ? null
+        : (dishes.find((item) => Number(item?.id) === selectedDishId) ?? null),
+    [dishes, selectedDishId],
   );
 
   const handleJump = (id: string) => {
@@ -227,7 +248,14 @@ const MenuResults: FC = () => {
 
   useEffect(() => {
     handleFetchRestaurant();
-  }, [restaurant, user]);
+    // The id, not the user object. What this actually depends on is who is
+    // asking, and `useAuth` happens to return a stable object today - the live
+    // page fetches the menu exactly once. Depending on the identity means the
+    // day that stops being true, the front door of every restaurant refetches on
+    // every render, which is the request loop this codebase has already had in
+    // MainSearchBar, BookmarkButton and RatingList.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [restaurant, user?.id]);
 
   useEffect(() => {
     if (uploadError) {
@@ -250,7 +278,7 @@ const MenuResults: FC = () => {
 
   const handleOpenDish = (item: MenuItemType) => {
     setDetailMode(RATING_TYPE.list);
-    setSelectedDish(item);
+    setSelectedDishId(Number(item?.id ?? 0) || null);
     refreshPhotos(item);
   };
 
@@ -405,7 +433,7 @@ const MenuResults: FC = () => {
         open={!!selectedDish}
         title={selectedDish?.name}
         onClose={() => {
-          setSelectedDish(null);
+          setSelectedDishId(null);
           setDishPhotos([]);
         }}
       >
@@ -418,6 +446,27 @@ const MenuResults: FC = () => {
               alt={selectedDish.name}
               eager
             />
+
+            {/* The disclosure is the ask. Somebody looking at a picture that is
+                admittedly not this kitchen's is the most persuadable person in
+                the product, and "have the real dish?" explains why their photo
+                is worth having in a way an upload button cannot. */}
+            {getDishPhotoSource(selectedDish) === IMAGE_SOURCE.stock && (
+              <p className="-mt-2 text-xs text-ink-muted">
+                {DISH_LABELS.stockPhoto} · {DISH_LABELS.stockPrompt}{" "}
+                {canParticipate ? (
+                  <PhotoUploadAction
+                    variant={UPLOAD_VARIANT.link}
+                    onSelect={(file) => handleAddPhotoFromSheet(file)}
+                    label={DISH_LABELS.addYourPhoto}
+                    uploadingLabel={DISH_LABELS.uploading}
+                    uploading={uploadingDishId === Number(selectedDish.id)}
+                  />
+                ) : (
+                  DISH_LABELS.signInToUpload
+                )}
+              </p>
+            )}
 
             {selectedDish.price !== undefined &&
               selectedDish.price !== null && (
@@ -466,6 +515,29 @@ const MenuResults: FC = () => {
                 ? DISH_LABELS.youOrderedThis
                 : DISH_LABELS.orderedThis}
             </button>
+
+            {/* Straight after saying they ordered it. This is the one person
+                who definitely had the plate in front of them, and the moment
+                they are most likely to still have the photo on their phone.
+
+                Only the photo is offered here - the vote sits a few
+                centimetres above in DishRecommendation, and asking twice in one
+                sheet is how a product ends up answering one question in three
+                places again. */}
+            {selectedDish.ordered_by_me && canParticipate && (
+              <div className="flex flex-wrap items-center gap-2 rounded-card bg-surface-sunken px-3 py-2">
+                <span className="text-xs text-ink-muted">
+                  {DISH_LABELS.orderedFollowUp}
+                </span>
+                <PhotoUploadAction
+                  variant={UPLOAD_VARIANT.chip}
+                  onSelect={(file) => handleAddPhotoFromSheet(file)}
+                  label={DISH_LABELS.addYourPhoto}
+                  uploadingLabel={DISH_LABELS.uploading}
+                  uploading={uploadingDishId === Number(selectedDish.id)}
+                />
+              </div>
+            )}
 
             {!!selectedDish.order_count && (
               <p className="text-xs text-ink-muted">

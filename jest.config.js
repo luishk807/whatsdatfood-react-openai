@@ -11,10 +11,16 @@ module.exports = {
   roots: ["<rootDir>/src"],
   setupFilesAfterEnv: ["<rootDir>/src/setupTests.ts"],
   testMatch: ["<rootDir>/src/**/*.test.ts", "<rootDir>/src/**/*.test.tsx"],
+  // Order matters: the first pattern that matches wins and nothing re-maps the
+  // result. With "^@/" first, `import loadingGif from "@/assets/loading.gif"`
+  // became a real path to a real GIF and Jest tried to parse it as JavaScript —
+  // which is why every test that reached Loading, and so MenuResults, died on an
+  // import rather than on anything real. Relative `./index.css` imports never
+  // hit the alias, so CSS looked fine and hid it.
   moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/src/$1",
     "\\.(css|less|sass|scss)$": "<rootDir>/src/test/styleMock.ts",
     "\\.(gif|png|jpe?g|svg|webp|avif)$": "<rootDir>/src/test/fileMock.ts",
+    "^@/(.*)$": "<rootDir>/src/$1",
   },
   transform: {
     "^.+\\.(ts|tsx)$": [

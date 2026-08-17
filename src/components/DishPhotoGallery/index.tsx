@@ -1,10 +1,13 @@
-import { ChangeEvent, FC, useRef, useState } from "react";
+import { FC, useState } from "react";
 import clsx from "clsx";
 import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
 import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
-import AddAPhotoOutlinedIcon from "@mui/icons-material/AddAPhotoOutlined";
 import Badge from "@/components/Badge";
-import { DishPhotoGalleryInterface } from "@/interfaces/photos";
+import {
+  DishPhotoGalleryInterface,
+  UPLOAD_VARIANT,
+} from "@/interfaces/photos";
+import PhotoUploadAction from "@/components/PhotoUploadAction";
 import { MenuItemPhoto } from "@/interfaces/restaurants";
 import { BADGE_TONE, REPORT_REASONS } from "@/customConstants/images";
 import { DISH_LABELS } from "@/customConstants/labels";
@@ -27,17 +30,7 @@ const DishPhotoGallery: FC<DishPhotoGalleryInterface> = ({
   uploading,
 }) => {
   const [reportingId, setReportingId] = useState<string | null>(null);
-  const fileRef = useRef<HTMLInputElement | null>(null);
 
-  const handleFile = (event: ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-
-    if (file && onAddPhoto) {
-      onAddPhoto(file);
-    }
-
-    event.target.value = "";
-  };
 
   const photoId = (photo: MenuItemPhoto) => String(photo.id ?? "");
 
@@ -48,28 +41,16 @@ const DishPhotoGallery: FC<DishPhotoGalleryInterface> = ({
           {DISH_LABELS.photosTitle}
         </h3>
 
+        {/* The section heading is the ask. Somebody who has scrolled this far
+            has already decided they care about this dish. */}
         {onAddPhoto && (
-          <>
-            <input
-              ref={fileRef}
-              type="file"
-              accept="image/*"
-              capture="environment"
-              onChange={handleFile}
-              className="hidden"
-              aria-hidden="true"
-              tabIndex={-1}
-            />
-            <button
-              type="button"
-              disabled={uploading}
-              onClick={() => fileRef.current?.click()}
-              className="inline-flex items-center gap-1 rounded-full bg-ink px-3 py-1 text-xs font-medium text-surface disabled:opacity-60"
-            >
-              <AddAPhotoOutlinedIcon sx={{ fontSize: 14 }} />
-              {uploading ? DISH_LABELS.uploading : DISH_LABELS.addPhoto}
-            </button>
-          </>
+          <PhotoUploadAction
+            variant={UPLOAD_VARIANT.chip}
+            onSelect={onAddPhoto}
+            label={DISH_LABELS.addPhotoShort}
+            uploadingLabel={DISH_LABELS.uploading}
+            uploading={uploading}
+          />
         )}
       </div>
 

@@ -42,6 +42,12 @@ The GraphQL contract is unchanged, so every document here and the Apollo
 - Hooks that own logic get tests. Hooks that only wrap Apollo usually do not.
 - Colocate: `src/utils/ranking.test.ts`, `src/components/DishCard/index.test.tsx`.
 
+`jest.config.js` `moduleNameMapper` is order-sensitive: the first match wins and
+nothing re-maps the result. The asset patterns must come **before** `^@/`, or
+`import gif from "@/assets/loading.gif"` resolves to a real GIF that Jest tries
+to parse as JavaScript — which is why anything importing `Loading`, and so the
+whole menu page, could not be tested at all.
+
 Tests assert what the code actually guarantees. If a test fails because a
 comment or a claim was too strong, fix the claim — do not weaken the test into
 tautology. This has already happened once: shrinkage narrows the gap between a
@@ -164,6 +170,11 @@ minute. Design for the phone and let desktop be the override, never the reverse.
   upload funnel and belongs there; on the front door it is a hole in the one
   thing the page shows. Third-party hosts 403 often — this is a normal case, not
   an edge one.
+- **The dish sheet holds an id, not the dish.** `selectedDishId` plus a lookup
+  against the live list. Holding the object made the sheet a snapshot taken when
+  it opened: recording an order refetched the menu and the sheet went on showing
+  the old row, so the button still said "I ordered this" and the recommend share
+  never moved until it was closed and reopened.
 - **Never wrap `DishPhoto` in a button.** A 403 turns a tile that had a URL into
   an empty one carrying the upload button, and that commit still has the wrapper
   around it — a button inside a button, which no after-the-fact state update can
@@ -185,6 +196,16 @@ the person who can take the photo is sitting at the table.
 - Community photos are credited through the existing `owner` field.
 - An empty tile does not open the detail sheet — it carries the upload button,
   and a button cannot be nested inside another button.
+- **There are three ways in, and `PhotoUploadAction` owns all of them.** The
+  empty tile on the menu, the stock-photo disclosure in the dish sheet
+  ("Have the real dish? Add your photo"), and a prompt straight after somebody
+  says they ordered it. One component holds the hidden input, `capture`, and the
+  reset that lets the same file be chosen twice — four copies of that is how one
+  entry point quietly stops opening the camera. Do not put an upload control on
+  cards that already have a photo; discovery happens in the sheet.
+- **A diner's photo is the hero.** `getDishPhoto` prefers a community photo over
+  a stock one rather than taking whichever came first, which had the search
+  result keeping the slot because it was stored earlier.
 
 ## Dependencies
 

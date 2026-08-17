@@ -24,7 +24,20 @@ export const DISH_LABELS = {
   photoBy: (username: string) => `Photo by @${username}`,
   helpful: "Helpful",
   reportPhoto: "Report this photo",
-  photosTitle: "Photos of this dish",
+  /**
+   * "From diners" rather than "of this dish". The section is a contribution
+   * funnel, and naming whose photos these are says what is being asked for.
+   */
+  photosTitle: "Photos from diners",
+  /**
+   * The stock-photo disclosure is the best moment to ask for a real one: the
+   * reader is looking at a picture that is admittedly not this kitchen's. A
+   * generic upload button cannot explain why their photo is worth having.
+   */
+  stockPrompt: "Have the real dish?",
+  addYourPhoto: "Add your photo",
+  /** Shown once a dish is in someone's history — they were just at the table. */
+  orderedFollowUp: "Added to your history.",
   noPhotosYet: "No photos yet. Be the first.",
   markHelpful: "Mark this photo helpful",
   markedHelpful: "You found this helpful",

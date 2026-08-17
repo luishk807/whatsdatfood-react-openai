@@ -5,6 +5,7 @@ import {
   normalizeCategory,
   groupDishesByCategory,
   dishPrice,
+  getDishPhotoCredit,
   sectionId,
   TOP_SECTION_ID,
 } from "@/utils/dish";
@@ -173,5 +174,59 @@ describe("sectionId", () => {
 
   it("gives two different categories two different ids", () => {
     expect(sectionId("Appetizer")).not.toBe(sectionId("Appetizers"));
+  });
+});
+
+describe("getDishPhoto picks what represents the dish", () => {
+  const stock = (url: string): MenuItemPhoto =>
+    ({ url_m: url, source: "stock" }) as MenuItemPhoto;
+  const diner = (url: string, owner = "luis"): MenuItemPhoto =>
+    ({ url_m: url, source: IMAGE_SOURCE.community, owner }) as MenuItemPhoto;
+
+  it("prefers a diner photo over a search result", () => {
+    // The stock photo is stored first, so taking the first usable one kept the
+    // search result in the hero slot forever. The premise of the product is
+    // that the people at the table took these.
+    const item = dish("Steak", "Mains", {
+      images: [stock("https://example.test/stock.jpg"), diner("https://example.test/mine.jpg")],
+    });
+
+    expect(getDishPhotoUrl(item)).toBe("https://example.test/mine.jpg");
+    expect(getDishPhotoSource(item)).toBe(IMAGE_SOURCE.community);
+    expect(getDishPhotoCredit(item)).toBe("luis");
+  });
+
+  it("keeps the first diner photo when there are several", () => {
+    const item = dish("Steak", "Mains", {
+      images: [
+        stock("https://example.test/stock.jpg"),
+        diner("https://example.test/one.jpg", "ana"),
+        diner("https://example.test/two.jpg", "bo"),
+      ],
+    });
+
+    // The server already ordered them: hero, then most helpful.
+    expect(getDishPhotoUrl(item)).toBe("https://example.test/one.jpg");
+  });
+
+  it("falls back to the search result when no diner has uploaded", () => {
+    const item = dish("Steak", "Mains", {
+      images: [stock("https://example.test/stock.jpg")],
+    });
+
+    expect(getDishPhotoUrl(item)).toBe("https://example.test/stock.jpg");
+    expect(getDishPhotoSource(item)).toBe(IMAGE_SOURCE.stock);
+    expect(getDishPhotoCredit(item)).toBeNull();
+  });
+
+  it("skips a diner row that carries no usable url", () => {
+    const item = dish("Steak", "Mains", {
+      images: [
+        { source: IMAGE_SOURCE.community, owner: "ghost" } as MenuItemPhoto,
+        stock("https://example.test/stock.jpg"),
+      ],
+    });
+
+    expect(getDishPhotoUrl(item)).toBe("https://example.test/stock.jpg");
   });
 });

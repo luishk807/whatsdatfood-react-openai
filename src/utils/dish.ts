@@ -2,8 +2,24 @@ import { MenuItemType, MenuItemPhoto } from "@/interfaces/restaurants";
 import { IMAGE_SOURCE } from "@/customConstants/images";
 import { ImageSourceType } from "@/types";
 
-export const getDishPhoto = (item: MenuItemType): MenuItemPhoto | undefined =>
-  item.images?.find((photo) => !!photo?.url_m) ?? item.images?.[0];
+/**
+ * The photo that represents the dish.
+ *
+ * A diner's photo beats a stock one, always. The whole premise is that the
+ * people at the table took these, so once one exists it is the answer to "what
+ * does this look like" — a search result is the placeholder it replaces. This
+ * used to take whichever photo came first, which meant the stock photo kept the
+ * hero slot because it was stored earlier.
+ */
+export const getDishPhoto = (item: MenuItemType): MenuItemPhoto | undefined => {
+  const usable = item.images?.filter((photo) => !!photo?.url_m) ?? [];
+
+  return (
+    usable.find((photo) => photo.source === IMAGE_SOURCE.community) ??
+    usable[0] ??
+    item.images?.[0]
+  );
+};
 
 export const getDishPhotoUrl = (item: MenuItemType): string | null =>
   getDishPhoto(item)?.url_m ?? item.image ?? null;
