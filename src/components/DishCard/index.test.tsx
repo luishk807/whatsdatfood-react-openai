@@ -4,7 +4,11 @@ import DishCard from "@/components/DishCard";
 import { MenuItemType, MenuItemPhoto } from "@/interfaces/restaurants";
 import { DishScore } from "@/interfaces/ranking";
 import { VOTE, RANKING } from "@/customConstants/ranking";
-import { DISH_LABELS, RANKING_LABELS } from "@/customConstants/labels";
+import {
+  DISH_LABELS,
+  RANKING_LABELS,
+  RECOMMEND_LABELS,
+} from "@/customConstants/labels";
 
 const photo = (url: string): MenuItemPhoto => ({ url_m: url }) as MenuItemPhoto;
 
@@ -165,6 +169,22 @@ describe("DishCard", () => {
 
     expect(screen.getByLabelText(DISH_LABELS.recommend)).toBeInTheDocument();
     expect(screen.queryByLabelText(DISH_LABELS.voteDown)).not.toBeInTheDocument();
+  });
+
+  it("shows the recommend share once enough people have voted", () => {
+    // The same metric the strip and the detail sheet use, so the product
+    // answers one question one way.
+    const item = dish({
+      ratings: [5, 5, 5, 5, 1].map((rating, index) => ({
+        id: `${index}`,
+        rating,
+        user_id: index + 1,
+      })),
+    } as never);
+
+    render(<DishCard item={item} />);
+
+    expect(screen.getByText(RECOMMEND_LABELS.share(80))).toBeInTheDocument();
   });
 
   it("says how many people have voted", () => {

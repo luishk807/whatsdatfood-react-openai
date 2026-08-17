@@ -1,95 +1,84 @@
-import { type FC, useEffect, useState } from "react";
-import { Box, Grid, Link } from "@mui/material";
-import "./index.css";
+import { type FC, useCallback, useEffect, useState } from "react";
 import useUserRating from "@/customHooks/useUserRating";
 import { _get } from "@/utils";
 import { UserRating, RatingListComponentInterface } from "@/interfaces/users";
 import UserRatingItem from "@/components/RatingItem";
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from "@/customConstants";
+import { REVIEW_LABELS } from "@/customConstants/labels";
 
+/**
+ * Reviews for one dish.
+ *
+ * The dish's name used to be repeated above this list, inside a sheet whose
+ * title is already that name - so someone scrolling past a full-width photo
+ * met the same words a third time. The heading says what the section is.
+ */
 const RatingListComponent: FC<RatingListComponentInterface> = ({
   data,
   onOpenCreate,
 }) => {
   const [ratingLists, setRatingLists] = useState<UserRating[]>([]);
+  const { getUserRatingsByItemId } = useUserRating();
 
-  const page = PAGE_DEFAULT;
-  const limit = LIMIT_DEFAULT;
-  const { getUserRatingsByItemId, getAllRatingByRestItemIdQuery } =
-    useUserRating();
-  const { loading } = getAllRatingByRestItemIdQuery;
+  // Held in a ref-free callback keyed on the dish: the hook returns a new
+  // function identity every render, and depending on it re-runs the effect
+  // forever.
+  const itemId = Number(_get(data, "id", 0));
 
-  const getAllUserRating = async (restItemId: number) => {
-    const resp = await getUserRatingsByItemId(restItemId, page, limit);
-    if (resp) {
-      const { data } = resp;
-      setRatingLists(data as UserRating[]);
-    } else {
+  const load = useCallback(async () => {
+    if (!itemId) {
       setRatingLists([]);
+      return;
     }
-  };
+
+    const resp = await getUserRatingsByItemId(
+      itemId,
+      PAGE_DEFAULT,
+      LIMIT_DEFAULT,
+    );
+
+    setRatingLists((resp?.data as UserRating[]) ?? []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [itemId]);
+
   useEffect(() => {
-    const itemId = _get(data, "id");
-    if (itemId) {
-      getAllUserRating(Number(itemId));
-    }
-  }, [data]);
+    load();
+  }, [load]);
 
   return (
-    <>
-      <Box className="w-full flex justify-between">
-        <Grid container className="w-full">
-          <Grid
-            size={7}
-            sx={{
-              justifyContent: "space-between",
-              fontWeight: { xs: "bold" },
-              padding: { xs: "10px" },
-            }}
-          >
-            {data.name}
-          </Grid>
-          <Grid
-            size={5}
-            sx={{
-              justifyContent: "end",
-              display: "flex",
-              padding: { xs: "10px" },
-            }}
-          >
-            <Link href="#" onClick={onOpenCreate} underline="hover">
-              Write you review
-            </Link>
-          </Grid>
-        </Grid>
-      </Box>
-      <Box
-        sx={{
-          height: {
-            lg: "540px",
-            xs: "80vh",
-          },
-          padding: {
-            xs: "20px",
-          },
-        }}
-        className="rating-model-list-ratings"
-      >
-        {ratingLists && !!ratingLists.length ? (
-          ratingLists.map((rating: UserRating, indx) => {
-            return (
-              <Box className="user-rating-item-container" key={indx}>
-                <UserRatingItem data={rating} />
-              </Box>
-            );
-          })
-        ) : (
-          <Box className="user-rating-item-container flex justify-center">
-            <h3>No ratings found for this item.</h3>
-          </Box>
-        )}
-      </Box>
-    </>
+    <section className="flex flex-col gap-3">
+      <div className="flex items-baseline justify-between gap-3">
+        <h3 className="text-sm font-semibold text-ink">
+          {REVIEW_LABELS.heading}
+          {ratingLists.length > 0 && (
+            <span className="ml-2 text-xs font-normal tabular-nums text-ink-muted">
+              {REVIEW_LABELS.count(ratingLists.length)}
+            </span>
+          )}
+        </h3>
+
+        <button
+          type="button"
+          onClick={onOpenCreate}
+          className="shrink-0 text-sm text-brand underline underline-offset-2"
+        >
+          {REVIEW_LABELS.write}
+        </button>
+      </div>
+
+      {ratingLists.length ? (
+        <ul className="flex flex-col divide-y divide-line">
+          {ratingLists.map((rating, index) => (
+            <li key={_get(rating, "id", index)} className="py-3">
+              <UserRatingItem data={rating} />
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-sm text-ink-muted">{REVIEW_LABELS.none}</p>
+      )}
+    </section>
   );
 };
+
 export default RatingListComponent;

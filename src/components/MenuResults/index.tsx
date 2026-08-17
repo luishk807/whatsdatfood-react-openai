@@ -34,6 +34,7 @@ import useDishPhotoUpload from "@/customHooks/useDishPhotoUpload";
 import useDishPhotos from "@/customHooks/useDishPhotos";
 import useDishOrders from "@/customHooks/useDishOrders";
 import DishPhotoGallery from "@/components/DishPhotoGallery";
+import DishRecommendation from "@/components/DishRecommendation";
 import DietaryTags from "@/components/DietaryTags";
 import useSnackbarHook from "@/customHooks/useSnackBar";
 import { groupDishesByCategory, getDishPhotoUrl } from "@/utils/dish";
@@ -360,21 +361,38 @@ const MenuResults: FC = () => {
       >
         {selectedDish && (
           <div className="flex flex-col gap-4">
-            <div className="mx-auto w-48">
-              <DishPhoto
-                url={getDishPhotoUrl(selectedDish)}
-                alt={selectedDish.name}
-                eager
-              />
-            </div>
+            {/* Full width, not a 192px thumbnail floated in the middle. This
+                is the sheet someone opened to see what the dish looks like. */}
+            <DishPhoto
+              url={getDishPhotoUrl(selectedDish)}
+              alt={selectedDish.name}
+              eager
+            />
 
-            <DietaryTags item={selectedDish} showDisclaimer />
+            {selectedDish.price !== undefined &&
+              selectedDish.price !== null && (
+                <p className="text-base font-semibold tabular-nums text-ink">
+                  {convertCurrency(Number(selectedDish.price))}
+                </p>
+              )}
 
             {selectedDish.description && (
               <p className="text-sm leading-relaxed text-ink-muted">
                 {selectedDish.description}
               </p>
             )}
+
+            <DietaryTags item={selectedDish} showDisclaimer />
+
+            {/* The headline answer, above everything else the sheet offers. */}
+            <div className="border-y border-line py-4">
+              <DishRecommendation
+                item={selectedDish}
+                vote={votes[Number(selectedDish.id)]}
+                canVote={canVote}
+                onVote={(value) => handleVote(selectedDish, value)}
+              />
+            </div>
 
             <button
               type="button"

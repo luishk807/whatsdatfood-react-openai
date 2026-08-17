@@ -6,6 +6,7 @@ import {
   buildDishScores,
   getTopDishes,
   hasRankedDishes,
+  recommendShare,
 } from "@/utils/ranking";
 import { RANKING } from "@/customConstants/ranking";
 import { MenuItemType } from "@/interfaces/restaurants";
@@ -194,5 +195,67 @@ describe("hasRankedDishes", () => {
         dish(1, "A", Array(RANKING.MIN_VOTES_TO_RANK).fill(5)),
       ]),
     ).toBe(true);
+  });
+});
+
+describe("recommendShare", () => {
+  const withVotes = (ratings: number[]) =>
+    ({
+      id: 1,
+      name: "Plain Pie",
+      ratings: ratings.map((rating, index) => ({
+        id: `${index}`,
+        rating,
+        user_id: index + 1,
+      })),
+    }) as unknown as MenuItemType;
+
+  const enough = RANKING.MIN_VOTES_TO_RANK;
+
+  it("is the percentage who voted it up", () => {
+    // 4 up, 1 down out of 5.
+    expect(withVotes([5, 5, 5, 5, 1])).toBeTruthy();
+    expect(recommendShare(withVotes([5, 5, 5, 5, 1]))).toBe(80);
+  });
+
+  it("is 100 when everyone recommends it", () => {
+    expect(recommendShare(withVotes(Array(enough).fill(5)))).toBe(100);
+  });
+
+  it("is 0 when nobody does", () => {
+    expect(recommendShare(withVotes(Array(enough).fill(1)))).toBe(0);
+  });
+
+  it("is null below the vote threshold", () => {
+    // "100% recommend" from one person is the most misleading thing this
+    // could say, so there is no percentage until there is a sample.
+    expect(recommendShare(withVotes([5]))).toBeNull();
+    expect(recommendShare(withVotes(Array(enough - 1).fill(5)))).toBeNull();
+  });
+
+  it("is null for a dish nobody has voted on", () => {
+    expect(recommendShare(withVotes([]))).toBeNull();
+  });
+
+  it("rounds rather than reporting a fraction of a person", () => {
+    // 2 of 6 is 33.33...
+    const share = recommendShare(withVotes([5, 5, 1, 1, 1, 1]));
+
+    expect(share).toBe(33);
+    expect(Number.isInteger(share)).toBe(true);
+  });
+
+  it("survives a rating that is not a number", () => {
+    const item = {
+      id: 1,
+      name: "Odd",
+      ratings: Array.from({ length: enough }, (_, index) => ({
+        id: `${index}`,
+        rating: "not a number" as unknown as number,
+        user_id: index,
+      })),
+    } as unknown as MenuItemType;
+
+    expect(recommendShare(item)).toBe(0);
   });
 });

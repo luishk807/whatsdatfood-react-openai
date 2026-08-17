@@ -177,3 +177,29 @@ export const CHUNK_LABELS = {
     "load. Reloading picks up the new version.",
   reload: "Reload",
 } as const;
+
+export const RECOMMEND_LABELS = {
+  share: (percent: number) => `${percent}% recommend this`,
+  votes: (count: number) =>
+    count === 1 ? "1 vote" : `${count} votes`,
+  // Below the threshold there is no percentage - one vote is not a
+  // proportion, and "100% recommend" from one person is a lie with a
+  // number attached.
+  tooFew: (count: number) =>
+    count === 0
+      ? "No votes yet"
+      : count === 1
+        ? "1 vote so far"
+        : `${count} votes so far`,
+  ask: "Would you order this again?",
+} as const;
+
+export const REVIEW_LABELS = {
+  heading: "Reviews",
+  count: (n: number) => (n === 1 ? "1 review" : `${n} reviews`),
+  none: "No reviews yet.",
+  write: "Write a review",
+  // Stars live here and nowhere else: inside a written review, where someone
+  // has already stopped to put their opinion into words.
+  starsHint: "Stars apply to this review only.",
+} as const;

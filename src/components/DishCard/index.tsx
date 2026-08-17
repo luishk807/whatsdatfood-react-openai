@@ -15,8 +15,10 @@ import {
   DISH_LABELS,
   RANKING_LABELS,
   ORDER_LABELS,
+  RECOMMEND_LABELS,
 } from "@/customConstants/labels";
 import { shareOfDiners } from "@/utils/orders";
+import { recommendShare } from "@/utils/ranking";
 import { VoteValue } from "@/types";
 
 /**
@@ -42,6 +44,7 @@ const DishCard: FC<DishCardInterface> = ({
   const uploading = Number(item?.id ?? 0) === Number(uploadingDishId ?? -1);
   const showTopBadge = score?.isRanked || item.top_choice;
   const orderShare = shareOfDiners(item.order_count, dinerCount);
+  const share = recommendShare(item);
 
   const handleVote = (value: VoteValue) => onVote && onVote(item, value);
 
@@ -113,12 +116,21 @@ const DishCard: FC<DishCardInterface> = ({
         </p>
       )}
 
-      {/* Below the vote threshold we show the count, never a rank — a wrong
-          "top dish" costs more trust than saying nothing. */}
-      {score && score.voteCount > 0 && !score.isRanked && (
-        <p className="text-xs text-ink-muted">
-          {RANKING_LABELS.voteCount(score.voteCount)}
+      {/* One metric across the card, the strip and the detail sheet, so the
+          product answers "would people order this again" the same way
+          everywhere. Below the vote threshold there is no percentage - a
+          wrong "top dish" costs more trust than saying nothing. */}
+      {share !== null ? (
+        <p className="text-xs font-medium tabular-nums text-brand">
+          {RECOMMEND_LABELS.share(share)}
         </p>
+      ) : (
+        score &&
+        score.voteCount > 0 && (
+          <p className="text-xs text-ink-muted">
+            {RANKING_LABELS.voteCount(score.voteCount)}
+          </p>
+        )
       )}
 
       <div className="flex items-center justify-between gap-2">

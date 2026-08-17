@@ -1,6 +1,6 @@
 import { MenuItemType } from "@/interfaces/restaurants";
 import { DishScore, DishScoreMap } from "@/interfaces/ranking";
-import { RANKING } from "@/customConstants/ranking";
+import { RANKING, VOTE_MIDPOINT } from "@/customConstants/ranking";
 
 export const getVoteCount = (item: MenuItemType): number =>
   item.ratings?.length ?? 0;
@@ -118,3 +118,30 @@ export const getTopDishes = (
 /** True once any dish has cleared the vote threshold. */
 export const hasRankedDishes = (items: MenuItemType[]): boolean =>
   items.some((item) => getVoteCount(item) >= RANKING.MIN_VOTES_TO_RANK);
+
+/**
+ * The share of voters who would recommend a dish, 0–100.
+ *
+ * This is the headline number the product should lead with. Thumbs and
+ * five-star reviews were competing to answer the same question in three
+ * different places - the card, the strip and the detail sheet - and a
+ * percentage of people who would order it again is both the more useful
+ * answer and the one this app can actually collect at a table.
+ *
+ * Null below the vote threshold: a single vote is not a percentage, and
+ * "100% recommend" from one person is the most misleading thing this could
+ * possibly say.
+ */
+export const recommendShare = (item: MenuItemType): number | null => {
+  const ratings = item?.ratings ?? [];
+
+  if (ratings.length < RANKING.MIN_VOTES_TO_RANK) {
+    return null;
+  }
+
+  const up = ratings.filter(
+    (rating) => Number(rating?.rating) >= VOTE_MIDPOINT,
+  ).length;
+
+  return Math.round((up / ratings.length) * 100);
+};
