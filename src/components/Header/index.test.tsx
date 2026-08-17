@@ -1,5 +1,4 @@
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import Header from "@/components/Header";
 import { SITE_LABELS } from "@/customConstants/labels";
@@ -62,22 +61,20 @@ describe("Header", () => {
     });
   });
 
-  it("opens a menu on the phone rather than crowding the bar", async () => {
+  it("has no hamburger", () => {
+    // Signed in it opened a sheet containing the account button, which opened
+    // a second sheet. Everything it held belongs in the account menu or the
+    // footer.
     show();
 
-    await userEvent.click(screen.getByLabelText(SITE_LABELS.menu));
-
-    expect(screen.getByRole("dialog")).toBeInTheDocument();
-    expect(screen.getByText(SITE_LABELS.createAccount)).toBeInTheDocument();
+    expect(screen.queryByLabelText(SITE_LABELS.menu)).not.toBeInTheDocument();
   });
 
-  it("closes that menu again", async () => {
-    show();
-    await userEvent.click(screen.getByLabelText(SITE_LABELS.menu));
+  it("is two controls wide, so it fits a phone", () => {
+    const { container } = show();
 
-    await userEvent.click(screen.getByLabelText(SITE_LABELS.closeMenu));
-
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+    // Brand, theme, and one account control.
+    expect(container.querySelectorAll("header button, header a")).toHaveLength(3);
   });
 
   it("carries the theme control", () => {
