@@ -188,6 +188,12 @@ export const SEARCH_LABELS = {
   failed: "Search is unavailable for a moment. Try again shortly.",
 } as const;
 
+export const LEGAL_LABELS = {
+  privacy: "Privacy",
+  terms: "Terms",
+  effective: (date: string) => `Last updated ${date}`,
+} as const;
+
 export const SITE_LABELS = {
   brand: "What's dat food",
   tagline: "Know what to order.",

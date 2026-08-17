@@ -12,6 +12,8 @@ export const ROUTES = {
   menuResults: "/menu-results/:restaurant",
   manage: "/manage",
   admin: "/admin",
+  privacy: "/privacy",
+  terms: "/terms",
   notFound: "*",
 } as const;
 

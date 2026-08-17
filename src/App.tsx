@@ -9,6 +9,8 @@ import { ROUTES } from "@/customConstants/routes";
 const LazyHomepage = lazy(() => import("@/components/Homepage"));
 const LazyResult = lazy(() => import("@/components/MenuResults"));
 const LazyNotFound = lazy(() => import("@/components/NotFound"));
+const LazyPrivacy = lazy(() => import("@/components/Privacy"));
+const LazyTerms = lazy(() => import("@/components/Terms"));
 const LazySignIN = lazy(() => import("@/components/SignInComponent"));
 const LazyCreateAccount = lazy(() => import("@/components/CreateAccount"));
 const LazyUserAccount = lazy(() => import("@/components/UserAccount"));
@@ -179,6 +181,29 @@ function App() {
             <Suspense fallback={<Loading style={customStyle} />}>
               <Layout>
                 <LazyHomepage />
+              </Layout>
+            </Suspense>
+          }
+        />
+
+        {/* Public and unauthenticated on purpose: somebody deciding whether to
+            upload a photo must be able to read the terms without an account. */}
+        <Route
+          path={ROUTES.privacy}
+          element={
+            <Suspense fallback={<Loading style={customStyle} />}>
+              <Layout>
+                <LazyPrivacy />
+              </Layout>
+            </Suspense>
+          }
+        />
+        <Route
+          path={ROUTES.terms}
+          element={
+            <Suspense fallback={<Loading style={customStyle} />}>
+              <Layout>
+                <LazyTerms />
               </Layout>
             </Suspense>
           }

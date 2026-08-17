@@ -1,13 +1,16 @@
-import { SITE_LABELS } from "@/customConstants/labels";
+import { Link } from "react-router-dom";
+import { SITE_LABELS, LEGAL_LABELS } from "@/customConstants/labels";
+import { ROUTES } from "@/customConstants/routes";
 
 /**
  * Small on purpose.
  *
  * This replaced a footer that rendered the literal words "Footer" and
  * "Contact" - placeholder text that shipped. Everything here goes somewhere:
- * no About or How it works link until there is a page behind it, and no
- * Privacy or Terms until they have been written and reviewed, which they must
- * be before strangers upload photographs.
+ * no About or How it works link until there is a page behind it. Privacy and
+ * Terms are now written and linked, which they had to be before strangers
+ * upload photographs - the terms are where the licence to display those
+ * photographs comes from.
  */
 const Footer = () => (
   <footer className="border-t border-line bg-surface">
@@ -17,7 +20,13 @@ const Footer = () => (
         <p className="text-ink-muted">{SITE_LABELS.tagline}</p>
       </div>
 
-      <div className="flex items-center gap-4 text-ink-muted">
+      <div className="flex flex-wrap items-center gap-4 text-ink-muted">
+        <Link to={ROUTES.privacy} className="hover:text-ink">
+          {LEGAL_LABELS.privacy}
+        </Link>
+        <Link to={ROUTES.terms} className="hover:text-ink">
+          {LEGAL_LABELS.terms}
+        </Link>
         <a
           href="mailto:info@whatsdatfood.com"
           className="hover:text-ink"
