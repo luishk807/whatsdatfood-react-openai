@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import clsx from "clsx";
 import useAuth from "@/customHooks/useAuth";
@@ -18,6 +19,10 @@ const AccountButton = () => {
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  // The sheet is portalled out of this subtree, so "outside" has to mean
+  // outside both - otherwise a tap on a row closes the menu before the
+  // link it landed on gets to fire.
+  const sheetRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!open) {
@@ -25,7 +30,12 @@ const AccountButton = () => {
     }
 
     const onClickOutside = (event: MouseEvent) => {
-      if (!containerRef.current?.contains(event.target as Node)) {
+      const target = event.target as Node;
+      const inside =
+        containerRef.current?.contains(target) ||
+        sheetRef.current?.contains(target);
+
+      if (!inside) {
         setOpen(false);
       }
     };
@@ -116,26 +126,36 @@ const AccountButton = () => {
             {rows}
           </div>
 
-          {/* Phone: a sheet, with rows a thumb can actually hit. */}
-          <div className="fixed inset-0 z-50 sm:hidden">
-            <div
-              className="absolute inset-0 bg-black/50"
-              onClick={() => setOpen(false)}
-              aria-hidden="true"
-            />
-            <div
-              role="menu"
-              className={clsx(
-                "absolute inset-x-0 bottom-0 max-h-[75vh] overflow-y-auto",
-                "rounded-t-card bg-surface-raised pb-4 shadow-sheet",
-              )}
-            >
-              <div className="flex justify-center py-2">
-                <span className="h-1 w-10 rounded-full bg-line" />
+          {/* Phone: a sheet, with rows a thumb can actually hit.
+
+              Rendered into the body on purpose. The header sets
+              backdrop-blur, and a backdrop-filter makes its box the
+              containing block for any fixed descendant - so `fixed inset-0`
+              meant the header's 56px, not the viewport, and the sheet was
+              squashed into the bar with only its last row showing. */}
+          {createPortal(
+            <div className="fixed inset-0 z-50 sm:hidden">
+              <div
+                className="absolute inset-0 bg-black/50"
+                onClick={() => setOpen(false)}
+                aria-hidden="true"
+              />
+              <div
+                ref={sheetRef}
+                role="menu"
+                className={clsx(
+                  "absolute inset-x-0 bottom-0 max-h-[75vh] overflow-y-auto",
+                  "rounded-t-card bg-surface-raised pb-4 shadow-sheet",
+                )}
+              >
+                <div className="flex justify-center py-2">
+                  <span className="h-1 w-10 rounded-full bg-line" />
+                </div>
+                {rows}
               </div>
-              {rows}
-            </div>
-          </div>
+            </div>,
+            document.body,
+          )}
         </>
       )}
     </div>

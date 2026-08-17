@@ -91,6 +91,37 @@ describe("AccountButton", () => {
     expect(screen.getAllByRole("menu")).toHaveLength(2);
   });
 
+  it("puts the sheet on the body, not inside the blurred header", async () => {
+    // A backdrop-filter makes its element the containing block for fixed
+    // descendants, so `fixed inset-0` meant the 56px header rather than the
+    // viewport - the sheet was squashed into the bar with one row showing.
+    show();
+    await openMenu();
+
+    const sheets = screen
+      .getAllByRole("menu")
+      .filter((menu) => menu.className.includes("bottom-0"));
+
+    expect(sheets).toHaveLength(1);
+    expect(document.body.contains(sheets[0])).toBe(true);
+    expect(sheets[0].closest("header")).toBeNull();
+  });
+
+  it("a tap inside the sheet is not treated as a tap outside", async () => {
+    // The sheet lives outside this component's subtree now, so the
+    // outside-click check has to know about both.
+    show();
+    await openMenu();
+
+    const [sheet] = screen
+      .getAllByRole("menu")
+      .filter((menu) => menu.className.includes("bottom-0"));
+
+    await userEvent.click(within(sheet).getByText("luis"));
+
+    expect(within(sheet).getByText("Favorites")).toBeInTheDocument();
+  });
+
   it("closes when a destination is chosen", async () => {
     show();
     await openMenu();
