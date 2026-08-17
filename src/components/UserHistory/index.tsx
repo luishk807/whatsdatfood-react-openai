@@ -24,7 +24,6 @@ const UserHistory: FC = () => {
       // const totalPages = _get(searches, "totalPages");
       // const currentPage = _get(searches, "currentPage");
 
-      console.log(data, "data");
       setUserViews(data as UserView[]);
     }
   };

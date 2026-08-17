@@ -27,7 +27,6 @@ const UserFriendLists: FC<UserFriendListsInt> = ({ onCreate }) => {
       const totalPages = _get(resp, "totalPages");
       const currentPage = _get(resp, "currentPage");
 
-      console.log(data, "data");
       setFriends(data as UserFriend[]);
     };
     fetchAllFriends();

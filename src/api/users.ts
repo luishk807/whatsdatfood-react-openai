@@ -16,7 +16,6 @@ export const handleCreateUser = async (
 
     const resp = _get(data, "addUser");
 
-    console.log("handleCreateUser", resp);
 
     return resp as unknown as CreateUserInputType;
   } catch (err: unknown) {
@@ -39,7 +38,6 @@ export const addUserRating = async (
 
     const resp = _get(data, "addUserRating");
 
-    console.log("addUserRating", resp);
 
     return resp as unknown as userRatingPayload;
   } catch (err) {

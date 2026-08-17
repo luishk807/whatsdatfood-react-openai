@@ -160,3 +160,12 @@ export const SITE_LABELS = {
   contact: "Contact",
   copyright: "© 2026 What's dat food",
 } as const;
+
+export const FAVORITE_LABELS = {
+  save: "Save this restaurant",
+  saved: "Saved",
+  remove: "Remove from saved",
+  signInToSave: "Sign in to save restaurants",
+  savedToast: "Saved",
+  failed: "Could not save that. Try again.",
+} as const;

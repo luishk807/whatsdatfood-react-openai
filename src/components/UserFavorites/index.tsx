@@ -18,13 +18,11 @@ const UserFavoritesSection: FC = () => {
     const fetchAllFavorites = async () => {
       const resp = await getAllUserFavorites(page, limit);
       if (resp) {
-        console.log("Fetched favorites:", resp);
         const data = _get(resp, "data");
         const totalItems = _get(resp, "totalItems");
         const totalPages = _get(resp, "totalPages");
         const currentPage = _get(resp, "currentPage");
 
-        console.log(data);
         setFavorites(data as UserFavorites[]);
       } else {
         console.error("Failed to fetch favorites");

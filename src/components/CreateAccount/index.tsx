@@ -15,7 +15,6 @@ const CreateAccount = () => {
 
   const handleSubmit = async (formData: any) => {
     const { confirm_password: _, ...payload } = formData;
-    console.log(payload);
 
     try {
       const resp = await createUser(payload);
@@ -26,7 +25,6 @@ const CreateAccount = () => {
         navigate("/sign-in");
       }, 3000);
     } catch (err) {
-      console.log("err", err);
       showSnackBar("ERROR: Unable to create account!", "error");
     }
   };

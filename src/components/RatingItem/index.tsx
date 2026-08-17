@@ -12,8 +12,6 @@ const RatingItem: FC<RatingItemInt> = ({ data }) => {
     ? _get(user, "first_name", "") + " " + _get(user, "last_name", "")
     : null;
   const { rating: score, title, comment, updatedAt } = data;
-  console.log("user", user);
-  console.log("raitng", data);
   return (
     <div className="w-full">
       <div className="w-full flex justify-between">

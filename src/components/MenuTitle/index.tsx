@@ -23,7 +23,6 @@ const MenuTitle: FC<MenuTitleInterface> = ({ restaurant }) => {
     return;
   }
 
-  console.log("restaurant info", restaurant);
   return (
     <Grid
       container

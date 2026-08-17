@@ -23,7 +23,6 @@ const RatingListComponent: FC<RatingListComponentInterface> = ({
     const resp = await getUserRatingsByItemId(restItemId, page, limit);
     if (resp) {
       const { data } = resp;
-      console.log("ratings", data);
       setRatingLists(data as UserRating[]);
     } else {
       setRatingLists([]);

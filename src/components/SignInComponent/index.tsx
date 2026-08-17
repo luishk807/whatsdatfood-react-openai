@@ -17,7 +17,6 @@ const SignInComponent = () => {
   const { checkUser } = useAuth();
 
   const handleSubmit = async (formData: any) => {
-    console.log("form data", formData);
     try {
       const { username, password } = formData;
       const resp = await login(username, password);

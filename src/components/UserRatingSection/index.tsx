@@ -47,7 +47,6 @@ const UserRatingsSection: FC = () => {
         ratings.map((data, indx) => {
           const item: MenuItemType = _get(data, "restaurantMenuItem");
           const images: RestaurantItemImageType = _get(item, "images.0");
-          console.log("item", item);
           return (
             <Grid
               size={12}

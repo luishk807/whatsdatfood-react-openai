@@ -10,7 +10,6 @@ const UserFriendCreate: FC<UserFriendCreateInt> = ({
   onPrevious,
   onSubmit,
 }) => {
-  console.log("type", type);
   const fields = CREATE_USER_FRIEND;
   const {
     addNewUserFriend,
@@ -33,12 +32,10 @@ const UserFriendCreate: FC<UserFriendCreateInt> = ({
     switch (type) {
       case UserFriendSectionWindows.create:
         await addNewUserFriend(friendData);
-        console.log("created", addFriendData);
         onSubmit && onSubmit(friendData, type);
         break;
       case UserFriendSectionWindows.edit:
         await updateUserFriend(friendData);
-        console.log("saved", updateFriendData);
         onSubmit && onSubmit(friendData, type);
         break;
     }

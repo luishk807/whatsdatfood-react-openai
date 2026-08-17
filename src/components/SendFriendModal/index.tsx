@@ -8,7 +8,6 @@ import Image from "@/components/Image";
 
 const SendFriendModal: FC<SendFriendModalInterface> = ({ data }) => {
   const handleSendFriend = (e: any) => {
-    console.log("got here");
   };
 
   return (

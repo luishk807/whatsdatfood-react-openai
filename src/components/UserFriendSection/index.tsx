@@ -33,7 +33,6 @@ const UserFriendSection: FC = () => {
     form: CreateUserFriend,
     type: UserFriendSectionWindowTypes,
   ) => {
-    console.log("here in submit", form);
     setToogleSection(UserFriendSectionWindows.list);
     switch (type) {
       case UserFriendSectionWindows.create:
@@ -51,7 +50,6 @@ const UserFriendSection: FC = () => {
   const getUserFriendComp = useCallback(() => {
     switch (toggleSection) {
       case UserFriendSectionWindows.list:
-        console.log("list");
         setComponentSelected(
           <Suspense fallback={<div>..loading</div>}>
             <UserFriendLists
@@ -61,7 +59,6 @@ const UserFriendSection: FC = () => {
         );
         break;
       case UserFriendSectionWindows.create:
-        console.log("create");
         setComponentSelected(
           <Suspense fallback={<div>..loading</div>}>
             <UserFriendCreate
@@ -73,7 +70,6 @@ const UserFriendSection: FC = () => {
         );
         break;
       case UserFriendSectionWindows.edit:
-        console.log("edit");
         setComponentSelected(
           <Suspense fallback={<div>..loading</div>}>
             <UserFriendCreate

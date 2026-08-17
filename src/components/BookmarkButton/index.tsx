@@ -1,69 +1,108 @@
-import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
-// import BookmarkBorderRoundedIcon from "@mui/icons-material/BookmarkBorderRounded";
-import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
-import { Grid, Box, Skeleton, IconButton } from "@mui/material";
+import { type FC, useCallback, useEffect, useState } from "react";
+import clsx from "clsx";
+import useAuth from "@/customHooks/useAuth";
 import useUserFavorite from "@/customHooks/useUserFavorites";
-import "./index.css";
-import { type FC, useEffect, useState } from "react";
 import useSnackbarHook from "@/customHooks/useSnackBar";
+import { FAVORITE_LABELS } from "@/customConstants/labels";
+import { BookmarkButtonInterface } from "@/interfaces/favorites";
 
-interface BookmarkButtonInt {
-  slug: string;
-  defaultValue?: boolean;
-}
-const BookmarkButton: FC<BookmarkButtonInt> = ({ slug, defaultValue }) => {
-  const {
-    saveFavorites,
-    checkUserFavoritesQuery,
-    isUserFavorite,
-    submitUserFavoritesQuery,
-  } = useUserFavorite();
+const HeartIcon: FC<{ filled: boolean }> = ({ filled }) => (
+  <svg
+    width="20"
+    height="20"
+    viewBox="0 0 24 24"
+    fill={filled ? "currentColor" : "none"}
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21.2l7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8z" />
+  </svg>
+);
+
+/**
+ * Saving a restaurant.
+ *
+ * It used to ask "is this one of my favourites?" whether or not anybody was
+ * signed in, so every anonymous visit to a menu page produced an UNAUTHORIZED
+ * error - and it logged the answer to the console while it was at it. Signed
+ * out it now asks nothing, and says what to do instead of reporting a failure.
+ */
+const BookmarkButton: FC<BookmarkButtonInterface> = ({ slug, defaultValue }) => {
+  const { user } = useAuth();
+  const { saveFavorites, isUserFavorite } = useUserFavorite();
   const { SnackbarComponent, showSnackBar } = useSnackbarHook();
-  const [isSaved, setIsSaved] = useState(defaultValue);
-  const { loading, error } = submitUserFavoritesQuery;
+  const [isSaved, setIsSaved] = useState(Boolean(defaultValue));
+  const [busy, setBusy] = useState(false);
 
-  const handleSaveButton = async () => {
-    if (slug) {
-      try {
-        const resp = await saveFavorites(slug);
-        if (resp) {
-          showSnackBar("Restaurant Saved!", "success");
-        } else {
-          showSnackBar("Unable to save favorite", "error");
-        }
-      } catch (err) {
-        showSnackBar("Unable to save favorite", "error");
-      } finally {
-        await checkUserFavorite();
-      }
+  const signedIn = Boolean(user);
+
+  const refresh = useCallback(async () => {
+    if (!slug || !signedIn) {
+      return;
     }
-  };
 
-  const checkUserFavorite = async () => {
-    const resp = await isUserFavorite(slug);
-    console.log("is saved:", resp);
-    setIsSaved(!!resp);
-  };
+    try {
+      setIsSaved(Boolean(await isUserFavorite(slug)));
+    } catch {
+      // Whether it is saved is not worth interrupting a page for.
+      setIsSaved(false);
+    }
+  }, [slug, signedIn, isUserFavorite]);
+
   useEffect(() => {
-    if (slug) {
-      checkUserFavorite();
+    refresh();
+  }, [refresh]);
+
+  const handleClick = async () => {
+    if (!signedIn) {
+      showSnackBar(FAVORITE_LABELS.signInToSave, "info");
+      return;
     }
-  }, [slug]);
+
+    setBusy(true);
+
+    try {
+      const saved = await saveFavorites(slug);
+
+      if (saved) {
+        showSnackBar(FAVORITE_LABELS.savedToast, "success");
+      } else {
+        showSnackBar(FAVORITE_LABELS.failed, "error");
+      }
+    } catch {
+      showSnackBar(FAVORITE_LABELS.failed, "error");
+    } finally {
+      setBusy(false);
+      await refresh();
+    }
+  };
+
+  const label = !signedIn
+    ? FAVORITE_LABELS.signInToSave
+    : isSaved
+      ? FAVORITE_LABELS.remove
+      : FAVORITE_LABELS.save;
+
   return (
     <>
       {SnackbarComponent}
-      <Grid className="w-full flex justify-end">
-        <Box className="bookmark-icon-container">
-          Favorite&nbsp;
-          <IconButton onClick={handleSaveButton}>
-            {isSaved ? (
-              <FavoriteRoundedIcon style={{ color: "red" }} />
-            ) : (
-              <FavoriteBorderRoundedIcon />
-            )}
-          </IconButton>
-        </Box>
-      </Grid>
+      <button
+        type="button"
+        onClick={handleClick}
+        disabled={busy}
+        aria-label={label}
+        aria-pressed={isSaved}
+        title={label}
+        className={clsx(
+          "flex h-11 w-11 items-center justify-center rounded-full transition-colors disabled:opacity-50 motion-reduce:transition-none",
+          isSaved ? "text-danger" : "text-ink-muted hover:text-ink",
+        )}
+      >
+        <HeartIcon filled={isSaved} />
+      </button>
     </>
   );
 };

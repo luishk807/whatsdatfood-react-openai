@@ -31,7 +31,6 @@ const RatingCustom: FC<RatingCustomInterface> = ({
   }
 
   const handleRatingChange = (event: any, newValue: any) => {
-    console.log(newValue);
     setValue(newValue);
     onClick && onClick(newValue);
   };

@@ -20,7 +20,6 @@ const UserSettings: FC = () => {
   const fetchUserData = async () => {
     const resp = await getUserInfo();
     if (resp) {
-      console.log(resp, "resp");
       setUserInfo(resp as UserType);
     }
   };
@@ -28,7 +27,6 @@ const UserSettings: FC = () => {
   const handleSubmit = async (formData: any) => {
     try {
       await updateUser(formData);
-      console.log("User updated successfully");
     } catch (error) {
       console.error("Error updating user:", error);
     }
