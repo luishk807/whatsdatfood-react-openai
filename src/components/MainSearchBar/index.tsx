@@ -24,6 +24,17 @@ const MainSearchBar: FC = () => {
   // after a newer one would otherwise overwrite it with stale results.
   const requestId = useRef(0);
 
+  /**
+   * Held in a ref, not a dependency.
+   *
+   * useRestaurantMutation returns a new function identity on every render, so
+   * depending on it made runSearch change every render, which re-ran the
+   * effect, which set state, which re-rendered - an unbroken loop of requests
+   * against the backend for as long as the box had anything in it.
+   */
+  const lookupRef = useRef(getRestaurantListByName);
+  lookupRef.current = getRestaurantListByName;
+
   const runSearch = useCallback(
     async (term: string, generate = false) => {
       const trimmed = term.trim();
@@ -39,7 +50,7 @@ const MainSearchBar: FC = () => {
       setOpen(true);
 
       try {
-        const response = await getRestaurantListByName(trimmed, generate);
+        const response = await lookupRef.current(trimmed, generate);
         const results = Array.isArray(response) ? response : [];
 
         if (id === requestId.current) {
@@ -61,7 +72,7 @@ const MainSearchBar: FC = () => {
         }
       }
     },
-    [getRestaurantListByName],
+    [],
   );
 
   useEffect(() => {
@@ -74,7 +85,9 @@ const MainSearchBar: FC = () => {
 
     const timeout = setTimeout(() => runSearch(value), DEBOUNCE_MS);
     return () => clearTimeout(timeout);
-  }, [value, runSearch]);
+    // Only the typed value. runSearch is stable by construction above.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
 
   const goTo = (restaurant: RestaurantType) => {
     if (!restaurant.slug) {
