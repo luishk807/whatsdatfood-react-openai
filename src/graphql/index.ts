@@ -49,7 +49,9 @@ const cache = new InMemoryCache({
           keyArgs: ["slug"],
         },
         aiRestaurantNameList: {
-          keyArgs: ["name"],
+          // Both args: a database-only miss must not be replayed as the
+          // answer to a submit that is allowed to generate.
+          keyArgs: ["name", "generate"],
         },
         getRestaurantImage: {
           keyArgs: ["id"],

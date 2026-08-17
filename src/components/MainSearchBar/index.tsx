@@ -25,7 +25,7 @@ const MainSearchBar: FC = () => {
   const requestId = useRef(0);
 
   const runSearch = useCallback(
-    async (term: string) => {
+    async (term: string, generate = false) => {
       const trimmed = term.trim();
 
       if (!trimmed) {
@@ -39,7 +39,7 @@ const MainSearchBar: FC = () => {
       setOpen(true);
 
       try {
-        const response = await getRestaurantListByName(trimmed);
+        const response = await getRestaurantListByName(trimmed, generate);
         const results = Array.isArray(response) ? response : [];
 
         if (id === requestId.current) {
@@ -94,7 +94,10 @@ const MainSearchBar: FC = () => {
   const handleSubmit = async (event?: React.FormEvent) => {
     event?.preventDefault();
 
-    const results = suggestions.length ? suggestions : await runSearch(value);
+    // Submitting is the deliberate act, so this one may reach the model.
+    const results = suggestions.length
+      ? suggestions
+      : await runSearch(value, true);
 
     if (results.length === 1) {
       goTo(results[0]);

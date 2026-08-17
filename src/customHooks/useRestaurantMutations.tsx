@@ -39,10 +39,15 @@ const useRestaurantMutation = () => {
     },
   ] = useLazyQuery(GET_RESTAURANT_IMAGES);
 
-  const getRestaurantListByName = async (name: string) => {
+  /**
+   * `generate` false is the type-ahead path: look in the database, never ask
+   * the model. True is what a deliberate submit does.
+   */
+  const getRestaurantListByName = async (name: string, generate = true) => {
     const resp = await GetAiRestaurantByName({
       variables: {
         name,
+        generate,
       },
     });
 

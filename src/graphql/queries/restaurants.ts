@@ -1,8 +1,13 @@
 import { gql } from "@apollo/client";
 
+/**
+ * `generate` decides whether a miss is allowed to reach the model. Suggestions
+ * pass false: every pause in someone's typing was otherwise a generation, and
+ * a visitor gets five an hour.
+ */
 export const GET_RESTAURANTS_BY_NAME = gql`
-  query GetAiRestaurant($name: String!) {
-    aiRestaurantNameList(name: $name) {
+  query GetAiRestaurant($name: String!, $generate: Boolean) {
+    aiRestaurantNameList(name: $name, generate: $generate) {
       name
       address
       city

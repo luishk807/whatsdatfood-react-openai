@@ -70,7 +70,11 @@ const useTheme = () => {
   // While on "system", a machine that switches at sunset should carry the page
   // with it rather than waiting for a reload.
   useEffect(() => {
-    if (preference !== THEME.system || typeof window === "undefined") {
+    if (
+      preference !== THEME.system ||
+      typeof window === "undefined" ||
+      typeof window.matchMedia !== "function"
+    ) {
       return;
     }
 
