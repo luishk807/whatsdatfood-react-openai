@@ -35,6 +35,12 @@ export interface DishPhotoInterface {
   onAddPhoto?: (file: File) => void;
   /** Fires once when a photo-less tile scrolls into view. */
   onVisible?: () => void;
+  /**
+   * Fires when there is nothing to show — no URL, or the host refused it.
+   * Third-party photo hosts 403 often enough that this is a normal case, and a
+   * caller that has nothing to offer in place of a photo can drop the tile.
+   */
+  onUnavailable?: () => void;
   /** Username to credit, shown on community photos. */
   credit?: string | null;
   uploading?: boolean;
@@ -78,4 +84,27 @@ export interface DishGridInterface
 export interface TopDishStripInterface
   extends Omit<DishGridInterface, "eagerCount"> {
   title?: string;
+}
+
+/**
+ * One photo on the homepage wall, as the server sends it.
+ *
+ * A photo on its own is decoration, so every tile carries the dish it shows,
+ * the restaurant it belongs to and the slug to follow.
+ */
+export interface ShowcasePhoto {
+  id?: string | null;
+  url_s?: string | null;
+  url_m?: string | null;
+  dish_name?: string | null;
+  restaurant_name?: string | null;
+  restaurant_slug?: string | null;
+  owner?: string | null;
+}
+
+export interface PhotoWallInterface {
+  photos: ShowcasePhoto[];
+  loading?: boolean;
+  /** How many tiles skip lazy loading; the rest are below the fold. */
+  eagerCount?: number;
 }

@@ -97,4 +97,57 @@ describe("DishPhoto", () => {
     expect(screen.getByText(DISH_LABELS.stockPhoto)).toBeInTheDocument();
     expect(screen.queryByText(/Photo by/)).not.toBeInTheDocument();
   });
+
+  describe("reporting that there is nothing to show", () => {
+    it("tells the caller when the host refuses the photo", async () => {
+      const onUnavailable = jest.fn();
+      render(
+        <DishPhoto
+          url="https://example.test/gone.jpg"
+          alt="Short rib"
+          onUnavailable={onUnavailable}
+        />,
+      );
+
+      expect(onUnavailable).not.toHaveBeenCalled();
+
+      fireEvent.error(screen.getByAltText("Short rib"));
+
+      expect(await screen.findByText(DISH_LABELS.photoFailed)).toBeVisible();
+      expect(onUnavailable).toHaveBeenCalledTimes(1);
+    });
+
+    it("tells the caller when there was never a photo", () => {
+      const onUnavailable = jest.fn();
+      render(<DishPhoto onUnavailable={onUnavailable} />);
+
+      expect(onUnavailable).toHaveBeenCalledTimes(1);
+    });
+
+    it("does not fire again when the caller passes a fresh callback", () => {
+      // A hook returning a new function identity each render, used as an effect
+      // dependency, is a request loop - it has already hit three components
+      // here. An inline arrow at the call site is exactly that shape.
+      const onUnavailable = jest.fn();
+      const { rerender } = render(<DishPhoto onUnavailable={onUnavailable} />);
+
+      rerender(<DishPhoto onUnavailable={() => onUnavailable()} />);
+      rerender(<DishPhoto onUnavailable={() => onUnavailable()} />);
+
+      expect(onUnavailable).toHaveBeenCalledTimes(1);
+    });
+
+    it("stays quiet while the photo is fine", () => {
+      const onUnavailable = jest.fn();
+      render(
+        <DishPhoto
+          url="https://example.test/a.jpg"
+          alt="Short rib"
+          onUnavailable={onUnavailable}
+        />,
+      );
+
+      expect(onUnavailable).not.toHaveBeenCalled();
+    });
+  });
 });

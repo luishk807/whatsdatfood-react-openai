@@ -26,6 +26,7 @@ const DishPhoto: FC<DishPhotoInterface> = ({
   eager,
   onAddPhoto,
   onVisible,
+  onUnavailable,
   credit,
   uploading,
 }) => {
@@ -40,6 +41,21 @@ const DishPhoto: FC<DishPhotoInterface> = ({
   }, [url]);
 
   const isEmpty = !url || failed;
+
+  // Held in a ref rather than listed as a dependency. An inline callback is a
+  // new identity on every render, and a new identity in an effect's dependency
+  // list is how this codebase has produced request loops three times.
+  const onUnavailableRef = useRef(onUnavailable);
+
+  useEffect(() => {
+    onUnavailableRef.current = onUnavailable;
+  }, [onUnavailable]);
+
+  useEffect(() => {
+    if (isEmpty) {
+      onUnavailableRef.current?.();
+    }
+  }, [isEmpty]);
 
   // Only a tile with nothing to show asks for a photo, and only once it is
   // near the viewport — so scrolling past a dish costs nothing.

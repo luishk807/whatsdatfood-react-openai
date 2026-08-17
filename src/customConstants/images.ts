@@ -38,6 +38,16 @@ export const BADGE_TONE = {
 
 
 /**
+ * The homepage wall. Twelve matches the server's default, and the first four
+ * load eagerly because they are the only ones above the fold on a phone —
+ * lazy-loading the visible photographs delays the one thing the page is for.
+ */
+export const SHOWCASE = {
+  LIMIT: 12,
+  EAGER_COUNT: 4,
+} as const;
+
+/**
  * Why someone flags a photo. Kept in step with the server's list — an unknown
  * reason is refused there.
  */

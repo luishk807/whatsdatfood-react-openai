@@ -159,3 +159,21 @@ export const FORGET_DISH_ORDER = gql`
     forgetDishOrder(dishId: $dishId)
   }
 `;
+
+/**
+ * The homepage wall. Public and deliberately cheap on the server — one query,
+ * no AI call, no image search — because every visitor loads this page.
+ */
+export const GET_RECENT_DISH_PHOTOS = gql`
+  query recentDishPhotos($limit: Int) {
+    recentDishPhotos(limit: $limit) {
+      id
+      url_s
+      url_m
+      dish_name
+      restaurant_name
+      restaurant_slug
+      owner
+    }
+  }
+`;

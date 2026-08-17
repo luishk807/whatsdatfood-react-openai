@@ -133,6 +133,17 @@ export const VENUE_LABELS = {
   noDetails: "Nothing on file for this restaurant yet.",
 } as const;
 
+export const SHOWCASE_LABELS = {
+  /** Not "recent photos": the point is that a tap leads to that menu. */
+  heading: "Lately on the menu",
+  /** A tile is a link, so it says where it goes rather than what it depicts. */
+  tileLabel: (dish: string, restaurant: string) => `${dish} at ${restaurant}`,
+  // Silence is the right failure here. The wall is an invitation, not the
+  // product, and an error where the food should be tells a visitor the site
+  // is broken when search works perfectly well.
+  empty: "",
+} as const;
+
 export const SEARCH_LABELS = {
   title: "See it before you order it",
   subtitle: "Photos and rankings from the people who ate there.",
