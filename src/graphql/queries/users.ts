@@ -120,7 +120,6 @@ export const GET_USER_DETAIL = gql`
       email
       phone
       username
-      dob
       createdAt
       updatedAt
     }

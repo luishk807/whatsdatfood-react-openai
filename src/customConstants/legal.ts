@@ -31,7 +31,6 @@ export const PRIVACY_SECTIONS: LegalSection[] = [
       "Your name and username.",
       "Your email address, which is how we reach you and how you recover your account.",
       "Your phone number, if you choose to add one. It is optional.",
-      "Your date of birth.",
       "Your password, stored only as a bcrypt hash. Nobody at What's dat food can read it, and it is never returned by our API.",
     ],
   },

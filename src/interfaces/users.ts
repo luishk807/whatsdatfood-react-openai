@@ -86,7 +86,6 @@ export interface UserRoleType {
 }
 
 export interface CreateUserInputType {
-  dob: string;
   first_name: string;
   last_name: string;
   email: string;
@@ -104,7 +103,6 @@ export interface UserType {
   email: string;
   role_id: bigint;
   verification: string;
-  dob?: Date;
   createdAt?: Date;
   updatedAt?: Date;
   status_id?: number;

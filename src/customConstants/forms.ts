@@ -24,12 +24,6 @@ export const CREATE_ACCOUNT = [
     type: FIELD_TYPES.textfield,
   },
   {
-    name: "dob",
-    label: "Date of birth",
-    isRequired: true,
-    type: FIELD_TYPES.date,
-  },
-  {
     name: "username",
     label: "Username",
     isRequired: true,
