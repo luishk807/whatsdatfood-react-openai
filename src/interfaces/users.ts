@@ -1,11 +1,7 @@
 import { SxProps, Theme, AlertColor } from "@mui/material";
 import { MenuItemType, RestaurantType } from "@/interfaces/restaurants";
 import { StatusType } from "@/interfaces";
-import {
-  ModalType,
-  RatingToogleType,
-  UserFriendSectionWindowTypes,
-} from "@/types";
+import { ModalType, UserFriendSectionWindowTypes } from "@/types";
 
 export interface RatingCustomInterface {
   defaultValue: number;
@@ -131,12 +127,6 @@ export interface RatingItemInt {
   data: UserRating;
 }
 
-export interface RatingModalCreateInterface {
-  data: MenuItemType;
-  label?: string;
-  type?: ModalType;
-}
-
 export interface RatingFormCreateInterface {
   data: MenuItemType;
   label?: string;
@@ -148,12 +138,6 @@ export interface RatingFormCreateInterface {
 export interface RatingListComponentInterface {
   data: MenuItemType;
   onOpenCreate?: () => void;
-}
-
-export interface RatingModalListComponentInt {
-  data: MenuItemType;
-  defaultType?: RatingToogleType;
-  onClose?: () => void;
 }
 
 export interface UserAccountLayoutInterface {

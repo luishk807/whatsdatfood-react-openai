@@ -16,20 +16,12 @@ export interface LoadingInterface {
   customLoader?: ComponentType;
 }
 
-export interface SearchButtonInterface<T> {
-  onSubmit: () => void;
-  showLoading: boolean;
-  data?: T | "";
-}
 export interface CustomModalInterface {
   children: ReactNode;
   customButton?: ReactNode;
   label?: string;
   type?: ModalType;
   closeOnParent?: boolean;
-}
-export interface SendFriendModalInterface {
-  data?: SendFriendModalData | null;
 }
 export interface TextFieldInterface<T> {
   label: string;
@@ -58,19 +50,6 @@ export interface addressType {
   state?: string;
   country?: string;
   postal_code?: string;
-}
-
-export interface MainSearchInputType {
-  onChange: (search: string) => void;
-  selectedValue: string;
-}
-
-export interface SendFriendModalData {
-  restaurantName: string;
-  address: string;
-  itemName: string;
-  price: string;
-  image?: string;
 }
 
 export interface SuggestionComponentType<T extends { name: string }> {
@@ -102,12 +81,6 @@ export interface formCompObjType {
 export interface CustomKeyPairObj<T> {
   label: string;
   value: T;
-}
-
-export interface DashingDisplayBoxInt {
-  show: boolean | undefined;
-  title?: string;
-  data: CustomKeyPairObj<string>[] | null;
 }
 
 export interface snackBarObjType {

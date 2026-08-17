@@ -25,7 +25,7 @@ jobs:
 
       - run: npm run build
 
-      # The bundle is the mobile experience. It is 689 KiB today against a
+      # The bundle is the mobile experience. It is 595 KiB today against a
       # 250 KiB target, so this reports rather than fails - it exists to make
       # a regression visible in the diff.
       # Filenames carry a content hash now, so this matches the entry

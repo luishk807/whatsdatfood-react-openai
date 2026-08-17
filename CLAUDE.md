@@ -117,7 +117,10 @@ minute. Design for the phone and let desktop be the override, never the reverse.
 - Vote controls sit in the lower third, within thumb reach.
 - Detail opens as a bottom sheet, not a route change.
 - Dark mode matters; restaurants are dim.
-- Target a main bundle under 250 KiB (currently ~688 KiB).
+- Target a main bundle under 250 KiB (currently ~595 KiB). Deleting unreferenced
+  components does not move this number — webpack only bundles what the entry
+  graph reaches, so dead code costs repo clarity, not bytes. The remaining gap
+  is MUI.
 
 ## Architecture worth knowing
 

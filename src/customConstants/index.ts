@@ -83,16 +83,6 @@ export const DROPDOWN_MENU = {
 
 export const MODAL_TYPE = ["button", "text", "custom", "link"] as const;
 
-export const RESTAURANT_AMENITIES_OPTIONS = [
-  "parking_available",
-  "cash_only",
-  "card_payment",
-  "delivery_option",
-  "reservation_required",
-  "reservation_available",
-  "drive_through",
-  "delivery_option",
-];
 
 export const RATING_TYPE = {
   list: "list",

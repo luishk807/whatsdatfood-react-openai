@@ -1,15 +1,6 @@
 import { UserRating } from "@/interfaces/users";
 import { BusinessHours } from "@/interfaces/businessHours";
 
-export interface MenuTitleInterface {
-  restaurant: RestaurantType | null;
-}
-
-export interface MenuItemInterface {
-  item: MenuItemType;
-  restaurant?: RestaurantType | null;
-}
-
 export interface ImageInterface {
   url?: string | null;
   alt?: string | null;
@@ -122,10 +113,3 @@ export interface MenuInterfaceItemType extends MenuItemType {
   price: number;
 }
 
-export interface ShowRestaurantDetailI {
-  data?: RestaurantType | null;
-}
-
-export interface RestaurantAmenitiesIconInt {
-  restaurant: RestaurantType;
-}
