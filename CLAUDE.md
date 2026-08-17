@@ -139,6 +139,18 @@ minute. Design for the phone and let desktop be the override, never the reverse.
   only when scrolled near, at most `PHOTO_LOOKUP.MAX_PER_PAGE_VIEW` per page
   view, with a session-level negative cache. Every dish firing a lookup on every
   load is what made a single page view cost 21 image searches.
+- **The homepage wall is `recentDishPhotos`** — one cheap server query, no AI
+  call, cache-first, and every tile links into that restaurant's menu. The
+  server returns one photo per dish and no repeated URL; without that the wall
+  showed the same salad three times. It renders **nothing at all** when the
+  query is empty or fails, because the search box above it is what people came
+  for.
+- **A tile whose photo the host refuses is dropped, not shown empty.**
+  `DishPhoto` reports it via `onUnavailable`. On a menu the empty tile is the
+  upload funnel and belongs there; on the front door it is a hole in the one
+  thing the page shows, and it is shorter than a photo so it pulls its column
+  out of line. Third-party hosts 403 often — this is a normal case, not an edge
+  one.
 
 ## Photo uploads
 
