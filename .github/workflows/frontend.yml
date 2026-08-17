@@ -28,10 +28,22 @@ jobs:
       # The bundle is the mobile experience. It is 689 KiB today against a
       # 250 KiB target, so this reports rather than fails - it exists to make
       # a regression visible in the diff.
+      # Filenames carry a content hash now, so this matches the entry
+      # bundle by pattern rather than by name - and fails loudly if it cannot
+      # find one, because a size check that silently measures nothing is
+      # worse than no size check.
       - name: Report bundle size
         run: |
-          size=$(stat -c%s dist/bundle.js)
-          echo "bundle.js: $((size / 1024)) KiB" >> "$GITHUB_STEP_SUMMARY"
+          main=$(ls dist/main.*.js | grep -v '\.chunk\.js$' | head -1)
+          if [ -z "$main" ]; then
+            echo "no entry bundle found in dist/" >&2
+            ls -la dist/ >&2
+            exit 1
+          fi
+          size=$(stat -c%s "$main")
+          echo "$(basename "$main"): $((size / 1024)) KiB" >> "$GITHUB_STEP_SUMMARY"
+          total=$(du -sk dist | cut -f1)
+          echo "dist total: $total KiB" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Audit
         run: npm audit --audit-level=high

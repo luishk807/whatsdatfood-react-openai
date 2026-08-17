@@ -79,7 +79,16 @@ const useTheme = () => {
     }
 
     const media = window.matchMedia(DARK_QUERY);
-    const onChange = () => publish(THEME.system);
+
+    // Checked at fire time, not captured. A handler that outlives the
+    // preference - a cleanup that did not take, a browser that ignores
+    // removeEventListener - would otherwise reset an explicit choice back
+    // to system the next time the machine changed theme.
+    const onChange = () => {
+      if (state.preference === THEME.system) {
+        publish(THEME.system);
+      }
+    };
 
     media.addEventListener("change", onChange);
     return () => media.removeEventListener("change", onChange);
