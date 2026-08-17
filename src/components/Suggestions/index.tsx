@@ -19,6 +19,7 @@ const SuggestionsComponent = ({
   show,
   searching,
   searched,
+  error,
   onSelect,
   onClose,
 }: SearchSuggestionsInterface) => {
@@ -55,7 +56,11 @@ const SuggestionsComponent = ({
         </p>
       )}
 
-      {!searching && searched && suggestions.length === 0 && (
+      {!searching && error && (
+        <p className="px-4 py-3 text-sm text-danger">{error}</p>
+      )}
+
+      {!searching && !error && searched && suggestions.length === 0 && (
         <p className="px-4 py-3 text-sm text-ink-muted">
           {SEARCH_LABELS.nothingFound}
         </p>

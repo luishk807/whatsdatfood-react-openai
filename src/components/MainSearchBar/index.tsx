@@ -18,6 +18,7 @@ const MainSearchBar: FC = () => {
   const [suggestions, setSuggestions] = useState<RestaurantType[]>([]);
   const [searching, setSearching] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
 
   // Only the most recent lookup may write state; a slow one that resolves
@@ -47,6 +48,7 @@ const MainSearchBar: FC = () => {
 
       const id = ++requestId.current;
       setSearching(true);
+      setError(null);
       setOpen(true);
 
       try {
@@ -59,10 +61,15 @@ const MainSearchBar: FC = () => {
         }
 
         return results;
-      } catch {
+      } catch (thrown) {
         if (id === requestId.current) {
           setSuggestions([]);
           setSearched(true);
+          setError(
+            thrown instanceof Error && thrown.message
+              ? thrown.message
+              : SEARCH_LABELS.failed,
+          );
         }
 
         return [];
@@ -164,6 +171,7 @@ const MainSearchBar: FC = () => {
         show={open}
         searching={searching}
         searched={searched}
+        error={error}
         onSelect={goTo}
         onClose={() => setOpen(false)}
       />

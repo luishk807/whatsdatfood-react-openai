@@ -13,6 +13,8 @@ export interface SearchSuggestionsInterface {
   /** Distinguishes "nothing matched" from "we have not looked yet". */
   searching: boolean;
   searched: boolean;
+  /** Set when the lookup failed, as opposed to returning nothing. */
+  error?: string | null;
   onSelect: (restaurant: RestaurantType) => void;
   onClose: () => void;
 }

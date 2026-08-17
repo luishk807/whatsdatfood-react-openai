@@ -165,14 +165,43 @@ describe("MainSearchBar", () => {
   });
 
   describe("when a lookup fails", () => {
-    it("says so instead of hanging on 'Looking…'", async () => {
-      getRestaurantListByName.mockRejectedValue(new Error("network"));
+    it("reports the refusal rather than claiming nothing was found", async () => {
+      // A rate-limited search reported "Nothing found", which sent someone
+      // hunting for a restaurant that was in the database all along.
+      getRestaurantListByName.mockRejectedValue(
+        new Error("Too many searches. Try again shortly."),
+      );
+      show();
+      await type("lucali");
+
+      expect(
+        await screen.findByText("Too many searches. Try again shortly."),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByText(SEARCH_LABELS.nothingFound),
+      ).not.toBeInTheDocument();
+    });
+
+    it("falls back to a plain message when the error carries none", async () => {
+      getRestaurantListByName.mockRejectedValue(new Error(""));
       show();
       await type("peter");
 
-      expect(
-        await screen.findByText(SEARCH_LABELS.nothingFound),
-      ).toBeInTheDocument();
+      expect(await screen.findByText(SEARCH_LABELS.failed)).toBeInTheDocument();
+    });
+
+    it("clears the error once a search succeeds", async () => {
+      getRestaurantListByName.mockRejectedValueOnce(new Error("boom"));
+      show();
+      await type("a");
+      await screen.findByText("boom");
+
+      getRestaurantListByName.mockResolvedValue([luger]);
+      await type("b");
+
+      await waitFor(() =>
+        expect(screen.queryByText("boom")).not.toBeInTheDocument(),
+      );
     });
   });
 

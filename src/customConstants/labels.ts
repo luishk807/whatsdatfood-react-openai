@@ -143,6 +143,10 @@ export const SEARCH_LABELS = {
   // never seen, so an empty list means the lookup itself came back empty.
   nothingFound: "Nothing found for that name. Try the full name, or add a city.",
   hint: "Press enter to look it up",
+  // A refusal is not an absence. Reporting "nothing found" when the
+  // backend said "too many requests" sends someone hunting for a
+  // restaurant that is sitting right there in the database.
+  failed: "Search is unavailable for a moment. Try again shortly.",
 } as const;
 
 export const SITE_LABELS = {
