@@ -1,4 +1,4 @@
-import { type FC, useCallback, useEffect, useState } from "react";
+import { type FC, useCallback, useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import useAuth from "@/customHooks/useAuth";
 import useUserFavorite from "@/customHooks/useUserFavorites";
@@ -39,18 +39,23 @@ const BookmarkButton: FC<BookmarkButtonInterface> = ({ slug, defaultValue }) => 
 
   const signedIn = Boolean(user);
 
+  // Same trap as the search box: the hook hands back a new function identity
+  // on every render, so depending on it makes the effect re-run every render.
+  const lookupRef = useRef(isUserFavorite);
+  lookupRef.current = isUserFavorite;
+
   const refresh = useCallback(async () => {
     if (!slug || !signedIn) {
       return;
     }
 
     try {
-      setIsSaved(Boolean(await isUserFavorite(slug)));
+      setIsSaved(Boolean(await lookupRef.current(slug)));
     } catch {
       // Whether it is saved is not worth interrupting a page for.
       setIsSaved(false);
     }
-  }, [slug, signedIn, isUserFavorite]);
+  }, [slug, signedIn]);
 
   useEffect(() => {
     refresh();

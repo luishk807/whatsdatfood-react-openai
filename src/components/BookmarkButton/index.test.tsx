@@ -102,6 +102,18 @@ describe("BookmarkButton", () => {
       );
     });
 
+    it("checks once, not on every render", async () => {
+      // The hook returns a new function identity each render; depending on
+      // it directly is what turned the search box into a request loop.
+      const { rerender } = render(<BookmarkButton slug="peter-luger" />);
+      await waitFor(() => expect(isUserFavorite).toHaveBeenCalledTimes(1));
+
+      rerender(<BookmarkButton slug="peter-luger" />);
+      rerender(<BookmarkButton slug="peter-luger" />);
+
+      expect(isUserFavorite).toHaveBeenCalledTimes(1);
+    });
+
     it("does not break the page when the check fails", async () => {
       isUserFavorite.mockRejectedValue(new Error("boom"));
 

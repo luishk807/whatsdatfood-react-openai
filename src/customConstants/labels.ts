@@ -169,3 +169,11 @@ export const FAVORITE_LABELS = {
   savedToast: "Saved",
   failed: "Could not save that. Try again.",
 } as const;
+
+export const CHUNK_LABELS = {
+  title: "This page is out of date",
+  body:
+    "The app was updated while this tab was open, so part of it could not " +
+    "load. Reloading picks up the new version.",
+  reload: "Reload",
+} as const;
