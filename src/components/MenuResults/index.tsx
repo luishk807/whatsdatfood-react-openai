@@ -270,20 +270,21 @@ const MenuResults: FC = () => {
         type={LOADING_TYPES.CUSTOM}
         data={restaurantInfo}
       >
-        <Grid size={12}>
-          <RestaurantHeader
-            restaurant={restaurantInfo}
-            onOpenDetails={() => setShowDetails(true)}
-            action={
-              restaurantInfo && restaurant ? (
-                <BookmarkButton slug={restaurant} />
-              ) : null
-            }
-          />
-        </Grid>
+        {/* Outside the Grid: MUI sizes its children, and the header's own
+            layout was collapsing to a column narrow enough to wrap the
+            restaurant name one word per line. */}
+        <RestaurantHeader
+          restaurant={restaurantInfo}
+          onOpenDetails={() => setShowDetails(true)}
+          action={
+            restaurantInfo && restaurant ? (
+              <BookmarkButton slug={restaurant} />
+            ) : null
+          }
+        />
 
-        <Grid size={12}>
-          <div className="mx-auto flex max-w-4xl flex-col gap-8 px-4 pb-16 pt-4">
+        <div className="w-full">
+          <div className="mx-auto flex max-w-5xl flex-col gap-8 px-4 pb-16 pt-4">
             <TopDishStrip
               items={topDishes}
               scores={scores}
@@ -340,7 +341,7 @@ const MenuResults: FC = () => {
               <ClaimRestaurantButton slug={restaurant} />
             </section>
           </div>
-        </Grid>
+        </div>
       </LoadingComponent>
 
       <RestaurantDetailsSheet

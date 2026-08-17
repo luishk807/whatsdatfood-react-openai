@@ -14,27 +14,56 @@ const BASE_CLASSES =
  * One tap, two options. Deliberately not a star rating: fine-grained scores
  * from few voters are the noisiest possible input, and the extra precision
  * costs enough friction that most people never vote at all.
+ *
+ * On a card only the recommend half is shown. Two circles on every tile
+ * scattered dozens of tiny controls across a menu, and competed with the
+ * photographs for attention - the down vote lives in the detail sheet, where
+ * somebody has already stopped to look at one dish.
  */
 const VoteButton: FC<VoteButtonInterface> = ({
   value,
   upCount,
   disabled,
+  compact,
   onVote,
 }) => {
   const handleVote = (next: VoteValue) => () => onVote && onVote(next);
+  const recommended = value === VOTE.up;
+
+  if (compact) {
+    return (
+      <button
+        type="button"
+        aria-label={DISH_LABELS.recommend}
+        aria-pressed={recommended}
+        title={disabled ? DISH_LABELS.signInToVote : DISH_LABELS.recommend}
+        disabled={disabled}
+        onClick={handleVote(VOTE.up)}
+        className={clsx(
+          "inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs transition-colors disabled:opacity-40 motion-reduce:transition-none",
+          recommended
+            ? "border-brand bg-brand-soft text-brand"
+            : "border-line text-ink-muted hover:border-brand hover:text-brand",
+        )}
+      >
+        <ThumbUpAltOutlinedIcon sx={{ fontSize: 14 }} />
+        {!!upCount && <span className="tabular-nums">{upCount}</span>}
+      </button>
+    );
+  }
 
   return (
     <div className="flex items-center gap-2">
       <button
         type="button"
         aria-label={DISH_LABELS.voteUp}
-        aria-pressed={value === VOTE.up}
+        aria-pressed={recommended}
         title={disabled ? DISH_LABELS.signInToVote : DISH_LABELS.voteUp}
         disabled={disabled}
         onClick={handleVote(VOTE.up)}
         className={clsx(
           BASE_CLASSES,
-          value === VOTE.up
+          recommended
             ? "border-brand bg-brand text-white"
             : "border-line text-ink-muted hover:border-brand hover:text-brand",
         )}
@@ -60,9 +89,7 @@ const VoteButton: FC<VoteButtonInterface> = ({
       </button>
 
       {!!upCount && (
-        <span className="text-xs tabular-nums text-ink-muted">
-          {upCount}
-        </span>
+        <span className="text-xs tabular-nums text-ink-muted">{upCount}</span>
       )}
     </div>
   );

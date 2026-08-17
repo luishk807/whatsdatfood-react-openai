@@ -90,7 +90,13 @@ describe("DishCard", () => {
       <DishCard item={dish()} onAddPhoto={onAddPhoto} />,
     );
 
-    expect(screen.getByText(DISH_LABELS.noPhoto)).toBeInTheDocument();
+    // The tile is the upload funnel, so it carries the invitation rather
+    // than a "no photo" apology - a menu with few photos was otherwise a
+    // screen of identical grey boxes saying nothing useful.
+    expect(
+      screen.getByRole("button", { name: DISH_LABELS.addPhoto }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(DISH_LABELS.noPhoto)).not.toBeInTheDocument();
 
     const picker = container.querySelector(
       'input[type="file"]',
@@ -146,9 +152,30 @@ describe("DishCard", () => {
     const onVote = jest.fn();
     render(<DishCard item={dish()} canVote onVote={onVote} />);
 
-    await userEvent.click(screen.getByLabelText(DISH_LABELS.voteUp));
+    await userEvent.click(screen.getByLabelText(DISH_LABELS.recommend));
 
     expect(onVote).toHaveBeenCalledWith(dish(), VOTE.up);
+  });
+
+  it("carries one vote control, not two", () => {
+    // Two circles on every tile scattered dozens of tiny controls across a
+    // menu and competed with the photographs. The down vote lives in the
+    // detail sheet, where somebody has stopped to look at one dish.
+    render(<DishCard item={dish()} canVote onVote={jest.fn()} />);
+
+    expect(screen.getByLabelText(DISH_LABELS.recommend)).toBeInTheDocument();
+    expect(screen.queryByLabelText(DISH_LABELS.voteDown)).not.toBeInTheDocument();
+  });
+
+  it("says how many people have voted", () => {
+    render(
+      <DishCard
+        item={dish()}
+        score={{ id: 1, score: 4, average: 4, voteCount: 24, isRanked: true }}
+      />,
+    );
+
+    expect(screen.getByText("24")).toBeInTheDocument();
   });
 
   it("opens the detail view when a photo is tapped", async () => {

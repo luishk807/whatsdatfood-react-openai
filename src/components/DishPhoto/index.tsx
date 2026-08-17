@@ -84,14 +84,25 @@ const DishPhoto: FC<DishPhotoInterface> = ({
   return (
     <div
       ref={containerRef}
-      className="relative aspect-square w-full overflow-hidden rounded-card bg-surface-sunken"
+      className={clsx(
+        "relative w-full overflow-hidden rounded-card bg-surface-sunken",
+        // A dish with no photo takes a fraction of the height of one that
+        // has. Square empty tiles gave a menu like Peter Luger's sides a
+        // full screen of identical grey boxes, which buried the food that
+        // does have photography - the opposite of the point.
+        isEmpty ? "h-20" : "aspect-square",
+      )}
     >
       {isEmpty ? (
-        <div className="flex h-full w-full flex-col items-center justify-center gap-2 p-3 text-center text-ink-muted">
-          <NoPhotographyOutlinedIcon fontSize="small" />
-          <span className="text-xs">
-            {failed ? DISH_LABELS.photoFailed : DISH_LABELS.noPhoto}
-          </span>
+        <div className="flex h-full w-full flex-col items-center justify-center gap-1 px-2 text-center text-ink-muted">
+          {!onAddPhoto && (
+            <>
+              <NoPhotographyOutlinedIcon fontSize="small" />
+              <span className="text-xs">
+                {failed ? DISH_LABELS.photoFailed : DISH_LABELS.noPhoto}
+              </span>
+            </>
+          )}
           {onAddPhoto && (
             <>
               <input
@@ -106,11 +117,14 @@ const DishPhoto: FC<DishPhotoInterface> = ({
                 aria-hidden="true"
                 tabIndex={-1}
               />
+              {/* Quiet rather than black-on-grey. It is still the upload
+                  funnel - it appears on exactly the dishes that need one -
+                  but it no longer shouts over the photographs. */}
               <button
                 type="button"
                 disabled={uploading}
                 onClick={() => fileRef.current?.click()}
-                className="mt-1 inline-flex items-center gap-1 rounded-full bg-ink px-3 py-1 text-xs font-medium text-surface disabled:opacity-60"
+                className="inline-flex items-center gap-1 rounded-full border border-line px-3 py-1 text-xs text-ink-muted hover:border-ink hover:text-ink disabled:opacity-60"
               >
                 <AddAPhotoOutlinedIcon sx={{ fontSize: 14 }} />
                 {uploading ? DISH_LABELS.uploading : DISH_LABELS.addPhoto}

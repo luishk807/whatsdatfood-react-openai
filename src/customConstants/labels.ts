@@ -5,6 +5,8 @@ export const DISH_LABELS = {
   stockPhoto: "Stock photo",
   communityPhoto: "Community photo",
   popularUnverified: "Popular",
+  recommend: "Recommend",
+  recommended: "Recommended",
   voteUp: "Would order again",
   voteDown: "Would not order again",
   signInToVote: "Sign in to vote",

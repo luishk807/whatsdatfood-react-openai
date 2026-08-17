@@ -44,6 +44,8 @@ export interface VoteButtonInterface {
   value?: VoteValue | null;
   upCount?: number;
   disabled?: boolean;
+  /** One control on a card; both on the detail sheet, where there is room. */
+  compact?: boolean;
   onVote?: (value: VoteValue) => void;
 }
 

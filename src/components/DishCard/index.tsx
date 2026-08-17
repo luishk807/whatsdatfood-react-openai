@@ -131,7 +131,9 @@ const DishCard: FC<DishCardInterface> = ({
         )}
 
         <VoteButton
+          compact
           value={vote}
+          upCount={score?.voteCount}
           disabled={!canVote}
           onVote={onVote ? handleVote : undefined}
         />

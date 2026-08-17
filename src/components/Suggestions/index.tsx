@@ -1,4 +1,5 @@
 import { useRef, useEffect } from "react";
+import clsx from "clsx";
 import { fullAddress } from "@/utils/venue";
 import { splitOnMatch } from "@/utils/search";
 import { SearchSuggestionsInterface } from "@/interfaces/search";
@@ -46,7 +47,9 @@ const SuggestionsComponent = ({
       ref={containerRef}
       className="absolute left-0 right-0 top-full z-40 mt-2 overflow-hidden rounded-card border border-line bg-surface-raised shadow-tile"
     >
-      {searching && (
+      {/* Only when there is nothing to show yet. Replacing a list that is
+          already on screen makes it blink out and back on every keystroke. */}
+      {searching && suggestions.length === 0 && (
         <p className="px-4 py-3 text-sm text-ink-muted">
           {SEARCH_LABELS.searching}
         </p>
@@ -58,8 +61,17 @@ const SuggestionsComponent = ({
         </p>
       )}
 
-      {!searching && suggestions.length > 0 && (
-        <ul role="listbox" className="max-h-72 overflow-y-auto">
+      {suggestions.length > 0 && (
+        <ul
+          role="listbox"
+          aria-busy={searching}
+          className={clsx(
+            "max-h-72 overflow-y-auto transition-opacity motion-reduce:transition-none",
+            // Stale results stay put and fade slightly while the next lookup
+            // runs, rather than disappearing.
+            searching && "opacity-60",
+          )}
+        >
           {suggestions.map((restaurant) => (
             <li
               key={restaurant.slug ?? restaurant.name}
