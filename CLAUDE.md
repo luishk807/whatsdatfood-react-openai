@@ -188,6 +188,37 @@ minute. Design for the phone and let desktop be the override, never the reverse.
   around it — a button inside a button, which no after-the-fact state update can
   unrender. The open-the-sheet control is an absolutely positioned sibling.
 
+## Contributor reputation — Food Cred
+
+The server owns every number. The frontend renders what it is told and computes
+nothing: `src/customConstants/reputation.ts` deliberately contains **no point
+values and no level thresholds**, because a copy in the browser is a second
+source of truth and invites a component to display a level the server never
+agreed to.
+
+- **`<FoodCredIcon />` is the only place the mark is drawn.** Point
+  `REPUTATION_ASSETS.foodCred` at an imported SVG or PNG and every instance
+  becomes that file — the box is already reserved at the same size, so nothing
+  reflows and no component changes. `champion` and `badges` have the same
+  contract, ready for Phases 2 and 3.
+- **Never an emoji.** An emoji is a different picture on every platform and
+  cannot be swapped without editing every call site. A test asserts no
+  pictographic character renders.
+- **Never money.** No `$`, no "points", "balance", "wallet" or "redeem" — a
+  test asserts that too. It is a reputation; the moment it looks like currency
+  somebody asks what it is worth.
+- **`<FoodCredAmount />` is used for every number**, so the unit stays spelled
+  "Food Cred" and never drifts.
+- **Two numbers, both true.** `LevelProgress` captions the total against the
+  next threshold ("620 / 750") and fills the bar across the band the
+  contributor is actually in (300→750, so 71%). Measured from zero every level
+  would look nearly finished.
+- **The award is carried on the upload response**, not fetched afterwards.
+  `useDishPhotoUpload` returns it, and `FoodCredAward` shows it while the
+  contributor is still looking at the dish they photographed. A duplicate
+  upload earns nothing and shows nothing — announcing "+0" would claim it was a
+  contribution.
+
 ## Photo uploads
 
 The empty photo tile *is* the upload funnel: it appears on exactly the dishes

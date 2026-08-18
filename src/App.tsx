@@ -19,6 +19,7 @@ const LazyUserFriendSection = lazy(
   () => import("@/components/UserFriendSection"),
 );
 const LazyUserRatings = lazy(() => import("@/components/UserRatingSection"));
+const LazyContributions = lazy(() => import("@/components/Contributions"));
 const LazyUserSettings = lazy(() => import("@/components/UserSettings"));
 const LazyUserHistory = lazy(() => import("@/components/UserHistory"));
 const LazyUserFavorites = lazy(() => import("@/components/UserFavorites"));
@@ -108,6 +109,18 @@ function App() {
                 <Layout>
                   <UserAccountLayout sectionTitle="Ratings">
                     <LazyUserRatings />
+                  </UserAccountLayout>
+                </Layout>
+              </Suspense>
+            }
+          />
+          <Route
+            path={ROUTES.contributions}
+            element={
+              <Suspense fallback={<Loading style={customStyle} />}>
+                <Layout>
+                  <UserAccountLayout sectionTitle="Your contributions">
+                    <LazyContributions />
                   </UserAccountLayout>
                 </Layout>
               </Suspense>

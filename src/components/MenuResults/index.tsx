@@ -30,6 +30,7 @@ import useDishRanking from "@/customHooks/useDishRanking";
 import useDishVotes from "@/customHooks/useDishVotes";
 import useDishPhotoLookup from "@/customHooks/useDishPhotoLookup";
 import useDishPhotoUpload from "@/customHooks/useDishPhotoUpload";
+import FoodCredAward from "@/components/FoodCredAward";
 import useDishPhotos from "@/customHooks/useDishPhotos";
 import useDishOrders from "@/customHooks/useDishOrders";
 import DishPhotoGallery from "@/components/DishPhotoGallery";
@@ -100,6 +101,8 @@ const MenuResults: FC = () => {
     uploadingDishId,
     error: uploadError,
     clearError: clearUploadError,
+    award: uploadAward,
+    clearAward: clearUploadAward,
   } = useDishPhotoUpload();
   const {
     load: loadPhotos,
@@ -326,6 +329,9 @@ const MenuResults: FC = () => {
   return (
     <div className="w-full">
       {SnackbarComponent}
+      {/* The moment the photo lands, while the contributor is still looking at
+          the dish they photographed. */}
+      <FoodCredAward award={uploadAward} onDismiss={clearUploadAward} />
       <LoadingComponent
         showLoading={loading}
         customLoader={SkeletonMenuItem}

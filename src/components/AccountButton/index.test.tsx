@@ -50,10 +50,12 @@ describe("AccountButton", () => {
       .getAllByRole("link")
       .map((link) => link.textContent?.trim());
 
-    // Favorites and History are the product; Settings is utility and used to
-    // come first.
-    expect(labels[0]).toBe("Favorites");
-    expect(labels[1]).toBe("History");
+    // Contributions first: photos are what the product is, and the only entry
+    // here about what somebody has given rather than what they have kept.
+    // Favorites and History follow; Settings is utility and used to come first.
+    expect(labels[0]).toBe("Your contributions");
+    expect(labels[1]).toBe("Favorites");
+    expect(labels[2]).toBe("History");
     expect(labels.indexOf("Settings")).toBeGreaterThan(labels.indexOf("Friends"));
     expect(labels[labels.length - 1]).toBe(ACCOUNT_LABELS.logOut);
   });

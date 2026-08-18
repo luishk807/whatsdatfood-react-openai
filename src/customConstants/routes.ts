@@ -7,6 +7,7 @@ export const ROUTES = {
   friends: "/friends",
   settings: "/settings",
   ratings: "/ratings",
+  contributions: "/contributions",
   history: "/history",
   favorites: "/favorites",
   menuResults: "/menu-results/:restaurant",

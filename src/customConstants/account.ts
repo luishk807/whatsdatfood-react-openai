@@ -13,6 +13,13 @@ export const ACCOUNT_GROUPS = [
   {
     id: "yours",
     items: [
+      // First in the group on purpose: it is the only entry that is about
+      // what somebody has given rather than what they have kept.
+      {
+        label: "Your contributions",
+        route: ROUTES.contributions,
+        icon: "camera",
+      },
       { label: "Favorites", route: ROUTES.favorites, icon: "heart" },
       { label: "History", route: ROUTES.history, icon: "clock" },
       // "Ratings" alone is ambiguous - whose?
