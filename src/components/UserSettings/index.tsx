@@ -38,7 +38,10 @@ const UserSettings: FC = () => {
   }, []);
 
   return (
-    <>
+    // A column, not a fragment. As siblings inside the account layout's grid
+    // these laid out side by side, which put an irreversible delete control
+    // level with the First Name field.
+    <div className="flex w-full flex-col">
       <FormComponent<UserType>
         submitLabel="Save Information"
         onHandleSubmit={handleSubmit}
@@ -48,7 +51,7 @@ const UserSettings: FC = () => {
       {/* Below the form and behind a confirmation: this is the one control here
           that cannot be undone. */}
       <DeleteAccount />
-    </>
+    </div>
   );
 };
 

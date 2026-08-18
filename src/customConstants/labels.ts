@@ -208,6 +208,24 @@ export const ACCOUNT_LABELS = {
   deleteFailed: "That did not work. Nothing has been deleted — try again.",
 } as const;
 
+export const AUTH_LABELS = {
+  /** "Welcome back", not "Sign In". The page is a doorway, not a form. */
+  signInTitle: "Welcome back",
+  signInSubtitle: "Sign in to keep track of what is worth ordering.",
+  identifier: "Email or username",
+  password: "Password",
+  show: "Show",
+  hide: "Hide",
+  submit: "Sign in",
+  submitting: "Signing in…",
+  noAccount: "Don't have an account?",
+  createAccount: "Create account",
+  failed: "That username and password did not match.",
+  /** The panel beside the form: what the product is, told with food. */
+  pitchTitle: "Know what to order.",
+  pitchBody: "See the dishes people actually recommend.",
+} as const;
+
 export const LEGAL_LABELS = {
   privacy: "Privacy",
   terms: "Terms",

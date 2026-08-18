@@ -48,6 +48,16 @@ export const SHOWCASE = {
 } as const;
 
 /**
+ * The food shown beside a sign-in form. Four fills the panel in a 2x2 without
+ * any one photo being small enough to be unreadable as food.
+ */
+export const AUTH_PITCH = {
+  COUNT: 4,
+  /** Fetched, not shown: a refused photo is replaced rather than leaving a hole. */
+  FETCH: 8,
+} as const;
+
+/**
  * Why someone flags a photo. Kept in step with the server's list — an unknown
  * reason is refused there.
  */
