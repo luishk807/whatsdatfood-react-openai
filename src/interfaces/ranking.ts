@@ -44,6 +44,11 @@ export interface DishPhotoInterface {
   /** Username to credit, shown on community photos. */
   credit?: string | null;
   uploading?: boolean;
+  /**
+   * A small tile — a card in the top strip, not a menu row. Shortens the ask
+   * so it stays one legible line rather than wrapping to four words a side.
+   */
+  compact?: boolean;
 }
 
 export interface VoteButtonInterface {

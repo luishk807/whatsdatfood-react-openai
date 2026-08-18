@@ -219,6 +219,34 @@ agreed to.
   upload earns nothing and shows nothing — announcing "+0" would claim it was a
   contribution.
 
+## The empty photo tile is the common case
+
+Dish photography is community uploads only — the server no longer serves stock
+imagery for a dish — so on most menus most tiles are empty, and the empty state
+is designed as the main case rather than as a failure.
+
+- **It names the absence and asks**: "No photos yet", then a real button. An
+  earlier version deliberately kept this quiet, because loud pills on two
+  thirds of a menu drowned out the photographs. That reasoning assumed stock
+  imagery filled the other two thirds. It does not any more — the empty tile
+  *is* the menu until diners fill it — so a placeholder that whispers just
+  makes the page look broken.
+- **Prominent through contrast and shape, never `brand`.** Brand is the vote's
+  colour; an upload button in it trades one signal for another.
+- **A drawn plate, not a crossed-out camera.** One reads as "waiting", the
+  other as "broken".
+- **`compact` on cards.** "Be the first to add a photo" wraps to four lines in
+  a 140px tile, so cards get the short form and the dish sheet gets the
+  sentence.
+- **`DishPhoto` refuses `IMAGE_SOURCE.generic`.** Cuisine tiles and marketing
+  panels illustrate an idea; rendering one under a restaurant's name erases the
+  distinction the product's credibility rests on.
+- **`useDishPhotoLookup` is dormant.** The server no longer searches, so every
+  request would return null — a round trip per dish to be told what the tile
+  already says. `MenuResults` no longer calls it. The hook and its budget are
+  kept because "every dish fires a lookup on every load" is what made one page
+  view cost 21 image searches, and that lesson should not need relearning.
+
 ## Photo uploads
 
 The empty photo tile *is* the upload funnel: it appears on exactly the dishes

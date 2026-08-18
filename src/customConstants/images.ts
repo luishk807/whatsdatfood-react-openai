@@ -11,18 +11,40 @@ export const IMAGE = {
 } as const;
 
 /**
- * Where a photo came from. Shown to the viewer, because a stock photo of the
- * dish and a photo of this restaurant's version answer different questions.
+ * Where a photo came from, and the line the product depends on.
+ *
+ * A photograph shown under a restaurant's name is a claim about what that
+ * kitchen serves, and only a diner can make it. The server no longer serves
+ * `stock` for a dish at all — existing rows stay in the database and stop
+ * being returned — so `community` is the only source a dish photo arrives
+ * with today.
+ *
+ * `stock` remains here because stored rows still carry it and the badge must
+ * keep rendering correctly if a deployment turns the old behaviour back on.
+ *
+ * `generic` is the separate thing: cuisine tiles, homepage inspiration, the
+ * food beside the sign-in form. It illustrates an idea rather than asserting
+ * what a particular kitchen plated, it is never attached to a dish, and
+ * `DishPhoto` refuses to render it — the two must not be confusable, because
+ * the moment a reader cannot tell them apart neither one is worth anything.
  */
 export const IMAGE_SOURCE = {
   community: "community",
   stock: "stock",
+  generic: "generic",
 } as const;
 
 /**
- * Looking up a missing photo costs an image-search query plus an LLM call, so
- * it is driven by what the reader actually scrolls to and capped per page view.
- * A found photo is persisted by the backend, so each dish costs at most once.
+ * The visibility-driven photo lookup.
+ *
+ * Dormant. The server no longer searches for dish photography, so every one of
+ * these requests would return null — a round trip per dish to be told what the
+ * empty tile already says. `MenuResults` no longer calls it.
+ *
+ * Kept, along with the hook, because the budget and the negative cache are the
+ * expensive lessons: every dish firing a lookup on every load is what made one
+ * page view cost 21 image searches. If placeholder imagery is ever wanted
+ * again, it is re-enabled here rather than rediscovered.
  */
 export const PHOTO_LOOKUP = {
   MAX_PER_PAGE_VIEW: 6,

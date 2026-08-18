@@ -38,11 +38,47 @@ describe("DishPhoto", () => {
 
   it("offers the picker only when an upload handler is given", () => {
     const { rerender, container } = render(<DishPhoto />);
-    expect(screen.queryByText(DISH_LABELS.addPhoto)).not.toBeInTheDocument();
+    expect(screen.queryByText(DISH_LABELS.beFirst)).not.toBeInTheDocument();
 
     rerender(<DishPhoto onAddPhoto={jest.fn()} />);
-    expect(screen.getByText(DISH_LABELS.addPhotoShort)).toBeInTheDocument();
+    expect(screen.getByText(DISH_LABELS.beFirst)).toBeInTheDocument();
     expect(pickerFor(container)).toBeInTheDocument();
+  });
+
+  it("names the absence and asks, rather than looking broken", () => {
+    // Dish photography is uploads only, so on most dishes this tile is the
+    // whole menu row. A silent grey box reads as a failed request.
+    render(<DishPhoto onAddPhoto={jest.fn()} />);
+
+    expect(screen.getByText(DISH_LABELS.noPhoto)).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: DISH_LABELS.beFirst }),
+    ).toBeInTheDocument();
+  });
+
+  it("shortens the ask on a small tile", () => {
+    // "Be the first to add a photo" wraps to four lines in a 140px card.
+    render(<DishPhoto onAddPhoto={jest.fn()} compact />);
+
+    expect(screen.getByText(DISH_LABELS.addPhotoShort)).toBeInTheDocument();
+    expect(screen.queryByText(DISH_LABELS.beFirst)).not.toBeInTheDocument();
+  });
+
+  it("never renders generic imagery as a photo of the dish", () => {
+    // Cuisine tiles and marketing panels illustrate an idea. Showing one under
+    // a restaurant's name is the exact confusion the source split exists to
+    // prevent.
+    render(
+      <DishPhoto
+        url="https://example.test/generic-noodles.jpg"
+        alt="Noodles"
+        source={IMAGE_SOURCE.generic}
+        onAddPhoto={jest.fn()}
+      />,
+    );
+
+    expect(screen.queryByAltText("Noodles")).not.toBeInTheDocument();
+    expect(screen.getByText(DISH_LABELS.noPhoto)).toBeInTheDocument();
   });
 
   it("opens the camera directly on a phone", () => {

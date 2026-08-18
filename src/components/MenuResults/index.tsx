@@ -28,7 +28,6 @@ import DishPhoto from "@/components/DishPhoto";
 import BottomSheet from "@/components/BottomSheet";
 import useDishRanking from "@/customHooks/useDishRanking";
 import useDishVotes from "@/customHooks/useDishVotes";
-import useDishPhotoLookup from "@/customHooks/useDishPhotoLookup";
 import useDishPhotoUpload from "@/customHooks/useDishPhotoUpload";
 import FoodCredAward from "@/components/FoodCredAward";
 import useDishPhotos from "@/customHooks/useDishPhotos";
@@ -95,7 +94,6 @@ const MenuResults: FC = () => {
   const { initialized } = checkAuthQuery;
   const { showSnackBar, SnackbarComponent } = useSnackbarHook();
 
-  const { found, lookup } = useDishPhotoLookup();
   const {
     upload,
     uploadingDishId,
@@ -115,15 +113,12 @@ const MenuResults: FC = () => {
   const [dishPhotos, setDishPhotos] = useState<MenuItemPhoto[]>([]);
   const { toggle: toggleOrdered, canRecord } = useDishOrders();
 
-  /** Dishes with any photo found on this page view folded back in. */
-  const dishes = useMemo<MenuItemType[]>(
-    () =>
-      menuItems.map((item) => {
-        const url = found[Number(item?.id ?? 0)];
-        return url ? { ...item, image: url } : item;
-      }),
-    [menuItems, found],
-  );
+  /**
+   * The menu as it arrived. There is nothing to fold in any more: dish
+   * photography is community uploads only, so a dish's photos come down with
+   * the menu payload and a dish without one has none until somebody takes it.
+   */
+  const dishes = menuItems;
 
   const restaurantMenu = useMemo<RestCategoryMenu>(
     () => groupDishesByCategory(dishes),
@@ -172,8 +167,6 @@ const MenuResults: FC = () => {
       .getElementById(id)
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
-
-  const handleDishVisible = (item: MenuItemType) => lookup(item?.id);
 
   const handleAddPhoto = async (item: MenuItemType, file: File) => {
     const uploaded = await upload(item, file);
@@ -374,7 +367,6 @@ const MenuResults: FC = () => {
                 canVote={canVote}
                 onVote={handleVote}
                 onOpen={handleOpenDish}
-                onVisible={handleDishVisible}
                 onAddPhoto={handleAddPhoto}
                 uploadingDishId={uploadingDishId}
                 dinerCount={dinerCount}
@@ -407,8 +399,7 @@ const MenuResults: FC = () => {
                   canVote={canVote}
                   onVote={handleVote}
                   onOpen={handleOpenDish}
-                  onVisible={handleDishVisible}
-                  onAddPhoto={handleAddPhoto}
+                    onAddPhoto={handleAddPhoto}
                   uploadingDishId={uploadingDishId}
                   dinerCount={dinerCount}
                 />

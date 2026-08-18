@@ -1,5 +1,11 @@
 export const DISH_LABELS = {
-  noPhoto: "No photo yet",
+  noPhoto: "No photos yet",
+  /**
+   * The ask, in full. Dish photography is uploads only now, so an empty tile
+   * is not a gap in the page - it is the page, on most dishes, until somebody
+   * fills it. It says what to do rather than what is absent.
+   */
+  beFirst: "Be the first to add a photo",
   addPhoto: "Add the first photo",
   /** Short form for the card, where the tile is small and quiet. */
   addPhotoShort: "Add a photo",

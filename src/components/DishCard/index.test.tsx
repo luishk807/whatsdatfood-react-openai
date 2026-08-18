@@ -96,13 +96,14 @@ describe("DishCard", () => {
       <DishCard item={dish()} onAddPhoto={onAddPhoto} />,
     );
 
-    // The tile is the upload funnel, so it carries the invitation rather
-    // than a "no photo" apology - a menu with few photos was otherwise a
-    // screen of identical grey boxes saying nothing useful.
+    // The tile is the upload funnel, so it carries the invitation. It also
+    // names the absence now: dish photography is uploads only, so an unfilled
+    // tile is the common case and a card that only shows a button reads as a
+    // control floating in a grey box.
     expect(
       screen.getByRole("button", { name: DISH_LABELS.addPhotoShort }),
     ).toBeInTheDocument();
-    expect(screen.queryByText(DISH_LABELS.noPhoto)).not.toBeInTheDocument();
+    expect(screen.getByText(DISH_LABELS.noPhoto)).toBeInTheDocument();
 
     const picker = container.querySelector(
       'input[type="file"]',

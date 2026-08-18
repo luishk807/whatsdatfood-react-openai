@@ -93,6 +93,9 @@ const DishCard: FC<DishCardInterface> = ({
           uploading={uploading}
           onVisible={onVisible ? handleVisible : undefined}
           onUnavailable={handleUnavailable}
+          // A card is 140-176px wide. The full ask belongs in the dish sheet,
+          // where there is room for a sentence.
+          compact
         />
 
         {/* A sibling overlay rather than a wrapper, so the upload button an

@@ -12,8 +12,16 @@ const VARIANT_CLASSES: Record<UploadVariant, string> = {
     "inline underline underline-offset-2 text-ink-muted hover:text-ink",
   [UPLOAD_VARIANT.chip]:
     "inline-flex items-center gap-1 rounded-full border border-line px-3 py-1 text-xs font-medium text-ink hover:border-ink",
+  // A real button, not a hint. It used to sit at 60% opacity on the reasoning
+  // that a loud pill on every tile drowned out the photographs - true when
+  // stock imagery filled most tiles. Dish photography is uploads only now, so
+  // an unfilled tile is the common case and the ask is the tile's whole job.
+  //
+  // Prominent through contrast and shape rather than colour: `brand` is the
+  // vote's, and an upload button competing with it would trade one signal for
+  // another.
   [UPLOAD_VARIANT.tile]:
-    "flex flex-col items-center gap-1 text-[11px] text-ink-muted opacity-60 transition-opacity hover:opacity-100 motion-reduce:transition-none",
+    "flex items-center gap-1.5 rounded-pill border border-line bg-surface-raised px-3 py-1.5 text-[11px] font-semibold text-ink shadow-sm transition-colors hover:border-ink hover:bg-ink hover:text-surface motion-reduce:transition-none",
 };
 
 /**
