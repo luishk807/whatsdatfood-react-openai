@@ -1,6 +1,6 @@
 import { FC, useEffect, useRef, useState } from "react";
 import clsx from "clsx";
-import NoPhotographyOutlinedIcon from "@mui/icons-material/NoPhotographyOutlined";
+import { NoPhotographyIcon } from "@/components/icons";
 import Badge from "@/components/Badge";
 import { DishPhotoInterface } from "@/interfaces/ranking";
 import {
@@ -104,7 +104,7 @@ const DishPhoto: FC<DishPhotoInterface> = ({
         <div className="flex h-full w-full flex-col items-center justify-center gap-1.5 px-2 text-center text-ink-muted">
           {!onAddPhoto && (
             <>
-              <NoPhotographyOutlinedIcon sx={{ fontSize: 18, opacity: 0.5 }} />
+              <NoPhotographyIcon size={18} className="opacity-50" />
               <span className="text-[11px] opacity-70">
                 {failed ? DISH_LABELS.photoFailed : DISH_LABELS.noPhoto}
               </span>

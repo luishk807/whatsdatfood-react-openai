@@ -1,10 +1,13 @@
-import { Modal, Box, Grid, IconButton } from "@mui/material";
-import { useState, useEffect, type FC, useMemo, ChangeEvent } from "react";
+import { useState, useEffect, type FC, useMemo, useRef } from "react";
 import { CustomModalInterface } from "@/interfaces";
 import Button from "@/components/Button";
-import "./index.css";
 import { Link } from "react-router-dom";
-import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import { CloseIcon } from "@/components/icons";
+
+/**
+ * The generic dialog. Full screen on a phone, a centred card from `lg` up —
+ * which is what the MUI `sx` breakpoint object it replaced was expressing.
+ */
 const CustomModal: FC<CustomModalInterface> = ({
   children,
   label,
@@ -13,7 +16,9 @@ const CustomModal: FC<CustomModalInterface> = ({
   closeOnParent,
 }) => {
   const [open, setOpen] = useState(false);
-  const toggleModal = (e: React.MouseEvent<HTMLElement>) => {
+  const panelRef = useRef<HTMLDivElement | null>(null);
+
+  const toggleModal = (e: React.MouseEvent | React.KeyboardEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -22,34 +27,30 @@ const CustomModal: FC<CustomModalInterface> = ({
 
   const determineType = useMemo(() => {
     return customButton ? "custom" : type || "button";
-  }, [customButton]);
+  }, [customButton, type]);
 
   const ModalButton = useMemo(() => {
     switch (determineType) {
-      case "button":
-        return <Button onClick={toggleModal}>{label}</Button>;
       case "text":
-        return <Link to="/">{label || "link label"}</Link>;
       case "link":
         return <Link to="/">{label || "link label"}</Link>;
       case "custom":
         return (
-          <Box
-            component="div"
+          <div
             role="button"
             tabIndex={0}
-            onClick={toggleModal} // <- this is what was missing
+            onClick={toggleModal}
             onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") toggleModal(e as any);
+              if (e.key === "Enter" || e.key === " ") toggleModal(e);
             }}
           >
             {customButton}
-          </Box>
+          </div>
         );
       default:
         return <Button onClick={toggleModal}>{label}</Button>;
     }
-  }, [determineType]);
+  }, [determineType, customButton, label]);
 
   useEffect(() => {
     if (closeOnParent) {
@@ -57,42 +58,62 @@ const CustomModal: FC<CustomModalInterface> = ({
     }
   }, [closeOnParent]);
 
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setOpen(false);
+      }
+    };
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", handleKeyDown);
+    panelRef.current?.focus();
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [open]);
+
   return (
     <>
       {ModalButton}
-      <Modal
-        style={{
-          backdropFilter: "blur(2px)",
-        }}
-        open={open}
-        onClose={toggleModal}
-      >
-        <Box
-          id="custom-modal-container"
-          sx={{
-            padding: { lg: "20px", xs: "0px" },
-            width: { lg: "500px", xs: "100%" },
-            height: {
-              lg: "auto",
-              xs: "100vh",
-            },
-            minHeight: {
-              lg: "200px",
-            },
-            borderRadius: {
-              lg: "10px",
-              xs: "0px",
-            },
-          }}
+      {open && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          role="dialog"
+          aria-modal="true"
+          aria-label={label}
         >
-          <Grid size={12} className="flex justify-end">
-            <IconButton onClick={() => setOpen(false)}>
-              <CloseRoundedIcon />
-            </IconButton>
-          </Grid>
-          {children}
-        </Box>
-      </Modal>
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-[2px]"
+            onClick={() => setOpen(false)}
+            aria-hidden="true"
+          />
+          <div
+            ref={panelRef}
+            tabIndex={-1}
+            className="relative z-10 h-screen w-full overflow-y-auto border border-line bg-surface-raised text-ink shadow-tile outline-none lg:h-auto lg:max-h-[85vh] lg:min-h-[200px] lg:w-[500px] lg:rounded-[10px] lg:p-5"
+          >
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                aria-label="Close"
+                className="rounded-full p-2 text-ink-muted hover:text-ink"
+              >
+                <CloseIcon size={20} />
+              </button>
+            </div>
+            {children}
+          </div>
+        </div>
+      )}
     </>
   );
 };

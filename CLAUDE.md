@@ -70,8 +70,14 @@ the vote threshold is what keeps a barely-voted dish out of the ranking.
   do not copy a field list between two types.
 - **Stable keys.** Use the entity id, never the array index — lists reorder by
   rank.
-- **New styling is Tailwind.** The codebase is migrating off MUI + ~60
-  per-component `index.css` files. Do not add new CSS files.
+- **Styling is Tailwind.** MUI is gone — do not reintroduce it, or
+  `@emotion/*`, which only ever came along as its styling engine. The
+  per-component `index.css` files are still being deleted as their components
+  are touched; do not add new ones.
+- **Icons are inline SVG in `src/components/icons/`.** Every
+  `@mui/icons-material` import pulled in `SvgIcon` and therefore the whole
+  emotion runtime for the sake of a chevron. Add a new icon to that module
+  rather than reaching for a package.
 
 ## Design system
 
@@ -123,10 +129,12 @@ minute. Design for the phone and let desktop be the override, never the reverse.
 - Vote controls sit in the lower third, within thumb reach.
 - Detail opens as a bottom sheet, not a route change.
 - Dark mode matters; restaurants are dim.
-- Target a main bundle under 250 KiB (currently ~595 KiB). Deleting unreferenced
-  components does not move this number — webpack only bundles what the entry
-  graph reaches, so dead code costs repo clarity, not bytes. The remaining gap
-  is MUI.
+- Target a main bundle under 250 KiB (currently ~516 KiB / 528,727 bytes).
+  Deleting unreferenced components does not move this number — webpack only
+  bundles what the entry graph reaches, so dead code costs repo clarity, not
+  bytes. Removing MUI and emotion took 90,364 bytes off; the remaining gap is
+  Apollo plus React itself, so the next real move is route-level splitting, not
+  another dependency sweep.
 
 ## Architecture worth knowing
 
@@ -221,7 +229,6 @@ Three majors are deliberately deferred, each for a reason:
 | Held back | Why |
 |---|---|
 | `@apollo/client` 3 → 4 | Real breaking changes to cache APIs the `typePolicies` and `updateFragment` vote-write depend on. Needs its own pass with the tests green. |
-| `@mui/*` 7 → 9 | Two majors, and the codebase is migrating off MUI to Tailwind. Upgrading what we intend to delete is wasted work. |
 | `typescript` 5.9 → 7 | Large jump; do it deliberately, not incidentally. |
 
 Before removing a dependency, check it is actually imported — `axios`,

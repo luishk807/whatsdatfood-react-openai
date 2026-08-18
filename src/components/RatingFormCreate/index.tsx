@@ -1,6 +1,5 @@
 import RatingCustom from "../Rating";
 import { type FC, useEffect, useMemo, useState } from "react";
-import { Box, Grid, TextField } from "@mui/material";
 import "./index.css";
 import FormComponent from "@/components/FormComponent";
 import Button from "../Button";

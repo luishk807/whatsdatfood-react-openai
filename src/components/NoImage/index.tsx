@@ -1,9 +1,9 @@
-import NoPhotographyOutlinedIcon from "@mui/icons-material/NoPhotographyOutlined";
-import "./index.css";
+import { NoPhotographyIcon } from "@/components/icons";
+
 const NoImage = () => {
   return (
-    <div id="no-image-container">
-      <NoPhotographyOutlinedIcon className="no-photo-img" />
+    <div className="flex h-[150px] w-[150px] items-center justify-center">
+      <NoPhotographyIcon size={75} className="text-ink-muted opacity-30" />
     </div>
   );
 };

@@ -1,4 +1,3 @@
-import { Box, Grid } from "@mui/material";
 import FormComponent from "@/components/FormComponent";
 import { FormFieldType } from "@/interfaces";
 import { CREATE_ACCOUNT } from "@/customConstants/forms";
@@ -32,16 +31,8 @@ const CreateAccount = () => {
   const formFields: FormFieldType[] = CREATE_ACCOUNT;
 
   return (
-    <Box
-      id="create-account-component-container"
-      sx={{
-        margin: {
-          md: "0px",
-          xs: "10px",
-        },
-      }}
-    >
-      <Box className="form-container">
+    <div id="create-account-component-container" className="m-[10px] md:m-0">
+      <div className="form-container">
         <FormComponent
           fields={formFields}
           title="Create Account"
@@ -49,16 +40,14 @@ const CreateAccount = () => {
           onHandleSubmit={handleSubmit}
           showLoadingSubmit={loading}
         />
-        <Grid container>
-          <Grid size={12} className="flex justify-start">
-            <Link to="/sign-in" className="link-text">
-              Back to Login
-            </Link>
-          </Grid>
-        </Grid>
-      </Box>
+        <div className="flex justify-start">
+          <Link to="/sign-in" className="link-text">
+            Back to Login
+          </Link>
+        </div>
+      </div>
       {SnackbarComponent}
-    </Box>
+    </div>
   );
 };
 

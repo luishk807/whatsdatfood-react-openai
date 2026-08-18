@@ -1,6 +1,6 @@
 import { FC } from "react";
 import clsx from "clsx";
-import LocalFireDepartmentOutlinedIcon from "@mui/icons-material/LocalFireDepartmentOutlined";
+import { FlameIcon } from "@/components/icons";
 import { MenuItemType } from "@/interfaces/restaurants";
 import {
   getDietaryTags,
@@ -50,7 +50,7 @@ const DietaryTags: FC<DietaryTagsInterface> = ({ item, showDisclaimer }) => {
 
         {spice && (
           <li className="inline-flex items-center gap-0.5 rounded-full bg-spice-soft px-2 py-0.5 text-[11px] font-medium text-spice">
-            <LocalFireDepartmentOutlinedIcon sx={{ fontSize: 12 }} />
+            <FlameIcon size={12} />
             {spice}
           </li>
         )}

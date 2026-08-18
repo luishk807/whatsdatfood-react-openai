@@ -1,12 +1,10 @@
 import { useEffect, useState, type FC } from "react";
-import { Grid } from "@mui/material";
 import useUserRating from "@/customHooks/useUserRating";
 import { UserRating } from "@/interfaces/users";
 import {
   MenuItemType,
   RestaurantItemImageType,
 } from "@/interfaces/restaurants";
-import "./index.css";
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from "@/customConstants";
 import { _get } from "@/utils";
 import Image from "@/components/Image";
@@ -42,37 +40,31 @@ const UserRatingsSection: FC = () => {
   }
 
   return (
-    <Grid container className="w-full">
+    <div className="w-full">
       {!!ratings.length &&
-        ratings.map((data, indx) => {
+        ratings.map((data) => {
           const item: MenuItemType = _get(data, "restaurantMenuItem");
           const images: RestaurantItemImageType = _get(item, "images.0");
           return (
-            <Grid
-              size={12}
-              key={indx}
-              sx={{
-                padding: "10px 0px",
-              }}
-              className="line-separator-top"
+            <div
+              key={data.id}
+              className="line-separator-top grid w-full grid-cols-12 py-[10px]"
             >
-              <Grid container className="w-full">
-                <Grid size={4}>
-                  <Image url={images.url_m} />
-                </Grid>
-                <Grid size={6}>
-                  <div>{item.name}</div>
-                  <div>{data.title}</div>
-                  <div>
-                    <Rating defaultValue={data.rating} isDisplay={true} />
-                  </div>
-                </Grid>
-                <Grid size={2}>{data.status.name}</Grid>
-              </Grid>
-            </Grid>
+              <div className="col-span-4">
+                <Image url={images.url_m} />
+              </div>
+              <div className="col-span-6">
+                <div>{item.name}</div>
+                <div>{data.title}</div>
+                <div>
+                  <Rating defaultValue={data.rating} isDisplay={true} />
+                </div>
+              </div>
+              <div className="col-span-2">{data.status.name}</div>
+            </div>
           );
         })}
-    </Grid>
+    </div>
   );
 };
 

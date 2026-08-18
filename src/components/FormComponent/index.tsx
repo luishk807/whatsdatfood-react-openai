@@ -1,5 +1,4 @@
 import { lazy, useState, useMemo, type FC, Suspense, useEffect } from "react";
-import { Box, Grid } from "@mui/material";
 import {
   FormFieldType,
   formCompObjType,
@@ -170,11 +169,7 @@ const FormComponent = <T,>({
       case FIELD_TYPES.email:
       case FIELD_TYPES.password:
         return (
-          <Grid
-            size={12}
-            className="field-container"
-            key={`${key}-${field.name}`}
-          >
+          <div className="field-container" key={`${key}-${field.name}`}>
             <Suspense fallback={<FormTextfieldSkeleton />}>
               <LazyTextField
                 name={field.name}
@@ -192,15 +187,11 @@ const FormComponent = <T,>({
                 }
               />
             </Suspense>
-          </Grid>
+          </div>
         );
       case FIELD_TYPES.username:
         return (
-          <Grid
-            size={12}
-            className="field-container"
-            key={`${key}-${field.name}`}
-          >
+          <div className="field-container" key={`${key}-${field.name}`}>
             <Suspense fallback={<FormTextfieldSkeleton />}>
               <LazyTextFieldDebounce
                 name={field.name}
@@ -218,12 +209,11 @@ const FormComponent = <T,>({
                 }
               />
             </Suspense>
-          </Grid>
+          </div>
         );
       case FIELD_TYPES.rating:
         return (
-          <Grid
-            size={12}
+          <div
             className="field-container flex flex-col"
             key={`${key}-${field.name}`}
           >
@@ -240,7 +230,7 @@ const FormComponent = <T,>({
                 }
               />
             </Suspense>
-          </Grid>
+          </div>
         );
     }
   };
@@ -260,54 +250,47 @@ const FormComponent = <T,>({
         handleSubmit(e);
       }}
     >
-      <Box>
-        <Grid
-          container
-          id="form-component-container"
-          sx={{
-            padding: {
-              lg: "0px",
-              xs: "10px",
-            },
-          }}
-        >
-          {title && (
-            <Grid className="field-title" size={12}>
-              {title}
-            </Grid>
-          )}
+      <div>
+        <div id="form-component-container" className="p-[10px] lg:p-0">
+          {title && <div className="field-title">{title}</div>}
           {!!errors.length && (
-            <Grid>
+            <div>
               <ul>
                 {errors.map((item, indx) => (
                   <li key={indx}>{item}</li>
                 ))}
               </ul>
-            </Grid>
+            </div>
           )}
           {fields.map((item, indx) => getFieldType(item, indx))}
-          <Grid size={12} className="form-component-button-container">
+          <div className="form-component-button-container">
             {onPrevious && (
-              <Grid size={5} spacing={1} className="field-container">
+              <div className="field-container w-[48%]">
                 <Suspense fallback={<FormButtonSkeleton />}>
                   <LazyButton type="button" onClick={onPrevious}>
                     Back
                   </LazyButton>
                 </Suspense>
-              </Grid>
+              </div>
             )}
             {submitLabel && (
-              <Grid size={onPrevious ? 5 : 12} className="field-container">
+              <div
+                className={
+                  onPrevious
+                    ? "field-container w-[48%]"
+                    : "field-container w-full"
+                }
+              >
                 <Suspense fallback={<FormButtonSkeleton />}>
                   <LazyButton disabled={isSubmitLoading} type="submit">
                     {submitLabel}
                   </LazyButton>
                 </Suspense>
-              </Grid>
+              </div>
             )}
-          </Grid>
-        </Grid>
-      </Box>
+          </div>
+        </div>
+      </div>
     </form>
   );
 };

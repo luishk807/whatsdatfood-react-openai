@@ -1,6 +1,6 @@
 import { ChangeEvent, FC, useRef } from "react";
 import clsx from "clsx";
-import AddAPhotoOutlinedIcon from "@mui/icons-material/AddAPhotoOutlined";
+import { AddAPhotoIcon } from "@/components/icons";
 import {
   PhotoUploadActionInterface,
   UPLOAD_VARIANT,
@@ -73,7 +73,7 @@ const PhotoUploadAction: FC<PhotoUploadActionInterface> = ({
         )}
       >
         {variant !== UPLOAD_VARIANT.link && (
-          <AddAPhotoOutlinedIcon sx={{ fontSize: variant === UPLOAD_VARIANT.tile ? 18 : 14 }} />
+          <AddAPhotoIcon size={variant === UPLOAD_VARIANT.tile ? 18 : 14} />
         )}
         {shown}
       </button>

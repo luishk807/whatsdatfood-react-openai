@@ -1,4 +1,3 @@
-import { Grid } from "@mui/material";
 import {
   useCallback,
   Suspense,
@@ -8,7 +7,6 @@ import {
   type FC,
 } from "react";
 import { UserFriend, CreateUserFriend } from "@/interfaces/users";
-import "./index.css";
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from "@/customConstants";
 import { _get } from "@/utils";
 import Button from "@/components/Button";
@@ -83,10 +81,10 @@ const UserFriendSection: FC = () => {
   }, [toggleSection]);
 
   return (
-    <Grid container className="w-full">
+    <div className="w-full">
       {SnackbarComponent}
       {componentSelected}
-    </Grid>
+    </div>
   );
 };
 

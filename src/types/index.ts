@@ -1,5 +1,9 @@
-import { FIELD_TYPES, LOADING_TYPES, ACCOUNT_TYPE } from "@/customConstants";
-import { AlertColor } from "@mui/material";
+import {
+  FIELD_TYPES,
+  LOADING_TYPES,
+  ACCOUNT_TYPE,
+  SEVERITY,
+} from "@/customConstants";
 import { dropDownMenuItemType, addressType } from "@/interfaces";
 import {
   MODAL_TYPE,
@@ -21,6 +25,8 @@ export type ResolvedTheme = typeof THEME.light | typeof THEME.dark;
 export type ImageSourceType = (typeof IMAGE_SOURCE)[keyof typeof IMAGE_SOURCE];
 
 export type BadgeToneType = (typeof BADGE_TONE)[keyof typeof BADGE_TONE];
+
+export type SeverityType = (typeof SEVERITY)[keyof typeof SEVERITY];
 
 export type FieldTypes = (typeof FIELD_TYPES)[keyof typeof FIELD_TYPES];
 

@@ -1,4 +1,3 @@
-import { Box, Grid } from "@mui/material";
 import { ChangeEvent, useEffect, useState, type FC } from "react";
 import "./index.css";
 import { TextFieldInterface } from "@/interfaces";
@@ -38,14 +37,14 @@ const TextField = <T,>({
   };
 
   return (
-    <Box id="textfield-container">
-      <Grid container className="w-full">
+    <div id="textfield-container">
+      <div className="w-full">
         {!isPlaceholder && (
-          <Grid size={12} className="flex justify-start">
+          <div className="flex justify-start">
             <label htmlFor={name}>{label}</label>
-          </Grid>
+          </div>
         )}
-        <Grid size={12} className="relative">
+        <div className="relative">
           <input
             className={`${isError && "error"}`}
             id={name}
@@ -57,14 +56,14 @@ const TextField = <T,>({
             {...(isPlaceholder && { placeholder: label })}
           />
           {showLoader && (
-            <Box className="inputfield-loader">
+            <div className="inputfield-loader">
               <Loading type={LOADING_TYPES.SPINER} />
-            </Box>
+            </div>
           )}
           {showLoaderElement}
-        </Grid>
-      </Grid>
-    </Box>
+        </div>
+      </div>
+    </div>
   );
 };
 export default TextField;

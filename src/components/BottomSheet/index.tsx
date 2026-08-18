@@ -1,5 +1,5 @@
 import { FC, useEffect, useRef } from "react";
-import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
+import { CloseIcon } from "@/components/icons";
 import { BottomSheetInterface } from "@/interfaces/ui";
 
 /**
@@ -71,7 +71,7 @@ const BottomSheet: FC<BottomSheetInterface> = ({
             aria-label="Close"
             className="-mr-1 -mt-1 shrink-0 rounded-full p-1 text-ink-muted hover:text-ink"
           >
-            <CloseRoundedIcon fontSize="small" />
+            <CloseIcon size={20} />
           </button>
         </div>
 

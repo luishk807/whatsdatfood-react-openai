@@ -1,6 +1,5 @@
-import { Box, Grid } from "@mui/material";
 import Modal from "@/components/Modal";
-import ScheduleIcon from "@mui/icons-material/Schedule";
+import { ScheduleIcon } from "@/components/icons";
 import { BusinessHours } from "@/interfaces/businessHours";
 import { useEffect, useMemo, type FC, useState } from "react";
 import { capitalizedWord } from "@/utils";
@@ -52,29 +51,22 @@ const BusinessHourDisplay: FC<BusinessHourDisplayInterface> = ({
 
   const CustomButton = () => {
     return (
-      <Box
-        sx={{
-          margin: "10px 0px",
-          cursor: "pointer",
-        }}
-      >
-        <div className="flex item-center text-[1em]">
-          <ScheduleIcon />
+      <div className="my-[10px] cursor-pointer">
+        <div className="flex items-center text-[1em]">
+          <ScheduleIcon size={20} />
           &nbsp;Business: Is&nbsp;
-          <Box
-            component="span"
-            style={{
-              color: isTodayOpen ? "green" : "red",
-              fontWeight: "bold",
-            }}
+          <span
+            className={
+              isTodayOpen ? "font-bold text-brand" : "font-bold text-danger"
+            }
           >
             {isTodayOpen ? `Open` : `Closed`} Now
-          </Box>
+          </span>
         </div>
         {isTodayOpen && (
           <div>{`${todaySchedule?.open_time} - ${todaySchedule?.close_time}`}</div>
         )}
-      </Box>
+      </div>
     );
   };
 
@@ -150,29 +142,25 @@ const BusinessHourDisplay: FC<BusinessHourDisplayInterface> = ({
   return (
     formatSchedule && (
       <Modal customButton={<CustomButton />}>
-        <Grid className="w-full" container>
-          <Grid className="w-full display flex justify-center">
+        <div className="w-full">
+          <div className="flex w-full justify-center">
             <h3>Business Hours</h3>
-          </Grid>
+          </div>
           {formatSchedule.map((item) => {
             const hours =
               item.open_time && item.close_time
                 ? `${item.open_time} - ${item.close_time}`
                 : "CLOSED";
             return (
-              <Grid className="w-full">
-                <Grid container>
-                  <Grid size={6} className="flex justify-start">
-                    {item.day_of_week}
-                  </Grid>
-                  <Grid size={6} className="flex justify-end">
-                    {hours}
-                  </Grid>
-                </Grid>
-              </Grid>
+              <div key={item.day_of_week} className="flex w-full">
+                <div className="flex w-1/2 justify-start">
+                  {item.day_of_week}
+                </div>
+                <div className="flex w-1/2 justify-end">{hours}</div>
+              </div>
             );
           })}
-        </Grid>
+        </div>
       </Modal>
     )
   );

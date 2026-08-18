@@ -1,5 +1,5 @@
 import { snackBarObjType } from "@/interfaces";
-import { AlertColor } from "@mui/material";
+import { SeverityType } from "@/types";
 import { useCallback, useEffect, useState } from "react";
 import SnackBarCustom from "@/components/Snackbar";
 const useSnackbarHook = () => {
@@ -10,7 +10,7 @@ const useSnackbarHook = () => {
   });
 
   const showSnackBar = useCallback(
-    (message: string, severity: AlertColor = "success") => {
+    (message: string, severity: SeverityType = "success") => {
       setSnackbarObj({
         message,
         severity,

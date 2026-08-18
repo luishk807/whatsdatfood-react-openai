@@ -1,6 +1,4 @@
 import { useEffect, useState, type FC } from "react";
-import { Grid } from "@mui/material";
-import "./index.css";
 import { UserFavorites } from "@/interfaces/users";
 import useUserFavorite from "@/customHooks/useUserFavorites";
 import { _get } from "@/utils";
@@ -37,31 +35,24 @@ const UserFavoritesSection: FC = () => {
   }
 
   return (
-    <Grid container id="user-favorites-section">
+    <div className="w-full">
       {favorites &&
         !!favorites.length &&
-        favorites.map((favorite, indx) => (
-          <>
-            <Grid
-              size={12}
-              key={indx}
-              className="user-favorite-item line-separator-top"
-            >
-              <Grid container>
-                <Grid size={6} className="flex justify-start">
-                  {favorite.restaurant.name}
-                </Grid>
-                <Grid size={2} className="flex justify-center">
-                  {getDate(favorite.createdAt)}
-                </Grid>
-                <Grid size={4} className="flex justify-end">
-                  delete
-                </Grid>
-              </Grid>
-            </Grid>
-          </>
+        favorites.map((favorite) => (
+          <div
+            key={favorite.id}
+            className="line-separator-top grid grid-cols-12 py-[10px]"
+          >
+            <div className="col-span-6 flex justify-start">
+              {favorite.restaurant.name}
+            </div>
+            <div className="col-span-2 flex justify-center">
+              {getDate(favorite.createdAt)}
+            </div>
+            <div className="col-span-4 flex justify-end">delete</div>
+          </div>
         ))}
-    </Grid>
+    </div>
   );
 };
 

@@ -1,6 +1,5 @@
 import { ReactNode, CSSProperties, ComponentType } from "react";
-import { AlertColor } from "@mui/material";
-import { FieldTypes, ModalType, LoadingType } from "@/types";
+import { FieldTypes, ModalType, LoadingType, SeverityType } from "@/types";
 
 export interface LoadingComponentInterface<T> {
   children: ReactNode;
@@ -86,7 +85,7 @@ export interface CustomKeyPairObj<T> {
 export interface snackBarObjType {
   open: boolean;
   message: string;
-  severity: AlertColor;
+  severity: SeverityType;
 }
 
 export interface StatusType {

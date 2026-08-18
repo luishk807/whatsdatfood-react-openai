@@ -1,10 +1,28 @@
 import { FC, useMemo } from "react";
 import "./index.css";
 import { LOADING_TYPES } from "@/customConstants";
-import Grid from "@mui/material/Grid";
-import { CircularProgress, LinearProgress } from "@mui/material";
 import { LoadingInterface } from "@/interfaces";
 import loadingGif from "@/assets/loading.gif";
+
+/** Was MUI's CircularProgress: a ring with one quarter left transparent. */
+const Circular: FC = () => (
+  <span
+    role="progressbar"
+    aria-label="Loading"
+    className="inline-block h-10 w-10 animate-spin rounded-full border-[3px] border-line border-t-brand motion-reduce:animate-none"
+  />
+);
+
+/** Was MUI's LinearProgress. Indeterminate, so it carries no false progress. */
+const Linear: FC = () => (
+  <span
+    role="progressbar"
+    aria-label="Loading"
+    className="block h-1 w-full overflow-hidden rounded-full bg-surface-sunken"
+  >
+    <span className="block h-full w-1/3 animate-pulse rounded-full bg-brand motion-reduce:animate-none" />
+  </span>
+);
 
 const Loading = ({
   style,
@@ -14,9 +32,9 @@ const Loading = ({
   const LoadingContainer: FC = useMemo(() => {
     switch (type) {
       case LOADING_TYPES.LINEAR:
-        return () => <LinearProgress />;
+        return Linear;
       case LOADING_TYPES.CIRCULAR:
-        return () => <CircularProgress />;
+        return Circular;
       case LOADING_TYPES.CUSTOM:
         return () => (CustomComponent ? <CustomComponent /> : null);
       default:
@@ -25,17 +43,16 @@ const Loading = ({
         );
     }
   }, [type]);
+
   return (
-    <Grid
-      container
+    <div
       style={style}
-      className="w-full justify-center items-center"
-      minHeight={20}
+      className="flex min-h-[20px] w-full items-center justify-center"
     >
-      <Grid size={12} className="w-full h-full flex" textAlign="center">
+      <div className="flex h-full w-full justify-center text-center">
         <LoadingContainer />
-      </Grid>
-    </Grid>
+      </div>
+    </div>
   );
 };
 

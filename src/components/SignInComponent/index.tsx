@@ -1,7 +1,6 @@
 import { type FC, type FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
-import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
+import { VisibilityIcon, VisibilityOffIcon } from "@/components/icons";
 import AuthPitch from "@/components/AuthPitch";
 import useAuth from "@/customHooks/useAuth";
 import useLogin from "@/customHooks/useLogin";
@@ -110,9 +109,9 @@ const SignInComponent: FC = () => {
                   className="absolute right-2 top-1/2 inline-flex -translate-y-1/2 items-center gap-1 rounded-full px-2 py-1 text-xs text-ink-muted hover:text-ink"
                 >
                   {revealed ? (
-                    <VisibilityOffOutlinedIcon sx={{ fontSize: 15 }} />
+                    <VisibilityOffIcon size={15} />
                   ) : (
-                    <VisibilityOutlinedIcon sx={{ fontSize: 15 }} />
+                    <VisibilityIcon size={15} />
                   )}
                   {revealed ? AUTH_LABELS.hide : AUTH_LABELS.show}
                 </button>

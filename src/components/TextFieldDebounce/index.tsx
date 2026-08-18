@@ -1,4 +1,3 @@
-import { Box } from "@mui/material";
 import { ReactNode, useEffect, useState, useCallback, type FC } from "react";
 import "./index.css";
 import { TextFieldInterface } from "@/interfaces";
@@ -32,11 +31,11 @@ const TextFieldDebounce = <T,>({
 
         setLoaderElement(
           resp ? (
-            <Box className="loader-message error">
+            <div className="loader-message error">
               Username is already being used!
-            </Box>
+            </div>
           ) : (
-            <Box className="loader-message success">Username is available!</Box>
+            <div className="loader-message success">Username is available!</div>
           ),
         );
 
@@ -45,9 +44,9 @@ const TextFieldDebounce = <T,>({
         }
       } catch (err) {
         setLoaderElement(
-          <Box className="loader-message success">
+          <div className="loader-message success">
             Unable to perform search
-          </Box>,
+          </div>,
         );
       }
     }, 1000),

@@ -1,7 +1,6 @@
 import { FC, useCallback, useEffect, useRef, useState } from "react";
 import clsx from "clsx";
-import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
-import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
+import { ChevronLeftIcon, ChevronRightIcon } from "@/components/icons";
 import DishCard from "@/components/DishCard";
 import { TopDishStripInterface } from "@/interfaces/ranking";
 import { RANKING_LABELS } from "@/customConstants/labels";
@@ -140,9 +139,9 @@ const TopDishStrip: FC<TopDishStripInterface> = ({
               )}
             >
               {direction === -1 ? (
-                <ChevronLeftRoundedIcon sx={{ fontSize: 20 }} />
+                <ChevronLeftIcon size={20} />
               ) : (
-                <ChevronRightRoundedIcon sx={{ fontSize: 20 }} />
+                <ChevronRightIcon size={20} />
               )}
             </button>
           );

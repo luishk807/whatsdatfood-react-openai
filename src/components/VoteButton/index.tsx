@@ -1,7 +1,6 @@
 import { FC } from "react";
 import clsx from "clsx";
-import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
-import ThumbDownAltOutlinedIcon from "@mui/icons-material/ThumbDownAltOutlined";
+import { ThumbUpIcon, ThumbDownIcon } from "@/components/icons";
 import { VoteButtonInterface } from "@/interfaces/ranking";
 import { VOTE } from "@/customConstants/ranking";
 import { DISH_LABELS } from "@/customConstants/labels";
@@ -53,7 +52,7 @@ const VoteButton: FC<VoteButtonInterface> = ({
               : "border-line text-ink-muted hover:border-brand hover:text-brand",
         )}
       >
-        <ThumbUpAltOutlinedIcon sx={{ fontSize: metric ? 15 : 14 }} />
+        <ThumbUpIcon size={metric ? 15 : 14} />
         {metric ? (
           <span className="tabular-nums">{metric}</span>
         ) : (
@@ -79,7 +78,7 @@ const VoteButton: FC<VoteButtonInterface> = ({
             : "border-line text-ink-muted hover:border-brand hover:text-brand",
         )}
       >
-        <ThumbUpAltOutlinedIcon sx={{ fontSize: 17 }} />
+        <ThumbUpIcon size={17} />
       </button>
 
       <button
@@ -96,7 +95,7 @@ const VoteButton: FC<VoteButtonInterface> = ({
             : "border-line text-ink-muted hover:border-neutral-800",
         )}
       >
-        <ThumbDownAltOutlinedIcon sx={{ fontSize: 17 }} />
+        <ThumbDownIcon size={17} />
       </button>
 
       {!!upCount && (

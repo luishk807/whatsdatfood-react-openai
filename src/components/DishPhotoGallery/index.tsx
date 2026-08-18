@@ -1,7 +1,6 @@
 import { FC, useState } from "react";
 import clsx from "clsx";
-import ThumbUpAltOutlinedIcon from "@mui/icons-material/ThumbUpAltOutlined";
-import FlagOutlinedIcon from "@mui/icons-material/FlagOutlined";
+import { ThumbUpIcon, FlagIcon } from "@/components/icons";
 import Badge from "@/components/Badge";
 import {
   DishPhotoGalleryInterface,
@@ -115,7 +114,7 @@ const DishPhotoGallery: FC<DishPhotoGalleryInterface> = ({
                         : "border-line text-ink-muted",
                     )}
                   >
-                    <ThumbUpAltOutlinedIcon sx={{ fontSize: 14 }} />
+                    <ThumbUpIcon size={14} />
                     <span className="tabular-nums">
                       {photo.helpful_count ?? 0}
                     </span>
@@ -135,7 +134,7 @@ const DishPhotoGallery: FC<DishPhotoGalleryInterface> = ({
                     }
                     className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-line text-ink-muted disabled:opacity-50"
                   >
-                    <FlagOutlinedIcon sx={{ fontSize: 14 }} />
+                    <FlagIcon size={14} />
                   </button>
                 </div>
               </div>

@@ -1,6 +1,4 @@
 import { useEffect, useState, type FC } from "react";
-import { Grid } from "@mui/material";
-import "./index.css";
 import useUserViews from "@/customHooks/useUserViews";
 import { PAGE_DEFAULT, LIMIT_DEFAULT } from "@/customConstants";
 import { _get } from "@/utils";
@@ -36,27 +34,28 @@ const UserHistory: FC = () => {
   }
 
   return (
-    <Grid container className="w-full">
+    <div className="w-full">
       {!!userViews.length ? (
-        userViews.map((view, indx) => {
+        userViews.map((view) => {
           const restaurant: RestaurantType = _get(view, "restaurant");
           return (
-            <Grid size={12} key={indx} className="line-separator-top py-[5px]">
-              <Grid container className="w-full">
-                <Grid size={10} className="flex justify-start">
-                  {restaurant.name}
-                </Grid>
-                <Grid size={2} className="flex justify-end">
-                  {getDate(view.createdAt)}
-                </Grid>
-              </Grid>
-            </Grid>
+            <div
+              key={view.id}
+              className="line-separator-top grid w-full grid-cols-12 py-[5px]"
+            >
+              <div className="col-span-10 flex justify-start">
+                {restaurant.name}
+              </div>
+              <div className="col-span-2 flex justify-end">
+                {getDate(view.createdAt)}
+              </div>
+            </div>
           );
         })
       ) : (
-        <Grid size={12}>No views</Grid>
+        <div>No views</div>
       )}
-    </Grid>
+    </div>
   );
 };
 

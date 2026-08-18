@@ -1,8 +1,7 @@
 import { useEffect } from "react";
-import { Grid, Box } from "@mui/material";
 import Button from "@/components/Button";
 import useAuth from "@/customHooks/useAuth";
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline";
+import { CheckCircleIcon } from "@/components/icons";
 import "./index.css";
 import { Navigate, useNavigate } from "react-router-dom";
 const Logout = () => {
@@ -25,15 +24,15 @@ const Logout = () => {
   }
 
   return (
-    <Grid container id="logout-container">
-      <Grid className="logout-item">
-        <Box>
-          <CheckCircleOutlineIcon sx={{ fill: "green" }} />
-        </Box>
-        Your are succesfully logout!<p>Thank you!</p>
+    <div id="logout-container">
+      <div className="logout-item">
+        <div>
+          <CheckCircleIcon className="text-brand" />
+        </div>
+        You are successfully logged out!<p>Thank you!</p>
         <Button onClick={() => navigator("/")}>Back to Homepage</Button>
-      </Grid>
-    </Grid>
+      </div>
+    </div>
   );
 };
 

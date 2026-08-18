@@ -1,13 +1,12 @@
 import { useState, type FC, useEffect, useMemo, lazy, Suspense } from "react";
 import { useParams } from "react-router-dom";
-import { Grid } from "@mui/material";
-import { AlertColor } from "@mui/material";
 import {
   RestaurantType,
   MenuItemType,
   RestCategoryMenu,
 } from "@/interfaces/restaurants";
 import { CustomKeyPairObj } from "@/interfaces";
+import { SeverityType } from "@/types";
 import LoadingComponent from "@/components/LoadingComponent";
 import RestaurantHeader from "@/components/RestaurantHeader";
 import RestaurantDetailsSheet from "@/components/RestaurantDetailsSheet";
@@ -310,7 +309,7 @@ const MenuResults: FC = () => {
     }
   };
 
-  const handleReviewSubmitted = (message: string, severity: AlertColor) => {
+  const handleReviewSubmitted = (message: string, severity: SeverityType) => {
     showSnackBar(message, severity);
     setDetailMode(RATING_TYPE.list);
     // Must bypass the cache: the menu is cache-first, so a plain refetch would
@@ -325,7 +324,7 @@ const MenuResults: FC = () => {
   }
 
   return (
-    <Grid container className="w-full">
+    <div className="w-full">
       {SnackbarComponent}
       <LoadingComponent
         showLoading={loading}
@@ -333,9 +332,9 @@ const MenuResults: FC = () => {
         type={LOADING_TYPES.CUSTOM}
         data={restaurantInfo}
       >
-        {/* Outside the Grid: MUI sizes its children, and the header's own
-            layout was collapsing to a column narrow enough to wrap the
-            restaurant name one word per line. */}
+        {/* Kept out of the surrounding layout: the header owns its own,
+            and nesting it was collapsing it to a column narrow enough to wrap
+            the restaurant name one word per line. */}
         <RestaurantHeader
           restaurant={restaurantInfo}
           onOpenDetails={() => setShowDetails(true)}
@@ -581,7 +580,7 @@ const MenuResults: FC = () => {
           </div>
         )}
       </BottomSheet>
-    </Grid>
+    </div>
   );
 };
 

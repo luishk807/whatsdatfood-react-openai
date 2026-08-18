@@ -1,5 +1,5 @@
 import { FC, useEffect, useState } from "react";
-import StorefrontOutlinedIcon from "@mui/icons-material/StorefrontOutlined";
+import { StorefrontIcon } from "@/components/icons";
 import useRestaurantOwnership from "@/customHooks/useRestaurantOwnership";
 import useAuth from "@/customHooks/useAuth";
 import { OWNER_LABELS } from "@/customConstants/labels";
@@ -71,7 +71,7 @@ const ClaimRestaurantButton: FC<ClaimRestaurantButtonInterface> = ({ slug }) => 
       }}
       className="inline-flex items-center gap-1 rounded-full border border-line px-3 py-1 text-xs font-medium text-ink disabled:opacity-50"
     >
-      <StorefrontOutlinedIcon sx={{ fontSize: 14 }} />
+      <StorefrontIcon size={14} />
       {OWNER_LABELS.claimCta}
     </button>
   );

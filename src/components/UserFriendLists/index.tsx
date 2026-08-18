@@ -1,8 +1,6 @@
-import { Grid } from "@mui/material";
 import { useEffect, useState, type FC } from "react";
 import useUserFriend from "@/customHooks/useUserFriend";
 import { UserFriend } from "@/interfaces/users";
-import "./index.css";
 import { LIMIT_DEFAULT, PAGE_DEFAULT } from "@/customConstants";
 import { _get } from "@/utils";
 import Button from "@/components/Button";
@@ -37,50 +35,31 @@ const UserFriendLists: FC<UserFriendListsInt> = ({ onCreate }) => {
   }
 
   return (
-    <Grid container className="w-full">
-      <Grid size={12} className="user-friends-button-section">
-        <Grid container className="flex w-full justify-end">
-          <Grid size={3} className="flex justify-end py-[10px]">
-            <Button
-              onClick={onCreate}
-              sx={{
-                fontSize: ".7em",
-                padding: "5px 8px",
-                width: "auto !important",
-                margin: "0px",
-              }}
-            >
-              Add Friend
-            </Button>
-          </Grid>
-        </Grid>
-      </Grid>
+    <div className="w-full">
+      <div className="flex w-full justify-end py-[10px]">
+        <Button onClick={onCreate} className="m-0 w-auto px-2 py-[5px] text-xs">
+          Add Friend
+        </Button>
+      </div>
       {!!friends.length ? (
-        friends.map((friend, indx) => {
+        friends.map((friend) => {
           return (
-            <Grid
-              key={indx}
-              size={12}
-              className="w-full py-[10px] line-separator-top flex"
+            <div
+              key={friend.id}
+              className="line-separator-top grid w-full grid-cols-12 py-[10px]"
             >
-              <Grid container className="w-full flex">
-                <Grid size={5} className="flex justify-start">
-                  {friend.name}
-                </Grid>
-                <Grid size={4} className="flex justify-center">
-                  {friend.email}
-                </Grid>
-                <Grid size={3} className="flex justify-end">
-                  {friend.phone}
-                </Grid>
-              </Grid>
-            </Grid>
+              <div className="col-span-5 flex justify-start">{friend.name}</div>
+              <div className="col-span-4 flex justify-center">
+                {friend.email}
+              </div>
+              <div className="col-span-3 flex justify-end">{friend.phone}</div>
+            </div>
           );
         })
       ) : (
-        <Grid size={12}>No Friends</Grid>
+        <div>No Friends</div>
       )}
-    </Grid>
+    </div>
   );
 };
 

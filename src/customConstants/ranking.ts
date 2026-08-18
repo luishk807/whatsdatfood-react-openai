@@ -33,3 +33,21 @@ export const ORDERS = {
    */
   MIN_DINERS_FOR_SHARE: 5,
 } as const;
+
+/** Stars in the review rating control. */
+export const STAR_COUNT = 5;
+
+/** Spoken score labels, keyed by the half-star values the control can produce. */
+export const RATING_LABELS: Record<number | string, string> = {
+  0.5: "Useless",
+  1: "Useless+",
+  1.5: "Poor",
+  2: "Poor+",
+  2.5: "Ok",
+  3: "Ok+",
+  3.5: "Good",
+  4: "Good+",
+  4.5: "Excellent",
+  5: "Excellent+",
+  group: "Rating",
+};

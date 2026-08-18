@@ -81,6 +81,14 @@ export const DROPDOWN_MENU = {
   ],
 };
 
+/** Snackbar severities. Was MUI's AlertColor; the values are the same. */
+export const SEVERITY = {
+  success: "success",
+  info: "info",
+  warning: "warning",
+  error: "error",
+} as const;
+
 export const MODAL_TYPE = ["button", "text", "custom", "link"] as const;
 
 
