@@ -47,3 +47,8 @@ export const ACCOUNT_LABELS = {
 } as const;
 
 export type AccountIcon = (typeof ACCOUNT_GROUPS)[number]["items"][number]["icon"];
+
+export const ACCOUNT = {
+  /** Ours, not the server's: the API accepts any password at all. */
+  MIN_PASSWORD: 8,
+} as const;

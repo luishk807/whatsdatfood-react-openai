@@ -156,3 +156,11 @@ export interface CreateUserFriend
   extends Partial<
     Omit<UserFriend, "id" | "user_id" | "createdAt" | "updatedAt">
   > {}
+
+export interface SettingsFieldInterface {
+  name: string;
+  label: string;
+  value: string;
+  type?: string;
+  onChange: (value: string) => void;
+}

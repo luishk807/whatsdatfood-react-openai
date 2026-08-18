@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import DeleteAccount from "@/components/DeleteAccount";
-import { ACCOUNT_LABELS } from "@/customConstants/labels";
+import { SETTINGS_LABELS } from "@/customConstants/labels";
 import { ROUTES } from "@/customConstants/routes";
 
 const deleteAccount = jest.fn();
@@ -53,7 +53,7 @@ describe("DeleteAccount", () => {
     show();
 
     await userEvent.click(
-      screen.getByRole("button", { name: ACCOUNT_LABELS.deleteCta }),
+      screen.getByRole("button", { name: SETTINGS_LABELS.deleteCta }),
     );
 
     expect(deleteAccount).not.toHaveBeenCalled();
@@ -63,10 +63,10 @@ describe("DeleteAccount", () => {
     show();
 
     await userEvent.click(
-      screen.getByRole("button", { name: ACCOUNT_LABELS.deleteCta }),
+      screen.getByRole("button", { name: SETTINGS_LABELS.deleteCta }),
     );
 
-    ACCOUNT_LABELS.deleteConsequences.forEach((line) =>
+    SETTINGS_LABELS.deleteConsequences.forEach((line) =>
       expect(screen.getByText(line)).toBeInTheDocument(),
     );
     // Photos are the part people do not expect and cannot get back.
@@ -77,10 +77,10 @@ describe("DeleteAccount", () => {
     show();
 
     await userEvent.click(
-      screen.getByRole("button", { name: ACCOUNT_LABELS.deleteCta }),
+      screen.getByRole("button", { name: SETTINGS_LABELS.deleteCta }),
     );
     await userEvent.click(
-      screen.getByRole("button", { name: ACCOUNT_LABELS.deleteConfirmCta }),
+      screen.getByRole("button", { name: SETTINGS_LABELS.deleteConfirmCta }),
     );
 
     expect(deleteAccount).toHaveBeenCalledTimes(1);
@@ -90,14 +90,14 @@ describe("DeleteAccount", () => {
     show();
 
     await userEvent.click(
-      screen.getByRole("button", { name: ACCOUNT_LABELS.deleteCta }),
+      screen.getByRole("button", { name: SETTINGS_LABELS.deleteCta }),
     );
     await userEvent.click(
-      screen.getByRole("button", { name: ACCOUNT_LABELS.deleteCancel }),
+      screen.getByRole("button", { name: SETTINGS_LABELS.deleteCancel }),
     );
 
     expect(
-      screen.queryByRole("button", { name: ACCOUNT_LABELS.deleteConfirmCta }),
+      screen.queryByRole("button", { name: SETTINGS_LABELS.deleteConfirmCta }),
     ).not.toBeInTheDocument();
     expect(deleteAccount).not.toHaveBeenCalled();
   });
@@ -106,10 +106,10 @@ describe("DeleteAccount", () => {
     show();
 
     await userEvent.click(
-      screen.getByRole("button", { name: ACCOUNT_LABELS.deleteCta }),
+      screen.getByRole("button", { name: SETTINGS_LABELS.deleteCta }),
     );
     await userEvent.click(
-      screen.getByRole("button", { name: ACCOUNT_LABELS.deleteConfirmCta }),
+      screen.getByRole("button", { name: SETTINGS_LABELS.deleteConfirmCta }),
     );
 
     // Home, and by a full page load: every cache in the tab describes a user
@@ -122,10 +122,10 @@ describe("DeleteAccount", () => {
     show();
 
     await userEvent.click(
-      screen.getByRole("button", { name: ACCOUNT_LABELS.deleteCta }),
+      screen.getByRole("button", { name: SETTINGS_LABELS.deleteCta }),
     );
     await userEvent.click(
-      screen.getByRole("button", { name: ACCOUNT_LABELS.deleteConfirmCta }),
+      screen.getByRole("button", { name: SETTINGS_LABELS.deleteConfirmCta }),
     );
 
     expect(replace).not.toHaveBeenCalled();
@@ -138,7 +138,7 @@ describe("DeleteAccount", () => {
     show();
 
     expect(screen.getByRole("alert")).toHaveTextContent(
-      ACCOUNT_LABELS.deleteFailed,
+      SETTINGS_LABELS.deleteFailed,
     );
   });
 
@@ -147,11 +147,11 @@ describe("DeleteAccount", () => {
     show();
 
     await userEvent.click(
-      screen.getByRole("button", { name: ACCOUNT_LABELS.deleteCta }),
+      screen.getByRole("button", { name: SETTINGS_LABELS.deleteCta }),
     );
 
     expect(
-      screen.getByRole("button", { name: ACCOUNT_LABELS.deleting }),
+      screen.getByRole("button", { name: SETTINGS_LABELS.deleting }),
     ).toBeDisabled();
   });
 });

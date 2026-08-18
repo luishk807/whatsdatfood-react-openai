@@ -188,7 +188,7 @@ export const SEARCH_LABELS = {
   failed: "Search is unavailable for a moment. Try again shortly.",
 } as const;
 
-export const ACCOUNT_LABELS = {
+export const SETTINGS_LABELS = {
   deleteTitle: "Delete your account",
   deleteBlurb:
     "This removes your account and everything we hold about you. It cannot " +
@@ -206,6 +206,30 @@ export const ACCOUNT_LABELS = {
   deleteCancel: "Keep my account",
   deleting: "Deleting…",
   deleteFailed: "That did not work. Nothing has been deleted — try again.",
+
+  profileTitle: "Profile",
+  profileBlurb: "How you appear on the photos and reviews you contribute.",
+  accountTitle: "Account",
+  accountBlurb: "Private to you. Nobody else sees these.",
+  passwordTitle: "Password",
+  changePassword: "Change password",
+  newPassword: "New password",
+  confirmPassword: "Confirm new password",
+  updatePassword: "Update password",
+  passwordUpdated: "Password updated.",
+  passwordMismatch: "Those two passwords do not match.",
+  passwordTooShort: "Use at least 8 characters.",
+  cancel: "Cancel",
+  save: "Save changes",
+  saving: "Saving…",
+  saved: "Saved.",
+  saveFailed: "That did not save. Nothing has been changed.",
+  firstName: "First name",
+  lastName: "Last name",
+  username: "Username",
+  email: "Email",
+  phone: "Phone",
+  dangerTitle: "Danger zone",
 } as const;
 
 export const AUTH_LABELS = {

@@ -1,6 +1,6 @@
 import { type FC, useState } from "react";
 import useDeleteAccount from "@/customHooks/useDeleteAccount";
-import { ACCOUNT_LABELS } from "@/customConstants/labels";
+import { SETTINGS_LABELS } from "@/customConstants/labels";
 import { ROUTES } from "@/customConstants/routes";
 
 /**
@@ -37,10 +37,10 @@ const DeleteAccount: FC = () => {
     <section className="mt-10 flex flex-col items-start gap-3 border-t border-line pt-6">
       <div className="flex flex-col gap-1">
         <h2 className="text-base font-semibold text-ink">
-          {ACCOUNT_LABELS.deleteTitle}
+          {SETTINGS_LABELS.deleteTitle}
         </h2>
         <p className="max-w-prose text-sm text-ink-muted">
-          {ACCOUNT_LABELS.deleteBlurb}
+          {SETTINGS_LABELS.deleteBlurb}
         </p>
       </div>
 
@@ -50,15 +50,15 @@ const DeleteAccount: FC = () => {
           onClick={() => setConfirming(true)}
           className="rounded-full border border-danger px-3 py-1.5 text-sm font-medium text-danger hover:bg-danger hover:text-white"
         >
-          {ACCOUNT_LABELS.deleteCta}
+          {SETTINGS_LABELS.deleteCta}
         </button>
       ) : (
         <div className="flex flex-col gap-3 rounded-card bg-surface-sunken p-4">
           <p className="max-w-prose text-sm font-medium text-ink">
-            {ACCOUNT_LABELS.deleteConfirm}
+            {SETTINGS_LABELS.deleteConfirm}
           </p>
           <ul className="flex list-disc flex-col gap-1 pl-5">
-            {ACCOUNT_LABELS.deleteConsequences.map((line) => (
+            {SETTINGS_LABELS.deleteConsequences.map((line) => (
               <li key={line} className="text-sm text-ink-muted">
                 {line}
               </li>
@@ -73,8 +73,8 @@ const DeleteAccount: FC = () => {
               className="rounded-full bg-danger px-3 py-1.5 text-sm font-medium text-white disabled:opacity-60"
             >
               {deleting
-                ? ACCOUNT_LABELS.deleting
-                : ACCOUNT_LABELS.deleteConfirmCta}
+                ? SETTINGS_LABELS.deleting
+                : SETTINGS_LABELS.deleteConfirmCta}
             </button>
             <button
               type="button"
@@ -82,7 +82,7 @@ const DeleteAccount: FC = () => {
               onClick={() => setConfirming(false)}
               className="rounded-full border border-line px-3 py-1.5 text-sm text-ink disabled:opacity-60"
             >
-              {ACCOUNT_LABELS.deleteCancel}
+              {SETTINGS_LABELS.deleteCancel}
             </button>
           </div>
         </div>
@@ -90,7 +90,7 @@ const DeleteAccount: FC = () => {
 
       {error && (
         <p role="alert" className="text-sm text-danger">
-          {ACCOUNT_LABELS.deleteFailed}
+          {SETTINGS_LABELS.deleteFailed}
         </p>
       )}
     </section>
