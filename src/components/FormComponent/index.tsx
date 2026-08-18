@@ -39,14 +39,21 @@ const FormComponent = <T,>({
     setErrorFields([]);
     const { label, value, type } = item;
     if (key && value) {
-      setFormData({
-        ...formData,
+      // The updater form, not a spread of `formData` from the closure. Two
+      // fields changing before React re-renders both read the same stale
+      // snapshot, and the second overwrites the first - so a password manager
+      // or browser autofill, which fills every field at once, leaves the form
+      // reporting that fields it visibly contains "can't be empty". The branch
+      // below already did this correctly, which is what made it look
+      // deliberate.
+      setFormData((prev) => ({
+        ...prev,
         [key]: {
           value,
           label,
           type: type,
         },
-      });
+      }));
     } else {
       setFormData((prev) => {
         const { [key]: _, ...rest } = prev;

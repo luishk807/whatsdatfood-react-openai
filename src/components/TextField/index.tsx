@@ -16,7 +16,20 @@ const TextField = <T,>({
   showLoaderElement,
   defaultValue,
 }: TextFieldInterface<T>) => {
-  const [inputValue, setInputValue] = useState<string>(defaultValue as string);
+  // Empty string, never undefined: an input given value={undefined} is
+  // uncontrolled, and becomes controlled on the first keystroke - which is the
+  // "changing an uncontrolled input to be controlled" warning this logged on
+  // every form in the app.
+  const [inputValue, setInputValue] = useState<string>(
+    (defaultValue as string) ?? "",
+  );
+
+  // A default that arrives after the first render is the normal case here: the
+  // settings form renders before the user has been fetched. Without this the
+  // field stays empty however late the data lands.
+  useEffect(() => {
+    setInputValue((defaultValue as string) ?? "");
+  }, [defaultValue]);
 
   const onChangeInput = (e: ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -29,7 +42,7 @@ const TextField = <T,>({
       <Grid container className="w-full">
         {!isPlaceholder && (
           <Grid size={12} className="flex justify-start">
-            <label htmlFor="inputfield">{label}</label>
+            <label htmlFor={name}>{label}</label>
           </Grid>
         )}
         <Grid size={12} className="relative">
@@ -39,7 +52,6 @@ const TextField = <T,>({
             name={name}
             type={type}
             value={inputValue}
-            defaultValue={defaultValue as string}
             autoComplete={name}
             onChange={onChangeInput}
             {...(isPlaceholder && { placeholder: label })}
