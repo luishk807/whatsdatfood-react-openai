@@ -164,3 +164,8 @@ export interface SettingsFieldInterface {
   type?: string;
   onChange: (value: string) => void;
 }
+
+export interface AccountNavInterface {
+  /** "sidebar" beside content on a wide screen; "list" as the page on a phone. */
+  variant: "sidebar" | "list";
+}

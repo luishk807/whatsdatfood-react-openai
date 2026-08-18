@@ -1,0 +1,89 @@
+import { type FC } from "react";
+import { Link, useLocation } from "react-router-dom";
+import clsx from "clsx";
+import { AccountRowIcon } from "@/components/AccountButton/icons";
+import { ACCOUNT_GROUPS, ACCOUNT_LABELS } from "@/customConstants/account";
+import { ROUTES } from "@/customConstants/routes";
+import { AccountNavInterface } from "@/interfaces/users";
+
+/**
+ * The account menu, in the two shapes it needs to take.
+ *
+ * `sidebar` is the column beside the content on a wide screen. `list` is the
+ * whole page on a phone, where a sidebar squeezed alongside a form is neither
+ * a menu nor a page — the account screen becomes a list of destinations and
+ * each one opens on its own.
+ *
+ * Both read from `ACCOUNT_GROUPS`, which already existed for the header
+ * dropdown and was never wired in here: the sidebar had its own flat copy of
+ * the same routes with worse words on them ("Setting", "Manage").
+ */
+const AccountNav: FC<AccountNavInterface> = ({ variant }) => {
+  const { pathname } = useLocation();
+  const isList = variant === "list";
+
+  return (
+    <nav aria-label={ACCOUNT_LABELS.open} className="w-full">
+      <ul className={clsx("flex flex-col", isList ? "gap-px" : "gap-1")}>
+        {ACCOUNT_GROUPS.map((group, index) => (
+          <li key={group.id}>
+            {/* A rule between groups rather than a heading. The groups say what
+                belongs together; naming them adds words nobody reads. */}
+            {index > 0 && (
+              <div
+                className={clsx("border-t border-line", isList ? "my-2" : "my-2")}
+              />
+            )}
+
+            <ul className={clsx("flex flex-col", isList ? "gap-px" : "gap-0.5")}>
+              {group.items.map((item) => {
+                const active = pathname === item.route;
+
+                return (
+                  <li key={item.route}>
+                    <Link
+                      to={item.route}
+                      aria-current={active ? "page" : undefined}
+                      className={clsx(
+                        "flex items-center gap-3 rounded-card text-ink",
+                        isList
+                          ? "px-1 py-3.5 text-base"
+                          : "px-3 py-2 text-sm hover:bg-surface-sunken",
+                        active && !isList && "bg-surface-sunken font-medium",
+                        active && isList && "font-medium",
+                      )}
+                    >
+                      <span className="text-ink-muted">
+                        <AccountRowIcon name={item.icon} />
+                      </span>
+                      <span className="flex-1">{item.label}</span>
+                      {isList && (
+                        <span aria-hidden="true" className="text-ink-muted">
+                          ›
+                        </span>
+                      )}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </li>
+        ))}
+      </ul>
+
+      <div className="mt-2 border-t border-line pt-2">
+        <Link
+          to={ROUTES.logout}
+          className={clsx(
+            "flex items-center rounded-card text-ink-muted hover:text-ink",
+            isList ? "px-1 py-3.5 text-base" : "px-3 py-2 text-sm",
+          )}
+        >
+          {ACCOUNT_LABELS.logOut}
+        </Link>
+      </div>
+    </nav>
+  );
+};
+
+export default AccountNav;

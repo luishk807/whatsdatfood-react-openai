@@ -1,104 +1,67 @@
-import { useEffect, useState, type FC } from "react";
-import { Grid, Box } from "@mui/material";
-import { Link } from "react-router-dom";
-import { UserAccountLayoutInterface, UserType } from "@/interfaces/users";
-import { ACCOUNT_MENU_LIST, LOGOUT_MENU } from "@/customConstants/index";
+import { type FC } from "react";
+import { Link, useLocation } from "react-router-dom";
+import AccountNav from "@/components/AccountNav";
 import useAuth from "@/customHooks/useAuth";
-import "./index.css";
+import { UserAccountLayoutInterface } from "@/interfaces/users";
+import { ACCOUNT_LABELS } from "@/customConstants/account";
+import { ROUTES } from "@/customConstants/routes";
 
+/**
+ * The frame around every account page.
+ *
+ * The menu is a column beside the content on a wide screen and absent on a
+ * phone, where it would be a third of the width squeezed against a form. There
+ * the account screen itself is the menu — see the `/account` page — and each
+ * destination opens on its own with a way back.
+ */
 const UserAccountLayout: FC<UserAccountLayoutInterface> = ({
   children,
   sectionTitle,
 }) => {
-  const [userData, setUserData] = useState<UserType>();
-
   const { user } = useAuth();
-
-  useEffect(() => {
-    if (user) {
-      setUserData(user);
-    }
-  }, [user]);
+  const { pathname } = useLocation();
+  const onTheMenu = pathname === ROUTES.account;
 
   return (
-    <Grid container spacing={2} id="user-account-layout">
-      <Grid
-        size={{
-          md: 12,
-          lg: 8,
-          sm: 12,
-        }}
-      >
-        <Grid container>
-          {userData && (
-            <Grid size={12} className="user-account-layout-header">
-              <h1>
-                Hi {userData?.first_name} {user?.last_name}
-              </h1>
-            </Grid>
-          )}
-          <Grid
-            size={{
-              md: 3,
-              lg: 3,
-            }}
-            sx={{
-              display: {
-                xs: "none",
-                sm: "none",
-                md: "block",
-                lg: "block",
-              },
-            }}
-            className="user-account-layout-dropdown"
-          >
-            <ul>
-              {ACCOUNT_MENU_LIST.map((item, indx) => (
-                <li key={indx}>
-                  <Link to={item.url}>{item.name}</Link>
-                </li>
-              ))}
-            </ul>
-            <Grid size={12} className="user-account-logout line-separator-top">
-              <Link to={LOGOUT_MENU.url}>{LOGOUT_MENU.name}</Link>
-            </Grid>
-          </Grid>
+    <div className="mx-auto w-full max-w-5xl px-4 pb-16 pt-4">
+      {user && (
+        <p className="text-sm text-ink-muted">
+          {ACCOUNT_LABELS.signedInAs}{" "}
+          <span className="font-medium text-ink">
+            {[user.first_name, user.last_name].filter(Boolean).join(" ") ||
+              user.username}
+          </span>
+        </p>
+      )}
 
-          <Grid
-            size={{
-              md: 10,
-              lg: 8,
-              sm: 12,
-            }}
-            className="user-account-layout-content"
-          >
-            <Box
-              sx={{
-                padding: {
-                  lg: "10px",
-                },
-                width: {
-                  lg: "80%",
-                  md: "80%",
-                  sm: "100%",
-                  xs: "100%",
-                },
-              }}
-              className="user-account-layout-content-inner"
+      <div className="mt-4 flex gap-10">
+        <aside className="hidden w-56 shrink-0 lg:block">
+          <AccountNav variant="sidebar" />
+        </aside>
+
+        <div className="min-w-0 flex-1">
+          {/* Only on a phone, and only away from the menu itself: on a wide
+              screen the sidebar is the way back, and on the menu it pointed at
+              the page it was already on. */}
+          {!onTheMenu && (
+            <Link
+              to={ROUTES.account}
+              className="mb-3 inline-flex items-center gap-1 text-sm text-ink-muted hover:text-ink lg:hidden"
             >
-              <Grid container className="user-account-layout-content-sections">
-                <Grid size={12} className="flex justify-start">
-                  <h2>{sectionTitle}</h2>
-                </Grid>
-                <Grid size={12} className="flex justify-center">
-                  {children}
-                </Grid>
-              </Grid>
-            </Box>
-          </Grid>
-        </Grid>
-      </Grid>
-    </Grid>
+              ‹ {ACCOUNT_LABELS.open}
+            </Link>
+          )}
+
+          {sectionTitle && (
+            <h1 className="mb-4 text-xl font-semibold tracking-tight text-ink">
+              {sectionTitle}
+            </h1>
+          )}
+
+          {children}
+        </div>
+      </div>
+    </div>
   );
 };
 
