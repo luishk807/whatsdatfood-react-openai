@@ -1,15 +1,7 @@
-import { Box, Skeleton } from "@mui/material";
-const FormRatingSkeleton = () => {
-  return (
-    <Box
-      sx={{
-        width: "100%",
-        margin: "10px 0px",
-      }}
-    >
-      <Skeleton animation="wave" height={5} width="50%" />
-    </Box>
-  );
-};
+const FormRatingSkeleton = () => (
+  <div className="my-2.5 w-full">
+    <div className="h-1.5 w-1/2 animate-pulse rounded bg-surface-sunken" />
+  </div>
+);
 
 export default FormRatingSkeleton;

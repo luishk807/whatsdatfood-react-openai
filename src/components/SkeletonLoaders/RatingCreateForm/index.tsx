@@ -1,47 +1,14 @@
-import { Skeleton } from "@mui/material";
-import { Box } from "@mui/material";
-const SkeletonRatingCreate = () => {
-  return (
-    <Box className="w-full" sx={{ margin: "10px 0px" }}>
-      <Box>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <Skeleton
-            animation="wave"
-            variant="rectangular"
-            height={30}
-            width="35%"
-          />
-          <Skeleton
-            animation="wave"
-            variant="rectangular"
-            height={30}
-            width="35%"
-          />
-        </Box>
+const bar = "animate-pulse rounded bg-surface-sunken";
 
-        <Skeleton
-          sx={{
-            margin: "10px 0px",
-          }}
-          animation="wave"
-          variant="rectangular"
-          height={30}
-          width="45%"
-        />
-        <Skeleton
-          animation="wave"
-          variant="rectangular"
-          height={150}
-          width="100%"
-        />
-      </Box>
-    </Box>
-  );
-};
+const SkeletonRatingCreate = () => (
+  <div className="my-2.5 flex w-full flex-col gap-2.5">
+    <div className="flex justify-between">
+      <div className={`h-8 w-1/3 ${bar}`} />
+      <div className={`h-8 w-1/3 ${bar}`} />
+    </div>
+    <div className={`h-8 w-5/12 ${bar}`} />
+    <div className={`h-36 w-full ${bar}`} />
+  </div>
+);
 
 export default SkeletonRatingCreate;

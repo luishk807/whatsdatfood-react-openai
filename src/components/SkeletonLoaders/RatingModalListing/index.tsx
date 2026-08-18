@@ -1,93 +1,23 @@
-import { Skeleton } from "@mui/material";
-import { Box } from "@mui/material";
-const SkeletonRatingListing = () => {
-  return (
-    <Box className="w-full" sx={{ margin: "10px 0px" }}>
-      <Box>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <Skeleton
-            animation="wave"
-            variant="rectangular"
-            height={30}
-            width="35%"
-          />
-          <Skeleton
-            animation="wave"
-            variant="rectangular"
-            height={30}
-            width="35%"
-          />
-        </Box>
+const bar = "animate-pulse rounded bg-surface-sunken";
 
-        <Skeleton
-          sx={{
-            margin: "10px 0px",
-          }}
-          animation="wave"
-          variant="rectangular"
-          height={30}
-          width="45%"
-        />
-        <Skeleton
-          animation="wave"
-          variant="rectangular"
-          height="150px"
-          width="100%"
-        />
-      </Box>
-      <Box sx={{ margin: "10px 0px" }}>
-        <Skeleton
-          animation="wave"
-          variant="rectangular"
-          height="5"
-          width="100%"
-        />
-      </Box>
+/** Two review-shaped blocks, which is what the list usually shows first. */
+const Review = () => (
+  <div className="flex flex-col gap-2.5">
+    <div className="flex justify-between">
+      <div className={`h-8 w-1/3 ${bar}`} />
+      <div className={`h-8 w-1/3 ${bar}`} />
+    </div>
+    <div className={`h-8 w-5/12 ${bar}`} />
+    <div className={`h-36 w-full ${bar}`} />
+  </div>
+);
 
-      <Box>
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <Skeleton
-            animation="wave"
-            variant="rectangular"
-            height={30}
-            width="35%"
-          />
-          <Skeleton
-            animation="wave"
-            variant="rectangular"
-            height={30}
-            width="35%"
-          />
-        </Box>
-
-        <Skeleton
-          sx={{
-            margin: "10px 0px",
-          }}
-          animation="wave"
-          variant="rectangular"
-          height={30}
-          width="45%"
-        />
-        <Skeleton
-          animation="wave"
-          variant="rectangular"
-          height={150}
-          width="100%"
-        />
-      </Box>
-    </Box>
-  );
-};
+const SkeletonRatingListing = () => (
+  <div className="my-2.5 flex w-full flex-col gap-4">
+    <Review />
+    <div className={`h-1 w-full ${bar}`} />
+    <Review />
+  </div>
+);
 
 export default SkeletonRatingListing;
