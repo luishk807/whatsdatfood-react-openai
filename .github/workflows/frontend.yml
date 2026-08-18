@@ -47,3 +47,60 @@ jobs:
 
       - name: Audit
         run: npm audit --audit-level=high
+
+  # Verify builds the bundle but nothing shipped it: the Worker served whatever
+  # was last deployed by hand, so work could sit merged and green for days while
+  # the site stayed on an older build. That happened - the photo wall, the legal
+  # pages and the delete-account control were all merged and none were live.
+  deploy:
+    needs: verify
+    # Pushes to the default branch only. A pull request must never deploy, and
+    # neither should a branch.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      # The backend URL is compiled into the bundle by DefinePlugin, and it
+      # normally arrives from a local .env - which is gitignored and therefore
+      # absent here. Without these the plugin substitutes an empty string and
+      # the deploy is a site that cannot reach its API at all, with nothing in
+      # the build log to say so.
+      - name: Build
+        env:
+          REACT_APP_BACKEND_URL: ${{ vars.REACT_APP_BACKEND_URL }}
+          REACT_APP_GRAPHQL_BACKEND_URL: ${{ vars.REACT_APP_GRAPHQL_BACKEND_URL }}
+        run: |
+          if [ -z "$REACT_APP_GRAPHQL_BACKEND_URL" ]; then
+            echo "REACT_APP_GRAPHQL_BACKEND_URL is not set." >&2
+            echo "Set it in Settings > Secrets and variables > Actions > Variables." >&2
+            exit 1
+          fi
+          npm run build
+
+      # Assert the URL actually reached the bundle rather than trusting that it
+      # did. An empty define is not a build error, so this is the only place the
+      # mistake becomes visible before users find it.
+      - name: Check the API URL was compiled in
+        env:
+          REACT_APP_GRAPHQL_BACKEND_URL: ${{ vars.REACT_APP_GRAPHQL_BACKEND_URL }}
+        run: |
+          host=$(printf '%s' "$REACT_APP_GRAPHQL_BACKEND_URL" | sed -E 's#^https?://##; s#/.*##')
+          if ! grep -rqF "$host" dist/; then
+            echo "built bundle does not contain $host" >&2
+            exit 1
+          fi
+          echo "API host $host is in the bundle" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Deploy to Cloudflare
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npx wrangler deploy
