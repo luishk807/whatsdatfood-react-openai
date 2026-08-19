@@ -317,6 +317,30 @@ placeholder drawings would be nine things to throw away.
 - **The description is the `title`**, because on a phone there is no room for
   it under every tile.
 
+## Suggesting a menu correction
+
+The menus are extracted by a language model, so they are wrong in ordinary
+ways. The person who can see that is sitting in front of the dish.
+
+- **Collapsed, at the bottom of the sheet.** A repair tool, not a call to
+  action — it must not compete with the photograph or the vote, which are what
+  somebody opened the sheet for. It opens only for a reader who already thinks
+  something is off.
+- **It says nothing changes on the strength of one suggestion.** Without that
+  line it reads as an edit button that silently did nothing.
+- **The field list omits allergens, and says why.** `CORRECTABLE_FIELDS` is
+  name, description, price and section. A test asserts no dietary field ever
+  appears — they are the one thing where being wrong can hurt somebody, so they
+  come from the kitchen or from nobody.
+- **Server refusals are shown verbatim.** Each one explains a rule — already
+  queued, not a number, that is what it already says — and rewording them here
+  would turn an explanation into a failure message.
+
+`CorrectionQueue` shows what a field says now beside what is proposed, because
+approving a change you cannot see is not a decision. "was empty" is called out
+rather than rendered blank: filling a hole and overwriting a fact are different
+things to agree to.
+
 ## Photo uploads
 
 The empty photo tile *is* the upload funnel: it appears on exactly the dishes

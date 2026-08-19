@@ -90,6 +90,20 @@ jest.mock("@/customHooks/useRestaurantLeaderboard", () => ({
   default: () => ({ standings: [], loading: false }),
 }));
 
+// Same reason: the dish sheet carries the correction control, which owns a
+// mutation. Its own behaviour is covered in SuggestCorrection's suite.
+jest.mock("@/customHooks/useMenuCorrections", () => ({
+  __esModule: true,
+  default: () => ({
+    suggest: jest.fn(),
+    loadPending: jest.fn(),
+    resolve: jest.fn(),
+    loading: false,
+    error: null,
+    clearError: jest.fn(),
+  }),
+}));
+
 jest.mock("@/customHooks/useDishPhotoUpload", () => ({
   __esModule: true,
   default: () => ({

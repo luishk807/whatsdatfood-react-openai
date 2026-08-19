@@ -331,3 +331,33 @@ export const CUISINE_LABELS = {
   photoBy: "Photo by",
   on: "on",
 } as const;
+
+/**
+ * Menu corrections. The menus are extracted by a language model, so they are
+ * wrong in ordinary ways — and the person who can see that is sitting in front
+ * of the dish.
+ */
+export const CORRECTION_LABELS = {
+  open: "Something wrong here?",
+  title: "Suggest a correction",
+  /** Says plainly that nothing changes on the strength of one suggestion. */
+  blurb: "A correction is reviewed before anything changes.",
+  field: "What is wrong",
+  value: "What it should say",
+  submit: "Send suggestion",
+  sending: "Sending…",
+  sent: "Thanks — someone will take a look.",
+  signIn: "Sign in to suggest a correction",
+  /**
+   * Shown under the field picker. Allergens are absent from the list on
+   * purpose and a reader deserves to know that is deliberate rather than an
+   * oversight.
+   */
+  dietaryNote:
+    "Allergen and dietary details are set by the restaurant, not by suggestions.",
+  queueTitle: "Suggested corrections",
+  queueEmpty: "Nothing waiting.",
+  approve: "Apply",
+  reject: "Dismiss",
+  wasEmpty: "was empty",
+} as const;

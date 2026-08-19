@@ -1,11 +1,14 @@
 import { FC, useCallback, useEffect, useState } from "react";
 import useAdminQueues from "@/customHooks/useAdminQueues";
+import useMenuCorrections from "@/customHooks/useMenuCorrections";
+import CorrectionQueue from "@/components/CorrectionQueue";
 import useAuth from "@/customHooks/useAuth";
 import {
   RestaurantClaimType,
   ReportedPhotoType,
 } from "@/interfaces/ownership";
-import { ADMIN_LABELS } from "@/customConstants/labels";
+import { MenuCorrectionType } from "@/interfaces/corrections";
+import { ADMIN_LABELS, CORRECTION_LABELS } from "@/customConstants/labels";
 import { ACCOUNT_TYPE } from "@/customConstants";
 
 /**
@@ -21,6 +24,12 @@ const AdminConsole: FC = () => {
     useAdminQueues();
   const [claims, setClaims] = useState<RestaurantClaimType[]>([]);
   const [reports, setReports] = useState<ReportedPhotoType[]>([]);
+  const {
+    loadPending: loadCorrections,
+    resolve: resolveCorrection,
+    loading: correctionsLoading,
+  } = useMenuCorrections();
+  const [corrections, setCorrections] = useState<MenuCorrectionType[]>([]);
 
   const isAdmin = String(user?.role_id ?? "") === ACCOUNT_TYPE.admin;
 
@@ -31,7 +40,8 @@ const AdminConsole: FC = () => {
 
     setClaims(await loadClaims());
     setReports(await loadReports());
-  }, [isAdmin, loadClaims, loadReports]);
+    setCorrections(await loadCorrections());
+  }, [isAdmin, loadClaims, loadReports, loadCorrections]);
 
   useEffect(() => {
     refresh();
@@ -46,6 +56,22 @@ const AdminConsole: FC = () => {
       <h1 className="text-lg font-semibold text-ink">
         {ADMIN_LABELS.title}
       </h1>
+
+      {/* Corrections first: they are the cheapest decision here and the one
+          that most directly improves what a reader sees. */}
+      <div className="flex flex-col gap-3">
+        <h2 className="text-sm font-semibold text-ink">
+          {CORRECTION_LABELS.queueTitle}
+        </h2>
+        <CorrectionQueue
+          corrections={corrections}
+          loading={correctionsLoading}
+          onResolve={async (id, approve) => {
+            await resolveCorrection(id, approve);
+            refresh();
+          }}
+        />
+      </div>
 
       <div className="flex flex-col gap-3">
         <h2 className="text-sm font-semibold text-ink">

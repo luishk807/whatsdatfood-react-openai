@@ -108,3 +108,18 @@ export const UserFriendSectionWindows = {
   edit: "edit",
   list: "list",
 };
+
+/**
+ * What a diner may suggest a change to.
+ *
+ * Kept in step with the server's `CORRECTABLE_DISH_FIELDS`, which refuses
+ * anything else. Dietary flags are **deliberately absent**: they are the
+ * biggest gap in the data and the one field where being wrong can hurt
+ * somebody, so they are corrected by the kitchen or by nobody.
+ */
+export const CORRECTABLE_FIELDS = [
+  { value: "name", label: "Name" },
+  { value: "description", label: "Description" },
+  { value: "price", label: "Price" },
+  { value: "category", label: "Section" },
+] as const;

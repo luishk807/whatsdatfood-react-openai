@@ -31,6 +31,7 @@ import useDishVotes from "@/customHooks/useDishVotes";
 import useDishPhotoUpload from "@/customHooks/useDishPhotoUpload";
 import FoodCredAward from "@/components/FoodCredAward";
 import TopContributors from "@/components/TopContributors";
+import SuggestCorrection from "@/components/SuggestCorrection";
 import FoodCredIcon from "@/components/FoodCredIcon";
 import { LEADERBOARD_LABELS } from "@/customConstants/reputation";
 import useRestaurantLeaderboard from "@/customHooks/useRestaurantLeaderboard";
@@ -485,6 +486,9 @@ const MenuResults: FC = () => {
                 Being first to photograph a dish is the contribution this
                 product most wants to exist, so it is said out loud and it does
                 not change hands when a later photo wins the hero slot. */}
+            {/* Bottom of the sheet, collapsed. A repair tool, not a call to
+                action — it must not compete with the photograph or the vote,
+                which are what somebody opened this for. */}
             {selectedDish.first_photographed_by && (
               <p className="-mt-1 inline-flex items-center gap-1.5 text-xs text-ink-muted">
                 <FoodCredIcon size={12} className="text-brand" />
@@ -604,6 +608,15 @@ const MenuResults: FC = () => {
                 />
               </Suspense>
             )}
+
+            {/* Last thing in the sheet, and collapsed. The menus are extracted
+                by a model, so they are wrong in ordinary ways and the person
+                who can see that is sitting in front of the dish. It stays out
+                of the way until somebody already thinks something is off. */}
+            <SuggestCorrection
+              dishId={Number(selectedDish.id)}
+              canSuggest={canParticipate}
+            />
           </div>
         )}
       </BottomSheet>
