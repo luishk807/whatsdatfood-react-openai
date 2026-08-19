@@ -37,19 +37,15 @@ describe("Header", () => {
     );
   });
 
-  it("says Sign in rather than showing an unexplained person icon", () => {
+  it("offers the account control whether or not anybody is signed in", () => {
+    // It used to be a "Sign in" link signed out and the menu signed in, which
+    // meant the theme control had nowhere to live but the header.
     show();
+    expect(screen.getAllByText("account menu").length).toBeGreaterThan(0);
 
-    const link = screen.getByText(SITE_LABELS.signIn);
-    expect(link.closest("a")).toHaveAttribute("href", "/sign-in");
-  });
-
-  it("shows the account menu once someone is signed in", () => {
     auth.user = { id: 1, username: "luis" };
     show();
-
     expect(screen.getAllByText("account menu").length).toBeGreaterThan(0);
-    expect(screen.queryByText(SITE_LABELS.signIn)).not.toBeInTheDocument();
   });
 
   it("has no link that goes nowhere", () => {
@@ -70,18 +66,21 @@ describe("Header", () => {
     expect(screen.queryByLabelText(SITE_LABELS.menu)).not.toBeInTheDocument();
   });
 
-  it("is two controls wide, so it fits a phone", () => {
+  it("is a brand and one control, so it fits a phone", () => {
+    // Two icons on the right made the account control read as a utility and
+    // took the space on the row where there is least of it.
     const { container } = show();
 
-    // Brand, theme, and one account control.
-    expect(container.querySelectorAll("header button, header a")).toHaveLength(3);
+    expect(container.querySelectorAll("header button, header a")).toHaveLength(
+      1,
+    );
   });
 
-  it("carries the theme control", () => {
+  it("does not carry the theme control any more", () => {
+    // It lives in the account menu, which now opens signed out as well — so
+    // nobody loses it, which was the reason it was ever up here.
     show();
 
-    expect(
-      screen.getAllByLabelText(THEME_LABELS.toggle).length,
-    ).toBeGreaterThan(0);
+    expect(screen.queryByLabelText(THEME_LABELS.toggle)).not.toBeInTheDocument();
   });
 });

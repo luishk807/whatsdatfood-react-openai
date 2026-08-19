@@ -148,3 +148,35 @@ export const ChevronRightIcon: FC<IconInterface> = (props) => (
     <path d="M9.2 5.6L15.6 12l-6.4 6.4" />
   </Svg>
 );
+
+/**
+ * A map pin, for "near me". Not an arrow or a crosshair — both read as
+ * "navigate me there", and this only ever means "somewhere around here".
+ */
+export const PinIcon: FC<IconInterface> = (props) => (
+  <Svg {...props}>
+    <path d="M12 21.5s7-6.2 7-11.2a7 7 0 1 0-14 0c0 5 7 11.2 7 11.2z" />
+    <circle cx="12" cy="10.2" r="2.6" />
+  </Svg>
+);
+
+export const MedalIcon: FC<IconInterface> = (props) => (
+  <Svg {...props}>
+    <circle cx="12" cy="15" r="5.4" />
+    <path d="M8.6 10.2L6.2 3.4h11.6l-2.4 6.8" />
+  </Svg>
+);
+
+export const ListIcon: FC<IconInterface> = (props) => (
+  <Svg {...props}>
+    <path d="M8.5 6.5h12M8.5 12h12M8.5 17.5h12" />
+    <path d="M3.6 6.5h.01M3.6 12h.01M3.6 17.5h.01" />
+  </Svg>
+);
+
+export const MapIcon: FC<IconInterface> = (props) => (
+  <Svg {...props}>
+    <path d="M9.2 4.2L3.6 6.4v13.4l5.6-2.2 5.6 2.2 5.6-2.2V4.2l-5.6 2.2z" />
+    <path d="M9.2 4.2v13.4M14.8 6.4v13.4" />
+  </Svg>
+);

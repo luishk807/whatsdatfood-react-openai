@@ -74,6 +74,9 @@ the vote threshold is what keeps a barely-voted dish out of the ranking.
   `@emotion/*`, which only ever came along as its styling engine. The
   per-component `index.css` files are still being deleted as their components
   are touched; do not add new ones.
+- **One dependency was added for the map**: `leaflet` (plus `@types/leaflet`).
+  It is imported by `RestaurantMap` alone and lands in its own chunk. Nothing
+  else in the app may import it.
 - **Icons are inline SVG in `src/components/icons/`.** Every
   `@mui/icons-material` import pulled in `SvgIcon` and therefore the whole
   emotion runtime for the sake of a chevron. Add a new icon to that module
@@ -129,7 +132,9 @@ minute. Design for the phone and let desktop be the override, never the reverse.
 - Vote controls sit in the lower third, within thumb reach.
 - Detail opens as a bottom sheet, not a route change.
 - Dark mode matters; restaurants are dim.
-- Target a main bundle under 250 KiB (currently ~524 KiB / 536,447 bytes).
+- Target a main bundle under 250 KiB (currently ~534 KiB / 547,298 bytes).
+  Leaflet is **not** in it: the map is a lazy component inside a lazy route,
+  and its 164 KiB chunk is downloaded only by somebody who taps Map.
   Deleting unreferenced components does not move this number — webpack only
   bundles what the entry graph reaches, so dead code costs repo clarity, not
   bytes. Removing MUI and emotion took 90,364 bytes off; the remaining gap is
@@ -373,6 +378,105 @@ two of them.
   components each had their own copy of `first_name last_name`.
 - **`AuthField` is shared by both auth pages**, at 48px. They were built months
   apart and looked it.
+
+## Finding food near you
+
+The front door answers two questions now: which restaurant, and what is around
+me. Search stays the primary action — somebody who knows the name should type
+it — and the location control is a quieter line under it.
+
+- **One location for the whole app.** `DiscoveryLocationProvider`, not a hook
+  with its own state. It *was* a plain hook, and every test passed while the
+  feature was broken: tapping "use my current location" on the home page and
+  navigating to `/nearby` mounted a second copy with no fix in it, so the page
+  asked "choose where to look" a second after being told. Every test rendered
+  one component. Driving the app found it in one tap.
+- **The device is asked once, from a tap, and never again on its own.** A page
+  that re-prompts is how somebody blocks the permission at the browser level,
+  which cannot be undone from inside the page. After a refusal the button is
+  replaced by the typed alternative rather than left there doing nothing.
+- **Every failure says which failure it was.** Denied, unavailable, timed out
+  and unsupported lead to different next moves.
+- **Only a typed choice is stored.** A device fix is never written to disk: it
+  is the most sensitive thing this app touches, it is stale within the hour,
+  and re-asking costs one tap. A choice beats a fix — somebody who typed
+  "Flushing" in Brooklyn meant it.
+- **The heading names an area, never an address.** "Trending near Flushing".
+  The server picks the name from the nearest restaurant it knows; nothing
+  reverse-geocodes anybody to a street and coordinates never reach a URL.
+- **`LocationCue` is always mounted**, never rendered conditionally on having a
+  location. Hiding it once located unmounted the component in the same render
+  the fix arrived in, so the effect that navigates never ran — the button
+  visibly did nothing.
+
+## The map
+
+`RestaurantMap`, and it is the only file that knows a map library exists.
+
+- **Leaflet with OpenStreetMap tiles, because they need no key.** Google Maps
+  and Mapbox both bill per load and both want a billing account before the
+  first pin renders. There is no traffic to justify a metered dependency yet,
+  and swapping later is this one component — the page passes places and
+  receives bounds.
+- **It is lazy, inside a lazy route.** Leaflet plus its stylesheet has no
+  business in the bundle somebody downloads to read a menu, so the list is the
+  default view and the map arrives on the tap that shows it.
+- **The list is never replaced by the map.** No keyboard reaches a pin and no
+  screen reader reads a tile layer, so the same places in the same order stay
+  underneath it. A map is the appealing half and the unusable one.
+- **The Leaflet instance is created once, behind a ref.** Rebuilding it on
+  render loses the reader's pan and zoom, which is the whole interaction.
+- **"Search this area" appears only after the map has moved.** Offered before,
+  it invites a tap that re-runs the search just performed.
+
+## Trending, and the honest version of it
+
+`TrendingStrip`, above the stock imagery and below the search.
+
+- **Real community photographs only.** The strip below it is stock and says so;
+  if this one borrowed from it, the distinction the product rests on would be
+  gone from the front door.
+- **The server decides which of its two states this is** and sends `mode`. The
+  threshold for "enough activity to call this trending" is a rule about the
+  data, and a copy in the browser is a second source of truth.
+- **The empty state is the ask, not an apology.** A real dish at a real
+  restaurant nearby, "No dish photos yet", and a way into the upload flow.
+  Nothing invented — no placeholder popularity, no rounded-up counts.
+- **The place name is the control.** Somebody reading "near Flushing" in
+  Brooklyn needs the fix to be where the wrong word is.
+
+## Cuisine tiles go somewhere now
+
+`CuisineStrip` was deliberately inert, and the reason was sound: a cuisine
+search reached the AI generation path — the one place this product spends real
+money — and there was no cuisine route to land on. Both changed. `/nearby?
+cuisine=chinese` answers out of the database: a bounding box and a `cuisine`
+column, no model, no third party.
+
+- **The whole tile is the link**, not the word. A label-sized target inside a
+  160px card is what a thumb misses.
+- **The credit sits outside that link.** A link inside a link is invalid and
+  browsers resolve it by dropping one — which would be the one Unsplash's
+  terms require.
+- **A swipe on a phone, a grid from `sm` up.** Two and a half cards visible at
+  390px, which is what says "there is more to the right".
+- **Most restaurants have no cuisine and so appear under no tile.** The
+  classifier refuses to guess; see the backend note. A short list beats a
+  wrong one.
+
+## The reputation system on the front door
+
+`ContributorIntro` introduces it in three lines and links to `/rankings`. The
+rules, the badge shelf and the leaderboards live there.
+
+- **No point values anywhere in the browser.** `customConstants/reputation.ts`
+  still holds none, and `/rankings` describes the *shape* — which contributions
+  are worth more and why — rather than the numbers. A figure here is a second
+  source of truth and the one that goes stale.
+- **Signed in, the pitch is replaced by the real standing.** `LevelProgress`
+  and `useFoodCred` already existed; this is a swap, not a second system.
+  `unavailable` still means "we could not ask", never "you have contributed
+  nothing".
 
 ## Photo uploads
 

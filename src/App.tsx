@@ -28,6 +28,10 @@ const LazyUserHistory = lazy(() => import("@/components/UserHistory"));
 const LazyUserFavorites = lazy(() => import("@/components/UserFavorites"));
 const LazyOwnerConsole = lazy(() => import("@/components/OwnerConsole"));
 const LazyAdminConsole = lazy(() => import("@/components/AdminConsole"));
+// Its own chunk, and the map inside it gets another: Leaflet has no business
+// in the bundle somebody downloads to read a menu.
+const LazyNearby = lazy(() => import("@/components/NearbyPage"));
+const LazyRankings = lazy(() => import("@/components/RankingsPage"));
 
 function App() {
   const customStyle = {
@@ -63,6 +67,28 @@ function App() {
             <Suspense fallback={<Loading style={customStyle} />}>
               <Layout>
                 <LazyLogout />
+              </Layout>
+            </Suspense>
+          }
+        />
+
+        {/* Browsing is public, and finding food near you is browsing. */}
+        <Route
+          path={ROUTES.nearby}
+          element={
+            <Suspense fallback={<Loading style={customStyle} />}>
+              <Layout>
+                <LazyNearby />
+              </Layout>
+            </Suspense>
+          }
+        />
+        <Route
+          path={ROUTES.rankings}
+          element={
+            <Suspense fallback={<Loading style={customStyle} />}>
+              <Layout>
+                <LazyRankings />
               </Layout>
             </Suspense>
           }

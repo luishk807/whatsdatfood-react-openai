@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import CuisineStrip from "@/components/CuisineStrip";
 import { CUISINE_LABELS } from "@/customConstants/labels";
 import { CuisineTileType } from "@/interfaces/generic";
@@ -16,11 +17,18 @@ const tile = (overrides: Partial<CuisineTileType> = {}): CuisineTileType => ({
   ...overrides,
 });
 
+const show = (tiles: CuisineTileType[], props: { loading?: boolean } = {}) =>
+  render(
+    <MemoryRouter>
+      <CuisineStrip tiles={tiles} {...props} />
+    </MemoryRouter>,
+  );
+
 describe("CuisineStrip", () => {
   it("says these are not photos of the restaurants here", () => {
     // The one thing this component must never let a reader get wrong. Every
     // other photograph in the product is evidence somebody was at a table.
-    render(<CuisineStrip tiles={[tile()]} />);
+    show([tile()]);
 
     expect(screen.getByText(CUISINE_LABELS.disclosure)).toBeInTheDocument();
   });
@@ -28,7 +36,7 @@ describe("CuisineStrip", () => {
   it("credits the photographer and Unsplash, both linked", () => {
     // Not a nicety — Unsplash's API terms require both links wherever the
     // photo is shown.
-    render(<CuisineStrip tiles={[tile()]} />);
+    show([tile()]);
 
     expect(screen.getByRole("link", { name: "Zhe ZHANG" })).toHaveAttribute(
       "href",
@@ -41,7 +49,7 @@ describe("CuisineStrip", () => {
   });
 
   it("opens credit links safely in a new tab", () => {
-    render(<CuisineStrip tiles={[tile()]} />);
+    show([tile()]);
 
     for (const name of ["Zhe ZHANG", "Unsplash"]) {
       expect(screen.getByRole("link", { name })).toHaveAttribute(
@@ -51,26 +59,56 @@ describe("CuisineStrip", () => {
     }
   });
 
-  it("does not make the tile itself tappable", () => {
-    // Searching a cuisine reaches the AI generation path, which is where this
-    // product spends real money. A grid on the front door where every tap
-    // opens the wallet is a bad idea whatever the rate limit says — and there
-    // is no cuisine-browse route to land on either.
-    render(<CuisineStrip tiles={[tile()]} />);
+  it("makes the whole tile a link to that cuisine nearby", () => {
+    // It used to be deliberately inert, because a cuisine search reached the
+    // AI generation path — the one place this product spends real money — and
+    // there was no cuisine route to land on. `/nearby` answers out of the
+    // database, so the tap is free and it goes somewhere.
+    show([tile()]);
 
-    expect(screen.queryByRole("button")).toBeNull();
-    // Only the two credit links, nothing wrapping the image.
-    expect(screen.getAllByRole("link")).toHaveLength(2);
+    expect(
+      screen.getByRole("link", { name: CUISINE_LABELS.findNearby("Japanese") }),
+    ).toHaveAttribute("href", "/nearby?cuisine=japanese");
+  });
+
+  it("names the tile by what tapping it does", () => {
+    // "Japanese" alone tells a screen reader a word, not a destination.
+    show([tile()]);
+
+    expect(
+      screen.getByRole("link", { name: /find japanese food near you/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("keeps the credit outside the tile link", () => {
+    // A link inside a link is invalid, and browsers resolve it by dropping
+    // one — which would be the one Unsplash's terms require.
+    show([tile()]);
+
+    const tileLink = screen.getByRole("link", {
+      name: CUISINE_LABELS.findNearby("Japanese"),
+    });
+
+    expect(tileLink.querySelector("a")).toBeNull();
+    expect(screen.getByRole("link", { name: "Zhe ZHANG" })).toBeInTheDocument();
+  });
+
+  it("leaves the photograph out of the accessible name", () => {
+    // The cuisine is the content; the stock photo illustrates it. Alt text
+    // describing the picture would be read out before the destination.
+    show([tile()]);
+
+    expect(screen.queryByAltText("a bowl of ramen")).not.toBeInTheDocument();
   });
 
   it("renders nothing at all when there is nothing to show", () => {
-    const { container } = render(<CuisineStrip tiles={[]} />);
+    const { container } = show([]);
 
     expect(container).toBeEmptyDOMElement();
   });
 
   it("renders nothing while loading rather than a row of grey boxes", () => {
-    const { container } = render(<CuisineStrip tiles={[]} loading />);
+    const { container } = show([], { loading: true });
 
     expect(container).toBeEmptyDOMElement();
   });
@@ -79,9 +117,13 @@ describe("CuisineStrip", () => {
     // Defensive: the server refuses to store an unattributable photo, so this
     // should be unreachable. If it ever happens, a missing credit must not
     // take the tile down with it.
-    render(<CuisineStrip tiles={[tile({ photographer: null })]} />);
+    show([tile({ photographer: null })]);
 
     expect(screen.getByText("Japanese")).toBeInTheDocument();
-    expect(screen.queryByRole("link")).toBeNull();
+    // The tile link survives; only the credit links are gone.
+    expect(screen.queryByRole("link", { name: "Zhe ZHANG" })).toBeNull();
+    expect(
+      screen.getByRole("link", { name: CUISINE_LABELS.findNearby("Japanese") }),
+    ).toBeInTheDocument();
   });
 });

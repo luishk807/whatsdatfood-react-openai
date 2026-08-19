@@ -3,6 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import AccountButton from "@/components/AccountButton";
 import { ACCOUNT_LABELS } from "@/customConstants/account";
+import { THEME_LABELS } from "@/customConstants/theme";
 
 const auth = { user: { username: "luis" } as unknown };
 
@@ -140,5 +141,56 @@ describe("AccountButton", () => {
     await userEvent.keyboard("{Escape}");
 
     expect(screen.queryByText("Favorites")).not.toBeInTheDocument();
+  });
+  describe("signed out", () => {
+    /**
+     * The control used to be a "Sign in" link, and the theme lived in the
+     * header because a visitor with no account had nowhere else to reach it.
+     * This is what let the header lose its second icon.
+     */
+    beforeEach(() => {
+      auth.user = null;
+    });
+
+    it("still opens", async () => {
+      show();
+      await userEvent.click(
+        screen.getByLabelText(ACCOUNT_LABELS.openSignedOut),
+      );
+
+      expect(
+        screen.getAllByRole("link", { name: ACCOUNT_LABELS.signIn }).length,
+      ).toBeGreaterThan(0);
+    });
+
+    it("carries the appearance control, so nobody loses the theme", async () => {
+      show();
+      await userEvent.click(
+        screen.getByLabelText(ACCOUNT_LABELS.openSignedOut),
+      );
+
+      expect(
+        screen.getAllByRole("group", { name: THEME_LABELS.toggle }).length,
+      ).toBeGreaterThan(0);
+    });
+
+    it("offers no account pages to somebody who has no account", async () => {
+      show();
+      await userEvent.click(
+        screen.getByLabelText(ACCOUNT_LABELS.openSignedOut),
+      );
+
+      expect(screen.queryByText("Favorites")).not.toBeInTheDocument();
+      expect(screen.queryByText(ACCOUNT_LABELS.logOut)).not.toBeInTheDocument();
+    });
+  });
+
+  it("carries the appearance control when signed in too", async () => {
+    show();
+    await openMenu();
+
+    expect(
+      screen.getAllByRole("group", { name: THEME_LABELS.toggle }).length,
+    ).toBeGreaterThan(0);
   });
 });

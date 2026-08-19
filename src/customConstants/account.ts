@@ -60,9 +60,25 @@ export const ACCOUNT_GROUPS = [
 
 export const ACCOUNT_LABELS = {
   open: "Your account",
+  /**
+   * Signed out. The same control, because a visitor tapping the person icon
+   * wants either to sign in or to change the theme, and both live behind it.
+   */
+  openSignedOut: "Sign in or change appearance",
   close: "Close",
   signedInAs: "Signed in as",
   logOut: "Log out",
+  /**
+   * The theme lives here rather than in the header.
+   *
+   * It used to be a second icon in the bar, kept there on the argument that a
+   * signed-out visitor has no account menu and would lose it — which was true
+   * of a menu only signed-in people could open. The menu opens for everybody
+   * now, so the argument is spent and the header is down to one control.
+   */
+  appearance: "Appearance",
+  signIn: "Sign in",
+  createAccount: "Create account",
 } as const;
 
 export type AccountIcon = (typeof ACCOUNT_GROUPS)[number]["items"][number]["icon"];

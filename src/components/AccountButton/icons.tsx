@@ -58,8 +58,15 @@ export const AccountRowIcon: FC<{ name: AccountIcon }> = ({ name }) => (
   <svg {...STROKE}>{PATHS[name]}</svg>
 );
 
-export const PersonIcon: FC = () => (
-  <svg {...STROKE} width={20} height={20}>
+/**
+ * The account control's icon, and the one row inside it.
+ *
+ * Sized by the caller because it is both: 26px in the header, where it is the
+ * only navigation control there is and read at arm's length on a phone, and
+ * 18px in a menu row beside text.
+ */
+export const PersonIcon: FC<{ size?: number }> = ({ size = 20 }) => (
+  <svg {...STROKE} width={size} height={size}>
     <circle cx="12" cy="8" r="3.5" />
     <path d="M4.5 20a7.5 7.5 0 0 1 15 0" />
   </svg>

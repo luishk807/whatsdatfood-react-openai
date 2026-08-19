@@ -1,0 +1,114 @@
+import { type FC } from "react";
+import { Link } from "react-router-dom";
+import clsx from "clsx";
+import { AddAPhotoIcon } from "@/components/icons";
+import { LOCATION_LABELS, NEARBY_LABELS } from "@/customConstants/labels";
+import { buildMenuResultsPath } from "@/customConstants/routes";
+import { NearbyListInterface } from "@/interfaces/location";
+import { milesFrom } from "@/utils/distance";
+
+/**
+ * Nearby restaurants as a list, which is the half that always works.
+ *
+ * The map beside it is the appealing half and the unusable one: no keyboard
+ * reaches a pin and no screen reader reads a tile layer. This carries the same
+ * places in the same order, so nothing is only available by pointing.
+ *
+ * **A restaurant with no photographs is listed, not hidden.** It is a real
+ * place a short walk away, and the tile that says "no dish photos yet" is the
+ * ask — hiding it would make the product look emptier than the neighbourhood
+ * is, and remove the contribution the early stage depends on.
+ */
+const NearbyList: FC<NearbyListInterface> = ({
+  places,
+  loading,
+  selectedId,
+  onSelect,
+}) => {
+  if (loading && !places.length) {
+    return (
+      <ul className="flex flex-col gap-2">
+        {[0, 1, 2].map((row) => (
+          <li
+            key={row}
+            className="h-24 animate-pulse rounded-card bg-surface-sunken motion-reduce:animate-none"
+          />
+        ))}
+      </ul>
+    );
+  }
+
+  if (!places.length) {
+    return (
+      <div className="flex flex-col gap-1 rounded-card border border-dashed border-line p-6 text-center">
+        <p className="text-sm font-medium text-ink">{NEARBY_LABELS.empty}</p>
+        <p className="text-sm text-ink-muted">{NEARBY_LABELS.emptyHelp}</p>
+      </div>
+    );
+  }
+
+  return (
+    <ul className="flex flex-col gap-2">
+      {places.map((place) => (
+        <li key={place.id}>
+          <Link
+            to={place.slug ? buildMenuResultsPath(place.slug) : "#"}
+            onFocus={() => onSelect?.(place.id)}
+            onMouseEnter={() => onSelect?.(place.id)}
+            aria-current={selectedId === place.id ? "true" : undefined}
+            className={clsx(
+              "flex gap-3 rounded-card border p-3",
+              selectedId === place.id
+                ? "border-ink bg-surface-sunken"
+                : "border-line bg-surface-raised",
+            )}
+          >
+            {place.top_dish_photo_url ? (
+              <img
+                src={place.top_dish_photo_url}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                className="h-20 w-20 shrink-0 rounded-card object-cover"
+              />
+            ) : (
+              <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-card bg-surface-sunken text-ink-muted">
+                <AddAPhotoIcon size={20} />
+              </span>
+            )}
+
+            <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+              <span className="truncate text-sm font-semibold text-ink">
+                {place.name}
+              </span>
+
+              <span className="truncate text-xs text-ink-muted">
+                {LOCATION_LABELS.miles(milesFrom(place.distance_km))}
+                {place.neighborhood ? ` · ${place.neighborhood}` : ""}
+                {place.price_range ? ` · ${place.price_range}` : ""}
+              </span>
+
+              {place.top_dish_name ? (
+                <span className="truncate text-xs text-ink">
+                  {place.top_dish_name}
+                </span>
+              ) : (
+                <span className="truncate text-xs text-ink-muted">
+                  {NEARBY_LABELS.noPhotos}
+                </span>
+              )}
+
+              <span className="pt-0.5 text-xs font-semibold text-ink underline underline-offset-2">
+                {place.top_dish_photo_url
+                  ? NEARBY_LABELS.seeDishes
+                  : NEARBY_LABELS.addFirst}
+              </span>
+            </span>
+          </Link>
+        </li>
+      ))}
+    </ul>
+  );
+};
+
+export default NearbyList;

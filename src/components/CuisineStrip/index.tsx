@@ -1,5 +1,7 @@
 import { type FC } from "react";
+import { Link } from "react-router-dom";
 import { CUISINE_LABELS } from "@/customConstants/labels";
+import { buildNearbyPath } from "@/customConstants/routes";
 import { CuisineStripInterface } from "@/interfaces/generic";
 
 /**
@@ -10,16 +12,18 @@ import { CuisineStripInterface } from "@/interfaces/generic";
  * nothing at all. These say what the product is about without pretending to be
  * evidence about any particular kitchen.
  *
- * **Deliberately not interactive.** Searching a cuisine reaches the AI
- * generation path, which is the one place this product spends real money — a
- * grid of tiles on the front door where every tap opens the wallet is a bad
- * idea whatever the rate limit says. There is also no cuisine-browse route to
- * land on, and a tile that looks tappable and goes nowhere is worse than one
- * that never claimed to. The search box directly above is the action.
+ * **The whole tile is now a link, and it was right that it was not before.**
+ * The old reason was sound: a cuisine tile that ran a search reached the AI
+ * generation path, which is the one place this product spends real money, and
+ * there was no cuisine route to land on either. Both have changed. `/nearby`
+ * answers "Chinese restaurants around here" out of the database — a bounding
+ * box and a `cuisine` column, no model, no third party — so the tap is free
+ * and it lands somewhere real.
  *
- * The credit links are the exception, and they are interactive because
- * Unsplash's API terms require it. They are the only interactive thing in the
- * tile, so nothing is nested inside anything else.
+ * The credit sits *outside* the link rather than inside it. Unsplash's terms
+ * require a working link to the photographer, and a link inside a link is
+ * invalid markup that browsers resolve by dropping one of them — which would
+ * be the one the terms require.
  */
 const CuisineStrip: FC<CuisineStripInterface> = ({ tiles, loading }) => {
   // Nothing to show is a complete answer. The search box is what people came
@@ -42,16 +46,25 @@ const CuisineStrip: FC<CuisineStripInterface> = ({ tiles, loading }) => {
         <p className="text-[11px] text-ink-muted">{CUISINE_LABELS.disclosure}</p>
       </div>
 
-      <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-pl-4 gap-3 overflow-x-auto px-4 pb-1">
+      {/* A swipe on a phone, a grid once there is width for one. Two and a
+          half cards visible on a 390px screen, which is what says "there is
+          more to the right" without anybody having to guess. */}
+      <div className="no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-pl-4 gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 lg:grid-cols-4">
         {tiles.map((tile) => (
           <figure
             key={tile.category}
-            className="m-0 flex w-40 shrink-0 snap-start flex-col gap-1 sm:w-48"
+            className="m-0 flex w-40 shrink-0 snap-start flex-col gap-1 sm:w-auto sm:shrink"
           >
-            <div className="relative overflow-hidden rounded-card bg-surface-sunken">
+            {/* The whole tile, not the word. A label-sized target inside a
+                160px card is the thing a thumb misses. */}
+            <Link
+              to={buildNearbyPath({ cuisine: tile.category })}
+              aria-label={CUISINE_LABELS.findNearby(tile.label)}
+              className="relative block overflow-hidden rounded-card bg-surface-sunken"
+            >
               <img
                 src={tile.thumb_url || tile.url}
-                alt={tile.alt || ""}
+                alt=""
                 loading="lazy"
                 decoding="async"
                 className="h-28 w-full object-cover sm:h-32"
@@ -62,7 +75,7 @@ const CuisineStrip: FC<CuisineStripInterface> = ({ tiles, loading }) => {
                   {tile.label}
                 </figcaption>
               </div>
-            </div>
+            </Link>
 
             {/* Under the photo rather than over it. Overlaid, the credit wrapped
                 to two lines inside a 40px scrim and ran off the tile - and this

@@ -333,6 +333,99 @@ export const AUTH_LABELS = {
   pitchBody: "See the dishes people actually recommend.",
 } as const;
 
+/**
+ * Finding food near you.
+ *
+ * Every string that names a place names an *area* — "near Flushing", never an
+ * address and never coordinates. The reader's position is used to ask a
+ * question and is never printed back at them.
+ */
+export const LOCATION_LABELS = {
+  useMyLocation: "Use my current location",
+  locating: "Finding you…",
+  /** Shown once, after a refusal. Never a second prompt. */
+  denied: "Location is off for this site.",
+  deniedHelp: "Enter a neighborhood, city or ZIP instead.",
+  unavailable: "Your device could not give a location.",
+  timedOut: "That took too long. Try again, or enter a location.",
+  unsupported: "This browser cannot share a location.",
+  enterLocation: "Enter a location",
+  placeholder: "Neighborhood, city or ZIP",
+  find: "Find",
+  finding: "Finding…",
+  notFound: "We could not find that place. Try a neighborhood or a ZIP.",
+  change: "Change",
+  changeLocation: "Change location",
+  near: (place: string) => `near ${place}`,
+  nearYou: "near you",
+  useLocationAgain: "Use my current location",
+  /** Distances are shown in miles: this is New York. */
+  miles: (value: number) =>
+    value < 0.1 ? "Just here" : `${value.toFixed(1)} mi`,
+} as const;
+
+/**
+ * Trending, and the honest version of it when there is nothing to show.
+ *
+ * The empty state is not an apology — it names a real dish at a real
+ * restaurant nearby and asks for a photograph, which is the thing this product
+ * cannot buy.
+ */
+export const TRENDING_LABELS = {
+  title: "Trending near you",
+  titleNear: (place: string) => `Trending near ${place}`,
+  subtitle: (place: string) =>
+    `Popular dishes people are discovering around ${place}`,
+  subtitleGeneric: "Popular dishes people are discovering nearby",
+  contributeTitle: (place: string) => `Help put ${place} on the food map`,
+  contributeTitleGeneric: "Help people see what is good nearby",
+  contributeBlurb: "Add a photo of something you ordered.",
+  noPhotos: "No dish photos yet",
+  addFirst: "Add the first photo",
+  seeDishes: "See dishes",
+  photoBy: (who: string) => `Photo by @${who}`,
+  /** The counts under a card. Real numbers or nothing — never a rounded-up
+   * claim about how popular something is. */
+  activity: (photos: number, votes: number) =>
+    [
+      photos === 1 ? "1 photo" : photos > 1 ? `${photos} photos` : "",
+      votes === 1 ? "1 vote" : votes > 1 ? `${votes} votes` : "",
+    ]
+      .filter(Boolean)
+      .join(" · "),
+  empty: "Nothing nearby yet.",
+} as const;
+
+/**
+ * The contributor system, introduced in a few seconds rather than explained.
+ *
+ * The rules, the thresholds and the leaderboards live on `/rankings`. This is
+ * the trailer.
+ */
+export const CONTRIBUTE_LABELS = {
+  title: "Earn your place on the food map",
+  blurb: "Share what you eat. Help everyone know what to order.",
+  steps: [
+    {
+      id: "photos",
+      title: "Add photos",
+      body: "Upload photos of dishes you have actually ordered.",
+    },
+    {
+      id: "help",
+      title: "Help the community",
+      body: "Useful photos, dish information and votes earn credit.",
+    },
+    {
+      id: "medals",
+      title: "Earn badges and climb",
+      body: "Build a reputation, earn badges, and move up the leaderboard.",
+    },
+  ],
+  cta: "See how rankings work",
+  yourProgress: "Your progress",
+} as const;
+
 export const LEGAL_LABELS = {
   privacy: "Privacy",
   terms: "Terms",
@@ -407,6 +500,12 @@ export const CUISINE_LABELS = {
   disclosure: "Stock photos, not from these restaurants",
   photoBy: "Photo by",
   on: "on",
+  /**
+   * The tile's accessible name. "Chinese" alone tells a screen reader the
+   * word and not what tapping it does, and the image is decorative — the
+   * cuisine is the content, the photograph illustrates it.
+   */
+  findNearby: (cuisine: string) => `Find ${cuisine} food near you`,
 } as const;
 
 /**
@@ -437,4 +536,107 @@ export const CORRECTION_LABELS = {
   approve: "Apply",
   reject: "Dismiss",
   wasEmpty: "was empty",
+} as const;
+
+/**
+ * The map. Every string here has a list equivalent beside it — a map is
+ * unusable with a keyboard and a screen reader, so it is the decorative half
+ * of nearby discovery and never the only way to read the answer.
+ */
+export const MAP_LABELS = {
+  label: "Map of nearby restaurants",
+  searchThisArea: "Search this area",
+  recentre: "Back to my location",
+  list: "List",
+  map: "Map",
+} as const;
+
+/**
+ * Nearby results.
+ *
+ * A restaurant with no community photograph is listed rather than hidden: it
+ * is a real place a short walk away, and the empty tile is the ask.
+ */
+export const NEARBY_LABELS = {
+  title: "Near you",
+  titleNear: (place: string) => `Near ${place}`,
+  cuisineNear: (cuisine: string, place: string) => `${cuisine} near ${place}`,
+  cuisineNearYou: (cuisine: string) => `${cuisine} near you`,
+  empty: "No restaurants around here yet.",
+  emptyHelp: "Try a wider area, or search for a restaurant by name.",
+  unavailable: "Nearby search is not available right now.",
+  seeDishes: "See dishes",
+  noPhotos: "No dish photos yet",
+  addFirst: "Add the first photo",
+  needLocation: "Choose where to look",
+  results: (count: number) =>
+    count === 1 ? "1 restaurant" : `${count} restaurants`,
+} as const;
+
+/**
+ * How Food Cred works, said in words rather than numbers.
+ *
+ * **No point values here, on purpose.** `customConstants/reputation.ts` holds
+ * none either: a copy of the server's figures in the browser is a second
+ * source of truth and invites a page to state a rule the server never agreed
+ * to. What this page describes is the shape — which contributions are worth
+ * more and why — which is what a contributor needs and what does not drift.
+ */
+export const RANKINGS_LABELS = {
+  title: "How rankings work",
+  blurb:
+    "Food Cred is what this community owes you for helping other diners " +
+    "decide what to order.",
+  earningTitle: "What earns the most",
+  earningBlurb:
+    "Quality over quantity, deliberately. Nobody reaches the top of a " +
+    "leaderboard by uploading five hundred mediocre photos.",
+  earning: [
+    {
+      title: "The first photo of a dish",
+      body:
+        "Worth more than any later one. An unphotographed dish is the gap " +
+        "this product exists to close, and only one person can close it.",
+    },
+    {
+      title: "The first photo at a restaurant",
+      body: "Worth more again — it puts a whole menu on the map.",
+    },
+    {
+      title: "A photo other diners find helpful",
+      body:
+        "Counted once per person, so a photo cannot be voted up repeatedly " +
+        "by the same account.",
+    },
+    {
+      title: "Your photo becoming the main one",
+      body:
+        "Earned once per photo, even if it wins the slot back later — " +
+        "otherwise a photo flapping in and out would pay every time.",
+    },
+    {
+      title: "A menu correction that is accepted",
+      body: "Someone has to agree with it first. Suggesting is not earning.",
+    },
+  ],
+  notEarningTitle: "What earns nothing",
+  notEarning: [
+    "A photo that moderation rejects. Nothing is written at all.",
+    "A duplicate of a photo already on that dish.",
+    "A contribution that is later removed — the credit is reversed with it.",
+    "Voting on your own photograph.",
+  ],
+  levelsTitle: "Levels",
+  levelsBlurb:
+    "Levels are bands of lifetime Food Cred and are worked out by the " +
+    "server, never by this page — so what you see is what you have, and the " +
+    "bands can change without anybody's level being wrong for a while.",
+  badgesTitle: "Your badges",
+  boardsTitle: "Leaderboards",
+  boardsBlurb:
+    "Every restaurant has one, and they are counted per place rather than " +
+    "globally: the person who has done most for one restaurant is a more " +
+    "useful thing to know than who has done most overall. Neighbourhood and " +
+    "city boards read the same numbers.",
+  join: "Create an account",
 } as const;
