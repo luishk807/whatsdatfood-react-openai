@@ -53,9 +53,11 @@ export const NEARBY = {
   /** The strip on the front door. A screenful, not a catalogue. */
   TRENDING_LIMIT: 10,
   MAP_LIMIT: 40,
-  /** Where the map starts when there is no location at all: Manhattan. */
-  FALLBACK_CENTRE: { latitude: 40.7549, longitude: -73.984 },
-  FALLBACK_LABEL: "New York",
+  // There is deliberately no fallback centre. A map opened on a guessed
+  // location shows real restaurants at real distances from somewhere the
+  // reader is not, and "0.3 mi" from the wrong point is worse than an empty
+  // page asking where to look. With no location the page asks; it does not
+  // pick one.
   DEFAULT_ZOOM: 14,
 } as const;
 
