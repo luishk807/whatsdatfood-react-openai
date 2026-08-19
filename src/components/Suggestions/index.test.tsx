@@ -2,16 +2,17 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import SuggestionsComponent from "@/components/Suggestions";
 import { SEARCH_LABELS } from "@/customConstants/labels";
-import { RestaurantType } from "@/interfaces/restaurants";
+import { RestaurantSuggestionType } from "@/interfaces/search";
 
-const restaurant = (over: Partial<RestaurantType> = {}): RestaurantType =>
-  ({
-    name: "Lucali",
-    slug: "lucali-575-henry-st-brooklyn",
-    city: "Brooklyn",
-    businessHours: [],
-    ...over,
-  }) as RestaurantType;
+const restaurant = (
+  over: Partial<RestaurantSuggestionType> = {},
+): RestaurantSuggestionType => ({
+  name: "Lucali",
+  slug: "lucali-575-henry-st-brooklyn",
+  address: "575 Henry St · Brooklyn",
+  known: true,
+  ...over,
+});
 
 const defaults = {
   query: "luc",
@@ -99,5 +100,46 @@ describe("Suggestions", () => {
         />,
       ),
     ).not.toThrow();
+  });
+  it("reads its name as a name, not as its highlighting", () => {
+    // The matched run is rendered in its own element, which made the
+    // accessible name "Luc ali" — a screen reader spelling out the emphasis.
+    render(
+      <SuggestionsComponent
+        {...defaults}
+        query="luc"
+        suggestions={[restaurant()]}
+      />,
+    );
+
+    expect(
+      screen.getByRole("option", { name: /^Lucali/ }),
+    ).toBeInTheDocument();
+  });
+
+  it("says which rows we already have a menu for", () => {
+    // The most useful thing a row can say, and also the free one: choosing it
+    // costs no external call.
+    render(
+      <SuggestionsComponent
+        {...defaults}
+        suggestions={[
+          restaurant(),
+          restaurant({
+            name: "Russ & Daughters",
+            slug: null,
+            place_id: "place-1",
+            known: false,
+          }),
+        ]}
+      />,
+    );
+
+    expect(
+      screen.getByRole("option", { name: /Lucali — Menu/ }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("option", { name: "Russ & Daughters" }),
+    ).toBeInTheDocument();
   });
 });

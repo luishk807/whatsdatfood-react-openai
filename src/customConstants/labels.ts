@@ -225,6 +225,11 @@ export const SEARCH_LABELS = {
    */
   nothingFound: "No match yet — press Search to look this one up.",
   hint: "Press enter to look it up",
+  /** Marks a row we already hold a menu for — the better answer, and the free
+   * one. */
+  hasMenu: "Menu",
+  /** While a chosen suggestion is being imported. */
+  opening: "Opening…",
   // A refusal is not an absence. Reporting "nothing found" when the
   // backend said "too many requests" sends someone hunting for a
   // restaurant that is sitting right there in the database.

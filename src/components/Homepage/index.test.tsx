@@ -12,6 +12,29 @@ jest.mock("@/customHooks/useRestaurantMutations", () => ({
   default: () => ({ getRestaurantListByName: jest.fn().mockResolvedValue([]) }),
 }));
 
+/**
+ * The suggestions hook talks to Apollo directly, so it is mocked here the way
+ * every other data hook in this suite is. Its own behaviour — the debounce
+ * guard, the session token, the negative cache — is tested against a mocked
+ * Apollo client in `useRestaurantSuggestions.test.tsx`.
+ */
+const autocomplete = {
+  suggestions: [] as unknown[],
+  loading: false,
+  searched: false,
+  error: null as string | null,
+  search: jest.fn(),
+  choosePlace: jest.fn(),
+  burnToken: jest.fn(),
+  clear: jest.fn(),
+};
+
+jest.mock("@/customHooks/useRestaurantSuggestions", () => ({
+  __esModule: true,
+  default: () => autocomplete,
+}));
+
+
 const wall = { photos: [] as unknown[], loading: false };
 
 jest.mock("@/customHooks/useRecentDishPhotos", () => ({

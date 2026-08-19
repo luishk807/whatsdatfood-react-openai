@@ -1,131 +1,153 @@
-import { type FC, useCallback, useEffect, useRef, useState } from "react";
+import { type FC, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SuggestionsComponent from "@/components/Suggestions";
+import useRestaurantSuggestions from "@/customHooks/useRestaurantSuggestions";
 import useRestaurantMutation from "@/customHooks/useRestaurantMutations";
-import { RestaurantType } from "@/interfaces/restaurants";
+import useDiscoveryLocation from "@/customHooks/useDiscoveryLocation";
+import { AUTOCOMPLETE } from "@/customConstants/search";
 import { SEARCH_LABELS } from "@/customConstants/labels";
 import { buildMenuResultsPath } from "@/customConstants/routes";
+import { RestaurantSuggestionType } from "@/interfaces/search";
 
-/** Long enough not to fire per keystroke, short enough to feel live. It was
- *  1000ms, which reads as broken on a phone. */
-const DEBOUNCE_MS = 300;
-
+/**
+ * The way in for somebody who knows the name.
+ *
+ * **It does not search per keystroke.** Every keystroke cancels the pending
+ * lookup and starts a new timer, so typing a name straight through is one
+ * request rather than one per character — and nothing is looked up at all
+ * below `MIN_CHARS`, because two letters return noise and, past our own
+ * database, still bill.
+ *
+ * **Our own restaurants first, Google only for the gap.** A restaurant this
+ * product already holds has a menu, photographs and votes behind it, which is
+ * the entire point, and finding it costs nothing. The external index is for
+ * the restaurant nobody has looked up yet — the case that produced "Nothing
+ * found for that name" to somebody who had typed the full name correctly.
+ *
+ * **Submitting is the deliberate act**, so it is the only path allowed to
+ * reach the model. A single unambiguous suggestion goes straight there
+ * instead.
+ */
 const MainSearchBar: FC = () => {
   const navigate = useNavigate();
   const { getRestaurantListByName } = useRestaurantMutation();
+  const { location } = useDiscoveryLocation();
+  const {
+    suggestions,
+    loading,
+    searched,
+    error,
+    search,
+    choosePlace,
+    burnToken,
+    clear,
+  } = useRestaurantSuggestions();
 
   const [value, setValue] = useState("");
-  const [suggestions, setSuggestions] = useState<RestaurantType[]>([]);
-  const [searching, setSearching] = useState(false);
-  const [searched, setSearched] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
-
-  // Only the most recent lookup may write state; a slow one that resolves
-  // after a newer one would otherwise overwrite it with stale results.
-  const requestId = useRef(0);
+  const [resolving, setResolving] = useState(false);
+  const [generating, setGenerating] = useState(false);
 
   /**
    * Held in a ref, not a dependency.
    *
    * useRestaurantMutation returns a new function identity on every render, so
-   * depending on it made runSearch change every render, which re-ran the
-   * effect, which set state, which re-rendered - an unbroken loop of requests
-   * against the backend for as long as the box had anything in it.
+   * depending on it made the effect below re-run every render, which set
+   * state, which re-rendered — an unbroken loop of requests for as long as the
+   * box had anything in it.
    */
   const lookupRef = useRef(getRestaurantListByName);
   lookupRef.current = getRestaurantListByName;
 
-  const runSearch = useCallback(
-    async (term: string, generate = false) => {
-      const trimmed = term.trim();
-
-      if (!trimmed) {
-        setSuggestions([]);
-        setSearched(false);
-        return [];
-      }
-
-      const id = ++requestId.current;
-      setSearching(true);
-      setError(null);
-      setOpen(true);
-
-      try {
-        const response = await lookupRef.current(trimmed, generate);
-        const results = Array.isArray(response) ? response : [];
-
-        if (id === requestId.current) {
-          setSuggestions(results);
-          setSearched(true);
-        }
-
-        return results;
-      } catch (thrown) {
-        if (id === requestId.current) {
-          setSuggestions([]);
-          setSearched(true);
-          setError(
-            thrown instanceof Error && thrown.message
-              ? thrown.message
-              : SEARCH_LABELS.failed,
-          );
-        }
-
-        return [];
-      } finally {
-        if (id === requestId.current) {
-          setSearching(false);
-        }
-      }
-    },
-    [],
-  );
+  const pointRef = useRef(location);
+  pointRef.current = location;
 
   useEffect(() => {
-    if (!value.trim()) {
-      setSuggestions([]);
-      setSearched(false);
+    const query = value.trim();
+
+    if (query.length < AUTOCOMPLETE.MIN_CHARS) {
+      clear();
       setOpen(false);
       return;
     }
 
-    const timeout = setTimeout(() => runSearch(value), DEBOUNCE_MS);
+    setOpen(true);
+
+    // The cancel is the whole mechanism: a keystroke inside the window throws
+    // the pending lookup away before it is made.
+    const timeout = setTimeout(
+      () => search(query, pointRef.current),
+      AUTOCOMPLETE.DEBOUNCE_MS,
+    );
+
     return () => clearTimeout(timeout);
-    // Only the typed value. runSearch is stable by construction above.
+    // Only the typed value. `search` and `clear` are stable.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
-  const goTo = (restaurant: RestaurantType) => {
-    if (!restaurant.slug) {
+  const goToSlug = (slug: string) => {
+    setOpen(false);
+    burnToken();
+    navigate(buildMenuResultsPath(slug));
+  };
+
+  const select = async (suggestion: RestaurantSuggestionType) => {
+    // Already ours: no call, no cost, straight to the menu.
+    if (suggestion.slug) {
+      goToSlug(suggestion.slug);
       return;
     }
 
-    setOpen(false);
-    navigate(buildMenuResultsPath(restaurant.slug));
+    if (!suggestion.place_id) {
+      return;
+    }
+
+    // The one billed call in the session, and only ever on a deliberate tap.
+    setResolving(true);
+
+    try {
+      const slug = await choosePlace(suggestion.place_id);
+
+      if (slug) {
+        goToSlug(slug);
+      }
+    } finally {
+      setResolving(false);
+    }
   };
 
-  /**
-   * Submitting used to return early unless a suggestion had been clicked, so
-   * typing a restaurant name and pressing the button did nothing at all - no
-   * navigation, no message. Now it searches, and goes straight there when the
-   * answer is unambiguous.
-   */
   const handleSubmit = async (event?: React.FormEvent) => {
     event?.preventDefault();
 
-    // Submitting is the deliberate act, so this one may reach the model.
-    const results = suggestions.length
-      ? suggestions
-      : await runSearch(value, true);
-
-    if (results.length === 1) {
-      goTo(results[0]);
+    if (suggestions.length === 1) {
+      await select(suggestions[0]);
       return;
+    }
+
+    if (suggestions.length > 1) {
+      setOpen(true);
+      return;
+    }
+
+    // Nothing matched anywhere. Only now is the model asked, and only because
+    // somebody pressed the button.
+    setGenerating(true);
+
+    try {
+      const results = await lookupRef.current(value.trim(), true);
+
+      if (Array.isArray(results) && results.length === 1 && results[0]?.slug) {
+        goToSlug(results[0].slug);
+        return;
+      }
+    } finally {
+      setGenerating(false);
     }
 
     setOpen(true);
   };
+
+  const busy = loading || resolving || generating;
 
   return (
     <form onSubmit={handleSubmit} className="relative w-full" role="search">
@@ -158,10 +180,10 @@ const MainSearchBar: FC = () => {
         <button
           type="submit"
           aria-label={SEARCH_LABELS.submit}
-          disabled={!value.trim() || searching}
+          disabled={!value.trim() || busy}
           className="shrink-0 rounded-full bg-brand px-3 py-1.5 text-sm font-medium text-white disabled:opacity-40"
         >
-          {searching ? SEARCH_LABELS.searching : SEARCH_LABELS.submit}
+          {busy ? SEARCH_LABELS.searching : SEARCH_LABELS.submit}
         </button>
       </div>
 
@@ -169,10 +191,11 @@ const MainSearchBar: FC = () => {
         suggestions={suggestions}
         query={value}
         show={open}
-        searching={searching}
+        searching={loading}
         searched={searched}
         error={error}
-        onSelect={goTo}
+        resolving={resolving}
+        onSelect={select}
         onClose={() => setOpen(false)}
       />
     </form>

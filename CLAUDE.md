@@ -379,6 +379,32 @@ two of them.
 - **`AuthField` is shared by both auth pages**, at 48px. They were built months
   apart and looked it.
 
+## The search box does not search per keystroke
+
+`MainSearchBar` plus `useRestaurantSuggestions`. Every keystroke cancels the
+pending lookup, so typing a name straight through is **one** request, not one
+per character — and below `AUTOCOMPLETE.MIN_CHARS` there is no request at all,
+because two letters return noise and, past our own database, still bill.
+
+- **400ms, not 2000.** A two-second wait means the suggestions arrive after
+  somebody has typed the whole name — too late to save them anything, so they
+  press Search, and that is the Text Search path at roughly six times the cost
+  of a Place Details call. A long debounce optimises the cheap path by pushing
+  people onto the expensive one.
+- **One session token per search, burned on selection.** It is what makes the
+  predictions free and leaves only the details call billed. Reusing a spent
+  one, or minting a fresh one per request, is the same as having none.
+- **A query that found nothing short-circuits its own extensions**, and answers
+  are cached for the session so backspacing costs nothing.
+- **Rows we already hold are marked and come first.** That is the most useful
+  thing a row can say and also the free one — choosing it makes no external
+  call at all.
+- **The option's accessible name is set explicitly.** Highlighting the matched
+  fragment splits the name across elements, which made a screen reader
+  announce "Luc ali".
+- **Submitting is the only path that may reach the model**, and only when
+  nothing matched anywhere.
+
 ## Finding food near you
 
 The front door answers two questions now: which restaurant, and what is around
