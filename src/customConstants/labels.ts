@@ -212,9 +212,18 @@ export const SEARCH_LABELS = {
   placeholder: "Search a restaurant",
   submit: "Search",
   searching: "Looking…",
-  // Not "no results": the app can generate a menu for a restaurant it has
-  // never seen, so an empty list means the lookup itself came back empty.
-  nothingFound: "Nothing found for that name. Try the full name, or add a city.",
+  /**
+   * Shown in the suggestion list while somebody is still typing, which is the
+   * only place it appears — and it must not read as a verdict.
+   *
+   * It used to say "Nothing found for that name. Try the full name, or add a
+   * city." to a reader who had typed the full name: the suggestions only ever
+   * search restaurants already in this database, and pressing Search is what
+   * looks a new one up. So the sentence was telling somebody their correct
+   * query was wrong, and telling them so before the thing that could answer
+   * it had been asked.
+   */
+  nothingFound: "No match yet — press Search to look this one up.",
   hint: "Press enter to look it up",
   // A refusal is not an absence. Reporting "nothing found" when the
   // backend said "too many requests" sends someone hunting for a
