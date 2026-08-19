@@ -40,6 +40,11 @@ jest.mock("@/components/ApiUsagePanel", () => ({
   default: () => <div>api usage</div>,
 }));
 
+jest.mock("@/components/FeatureStatus", () => ({
+  __esModule: true,
+  default: () => <div>feature flags</div>,
+}));
+
 jest.mock("@/customHooks/useMenuCorrections", () => ({
   __esModule: true,
   default: () => ({

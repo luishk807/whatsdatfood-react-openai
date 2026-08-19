@@ -712,6 +712,8 @@ export const MEMBERSHIP_LABELS = {
   choose: (plan: string) => `Choose ${plan}`,
   /** A plan with no checkout behind it yet. */
   notYet: "Not available yet.",
+  /** The Pro page with no plans configured. Said plainly, not as a teaser. */
+  nothingYet: "There is nothing to sign up for yet.",
   notForSale:
     "Food Cred, badges and leaderboard places are earned, never bought — " +
     "and membership grants no moderation or editing rights over anybody " +
@@ -719,4 +721,29 @@ export const MEMBERSHIP_LABELS = {
   /** The account row and the footer link, when there are plans. */
   link: "Membership",
   memberSince: (tier: string) => `You are a ${tier} member. Thank you.`,
+} as const;
+
+/**
+ * Feature states, for the admin console.
+ *
+ * Read-only on purpose: changing one is an environment variable and a
+ * restart. A switch that flips a product live from a web page is one
+ * mis-click away from launching it, and the deploy history is the audit trail.
+ */
+export const FEATURE_LABELS = {
+  title: "Feature flags",
+  name: (key: string) =>
+    ({ pro: "WhatsDatFood Pro" })[key] ?? key,
+  status: (state: string) =>
+    ({
+      hidden: "Hidden",
+      internal_testing: "Internal testing",
+      live: "Live",
+    })[state] ?? state,
+  explain: (state: string) =>
+    ({
+      hidden: "Nobody can see it, including you.",
+      internal_testing: "Admins only. Everybody else sees no trace of it.",
+      live: "Publicly available.",
+    })[state] ?? "",
 } as const;

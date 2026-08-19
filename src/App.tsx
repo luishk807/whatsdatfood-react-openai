@@ -5,6 +5,8 @@ import { Routes, Route } from "react-router-dom";
 import "./App.css";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Loading from "@/components/Loading";
+import FeatureRoute from "@/components/FeatureRoute";
+import { FEATURES } from "@/customConstants/features";
 import { ROUTES } from "@/customConstants/routes";
 const LazyHomepage = lazy(() => import("@/components/Homepage"));
 const LazyResult = lazy(() => import("@/components/MenuResults"));
@@ -32,6 +34,10 @@ const LazyAdminConsole = lazy(() => import("@/components/AdminConsole"));
 // in the bundle somebody downloads to read a menu.
 const LazyNearby = lazy(() => import("@/components/NearbyPage"));
 const LazyRankings = lazy(() => import("@/components/RankingsPage"));
+// Its own chunk, and never fetched while Pro is hidden: `FeatureRoute`
+// resolves before the child renders, so the bundle for an unlaunched product
+// is not downloaded by people who cannot see it.
+const LazyPro = lazy(() => import("@/components/ProPage"));
 
 function App() {
   const customStyle = {
@@ -71,6 +77,27 @@ function App() {
             </Suspense>
           }
         />
+
+        {/* Pro, and the URLs somebody would guess. All four redirect home
+            unless the server says this caller may see it — a 404 or a
+            "coming soon" would confirm that something is being built. */}
+        <Route element={<FeatureRoute feature={FEATURES.pro} />}>
+          {[ROUTES.pro, ROUTES.pricing, ROUTES.upgrade, ROUTES.subscription].map(
+            (path) => (
+              <Route
+                key={path}
+                path={path}
+                element={
+                  <Suspense fallback={<Loading style={customStyle} />}>
+                    <Layout>
+                      <LazyPro />
+                    </Layout>
+                  </Suspense>
+                }
+              />
+            ),
+          )}
+        </Route>
 
         {/* Browsing is public, and finding food near you is browsing. */}
         <Route

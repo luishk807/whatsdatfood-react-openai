@@ -22,6 +22,16 @@ export const ROUTES = {
   nearby: "/nearby",
   /** How Food Cred works, and the leaderboards. */
   rankings: "/rankings",
+
+  /**
+   * WhatsDatFood Pro. Every one of these redirects home unless the server
+   * says this caller may see Pro — including the aliases, because somebody
+   * guessing "/pricing" must not find the unfinished interface either.
+   */
+  pro: "/pro",
+  pricing: "/pricing",
+  upgrade: "/upgrade",
+  subscription: "/account/subscription",
   manage: "/manage",
   admin: "/admin",
   privacy: "/privacy",

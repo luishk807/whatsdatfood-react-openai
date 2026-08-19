@@ -2,6 +2,7 @@ import { type FC, useCallback, useEffect, useState } from "react";
 import useAdminQueues from "@/customHooks/useAdminQueues";
 import useMenuCorrections from "@/customHooks/useMenuCorrections";
 import ApiUsagePanel from "@/components/ApiUsagePanel";
+import FeatureStatus from "@/components/FeatureStatus";
 import CorrectionQueue from "@/components/CorrectionQueue";
 import ClaimReview from "@/components/ClaimReview";
 import ReportReview from "@/components/ReportReview";
@@ -14,6 +15,7 @@ import { MenuCorrectionType } from "@/interfaces/corrections";
 import {
   ADMIN_LABELS,
   CORRECTION_LABELS,
+  FEATURE_LABELS,
   USAGE_LABELS,
 } from "@/customConstants/labels";
 import { ACCOUNT_TYPE } from "@/customConstants";
@@ -130,6 +132,13 @@ const AdminConsole: FC = () => {
       {/* Last, because it is the only section that is not a queue: nothing
           here is waiting on a decision. It is the page an admin scrolls to
           rather than the reason they opened it. */}
+      <div className="flex flex-col gap-3">
+        <h2 className="text-sm font-semibold text-ink">
+          {FEATURE_LABELS.title}
+        </h2>
+        <FeatureStatus />
+      </div>
+
       <div className="flex flex-col gap-3">
         <h2 className="text-sm font-semibold text-ink">{USAGE_LABELS.title}</h2>
         <ApiUsagePanel />
