@@ -31,6 +31,15 @@ jest.mock("@/customHooks/useAdminQueues", () => ({
   }),
 }));
 
+/**
+ * The cost panel talks to Apollo directly and has its own test. Mocked here so
+ * the queue tests do not need a provider.
+ */
+jest.mock("@/components/ApiUsagePanel", () => ({
+  __esModule: true,
+  default: () => <div>api usage</div>,
+}));
+
 jest.mock("@/customHooks/useMenuCorrections", () => ({
   __esModule: true,
   default: () => ({

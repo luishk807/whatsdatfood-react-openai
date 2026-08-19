@@ -379,6 +379,20 @@ two of them.
 - **`AuthField` is shared by both auth pages**, at 48px. They were built months
   apart and looked it.
 
+## The cost page
+
+`ApiUsagePanel`, last in the admin console because it is the only section that
+is not a queue — nothing there is waiting on a decision.
+
+**The hit rate is the headline, not the spend.** The bill is a symptom; the
+proportion of searches answered from our own rows is what decides it, and it
+should climb on its own as the catalogue fills. A rate that stops moving means
+the local matcher is missing restaurants we already have — a bug that shows up
+here long before it shows up on an invoice.
+
+**A quiet day is not a zero per cent hit rate.** With no searches the figure is
+absent, because "0%" would read as total failure of the thing that is working.
+
 ## The search box does not search per keystroke
 
 `MainSearchBar` plus `useRestaurantSuggestions`. Every keystroke cancels the
@@ -386,7 +400,7 @@ pending lookup, so typing a name straight through is **one** request, not one
 per character — and below `AUTOCOMPLETE.MIN_CHARS` there is no request at all,
 because two letters return noise and, past our own database, still bill.
 
-- **400ms, not 2000.** A two-second wait means the suggestions arrive after
+- **300ms, not 2000.** A two-second wait means the suggestions arrive after
   somebody has typed the whole name — too late to save them anything, so they
   press Search, and that is the Text Search path at roughly six times the cost
   of a Place Details call. A long debounce optimises the cheap path by pushing
@@ -396,6 +410,9 @@ because two letters return noise and, past our own database, still bill.
   one, or minting a fresh one per request, is the same as having none.
 - **A query that found nothing short-circuits its own extensions**, and answers
   are cached for the session so backspacing costs nothing.
+- **A superseded request is aborted, not merely ignored.** Discarding the
+  answer stops it corrupting the list; aborting stops the work being done,
+  which is what the bill is for.
 - **Rows we already hold are marked and come first.** That is the most useful
   thing a row can say and also the free one — choosing it makes no external
   call at all.

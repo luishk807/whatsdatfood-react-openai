@@ -654,3 +654,44 @@ export const RANKINGS_LABELS = {
     "city boards read the same numbers.",
   join: "Create an account",
 } as const;
+
+/**
+ * The cost page.
+ *
+ * The hit rate is the headline rather than the spend: the bill is a symptom,
+ * and the proportion of searches answered from our own rows is what decides
+ * it. It should climb on its own as the catalogue fills.
+ */
+export const USAGE_LABELS = {
+  title: "API usage and cost",
+  hitRate: "Local search hit rate",
+  hitRateBlurb: (local: number, total: number) =>
+    total
+      ? `${local.toLocaleString()} of ${total.toLocaleString()} searches this month were answered without calling anybody.`
+      : "No searches yet this month.",
+  noSearchesYet: "—",
+  today: "Today",
+  thisMonth: "This month",
+  nothingYet: "Nothing yet.",
+  unavailable: "Usage reporting is not available right now.",
+  heaviest: "Heaviest callers, last 24 hours",
+  heaviestNote: "Hashed handles, not addresses.",
+  signedInCaller: (id: string) => `User ${id}`,
+  unknownCaller: "Unknown",
+  /** "google · autocomplete" reads as machinery; these read as spending. */
+  operation: (provider: string, operation: string) => {
+    const names: Record<string, string> = {
+      autocomplete: "Google autocomplete",
+      place_details: "Google place details",
+      text_search: "Google text search",
+      chat: "OpenAI requests",
+      restaurant_search: "Restaurant searches",
+    };
+
+    const name = names[operation] ?? `${provider} ${operation}`;
+
+    return operation === "restaurant_search"
+      ? `${name} (${provider === "local" ? "served locally" : "needed Google"})`
+      : name;
+  },
+} as const;

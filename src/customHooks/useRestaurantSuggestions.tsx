@@ -25,6 +25,9 @@ import { _get } from "@/utils";
  *   asking is paying to be told so again.
  * - **Answers are remembered for the session.** Backspacing re-issues a query
  *   that was just made; a cache turns that into nothing.
+ * - **A superseded request is aborted, not merely ignored.** Discarding the
+ *   answer stops it corrupting the list; aborting stops the server doing the
+ *   work, which is what the bill is for.
  *
  * The debounce lives in the component, because it belongs to the input.
  */
@@ -40,6 +43,7 @@ const useRestaurantSuggestions = () => {
   const empty = useRef<string[]>([]);
   // Answers can arrive out of order; only the newest query may write.
   const latest = useRef(0);
+  const inFlight = useRef<AbortController | null>(null);
 
   const sessionToken = useCallback(() => {
     if (!token.current) {
@@ -88,6 +92,14 @@ const useRestaurantSuggestions = () => {
       }
 
       const ticket = ++latest.current;
+
+      // The previous lookup is superseded. Aborting it stops the request on
+      // the wire rather than only ignoring what comes back — the difference
+      // between a wasted answer and a call that was never billed.
+      inFlight.current?.abort();
+      const controller = new AbortController();
+      inFlight.current = controller;
+
       setLoading(true);
       setError(null);
 
@@ -101,6 +113,7 @@ const useRestaurantSuggestions = () => {
             longitude: point?.longitude,
           },
           fetchPolicy: "no-cache",
+          context: { fetchOptions: { signal: controller.signal } },
         });
 
         if (ticket !== latest.current) {
@@ -123,7 +136,8 @@ const useRestaurantSuggestions = () => {
         setSuggestions(found);
         setSearched(true);
       } catch (caught) {
-        if (ticket !== latest.current) {
+        // A request we cancelled ourselves is not a failure to report.
+        if (ticket !== latest.current || controller.signal.aborted) {
           return;
         }
 
@@ -138,6 +152,7 @@ const useRestaurantSuggestions = () => {
         setSuggestions([]);
       } finally {
         if (ticket === latest.current) {
+          inFlight.current = null;
           setLoading(false);
         }
       }
@@ -173,6 +188,9 @@ const useRestaurantSuggestions = () => {
   );
 
   const clear = useCallback(() => {
+    // Emptying the box cancels whatever it asked for.
+    inFlight.current?.abort();
+    inFlight.current = null;
     setSuggestions([]);
     setSearched(false);
     setError(null);
