@@ -695,3 +695,28 @@ export const USAGE_LABELS = {
       : name;
   },
 } as const;
+
+/**
+ * Membership.
+ *
+ * `notForSale` is the important one and is on the page rather than only in a
+ * comment: reputation and moderation are the two things a membership must
+ * never include, and somebody looking at a price deserves to know what they
+ * are not buying.
+ */
+export const MEMBERSHIP_LABELS = {
+  title: "Support What's dat food",
+  blurb:
+    "The photographs, the rankings and the menus stay free for everyone. " +
+    "This is for people who want to help keep them coming.",
+  choose: (plan: string) => `Choose ${plan}`,
+  /** A plan with no checkout behind it yet. */
+  notYet: "Not available yet.",
+  notForSale:
+    "Food Cred, badges and leaderboard places are earned, never bought — " +
+    "and membership grants no moderation or editing rights over anybody " +
+    "else's contributions.",
+  /** The account row and the footer link, when there are plans. */
+  link: "Membership",
+  memberSince: (tier: string) => `You are a ${tier} member. Thank you.`,
+} as const;

@@ -108,6 +108,13 @@ export interface UserType {
   phone: string;
   email: string;
   role_id: bigint;
+  /**
+   * What this person has paid for. Read-only: the server owns it, an expired
+   * membership already reports as absent, and no mutation sets it.
+   *
+   * Not a role. A role is what somebody may do to other people's work.
+   */
+  membership_tier?: string | null;
   verification: string;
   createdAt?: Date;
   updatedAt?: Date;

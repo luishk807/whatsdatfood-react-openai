@@ -379,6 +379,35 @@ two of them.
 - **`AuthField` is shared by both auth pages**, at 48px. They were built months
   apart and looked it.
 
+## Membership is prepared, not shipped
+
+`MEMBERSHIP_PLANS` is empty and everything that draws it is built. Add an
+entry and the plans section appears; leave it empty and nothing renders.
+
+**Nothing can be bought.** No provider, no checkout, no price anywhere. A plan
+card with a price and no working button is a worse version of the dead
+sign-in button — that one only fails to open a door, this one makes a claim
+about a commercial relationship that does not exist. A plan whose `href` is
+missing renders without a button rather than with a dead one, so a
+half-configured plan cannot ship a control that goes nowhere.
+
+**Two things a plan must never include**, both load-bearing and both tested:
+
+- *Food Cred, badges, leaderboard position.* Reputation is earned by
+  photographing food and being useful. A leaderboard somebody can pay to enter
+  is not a leaderboard, and the ranking is the product. The award rules have
+  no idea membership exists, and a test asserts the word does not appear in
+  them.
+- *Anything a role decides.* Moderation, claim decisions, photo removal.
+  Membership is what somebody paid for; a role is what they may do to other
+  people's work. Separate columns, separate concepts, and `MEMBERSHIP_LABELS.
+  notForSale` says so on the page rather than only here.
+
+**`membershipOf()` in `utils/entitlement.ts` is the only way to ask.** A gate
+written as `user.membership_tier === "x"` in a component is how a tier rename
+becomes a fortnight of grep. The server owns the value and already reports a
+lapsed membership as absent, so nothing in the browser handles dates.
+
 ## The cost page
 
 `ApiUsagePanel`, last in the admin console because it is the only section that
