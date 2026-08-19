@@ -32,7 +32,9 @@ const FoodCredAmount: FC<FoodCredAmountInterface> = ({
   return (
     <span
       className={clsx(
-        "inline-flex items-center",
+        // The unit never wraps away from its number. "440 Food / Cred" across
+        // two lines reads as two facts rather than one.
+        "inline-flex items-center whitespace-nowrap",
         scale.gap,
         scale.text,
         muted

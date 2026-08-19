@@ -75,5 +75,28 @@ export const FOOD_CRED_EVENT = {
   reversal: "REVERSAL",
 } as const;
 
+export const PROFILE_LABELS = {
+  /**
+   * Unknown, blocked, inactive and erased accounts all read the same on
+   * purpose. Telling them apart would make this page a way to find out whether
+   * an account exists and what happened to it.
+   */
+  notFound: "That contributor is not available.",
+  joined: (when: string) => `Contributing since ${when}`,
+} as const;
+
+export const LEADERBOARD_LABELS = {
+  title: "Top contributors",
+  champion: "Restaurant Champion",
+  viewAll: "View leaderboard",
+  /** e.g. "First photographed by Luis" */
+  firstPhotographed: (name: string) => `First photographed by ${name}`,
+  /** Suffix on a leaderboard row. Never "points" — see FOOD_CRED_LABELS.unit. */
+  credSuffix: "Cred",
+} as const;
+
+/** How many contributors the restaurant page shows before "View leaderboard". */
+export const LEADERBOARD_PREVIEW = 3;
+
 /** How long an award stays on screen before it gets out of the way. */
 export const AWARD_VISIBLE_MS = 4500;

@@ -30,6 +30,10 @@ import useDishRanking from "@/customHooks/useDishRanking";
 import useDishVotes from "@/customHooks/useDishVotes";
 import useDishPhotoUpload from "@/customHooks/useDishPhotoUpload";
 import FoodCredAward from "@/components/FoodCredAward";
+import TopContributors from "@/components/TopContributors";
+import FoodCredIcon from "@/components/FoodCredIcon";
+import { LEADERBOARD_LABELS } from "@/customConstants/reputation";
+import useRestaurantLeaderboard from "@/customHooks/useRestaurantLeaderboard";
 import useDishPhotos from "@/customHooks/useDishPhotos";
 import useDishOrders from "@/customHooks/useDishOrders";
 import DishPhotoGallery from "@/components/DishPhotoGallery";
@@ -93,6 +97,7 @@ const MenuResults: FC = () => {
   const { checkAuthQuery, user } = useAuth();
   const { initialized } = checkAuthQuery;
   const { showSnackBar, SnackbarComponent } = useSnackbarHook();
+  const { standings } = useRestaurantLeaderboard(restaurant);
 
   const {
     upload,
@@ -235,6 +240,9 @@ const MenuResults: FC = () => {
             card_payment: _get(resp, "card_payment"),
             drive_through: _get(resp, "drive_through"),
             delivery_option: _get(resp, "delivery_option"),
+            // Easy to miss: this object is assembled field by field, so a new
+            // field on the query is invisible here until it is named.
+            champion: _get(resp, "champion", null),
           });
         }
       }
@@ -399,12 +407,21 @@ const MenuResults: FC = () => {
                   canVote={canVote}
                   onVote={handleVote}
                   onOpen={handleOpenDish}
-                    onAddPhoto={handleAddPhoto}
+                  onAddPhoto={handleAddPhoto}
                   uploadingDishId={uploadingDishId}
                   dinerCount={dinerCount}
                 />
               </section>
             ))}
+
+            {/* Below the whole menu on purpose. The food is the page and
+                reputation supports it; a leaderboard above the dishes would
+                invert that, and nobody arrived here to read a ranking of
+                photographers. */}
+            <TopContributors
+              standings={standings}
+              champion={restaurantInfo?.champion}
+            />
 
             <section className="flex flex-col items-start gap-2 border-t border-line pt-6">
               <h2 className="text-sm font-semibold text-ink">
@@ -460,6 +477,19 @@ const MenuResults: FC = () => {
                   />
                 ) : (
                   DISH_LABELS.signInToUpload
+                )}
+              </p>
+            )}
+
+            {/* Permanent credit, and separate from whoever's photo leads today.
+                Being first to photograph a dish is the contribution this
+                product most wants to exist, so it is said out loud and it does
+                not change hands when a later photo wins the hero slot. */}
+            {selectedDish.first_photographed_by && (
+              <p className="-mt-1 inline-flex items-center gap-1.5 text-xs text-ink-muted">
+                <FoodCredIcon size={12} className="text-brand" />
+                {LEADERBOARD_LABELS.firstPhotographed(
+                  selectedDish.first_photographed_by,
                 )}
               </p>
             )}

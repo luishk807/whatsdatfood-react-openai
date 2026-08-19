@@ -97,3 +97,28 @@ export interface FoodCredAwardInterface {
   award: FoodCredEarnedType | null;
   onDismiss: () => void;
 }
+
+/**
+ * One person's place in a scope — a leaderboard row, or a Champion.
+ *
+ * Deliberately not a user object. A leaderboard is public and the user type
+ * carries an email and a phone; the safe shape is one that never had them.
+ */
+export interface StandingType {
+  username: string;
+  display_name: string;
+  cred: number;
+}
+
+export interface TopContributorsInterface {
+  standings: StandingType[];
+  champion?: StandingType | null;
+  loading?: boolean;
+  /** Opens the full list. Absent while the leaderboard fits on screen. */
+  onViewAll?: () => void;
+}
+
+export interface ChampionIconInterface {
+  size?: number;
+  className?: string;
+}

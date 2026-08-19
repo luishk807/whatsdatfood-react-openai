@@ -68,6 +68,11 @@ export const GET_RESTAURANT_BY_SLUG = gql`
         close_time
       }
       diner_count
+      champion {
+        username
+        display_name
+        cred
+      }
       restaurantMenuItems {
         id
         name
@@ -77,6 +82,7 @@ export const GET_RESTAURANT_BY_SLUG = gql`
         category
         order_count
         ordered_by_me
+        first_photographed_by
         is_vegetarian
         is_vegan
         is_gluten_free

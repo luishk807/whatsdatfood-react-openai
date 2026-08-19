@@ -69,3 +69,13 @@ export const CONTRIBUTOR_PROFILE = gql`
     }
   }
 `;
+
+export const RESTAURANT_LEADERBOARD = gql`
+  query restaurantLeaderboard($slug: String!, $limit: Int) {
+    restaurantLeaderboard(slug: $slug, limit: $limit) {
+      username
+      display_name
+      cred
+    }
+  }
+`;

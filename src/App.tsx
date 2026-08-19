@@ -20,6 +20,9 @@ const LazyUserFriendSection = lazy(
 );
 const LazyUserRatings = lazy(() => import("@/components/UserRatingSection"));
 const LazyContributions = lazy(() => import("@/components/Contributions"));
+const LazyContributorProfile = lazy(
+  () => import("@/components/ContributorProfile"),
+);
 const LazyUserSettings = lazy(() => import("@/components/UserSettings"));
 const LazyUserHistory = lazy(() => import("@/components/UserHistory"));
 const LazyUserFavorites = lazy(() => import("@/components/UserFavorites"));
@@ -60,6 +63,19 @@ function App() {
             <Suspense fallback={<Loading style={customStyle} />}>
               <Layout>
                 <LazyLogout />
+              </Layout>
+            </Suspense>
+          }
+        />
+
+        {/* Public. A leaderboard whose names lead nowhere unless you have
+            an account is a leaderboard most readers cannot use. */}
+        <Route
+          path={ROUTES.profile}
+          element={
+            <Suspense fallback={<Loading style={customStyle} />}>
+              <Layout>
+                <LazyContributorProfile />
               </Layout>
             </Suspense>
           }

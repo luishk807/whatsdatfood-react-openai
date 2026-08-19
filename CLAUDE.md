@@ -272,6 +272,34 @@ The credit **wraps rather than truncates**. `truncate` clipped it to "Photo by
 Orijit Chatterjee on Uns…", and the Unsplash link is required by the API terms
 — cutting it off is a compliance problem, not a cosmetic one.
 
+## Leaderboards and the Champion
+
+`TopContributors` sits **below the whole menu**, not above it. The food is the
+page and reputation supports it; a ranking of photographers over the dishes
+inverts that, and nobody arrived here to read one.
+
+- **The number is Cred earned at this restaurant**, never a global total.
+- **It renders nothing until somebody has earned some** — same rule as the
+  "most loved" strip. A heading claiming a thing the data has not earned is
+  worse than no section.
+- **Three, then a link.** `LEADERBOARD_PREVIEW`.
+- **`ChampionIcon` is a rosette, not a trophy.** A trophy reads as a
+  competition that is over; this is a standing that changes hands the moment
+  somebody contributes more. Same swap contract as `FoodCredIcon` —
+  `REPUTATION_ASSETS.champion`.
+- **First-photographed credit lives in the dish sheet**, and is separate from
+  whoever's photo leads today. Two different facts; the product says both and
+  the first never changes hands.
+- **Profiles are public** (`/contributor/:username`), because a leaderboard
+  whose names lead nowhere unless you have an account is one most readers
+  cannot use. Unknown, blocked, inactive and erased all render identically —
+  distinguishing them would make the page a way to find out whether an account
+  exists and what happened to it.
+
+**`restaurantInfo` in `MenuResults` is assembled field by field**, so a new
+field on the query is invisible until it is named there. The Champion badge
+silently did not render for exactly this reason.
+
 ## Photo uploads
 
 The empty photo tile *is* the upload funnel: it appears on exactly the dishes

@@ -83,6 +83,13 @@ jest.mock("@/customHooks/useDishPhotoLookup", () => ({
   default: () => ({ found: {}, lookup: jest.fn() }),
 }));
 
+// The leaderboard is its own query, so it needs its own stub here: this suite
+// renders MenuResults without an Apollo provider on purpose.
+jest.mock("@/customHooks/useRestaurantLeaderboard", () => ({
+  __esModule: true,
+  default: () => ({ standings: [], loading: false }),
+}));
+
 jest.mock("@/customHooks/useDishPhotoUpload", () => ({
   __esModule: true,
   default: () => ({

@@ -36,6 +36,12 @@ export interface MenuItemType {
   spice_level?: number | null;
   /** "owner" or "ai" — whose answer this is. */
   dietary_source?: string | null;
+  /**
+   * Who first photographed this dish. Recorded when it happened and never
+   * rewritten, so it does not move when a later photo wins the hero slot —
+   * those are two different facts and the product says both.
+   */
+  first_photographed_by?: string | null;
   restaurant?: RestaurantType;
 }
 
@@ -77,6 +83,15 @@ export interface RestaurantType {
   delivery_option?: boolean;
   businessHours: BusinessHours[];
   restaurantItems?: MenuItemType[];
+  /**
+   * The most valuable contributor here, by Food Cred earned at this
+   * restaurant. Null until somebody has earned any.
+   */
+  champion?: {
+    username: string;
+    display_name: string;
+    cred: number;
+  } | null;
   /** Denominator for the order share. */
   diner_count?: number;
 }
