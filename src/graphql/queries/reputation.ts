@@ -12,6 +12,15 @@ export const MY_FOOD_CRED = gql`
       photo_count
       dish_count
       restaurant_count
+      badges {
+        id
+        name
+        description
+        icon
+        earnedAt
+        progress
+        target
+      }
       level {
         key
         name
@@ -57,6 +66,15 @@ export const CONTRIBUTOR_PROFILE = gql`
       dish_count
       restaurant_count
       joinedAt
+      badges {
+        id
+        name
+        description
+        icon
+        earnedAt
+        progress
+        target
+      }
       level {
         key
         name

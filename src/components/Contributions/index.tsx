@@ -1,6 +1,7 @@
 import { type FC } from "react";
 import ContributorSummary from "@/components/ContributorSummary";
 import FoodCredHistory from "@/components/FoodCredHistory";
+import BadgeGrid from "@/components/BadgeGrid";
 import useFoodCred from "@/customHooks/useFoodCred";
 import useAuth from "@/customHooks/useAuth";
 import { FOOD_CRED_LABELS } from "@/customConstants/reputation";
@@ -39,6 +40,10 @@ const Contributions: FC = () => {
       ) : (
         stats && <ContributorSummary name={name} stats={stats} />
       )}
+
+      {/* Between the standing and the ledger: badges are the goals, the ledger
+          is the receipts. */}
+      <BadgeGrid badges={stats?.badges ?? []} />
 
       <section>
         <h3 className="mb-2 text-sm font-semibold text-ink">

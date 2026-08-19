@@ -36,6 +36,7 @@ export interface ContributorStatsType {
   photo_count: number;
   dish_count: number;
   restaurant_count: number;
+  badges?: BadgeType[];
 }
 
 export interface ContributorProfileType extends ContributorStatsType {
@@ -121,4 +122,34 @@ export interface TopContributorsInterface {
 export interface ChampionIconInterface {
   size?: number;
   className?: string;
+}
+
+/**
+ * A badge, earned or in progress.
+ *
+ * `icon` is a key the server chose, not a URL. `BadgeIcon` maps it to an asset,
+ * so replacing the artwork never touches the API.
+ */
+export interface BadgeType {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  /** Null until earned. Its presence is what "earned" means. */
+  earnedAt: string | null;
+  progress: number;
+  target: number;
+}
+
+export interface BadgeIconInterface {
+  badgeId: string;
+  earned?: boolean;
+  size?: number;
+  className?: string;
+}
+
+export interface BadgeGridInterface {
+  badges: BadgeType[];
+  /** Hides progress on someone else's profile — their progress is theirs. */
+  showProgress?: boolean;
 }

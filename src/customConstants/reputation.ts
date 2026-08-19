@@ -75,6 +75,12 @@ export const FOOD_CRED_EVENT = {
   reversal: "REVERSAL",
 } as const;
 
+export const BADGE_LABELS = {
+  title: "Badges",
+  /** e.g. "7 / 10" — the number that makes an unearned badge worth showing. */
+  progress: (done: number, target: number) => `${done} / ${target}`,
+} as const;
+
 export const PROFILE_LABELS = {
   /**
    * Unknown, blocked, inactive and erased accounts all read the same on

@@ -300,6 +300,23 @@ inverts that, and nobody arrived here to read one.
 field on the query is invisible until it is named there. The Champion badge
 silently did not render for exactly this reason.
 
+## Badges
+
+`BadgeIcon` takes the **icon key the server sent**, never a URL, so badge logic
+and badge graphics stay uncoupled — swapping artwork is one entry in
+`REPUTATION_ASSETS.badges` and nothing else. Until then every badge shares one
+placeholder shape and is told apart by its name, which is honest: nine bespoke
+placeholder drawings would be nine things to throw away.
+
+- **Unearned badges render, greyed, with "7 / 10".** That is the whole reason
+  they are shown. A badge you cannot see yourself approaching is a surprise
+  rather than an incentive.
+- **Public profiles pass `showProgress={false}`** and the server sends earned
+  badges only. How close a stranger is to something is their business — belt
+  and braces, on purpose.
+- **The description is the `title`**, because on a phone there is no room for
+  it under every tile.
+
 ## Photo uploads
 
 The empty photo tile *is* the upload funnel: it appears on exactly the dishes

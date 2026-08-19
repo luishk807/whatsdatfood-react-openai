@@ -1,6 +1,7 @@
 import { type FC } from "react";
 import { useParams } from "react-router-dom";
 import ContributorSummary from "@/components/ContributorSummary";
+import BadgeGrid from "@/components/BadgeGrid";
 import useContributorProfile from "@/customHooks/useContributorProfile";
 import { PROFILE_PARAM } from "@/customConstants/routes";
 import { PROFILE_LABELS } from "@/customConstants/reputation";
@@ -52,6 +53,11 @@ const ContributorProfile: FC = () => {
             : profile.level?.name
         }
       />
+
+      {/* Earned only, and no progress bars: how close a stranger is to
+          something is their business, not a visitor's. The server sends only
+          earned badges here, so this is belt and braces. */}
+      <BadgeGrid badges={profile.badges ?? []} showProgress={false} />
     </div>
   );
 };
