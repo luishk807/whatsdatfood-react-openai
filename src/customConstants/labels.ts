@@ -316,3 +316,18 @@ export const REVIEW_LABELS = {
   // has already stopped to put their opinion into words.
   starsHint: "Stars apply to this review only.",
 } as const;
+
+/**
+ * The generic-imagery strip on the front door.
+ *
+ * `disclosure` is not decoration. Every other photograph in this product is
+ * evidence that somebody was at a table; these are stock. A reader must never
+ * have to work out which kind they are looking at, and the per-photo credit
+ * alone is too quiet to carry that on its own.
+ */
+export const CUISINE_LABELS = {
+  title: "Food inspiration",
+  disclosure: "Stock photos, not from these restaurants",
+  photoBy: "Photo by",
+  on: "on",
+} as const;

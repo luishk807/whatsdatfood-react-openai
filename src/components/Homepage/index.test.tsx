@@ -1,7 +1,11 @@
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import Homepage from "@/components/Homepage";
-import { SEARCH_LABELS, SHOWCASE_LABELS } from "@/customConstants/labels";
+import {
+  CUISINE_LABELS,
+  SEARCH_LABELS,
+  SHOWCASE_LABELS,
+} from "@/customConstants/labels";
 
 jest.mock("@/customHooks/useRestaurantMutations", () => ({
   __esModule: true,
@@ -15,6 +19,13 @@ jest.mock("@/customHooks/useRecentDishPhotos", () => ({
   default: () => wall,
 }));
 
+const cuisines = { tiles: [] as unknown[], loading: false };
+
+jest.mock("@/customHooks/useCuisineTiles", () => ({
+  __esModule: true,
+  default: () => cuisines,
+}));
+
 const show = () =>
   render(
     <MemoryRouter>
@@ -26,6 +37,8 @@ describe("Homepage", () => {
   beforeEach(() => {
     wall.photos = [];
     wall.loading = false;
+    cuisines.tiles = [];
+    cuisines.loading = false;
   });
 
   it("says what the product does, not what to type", () => {
@@ -83,5 +96,51 @@ describe("Homepage", () => {
     expect(
       screen.queryByRole("heading", { name: SHOWCASE_LABELS.heading }),
     ).not.toBeInTheDocument();
+  });
+
+  it("offers generic inspiration only below the real photographs", () => {
+    // Diner photos are the product; stock imagery is what fills the page when
+    // there are none yet. It must never lead.
+    wall.photos = [{ id: "1", url_m: "https://example.test/a.jpg", dish: "Ramen" }];
+    cuisines.tiles = [
+      {
+        category: "japanese",
+        label: "Japanese",
+        url: "https://images.unsplash.test/a.jpg",
+        thumb_url: null,
+        alt: null,
+        photographer: "Zhe ZHANG",
+        photographer_url: "https://unsplash.test/@z",
+        provider_url: "https://unsplash.test/",
+        provider: "unsplash",
+      },
+    ];
+
+    const { container } = show();
+    const text = container.textContent ?? "";
+
+    expect(text.indexOf(SHOWCASE_LABELS.heading)).toBeLessThan(
+      text.indexOf(CUISINE_LABELS.title),
+    );
+  });
+
+  it("labels stock imagery as such so nobody mistakes it for a restaurant", () => {
+    cuisines.tiles = [
+      {
+        category: "thai",
+        label: "Thai",
+        url: "https://images.unsplash.test/b.jpg",
+        thumb_url: null,
+        alt: null,
+        photographer: "A N",
+        photographer_url: "https://unsplash.test/@a",
+        provider_url: "https://unsplash.test/",
+        provider: "unsplash",
+      },
+    ];
+
+    show();
+
+    expect(screen.getByText(CUISINE_LABELS.disclosure)).toBeInTheDocument();
   });
 });

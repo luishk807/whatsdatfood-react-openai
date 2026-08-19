@@ -1,7 +1,9 @@
 import { type FC, lazy, Suspense } from "react";
 import { SEARCH_LABELS } from "@/customConstants/labels";
 import PhotoWall from "@/components/PhotoWall";
+import CuisineStrip from "@/components/CuisineStrip";
 import useRecentDishPhotos from "@/customHooks/useRecentDishPhotos";
+import useCuisineTiles from "@/customHooks/useCuisineTiles";
 
 const LazyMainSearch = lazy(() => import("@/components/MainSearchBar"));
 
@@ -16,6 +18,7 @@ const LazyMainSearch = lazy(() => import("@/components/MainSearchBar"));
  */
 const Homepage: FC = () => {
   const { photos, loading } = useRecentDishPhotos();
+  const { tiles, loading: tilesLoading } = useCuisineTiles();
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 pb-16 pt-8 sm:pt-14">
@@ -37,6 +40,12 @@ const Homepage: FC = () => {
       </Suspense>
 
       <PhotoWall photos={photos} loading={loading} />
+
+      {/* Below the real photographs, always. When diners have uploaded, their
+          work leads and this is a footnote; when they have not, this is the
+          difference between a front door that says what the product is and a
+          search box floating in white space. */}
+      <CuisineStrip tiles={tiles} loading={tilesLoading} />
     </div>
   );
 };

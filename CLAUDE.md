@@ -247,6 +247,31 @@ is designed as the main case rather than as a failure.
   kept because "every dish fires a lookup on every load" is what made one page
   view cost 21 image searches, and that lesson should not need relearning.
 
+## Generic imagery is a separate thing, and says so
+
+`CuisineStrip` on the homepage is the one place stock photography appears, and
+three rules keep it from being mistaken for the real thing.
+
+- **It is labelled.** "Stock photos, not from these restaurants" sits beside
+  the heading. Every other photograph in this product is evidence somebody was
+  at a table; a reader must never have to work out which kind they are looking
+  at, and a per-photo credit is too quiet to carry that alone.
+- **It sits below the diner photos, always.** When there are uploads, their
+  work leads and this is a footnote.
+- **`DishPhoto` refuses `IMAGE_SOURCE.generic`** outright, so a generic image
+  cannot render as a photo of a dish even if one reached the component.
+
+**Deliberately not interactive.** Searching a cuisine reaches the AI generation
+path, which is the one place this product spends real money — a grid on the
+front door where every tap opens the wallet is a bad idea whatever the rate
+limit says, and there is no cuisine-browse route to land on either. The credit
+links are the only interactive thing in a tile, which also means nothing is
+nested inside anything else.
+
+The credit **wraps rather than truncates**. `truncate` clipped it to "Photo by
+Orijit Chatterjee on Uns…", and the Unsplash link is required by the API terms
+— cutting it off is a compliance problem, not a cosmetic one.
+
 ## Photo uploads
 
 The empty photo tile *is* the upload funnel: it appears on exactly the dishes
