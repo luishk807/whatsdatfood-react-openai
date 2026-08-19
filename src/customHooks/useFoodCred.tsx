@@ -16,6 +16,14 @@ import { LIMIT_DEFAULT, PAGE_DEFAULT } from "@/customConstants";
  * fresh on every visit while the history is paginated and rarely looked at.
  * Neither takes a user id: the server reads the session, which is the only way
  * a reputation number can be trusted.
+ *
+ * `unavailable` is the case where the backend does not know these fields yet.
+ * The two halves of this app deploy independently — the frontend through
+ * Cloudflare, the API through Railway — so the frontend routinely runs ahead
+ * of the API for minutes, and can run ahead for hours if one of them is having
+ * a bad day. An unknown field fails GraphQL validation, so without this the
+ * page would report a contributor's history as empty, which is a different
+ * and much worse claim than "not available yet".
  */
 const useFoodCred = (page = PAGE_DEFAULT, limit = LIMIT_DEFAULT) => {
   const summaryQuery = useQuery<{ myFoodCred: ContributorStatsType }>(
@@ -34,12 +42,18 @@ const useFoodCred = (page = PAGE_DEFAULT, limit = LIMIT_DEFAULT) => {
     };
   }>(FOOD_CRED_HISTORY, { variables: { page, limit } });
 
+  // Only the summary decides. It is the query the page cannot do without, and
+  // treating a paginated history failure as "the feature is missing" would
+  // hide a real total behind a maintenance notice.
+  const unavailable = !summaryQuery.loading && !!summaryQuery.error;
+
   return {
     stats: summaryQuery.data?.myFoodCred ?? null,
     statsLoading: summaryQuery.loading,
     events: historyQuery.data?.foodCredHistory?.data ?? [],
     totalPages: historyQuery.data?.foodCredHistory?.totalPages ?? 0,
     historyLoading: historyQuery.loading,
+    unavailable,
     refetch: summaryQuery.refetch,
   };
 };

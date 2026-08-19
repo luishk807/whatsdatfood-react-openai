@@ -14,12 +14,23 @@ import { FOOD_CRED_LABELS } from "@/customConstants/reputation";
  */
 const Contributions: FC = () => {
   const { user } = useAuth();
-  const { stats, statsLoading, events, historyLoading } = useFoodCred();
+  const { stats, statsLoading, events, historyLoading, unavailable } =
+    useFoodCred();
 
   const name =
     [user?.first_name, user?.last_name].filter(Boolean).join(" ") ||
     user?.username ||
     "";
+
+  if (unavailable) {
+    return (
+      <div className="flex w-full max-w-2xl flex-col gap-6">
+        <p className="rounded-card border border-dashed border-line px-4 py-6 text-center text-sm text-ink-muted">
+          {FOOD_CRED_LABELS.unavailable}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex w-full max-w-2xl flex-col gap-6">

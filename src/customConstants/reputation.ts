@@ -48,6 +48,13 @@ export const FOOD_CRED_LABELS = {
   firstDiscovery: "First dish discovery!",
   photoApproved: "Photo approved",
   viewHistory: "See how you earned this",
+  /**
+   * Shown when the API does not know about Food Cred yet. The frontend and the
+   * API deploy independently, so this is a normal few minutes rather than an
+   * error — and saying "no contributions" instead would be a claim about the
+   * reader rather than about the deploy.
+   */
+  unavailable: "Contributions are not available just now. Check back shortly.",
 } as const;
 
 /**
