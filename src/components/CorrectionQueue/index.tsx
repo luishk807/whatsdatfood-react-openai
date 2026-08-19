@@ -1,4 +1,6 @@
 import { type FC } from "react";
+import QueueRowActions from "@/components/QueueRowActions";
+import useQueueDecision from "@/customHooks/useQueueDecision";
 import { CORRECTION_LABELS } from "@/customConstants/labels";
 import { CorrectionQueueInterface } from "@/interfaces/corrections";
 
@@ -19,6 +21,8 @@ const CorrectionQueue: FC<CorrectionQueueInterface> = ({
   loading,
   onResolve,
 }) => {
+  const { busyId, failedId, run } = useQueueDecision(onResolve);
+
   if (loading) {
     return (
       <div className="h-20 w-full animate-pulse rounded-card bg-surface-sunken motion-reduce:animate-none" />
@@ -72,22 +76,14 @@ const CorrectionQueue: FC<CorrectionQueueInterface> = ({
             </p>
           )}
 
-          <div className="flex gap-2">
-            <button
-              type="button"
-              onClick={() => onResolve(correction.id, true)}
-              className="rounded-pill border border-brand bg-brand-soft px-3 py-1 text-xs font-semibold text-brand hover:bg-brand hover:text-white"
-            >
-              {CORRECTION_LABELS.approve}
-            </button>
-            <button
-              type="button"
-              onClick={() => onResolve(correction.id, false)}
-              className="rounded-pill border border-line px-3 py-1 text-xs text-ink-muted hover:border-ink hover:text-ink"
-            >
-              {CORRECTION_LABELS.reject}
-            </button>
-          </div>
+          <QueueRowActions
+            id={correction.id}
+            affirmative={CORRECTION_LABELS.approve}
+            negative={CORRECTION_LABELS.reject}
+            busy={busyId === correction.id}
+            failed={failedId === correction.id}
+            onDecide={run}
+          />
         </li>
       ))}
     </ul>

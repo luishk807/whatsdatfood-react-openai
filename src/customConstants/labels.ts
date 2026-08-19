@@ -133,6 +133,13 @@ export const OWNER_LABELS = {
 
 export const ADMIN_LABELS = {
   title: "Review queue",
+  /** Says what the page is for, to somebody who opens it once a week. */
+  blurb:
+    "Decisions only an admin makes. Nothing here changes until you decide it.",
+  /** The whole page in one line, so an empty queue costs one glance. */
+  allClear: "Nothing is waiting.",
+  waiting: (count: number) =>
+    count === 1 ? "1 thing waiting" : `${count} things waiting`,
   claims: "Ownership claims",
   reports: "Reported photos",
   noClaims: "No claims waiting.",
@@ -141,7 +148,28 @@ export const ADMIN_LABELS = {
   reject: "Reject",
   keepPhoto: "Keep",
   removePhoto: "Remove",
+  confirmRemove: "Remove for good",
+  cancel: "Cancel",
+  working: "Working…",
+  /**
+   * On the row, not at the top of the page: with three queues open, "that did
+   * not work" says nothing about which decision is still waiting.
+   */
+  decisionFailed: "That did not stick. Try again.",
   removeWarning: "Removing a photo is the only way one disappears.",
+  verification: "Proof",
+  noVerification: "None offered",
+  note: "Note",
+  reason: "Reported as",
+  uploadedBy: "Uploaded by",
+  unattributed: "Unattributed",
+  unknownDish: "Dish unknown",
+  /**
+   * Shown to a signed-in reader who is not an admin. It used to render
+   * nothing at all under a heading reading "Review", which looks like the
+   * page failed to load rather than like a page that was never theirs.
+   */
+  notForYou: "This page is for admins.",
 } as const;
 /**
  * The restaurant screen.
@@ -232,7 +260,15 @@ export const SETTINGS_LABELS = {
   saveFailed: "That did not save. Nothing has been changed.",
   firstName: "First name",
   lastName: "Last name",
+  displayName: "Display name",
+  displayNameHint: "Shown on your photos, reviews and leaderboard places.",
   username: "Username",
+  /**
+   * Signup derives a handle so nobody has to invent one at the door. This is
+   * where it can be changed, and the sentence says what changing it costs.
+   */
+  usernameHint:
+    "Your profile address. Changing it breaks links to your old one.",
   email: "Email",
   phone: "Phone",
   dangerTitle: "Danger zone",
@@ -251,6 +287,47 @@ export const AUTH_LABELS = {
   noAccount: "Don't have an account?",
   createAccount: "Create account",
   failed: "That username and password did not match.",
+  /**
+   * Signing up. Three fields: a display name, an email and a password.
+   *
+   * It used to ask for a first name, a last name, a phone number, a username
+   * and the password twice, on a page that looked like a database form —
+   * seven boxes before anybody had seen a single dish. Everything that is not
+   * needed to create an account is asked for later, if at all.
+   */
+  registerTitle: "Create your account",
+  registerSubtitle:
+    "Discover dishes, share photos, and earn your spot on the leaderboard.",
+  displayName: "Display name",
+  displayNamePlaceholder: "Luis",
+  email: "Email",
+  emailPlaceholder: "you@example.com",
+  /**
+   * Under the field, not inside it. A placeholder saying the same thing
+   * disappears at the first keystroke — which is the moment somebody starts
+   * counting characters.
+   */
+  passwordHint: (minimum: number) => `At least ${minimum} characters`,
+  /** "Register" is what a database form says. */
+  register: "Create account",
+  registering: "Creating your account…",
+  haveAccount: "Already have an account?",
+  signInLink: "Sign in",
+  /** Above the email form when there is a provider to point at. */
+  continueWith: (provider: string) => `Continue with ${provider}`,
+  orWithEmail: "or continue with email",
+  /**
+   * Small, under the button, and not a checkbox. Somebody who has read neither
+   * document is not made to have read them by being asked to tick a box; the
+   * link is what matters.
+   */
+  legalPrefix: "By creating an account, you agree to the",
+  legalTerms: "Terms",
+  /** Spelled out. "Privacy" alone names a topic rather than a document. */
+  legalPrivacy: "Privacy Policy",
+  legalAnd: "and",
+  legalSuffix: ".",
+  registerFailed: "Could not create that account. Try again.",
   /** The panel beside the form: what the product is, told with food. */
   pitchTitle: "Know what to order.",
   pitchBody: "See the dishes people actually recommend.",

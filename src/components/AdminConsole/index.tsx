@@ -1,7 +1,9 @@
-import { FC, useCallback, useEffect, useState } from "react";
+import { type FC, useCallback, useEffect, useState } from "react";
 import useAdminQueues from "@/customHooks/useAdminQueues";
 import useMenuCorrections from "@/customHooks/useMenuCorrections";
 import CorrectionQueue from "@/components/CorrectionQueue";
+import ClaimReview from "@/components/ClaimReview";
+import ReportReview from "@/components/ReportReview";
 import useAuth from "@/customHooks/useAuth";
 import {
   RestaurantClaimType,
@@ -12,11 +14,15 @@ import { ADMIN_LABELS, CORRECTION_LABELS } from "@/customConstants/labels";
 import { ACCOUNT_TYPE } from "@/customConstants";
 
 /**
- * The two decisions only an admin makes: who owns a restaurant, and whether a
- * reported photo stays.
+ * The decisions only an admin makes: who owns a restaurant, whether a reported
+ * photo stays, and whether a suggested correction is applied.
  *
  * Photo removal lives here and nowhere else, which is what stops an owner
  * quietly deleting the unflattering pictures of their food.
+ *
+ * The count is in every heading and in one line at the top, because the most
+ * common visit to this page ends in "nothing to do" and that answer should
+ * cost one glance rather than three scrolls past three empty sections.
  */
 const AdminConsole: FC = () => {
   const { user } = useAuth();
@@ -30,6 +36,7 @@ const AdminConsole: FC = () => {
     loading: correctionsLoading,
   } = useMenuCorrections();
   const [corrections, setCorrections] = useState<MenuCorrectionType[]>([]);
+  const [loaded, setLoaded] = useState(false);
 
   const isAdmin = String(user?.role_id ?? "") === ACCOUNT_TYPE.admin;
 
@@ -41,6 +48,7 @@ const AdminConsole: FC = () => {
     setClaims(await loadClaims());
     setReports(await loadReports());
     setCorrections(await loadCorrections());
+    setLoaded(true);
   }, [isAdmin, loadClaims, loadReports, loadCorrections]);
 
   useEffect(() => {
@@ -48,27 +56,37 @@ const AdminConsole: FC = () => {
   }, [refresh]);
 
   if (!isAdmin) {
-    return null;
+    // Not nothing. A blank page under a heading reads as a page that failed.
+    return <p className="text-sm text-ink-muted">{ADMIN_LABELS.notForYou}</p>;
   }
 
+  const busy = loading || correctionsLoading;
+  const waiting = corrections.length + claims.length + reports.length;
+
   return (
-    <section className="flex w-full flex-col gap-8 px-4 py-4">
-      <h1 className="text-lg font-semibold text-ink">
-        {ADMIN_LABELS.title}
-      </h1>
+    <section className="flex w-full max-w-3xl flex-col gap-8">
+      <div className="flex flex-col gap-1">
+        <p className="text-sm text-ink-muted">{ADMIN_LABELS.blurb}</p>
+        {loaded && (
+          <p className="text-sm font-medium text-ink">
+            {waiting ? ADMIN_LABELS.waiting(waiting) : ADMIN_LABELS.allClear}
+          </p>
+        )}
+      </div>
 
       {/* Corrections first: they are the cheapest decision here and the one
           that most directly improves what a reader sees. */}
       <div className="flex flex-col gap-3">
         <h2 className="text-sm font-semibold text-ink">
           {CORRECTION_LABELS.queueTitle}
+          {corrections.length > 0 && ` (${corrections.length})`}
         </h2>
         <CorrectionQueue
           corrections={corrections}
-          loading={correctionsLoading}
+          loading={correctionsLoading && !loaded}
           onResolve={async (id, approve) => {
             await resolveCorrection(id, approve);
-            refresh();
+            await refresh();
           }}
         />
       </div>
@@ -76,120 +94,32 @@ const AdminConsole: FC = () => {
       <div className="flex flex-col gap-3">
         <h2 className="text-sm font-semibold text-ink">
           {ADMIN_LABELS.claims}
+          {claims.length > 0 && ` (${claims.length})`}
         </h2>
-
-        {!loading && !claims.length && (
-          <p className="text-sm text-ink-muted">
-            {ADMIN_LABELS.noClaims}
-          </p>
-        )}
-
-        <ul className="flex flex-col gap-2">
-          {claims.map((claim) => (
-            <li
-              key={claim.id}
-              className="flex items-center justify-between gap-3 rounded-card border border-line p-3"
-            >
-              <div className="flex min-w-0 flex-col">
-                <span className="truncate text-sm font-medium text-ink">
-                  {claim.restaurant?.name}
-                </span>
-                <span className="truncate text-xs text-ink-muted">
-                  {claim.verification_method ?? "no verification offered"}
-                  {claim.note ? ` · ${claim.note}` : ""}
-                </span>
-              </div>
-
-              <div className="flex shrink-0 gap-2">
-                <button
-                  type="button"
-                  onClick={async () => {
-                    await decideClaim(claim.id, true);
-                    refresh();
-                  }}
-                  className="rounded-full bg-emerald-600 px-3 py-1 text-xs font-medium text-white"
-                >
-                  {ADMIN_LABELS.approve}
-                </button>
-                <button
-                  type="button"
-                  onClick={async () => {
-                    await decideClaim(claim.id, false);
-                    refresh();
-                  }}
-                  className="rounded-full border border-line px-3 py-1 text-xs font-medium text-ink"
-                >
-                  {ADMIN_LABELS.reject}
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <ClaimReview
+          claims={claims}
+          loading={busy && !loaded}
+          onDecide={async (id, approve) => {
+            await decideClaim(id, approve);
+            await refresh();
+          }}
+        />
       </div>
 
       <div className="flex flex-col gap-3">
         <h2 className="text-sm font-semibold text-ink">
           {ADMIN_LABELS.reports}
+          {reports.length > 0 && ` (${reports.length})`}
         </h2>
-        <p className="text-xs text-ink-muted">
-          {ADMIN_LABELS.removeWarning}
-        </p>
-
-        {!loading && !reports.length && (
-          <p className="text-sm text-ink-muted">
-            {ADMIN_LABELS.noReports}
-          </p>
-        )}
-
-        <ul className="flex flex-col gap-3">
-          {reports.map((report) => (
-            <li
-              key={report.id}
-              className="flex items-center gap-3 rounded-card border border-line p-3"
-            >
-              {report.photo?.url_m && (
-                <img
-                  src={report.photo.url_m}
-                  alt=""
-                  className="h-16 w-16 shrink-0 rounded object-cover"
-                />
-              )}
-
-              <div className="flex min-w-0 flex-1 flex-col">
-                <span className="text-sm font-medium text-ink">
-                  {report.reason}
-                </span>
-                <span className="truncate text-xs text-ink-muted">
-                  {report.photo?.owner ? `@${report.photo.owner}` : "unattributed"}
-                  {report.note ? ` · ${report.note}` : ""}
-                </span>
-              </div>
-
-              <div className="flex shrink-0 gap-2">
-                <button
-                  type="button"
-                  onClick={async () => {
-                    await resolveReport(report.id, false);
-                    refresh();
-                  }}
-                  className="rounded-full border border-line px-3 py-1 text-xs font-medium text-ink"
-                >
-                  {ADMIN_LABELS.keepPhoto}
-                </button>
-                <button
-                  type="button"
-                  onClick={async () => {
-                    await resolveReport(report.id, true);
-                    refresh();
-                  }}
-                  className="rounded-full bg-red-600 px-3 py-1 text-xs font-medium text-white"
-                >
-                  {ADMIN_LABELS.removePhoto}
-                </button>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <p className="text-xs text-ink-muted">{ADMIN_LABELS.removeWarning}</p>
+        <ReportReview
+          reports={reports}
+          loading={busy && !loaded}
+          onResolve={async (id, removePhoto) => {
+            await resolveReport(id, removePhoto);
+            await refresh();
+          }}
+        />
       </div>
     </section>
   );

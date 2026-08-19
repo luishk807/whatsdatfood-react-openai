@@ -5,6 +5,7 @@ import useAuth from "@/customHooks/useAuth";
 import { UserAccountLayoutInterface } from "@/interfaces/users";
 import { ACCOUNT_LABELS } from "@/customConstants/account";
 import { ROUTES } from "@/customConstants/routes";
+import { displayName } from "@/utils/people";
 
 /**
  * The frame around every account page.
@@ -28,8 +29,7 @@ const UserAccountLayout: FC<UserAccountLayoutInterface> = ({
         <p className="text-sm text-ink-muted">
           {ACCOUNT_LABELS.signedInAs}{" "}
           <span className="font-medium text-ink">
-            {[user.first_name, user.last_name].filter(Boolean).join(" ") ||
-              user.username}
+            {displayName(user)}
           </span>
         </p>
       )}

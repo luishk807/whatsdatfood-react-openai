@@ -3,9 +3,8 @@ import { gql } from "@apollo/client";
 export const ADD_USER_MUTATION = gql`
   mutation addUser($payload: CreateUserInput!) {
     addUser(input: $payload) {
-      first_name
-      last_name
-      phone
+      display_name
+      username
       email
     }
   }
@@ -53,6 +52,8 @@ export const DELETE_USER_FAVORITES = gql`
 export const UPDATE_USER_MUTATION = gql`
   mutation updateUser($payload: UpdateUserInput!) {
     updateUser(input: $payload) {
+      display_name
+      username
       first_name
       last_name
       phone
@@ -100,6 +101,7 @@ export const GET_USER_FAVORITES = gql`
         }
         user {
           id
+          display_name
           first_name
           last_name
           email
@@ -115,6 +117,7 @@ export const GET_USER_FAVORITES = gql`
 export const GET_USER_DETAIL = gql`
   query userDetail {
     userDetail {
+      display_name
       first_name
       last_name
       email
@@ -237,6 +240,7 @@ export const GET_RATINGS_BY_REST_ITEM_ID = gql`
           name
         }
         user {
+          display_name
           first_name
           last_name
         }

@@ -5,6 +5,7 @@ import DeleteAccount from "@/components/DeleteAccount";
 import SettingsField from "@/components/SettingsField";
 import { SETTINGS_LABELS } from "@/customConstants/labels";
 import { ACCOUNT } from "@/customConstants/account";
+import { displayName } from "@/utils/people";
 
 /**
  * Settings, as cards rather than one long column of inputs.
@@ -21,9 +22,12 @@ import { ACCOUNT } from "@/customConstants/account";
 const UserSettings: FC = () => {
   const { getUserInfo, updateUser } = useUser();
 
+  // No first and last name. They are still columns — filled from the display
+  // name at signup and read by nothing since every renderer went through
+  // `displayName()` — and four name fields on one card is the clutter the
+  // signup page was just cured of.
   const [form, setForm] = useState({
-    first_name: "",
-    last_name: "",
+    display_name: "",
     username: "",
     email: "",
     phone: "",
@@ -49,8 +53,10 @@ const UserSettings: FC = () => {
       }
 
       setForm({
-        first_name: user.first_name ?? "",
-        last_name: user.last_name ?? "",
+        // Falls back to the name parts for an account created before the
+        // column existed, so its owner sees their own name rather than a
+        // blank box that would wipe it on the next save.
+        display_name: displayName(user),
         username: user.username ?? "",
         email: user.email ?? "",
         phone: user.phone ?? "",
@@ -122,24 +128,20 @@ const UserSettings: FC = () => {
             </p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <SettingsField
-              name="first_name"
-              label={SETTINGS_LABELS.firstName}
-              value={form.first_name}
-              onChange={set("first_name")}
-            />
-            <SettingsField
-              name="last_name"
-              label={SETTINGS_LABELS.lastName}
-              value={form.last_name}
-              onChange={set("last_name")}
-            />
-          </div>
+          <SettingsField
+            name="display_name"
+            label={SETTINGS_LABELS.displayName}
+            hint={SETTINGS_LABELS.displayNameHint}
+            value={form.display_name}
+            onChange={set("display_name")}
+          />
 
+          {/* Where the derived handle gets changed. Signup no longer asks for
+              one, so this is the first time most people see theirs. */}
           <SettingsField
             name="username"
             label={SETTINGS_LABELS.username}
+            hint={SETTINGS_LABELS.usernameHint}
             value={form.username}
             onChange={set("username")}
           />

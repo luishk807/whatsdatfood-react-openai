@@ -16,9 +16,11 @@ const useLogin = () => {
         },
       });
 
-      const resp = _get(data, "login");
-
-      return resp;
+      // The payload, not the payload's truthiness. `{ success: false }` is an
+      // object, so a caller writing `if (await login(...))` was signing
+      // somebody in on a refusal — survivable only because the backend raises
+      // instead of returning one.
+      return Boolean(_get(data, "login.success", false));
     } catch (err) {
       if (err instanceof Error) {
         throw new Error(err.message);

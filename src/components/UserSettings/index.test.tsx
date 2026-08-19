@@ -28,6 +28,7 @@ const show = () =>
 describe("UserSettings", () => {
   beforeEach(() => {
     getUserInfo.mockReset().mockResolvedValue({
+      display_name: "Luis Local",
       first_name: "Luis",
       last_name: "Local",
       username: "luis",
@@ -42,9 +43,11 @@ describe("UserSettings", () => {
 
     // The value, not the label: the field renders immediately and the account
     // arrives afterwards, so waiting for the label proves nothing.
-    await screen.findByDisplayValue("Luis");
+    await screen.findByDisplayValue("Luis Local");
 
-    expect(screen.getByLabelText(SETTINGS_LABELS.firstName)).toHaveValue("Luis");
+    expect(screen.getByLabelText(SETTINGS_LABELS.displayName)).toHaveValue(
+      "Luis Local",
+    );
     expect(screen.getByLabelText(SETTINGS_LABELS.email)).toHaveValue(
       "luis@localhost.test",
     );
@@ -53,7 +56,7 @@ describe("UserSettings", () => {
   it("asks for the account once, not on every render", async () => {
     show();
 
-    await screen.findByDisplayValue("Luis");
+    await screen.findByDisplayValue("Luis Local");
 
     expect(getUserInfo).toHaveBeenCalledTimes(1);
   });
@@ -61,21 +64,21 @@ describe("UserSettings", () => {
   it("saves what was edited", async () => {
     show();
 
-    await screen.findByDisplayValue("Luis");
-    const first = screen.getByLabelText(SETTINGS_LABELS.firstName);
+    await screen.findByDisplayValue("Luis Local");
+    const first = screen.getByLabelText(SETTINGS_LABELS.displayName);
     await userEvent.clear(first);
     await userEvent.type(first, "Luisa");
     await userEvent.click(screen.getByRole("button", { name: SETTINGS_LABELS.save }));
 
     await waitFor(() => expect(updateUser).toHaveBeenCalled());
-    expect(updateUser.mock.calls[0][0]).toMatchObject({ first_name: "Luisa" });
+    expect(updateUser.mock.calls[0][0]).toMatchObject({ display_name: "Luisa" });
   });
 
   it("says so when saving fails, rather than looking saved", async () => {
     updateUser.mockRejectedValue(new Error("nope"));
     show();
 
-    await screen.findByDisplayValue("Luis");
+    await screen.findByDisplayValue("Luis Local");
     await userEvent.click(screen.getByRole("button", { name: SETTINGS_LABELS.save }));
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
@@ -88,7 +91,7 @@ describe("UserSettings", () => {
       // They used to sit open beside name and email, which suggests the
       // password is something you re-enter to save anything else.
       show();
-      await screen.findByDisplayValue("Luis");
+      await screen.findByDisplayValue("Luis Local");
 
       expect(
         screen.queryByLabelText(SETTINGS_LABELS.newPassword),
@@ -100,7 +103,7 @@ describe("UserSettings", () => {
 
     it("opens on request", async () => {
       show();
-      await screen.findByDisplayValue("Luis");
+      await screen.findByDisplayValue("Luis Local");
       await userEvent.click(
         screen.getByRole("button", { name: SETTINGS_LABELS.changePassword }),
       );
@@ -112,7 +115,7 @@ describe("UserSettings", () => {
 
     it("refuses two that do not match, without calling the server", async () => {
       show();
-      await screen.findByDisplayValue("Luis");
+      await screen.findByDisplayValue("Luis Local");
       await userEvent.click(
         screen.getByRole("button", { name: SETTINGS_LABELS.changePassword }),
       );
@@ -139,7 +142,7 @@ describe("UserSettings", () => {
       // The API accepts any password at all, so this is the only place the
       // rule exists.
       show();
-      await screen.findByDisplayValue("Luis");
+      await screen.findByDisplayValue("Luis Local");
       await userEvent.click(
         screen.getByRole("button", { name: SETTINGS_LABELS.changePassword }),
       );
@@ -165,7 +168,7 @@ describe("UserSettings", () => {
 
     it("sends only the password, never the whole profile", async () => {
       show();
-      await screen.findByDisplayValue("Luis");
+      await screen.findByDisplayValue("Luis Local");
       await userEvent.click(
         screen.getByRole("button", { name: SETTINGS_LABELS.changePassword }),
       );
@@ -188,7 +191,7 @@ describe("UserSettings", () => {
 
     it("closes and confirms once it is changed", async () => {
       show();
-      await screen.findByDisplayValue("Luis");
+      await screen.findByDisplayValue("Luis Local");
       await userEvent.click(
         screen.getByRole("button", { name: SETTINGS_LABELS.changePassword }),
       );

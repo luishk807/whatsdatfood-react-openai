@@ -13,6 +13,7 @@ const SettingsField: FC<SettingsFieldInterface> = ({
   label,
   value,
   type = "text",
+  hint,
   onChange,
 }) => (
   <div className="flex flex-col gap-1.5">
@@ -25,9 +26,15 @@ const SettingsField: FC<SettingsFieldInterface> = ({
       type={type}
       value={value}
       autoComplete={type === "password" ? "new-password" : name}
+      aria-describedby={hint ? `${name}-hint` : undefined}
       onChange={(event) => onChange(event.target.value)}
       className="w-full rounded-card border border-line bg-surface-raised px-3 py-2 text-base text-ink"
     />
+    {hint && (
+      <p id={`${name}-hint`} className="text-xs text-ink-muted">
+        {hint}
+      </p>
+    )}
   </div>
 );
 

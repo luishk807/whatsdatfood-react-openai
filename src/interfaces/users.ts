@@ -87,16 +87,20 @@ export interface UserRoleType {
   name: string;
 }
 
+/**
+ * What signing up sends. Three fields — the handle is derived from the display
+ * name on the server, and nothing else was ever used.
+ */
 export interface CreateUserInputType {
-  first_name: string;
-  last_name: string;
+  display_name: string;
   email: string;
   password: string;
-  phone: string;
 }
 
 export interface UserType {
   id: number;
+  /** Absent on every account created before the column existed. */
+  display_name?: string;
   first_name: string;
   last_name: string;
   password: string;
@@ -164,6 +168,8 @@ export interface SettingsFieldInterface {
   label: string;
   value: string;
   type?: string;
+  /** What this field costs or means, said under it rather than in a tooltip. */
+  hint?: string;
   onChange: (value: string) => void;
 }
 

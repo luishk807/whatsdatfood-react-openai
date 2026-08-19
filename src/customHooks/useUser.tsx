@@ -5,6 +5,7 @@ import {
   UPDATE_USER_MUTATION,
 } from "@/graphql/queries/users";
 import { _get } from "@/utils";
+import { CreateUserInputType } from "@/interfaces/users";
 import useAuth from "./useAuth";
 
 const useUser = () => {
@@ -34,7 +35,7 @@ const useUser = () => {
     fetchPolicy: "network-only",
   });
 
-  const createUser = async (payload: any) => {
+  const createUser = async (payload: CreateUserInputType) => {
     try {
       const resp = await createUserGraphql({
         variables: {

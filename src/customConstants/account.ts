@@ -44,6 +44,18 @@ export const ACCOUNT_GROUPS = [
     id: "account",
     items: [{ label: "Settings", route: ROUTES.settings, icon: "gear" }],
   },
+  {
+    /**
+     * Admins only, and the reason this group exists at all: `/admin` was
+     * reachable by typing the URL and by nothing else, so the queues that
+     * decide whether a reported photo stays had no way in from the app. The
+     * one person who can work them is the one person who was never shown the
+     * door.
+     */
+    id: "admin",
+    adminOnly: true,
+    items: [{ label: "Review queue", route: ROUTES.admin, icon: "gear" }],
+  },
 ] as const;
 
 export const ACCOUNT_LABELS = {
@@ -56,6 +68,13 @@ export const ACCOUNT_LABELS = {
 export type AccountIcon = (typeof ACCOUNT_GROUPS)[number]["items"][number]["icon"];
 
 export const ACCOUNT = {
-  /** Ours, not the server's: the API accepts any password at all. */
+  /**
+   * Said under the field before anything is typed, so nobody meets this rule
+   * for the first time as a rejection.
+   *
+   * The server enforces it too — `MIN_PASSWORD_LENGTH` in
+   * `app/services/users.py`, which is what actually decides. Keep the two in
+   * step; this one only saves a round trip.
+   */
   MIN_PASSWORD: 8,
 } as const;

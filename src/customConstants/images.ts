@@ -90,3 +90,16 @@ export const REPORT_REASONS = [
   { value: "spam", label: "Spam" },
   { value: "other", label: "Something else" },
 ] as const;
+
+/**
+ * The words the reporter picked, not the value stored beside them.
+ *
+ * The review queue printed `wrong_dish` — a column value, shown to the one
+ * person who has to weigh it against somebody's photograph. An unrecognised
+ * value is passed through rather than swallowed: a reason the server knows
+ * and this list does not is worth seeing, even raw.
+ */
+export const reportReasonLabel = (value?: string | null): string =>
+  REPORT_REASONS.find((reason) => reason.value === value)?.label ??
+  value ??
+  "";

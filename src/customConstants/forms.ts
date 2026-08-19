@@ -1,63 +1,9 @@
 import { FIELD_TYPES } from "@/customConstants";
-export const CREATE_ACCOUNT = [
-  {
-    name: "first_name",
-    label: "First Name",
-    isRequired: true,
-    type: FIELD_TYPES.textfield,
-  },
-  {
-    name: "last_name",
-    label: "Last Name",
-    isRequired: true,
-    type: FIELD_TYPES.textfield,
-  },
-  {
-    name: "email",
-    label: "Email",
-    isRequired: true,
-    type: FIELD_TYPES.email,
-  },
-  {
-    name: "phone",
-    label: "Phone",
-    type: FIELD_TYPES.textfield,
-  },
-  {
-    name: "username",
-    label: "Username",
-    isRequired: true,
-    type: FIELD_TYPES.username,
-  },
-  {
-    name: "password",
-    label: "Password",
-    isRequired: true,
-    type: FIELD_TYPES.password,
-  },
-  {
-    name: "confirm_password",
-    label: "Confirm Password",
-    isRequired: true,
-    type: FIELD_TYPES.password,
-  },
-];
 
-export const SIGN_IN_FIELDS = [
-  {
-    name: "username",
-    label: "Username",
-    isRequired: true,
-    type: FIELD_TYPES.textfield,
-  },
-  {
-    name: "password",
-    label: "Password",
-    isRequired: true,
-    type: FIELD_TYPES.password,
-  },
-];
-
+// CREATE_ACCOUNT and SIGN_IN_FIELDS used to live here. Both auth pages are
+// written out now rather than generated from a field list: they are two forms
+// in the whole app, and generating them cost a shared password box, a shared
+// reveal control and a shared idea of what a labelled input looks like.
 export const CREATE_RATING = [
   {
     name: "rating",

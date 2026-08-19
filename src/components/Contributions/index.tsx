@@ -4,6 +4,7 @@ import FoodCredHistory from "@/components/FoodCredHistory";
 import BadgeGrid from "@/components/BadgeGrid";
 import useFoodCred from "@/customHooks/useFoodCred";
 import useAuth from "@/customHooks/useAuth";
+import { displayName } from "@/utils/people";
 import { FOOD_CRED_LABELS } from "@/customConstants/reputation";
 
 /**
@@ -18,10 +19,7 @@ const Contributions: FC = () => {
   const { stats, statsLoading, events, historyLoading, unavailable } =
     useFoodCred();
 
-  const name =
-    [user?.first_name, user?.last_name].filter(Boolean).join(" ") ||
-    user?.username ||
-    "";
+  const name = displayName(user);
 
   if (unavailable) {
     return (

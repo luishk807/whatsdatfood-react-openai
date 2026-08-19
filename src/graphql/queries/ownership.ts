@@ -123,6 +123,9 @@ export const REPORTED_PHOTOS = gql`
         reason
         note
         createdAt
+        dish_name
+        restaurant_name
+        restaurant_slug
         photo {
           id
           url_m

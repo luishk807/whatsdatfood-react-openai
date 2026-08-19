@@ -1,3 +1,5 @@
+import { QueueDecision } from "@/interfaces/ownership";
+
 export interface MenuCorrectionType {
   id: string;
   dish_id: string;
@@ -23,5 +25,5 @@ export interface SuggestCorrectionInterface {
 export interface CorrectionQueueInterface {
   corrections: MenuCorrectionType[];
   loading?: boolean;
-  onResolve: (id: string, approve: boolean) => void;
+  onResolve: QueueDecision;
 }

@@ -129,7 +129,7 @@ minute. Design for the phone and let desktop be the override, never the reverse.
 - Vote controls sit in the lower third, within thumb reach.
 - Detail opens as a bottom sheet, not a route change.
 - Dark mode matters; restaurants are dim.
-- Target a main bundle under 250 KiB (currently ~516 KiB / 528,727 bytes).
+- Target a main bundle under 250 KiB (currently ~524 KiB / 536,447 bytes).
   Deleting unreferenced components does not move this number — webpack only
   bundles what the entry graph reaches, so dead code costs repo clarity, not
   bytes. Removing MUI and emotion took 90,364 bytes off; the remaining gap is
@@ -341,6 +341,39 @@ approving a change you cannot see is not a decision. "was empty" is called out
 rather than rendered blank: filling a hole and overwriting a fact are different
 things to agree to.
 
+## Signing up, and what a person is called
+
+Registration asks for **three things: a display name, an email and a
+password.** It used to ask for seven — first name, last name, email, phone,
+username, password, password again — before anybody had seen a dish, and used
+two of them.
+
+- **The handle is derived server-side** from the display name
+  (`app/helpers/usernames.py`), deduped, and changeable later in settings.
+  `/contributor/:username` is a real URL so there has to be one, but nobody
+  should have to invent it at the door.
+- **Signing up signs you in.** `createUser` then `login(email, password)`, then
+  home. Handing somebody back to a login form to retype the password they chose
+  four seconds ago is a step that exists only because the two mutations are
+  separate.
+- **An email is a valid identifier on sign-in.** It has to be: the handle was
+  derived and a new account holder has never seen theirs. `LoginService`
+  matched a username only, for the whole life of a field labelled "Email or
+  username".
+- **Server refusals are shown verbatim** — "That email already has an account",
+  "Password must be at least 8 characters". Each explains a rule; "Could not
+  create that account" explains none of them.
+- **`AUTH_PROVIDERS` is the slot for "Continue with Google".** It is empty, so
+  the buttons and the "or continue with email" divider do not render. The
+  backend has no OAuth endpoint, and a dead button at the front door is worse
+  than an absent one — the same reason there is no "Forgot password?" link.
+  Filling the array is all the frontend needs.
+- **`displayName()` in `utils/people.ts` is the only place a name is worked
+  out** — display name, then the legacy name parts, then the handle. Three
+  components each had their own copy of `first_name last_name`.
+- **`AuthField` is shared by both auth pages**, at 48px. They were built months
+  apart and looked it.
+
 ## Photo uploads
 
 The empty photo tile *is* the upload funnel: it appears on exactly the dishes
@@ -367,6 +400,36 @@ the person who can take the photo is sitting at the table.
 - **A diner's photo is the hero.** `getDishPhoto` prefers a community photo over
   a stock one rather than taking whichever came first, which had the search
   result keeping the slot because it was stored earlier.
+
+## The review queue
+
+`/admin` is where a claim is decided, a reported photo is kept or removed, and
+a suggested correction is applied. It is the one place photo removal exists,
+which is what stops an owner deleting the unflattering pictures of their food.
+
+- **It is on the account menu, for admins only.** `ACCOUNT_GROUPS` carries an
+  `adminOnly` group. The page was reachable by typing the URL and by nothing
+  else, so the one person who can work the queues was the one person never
+  shown the door. Hiding a link is not access control — the server refuses the
+  queries regardless.
+- **Counts in every heading and one line at the top.** The common visit ends in
+  "nothing to do", and that should cost a glance rather than three scrolls past
+  three empty sections.
+- **`useQueueDecision` owns the row state** — which row is busy, which row
+  failed. All three queues used to fire and forget, so a click did nothing
+  visible until the page reloaded behind it and a failed decision looked
+  exactly like a successful one.
+- **Removing a photo asks twice.** `QueueRowActions destructive`. Keeping is one
+  click, because most reports are wrong and nothing happening is the common
+  outcome.
+- **A reported photo names its dish.** "Is this that dish?" is the question, and
+  the queue used to show everything except the answer — picture, reason,
+  uploader. `PhotoReport` carries `dish_name`/`restaurant_name`/slug, resolved
+  one query per page rather than one per row.
+- **Reasons are rendered in words.** `reportReasonLabel`; it printed
+  `wrong_dish`.
+- **A non-admin is told, not shown a blank.** It returned `null`, which under a
+  heading reading "Review" looks like a page that failed to load.
 
 ## Dependencies
 

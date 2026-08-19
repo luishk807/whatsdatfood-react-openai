@@ -2,7 +2,15 @@ import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import AccountNav from "@/components/AccountNav";
 import { ACCOUNT_GROUPS, ACCOUNT_LABELS } from "@/customConstants/account";
+import { ACCOUNT_TYPE } from "@/customConstants";
 import { ROUTES } from "@/customConstants/routes";
+
+const session: { role_id?: string } = {};
+
+jest.mock("@/customHooks/useAuth", () => ({
+  __esModule: true,
+  default: () => ({ user: { role_id: session.role_id } }),
+}));
 
 const show = (
   variant: "sidebar" | "list" = "sidebar",
@@ -14,10 +22,22 @@ const show = (
     </MemoryRouter>,
   );
 
-const everyItem: { label: string; route: string }[] = ACCOUNT_GROUPS.flatMap(
-  (group) =>
+const itemsIn = (groups: typeof ACCOUNT_GROUPS[number][]) =>
+  groups.flatMap((group) =>
     group.items.map((item) => ({ label: item.label, route: item.route })),
+  );
+
+const everyItem = itemsIn(
+  ACCOUNT_GROUPS.filter((group) => !("adminOnly" in group && group.adminOnly)),
 );
+
+const adminItems = itemsIn(
+  ACCOUNT_GROUPS.filter((group) => "adminOnly" in group && group.adminOnly),
+);
+
+beforeEach(() => {
+  session.role_id = ACCOUNT_TYPE.user;
+});
 
 describe("AccountNav", () => {
   it.each(["sidebar", "list"] as const)(
@@ -65,6 +85,40 @@ describe("AccountNav", () => {
     expect(
       screen.getByRole("link", { name: ACCOUNT_LABELS.logOut }),
     ).toHaveAttribute("href", ROUTES.logout);
+  });
+
+  describe("the admin group", () => {
+    /**
+     * `/admin` was reachable by typing the URL and by nothing else, so the
+     * queues that decide whether a reported photo stays had no way in from
+     * the app at all.
+     */
+    it("is offered to an admin", () => {
+      session.role_id = ACCOUNT_TYPE.admin;
+      show();
+
+      adminItems.forEach((item) =>
+        expect(
+          screen.getByRole("link", { name: new RegExp(item.label, "i") }),
+        ).toHaveAttribute("href", item.route),
+      );
+    });
+
+    it.each([ACCOUNT_TYPE.user, ACCOUNT_TYPE.guest, undefined])(
+      "is not advertised to role %s",
+      (role) => {
+        // Not access control — the server refuses the queries regardless.
+        // This is not offering somebody a door that will not open.
+        session.role_id = role;
+        show();
+
+        adminItems.forEach((item) =>
+          expect(
+            screen.queryByRole("link", { name: new RegExp(item.label, "i") }),
+          ).toBeNull(),
+        );
+      },
+    );
   });
 
   it("names itself, since the page holds more than one nav", () => {

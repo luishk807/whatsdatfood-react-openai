@@ -1,7 +1,8 @@
 import { type FC } from "react";
-import { RatingItemInt } from "@/interfaces/users";
+import { RatingItemInt, UserType } from "@/interfaces/users";
 import RatingCustom from "@/components/Rating";
 import { _get } from "@/utils";
+import { displayName } from "@/utils/people";
 import { getDate } from "@/utils/time";
 
 /**
@@ -11,10 +12,8 @@ import { getDate } from "@/utils/time";
  * a paragraph - the eye loses the start of each line.
  */
 const RatingItem: FC<RatingItemInt> = ({ data }) => {
-  const user = _get<Record<string, unknown> | null>(data, "user", null);
-  const fullName = user
-    ? `${_get(user, "first_name", "")} ${_get(user, "last_name", "")}`.trim()
-    : null;
+  const user = _get<UserType | null>(data, "user", null);
+  const fullName = displayName(user) || null;
 
   const { rating: score, title, comment, updatedAt } = data;
 

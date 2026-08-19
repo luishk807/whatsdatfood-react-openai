@@ -46,7 +46,7 @@ const signIn = async (user = "ada", pass = "hunter2") => {
 describe("SignInComponent", () => {
   beforeEach(() => {
     state.loading = false;
-    login.mockReset().mockResolvedValue({ success: true });
+    login.mockReset().mockResolvedValue(true);
     checkUser.mockReset();
     navigate.mockReset();
   });

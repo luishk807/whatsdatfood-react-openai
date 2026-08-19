@@ -2,7 +2,9 @@ import { type FC } from "react";
 import { Link, useLocation } from "react-router-dom";
 import clsx from "clsx";
 import { AccountRowIcon } from "@/components/AccountButton/icons";
+import useAuth from "@/customHooks/useAuth";
 import { ACCOUNT_GROUPS, ACCOUNT_LABELS } from "@/customConstants/account";
+import { ACCOUNT_TYPE } from "@/customConstants";
 import { ROUTES } from "@/customConstants/routes";
 import { AccountNavInterface } from "@/interfaces/users";
 
@@ -17,15 +19,28 @@ import { AccountNavInterface } from "@/interfaces/users";
  * Both read from `ACCOUNT_GROUPS`, which already existed for the header
  * dropdown and was never wired in here: the sidebar had its own flat copy of
  * the same routes with worse words on them ("Setting", "Manage").
+ *
+ * A group marked `adminOnly` is dropped for everybody else. That is a matter
+ * of not advertising a page somebody cannot use — the server refuses the
+ * queries either way, and the console says so rather than rendering blank.
  */
 const AccountNav: FC<AccountNavInterface> = ({ variant }) => {
   const { pathname } = useLocation();
+  const { user } = useAuth();
   const isList = variant === "list";
+
+  // The role, not a prop: this menu renders from two places and a flag threaded
+  // through both is a flag one of them eventually stops passing. The route is
+  // guarded on the server regardless — hiding a link is not access control.
+  const isAdmin = String(user?.role_id ?? "") === ACCOUNT_TYPE.admin;
+  const groups = ACCOUNT_GROUPS.filter(
+    (group) => !("adminOnly" in group && group.adminOnly) || isAdmin,
+  );
 
   return (
     <nav aria-label={ACCOUNT_LABELS.open} className="w-full">
       <ul className={clsx("flex flex-col", isList ? "gap-px" : "gap-1")}>
-        {ACCOUNT_GROUPS.map((group, index) => (
+        {groups.map((group, index) => (
           <li key={group.id}>
             {/* A rule between groups rather than a heading. The groups say what
                 belongs together; naming them adds words nobody reads. */}
