@@ -4,11 +4,13 @@ import PhotoWall from "@/components/PhotoWall";
 import CuisineStrip from "@/components/CuisineStrip";
 import LocationCue from "@/components/LocationCue";
 import TrendingStrip from "@/components/TrendingStrip";
+import TrendingRestaurants from "@/components/TrendingRestaurants";
 import ContributorIntro from "@/components/ContributorIntro";
 import useRecentDishPhotos from "@/customHooks/useRecentDishPhotos";
 import useCuisineTiles from "@/customHooks/useCuisineTiles";
 import useDiscoveryLocation from "@/customHooks/useDiscoveryLocation";
 import { useNearbyDiscovery } from "@/customHooks/useNearby";
+import useTrendingNearby from "@/customHooks/useTrendingNearby";
 
 const LazyMainSearch = lazy(() => import("@/components/MainSearchBar"));
 
@@ -38,6 +40,7 @@ const Homepage: FC = () => {
   const { tiles, loading: tilesLoading } = useCuisineTiles();
   const { location, nameArea } = useDiscoveryLocation();
   const { discovery, loading: discoveryLoading } = useNearbyDiscovery(location);
+  const { trending, loading: trendingLoading } = useTrendingNearby(location);
 
   // The server names the area from the nearest restaurant it knows; the
   // browser only ever had coordinates. Nothing here reverse-geocodes anybody
@@ -47,6 +50,12 @@ const Homepage: FC = () => {
       nameArea(discovery.area_label);
     }
   }, [discovery?.area_label, nameArea]);
+
+  /** Both discovery sections send the reader to the same control. */
+  const scrollToLocationCue = () =>
+    document
+      .getElementById("discovery-place-cue")
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 pb-16 pt-8 sm:pt-14">
@@ -76,15 +85,21 @@ const Homepage: FC = () => {
           never ran and the button did nothing. */}
       <LocationCue />
 
+      {/* Places to go, above the dish strip. Somebody who has not decided
+          where to eat cannot use a row of dishes yet, and this is the
+          section that answers first. */}
+      <TrendingRestaurants
+        trending={trending}
+        loading={trendingLoading}
+        hasLocation={Boolean(location)}
+        onChangeLocation={scrollToLocationCue}
+      />
+
       <TrendingStrip
         discovery={discovery}
         loading={discoveryLoading}
         hasLocation={Boolean(location)}
-        onChangeLocation={() => {
-          document
-            .getElementById("discovery-place-cue")
-            ?.scrollIntoView({ behavior: "smooth", block: "center" });
-        }}
+        onChangeLocation={scrollToLocationCue}
       />
 
       <PhotoWall photos={photos} loading={loading} />

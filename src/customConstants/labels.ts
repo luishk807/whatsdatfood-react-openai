@@ -656,6 +656,44 @@ export const MANAGE_MENU_LABELS = {
   emptyHelp: "Add the first one, or wait for the menu to be read automatically.",
 } as const;
 
+/**
+ * The discovery section on the front door.
+ *
+ * Named apart from `TRENDING_LABELS`, which belongs to the dish strip. Two
+ * sections, two vocabularies, and confusing them is how a heading ends up
+ * claiming something the data behind it does not support.
+ *
+ * Two vocabularies for two modes, and the server picks. "Trending" and "hot"
+ * are claims about what other people have been doing and need the activity to
+ * back them; "popular" and "worth a look" claim only that we know the place.
+ * Using the first set over three page views is the one thing this section
+ * must never do.
+ */
+export const DISCOVERY_LABELS = {
+  trendingNear: (area: string) => `Trending near ${area}`,
+  trendingNearYou: "Trending near you",
+  thisMonth: "Where people have been looking this month",
+
+  popularNear: (area: string) => `Discover near ${area}`,
+  popularNearYou: "Discover near you",
+  discoverBlurb: "Places nearby worth knowing about",
+
+  hotPick: "Hot near you",
+  worthALook: "Worth a look",
+  /**
+   * Says why, and stays true when the number is small. "Popular with diners
+   * this month" over two people would be the same fabrication in a sentence.
+   */
+  whyHot: (contributors: number) =>
+    contributors > 2
+      ? "People have been photographing and voting on this one"
+      : "Getting attention this month",
+  whyLook: "Near you, and we have a menu for it",
+  noPhotoYet: "No photos of this one yet",
+
+  seeAllNearby: "See all nearby",
+} as const;
+
 export const MAP_LABELS = {
   label: "Map of nearby restaurants",
   searchThisArea: "Search this area",

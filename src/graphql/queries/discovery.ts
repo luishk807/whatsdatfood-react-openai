@@ -37,3 +37,74 @@ export const RESOLVE_PLACE = gql`
     }
   }
 `;
+
+/**
+ * Restaurants worth putting on the front door.
+ *
+ * `mode` comes back with the rows rather than being inferred from how many
+ * arrived: whether this may be called "trending" is a rule about the data and
+ * the server owns it.
+ */
+export const TRENDING_NEARBY = gql`
+  query trendingNearby($latitude: Float!, $longitude: Float!, $limit: Int) {
+    trendingNearby(latitude: $latitude, longitude: $longitude, limit: $limit) {
+      mode
+      area_label
+      hot_pick {
+        id
+        slug
+        name
+        neighborhood
+        cuisine
+        price_range
+        distance_km
+        top_dish_name
+        top_dish_photo_url
+        photo_count
+        contributor_count
+      }
+      restaurants {
+        id
+        slug
+        name
+        neighborhood
+        cuisine
+        price_range
+        distance_km
+        top_dish_name
+        top_dish_photo_url
+        photo_count
+        contributor_count
+      }
+    }
+  }
+`;
+
+export const MY_DISCOVERY_AREA = gql`
+  query myDiscoveryArea {
+    myDiscoveryArea {
+      label
+      city
+      latitude
+      longitude
+      source
+    }
+  }
+`;
+
+export const SAVE_DISCOVERY_AREA = gql`
+  mutation saveDiscoveryArea($input: SaveDiscoveryAreaInput!) {
+    saveDiscoveryArea(input: $input) {
+      label
+      latitude
+      longitude
+      source
+    }
+  }
+`;
+
+export const FORGET_DISCOVERY_AREA = gql`
+  mutation forgetDiscoveryArea {
+    forgetDiscoveryArea
+  }
+`;

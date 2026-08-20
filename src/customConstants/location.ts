@@ -52,6 +52,8 @@ export const NEARBY = {
   DEFAULT_RADIUS_KM: 5,
   /** The strip on the front door. A screenful, not a catalogue. */
   TRENDING_LIMIT: 10,
+  /** Six restaurants: two rows of three on a desktop, a swipe on a phone. */
+  TRENDING_RESTAURANTS: 6,
   MAP_LIMIT: 40,
   // There is deliberately no fallback centre. A map opened on a guessed
   // location shows real restaurants at real distances from somewhere the

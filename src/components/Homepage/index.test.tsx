@@ -70,6 +70,15 @@ jest.mock("@/customHooks/useDiscoveryLocation", () => ({
 
 const discovery = { discovery: null as unknown, loading: false, unavailable: false };
 
+/** Same reason as the rest: it reaches Apollo, and this suite is about what
+ *  the front door puts where. The section has its own tests. */
+const trending = { trending: null as unknown, loading: false, unavailable: false };
+
+jest.mock("@/customHooks/useTrendingNearby", () => ({
+  __esModule: true,
+  default: () => trending,
+}));
+
 jest.mock("@/customHooks/useNearby", () => ({
   __esModule: true,
   useNearbyDiscovery: () => discovery,
