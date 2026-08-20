@@ -402,6 +402,39 @@ people who can fix it get deliberately different powers.
   previous value, so the existing branch would have read every one as
   identifying the dish. Dietary fields are still absent from the whole list.
 
+## Menus are demand-driven, and must stay that way
+
+**Never bulk-generate menus. Ask first, every time.** 6,783 of the 6,786
+restaurants have none, and a menu costs an AI call — so a populate job is the
+one thing here that turns a rounding error into a real bill with nobody
+watching. This holds after the OpenAI rate limit is resolved; the limit was
+never the reason.
+
+There is exactly one way a menu comes into existence: somebody opens a
+restaurant page and `aiRestaurantBySlug` generates it. One call site, and
+`tests/test_menus_stay_demand_driven.py` fails if a second appears — the
+guarantee is structural rather than written in the code, so a single new
+caller would remove it silently.
+
+Four things bound the damage if that guard is ever wrong:
+
+| Guard | Value |
+|---|---|
+| New menus per day | `MAX_NEW_RESTAURANT_AI_GENERATIONS_PER_DAY` = 30 |
+| OpenAI spend per day | `OPENAI_DAILY_BUDGET_USD` = 2.00 |
+| Kill switch | `AI_ENRICHMENT_ENABLED=false`, no deploy needed |
+| Per restaurant | Enrichment gate — once, ever, with backoff on failure |
+
+At 30 a day the whole catalogue takes most of a year, which is what makes the
+cap meaningful rather than decorative. A test asserts that arithmetic.
+
+`scripts/compare_extraction_models.py` is the single script allowed to reach
+the extractor, and only because it takes three restaurants by default, writes
+nothing, and re-runs restaurants already extracted. A test asserts all three.
+
+If bulk population is ever wanted, it needs a batch size, a spend ceiling and
+a person who said yes — not a loop over `restaurants`.
+
 ## The catalogue is frozen, deliberately
 
 Production holds ~6,786 restaurants — Manhattan, Flushing and part of Brooklyn
