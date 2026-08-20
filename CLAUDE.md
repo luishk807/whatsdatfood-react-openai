@@ -402,6 +402,27 @@ people who can fix it get deliberately different powers.
   previous value, so the existing branch would have read every one as
   identifying the dish. Dietary fields are still absent from the whole list.
 
+## The catalogue is frozen, deliberately
+
+Production holds ~6,786 restaurants — Manhattan, Flushing and part of Brooklyn
+— imported from OpenStreetMap. **Do not import more without asking**, and
+expect the answer to be "once menus work".
+
+6,783 of those 6,786 have no menu. Widening the map makes the catalogue bigger
+and the emptiness bigger with it, and a directory of thirty thousand
+restaurants with no food in it is a worse product than six thousand with the
+same problem. The import fixed discovery — nearby returned zero from anywhere
+before it — and it does nothing at all for "what should I order here", which
+is what the product is for.
+
+Nothing resumes it on its own: no cron exists, the deploy command does not
+touch it, and `scripts/import_restaurants.py` exits with its help text unless
+a person names an area. That is the design, not an accident.
+
+**Nothing already imported may be deleted or rewritten either.** The rows
+carry `osm_id`, so a re-run updates rather than duplicates, and `fill_blanks`
+only ever writes where a column is empty.
+
 ## Trending, and the word it will not use
 
 `RestaurantTrendingService` and `TrendingRestaurants`, above the dish strip —
