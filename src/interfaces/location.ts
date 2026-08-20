@@ -62,6 +62,16 @@ export interface NearbyDiscoveryType {
 export interface LocationCueInterface {
   /** Carried through to the results, so "Chinese" plus a location is one tap. */
   cuisine?: string;
+  /**
+   * Whether a new location should send the reader to `/nearby`.
+   *
+   * True where this is a way *in* — the front door's own prompt. False where
+   * it is a way to *change* the location of sections already on screen, as on
+   * the home page: navigating away there meant the sections never visibly
+   * updated, and somebody who had just moved cities read the old area name
+   * again when they came back.
+   */
+  navigateOnFix?: boolean;
 }
 
 export interface TrendingStripInterface {

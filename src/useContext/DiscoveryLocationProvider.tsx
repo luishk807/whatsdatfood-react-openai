@@ -2,6 +2,7 @@ import {
   createContext,
   type ReactNode,
   useCallback,
+  useEffect,
   useMemo,
   useState,
 } from "react";
@@ -103,6 +104,36 @@ export const DiscoveryLocationProvider = ({
     setDeviceLabel("");
     request();
   }, [request]);
+
+  // A granted fix does not merely outrank the stored choice — it replaces it.
+  //
+  // Leaving "Flushing" on disk meant somebody who travelled to Manhattan,
+  // tapped the button and got a correct fix would be back in Flushing on
+  // their next visit, with nothing on screen to explain why. Priority alone
+  // is not enough when the stale value survives the session.
+  //
+  // Only on success. A refusal keeps whatever they chose, because losing a
+  // location somebody set by tapping a button they were denied is the worst
+  // of both.
+  useEffect(() => {
+    if (preferred !== LOCATION_SOURCE.device || !coordinates) {
+      return;
+    }
+
+    setChosen((current) => {
+      if (current === null) {
+        return current;
+      }
+
+      try {
+        window.localStorage.removeItem(LOCATION_STORAGE_KEY);
+      } catch {
+        // As everywhere else here: remembering is a convenience.
+      }
+
+      return null;
+    });
+  }, [preferred, coordinates]);
 
   const choose = useCallback((place: ResolvedLocationType) => {
     setPreferred(LOCATION_SOURCE.chosen);

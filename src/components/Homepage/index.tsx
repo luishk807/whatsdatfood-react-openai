@@ -83,7 +83,11 @@ const Homepage: FC = () => {
           location was known, which unmounted the component in the same render
           the fix arrived in — so the effect that navigates to the results
           never ran and the button did nothing. */}
-      <LocationCue />
+      {/* Not a way in — a way to change what the sections below are showing.
+          Navigating to /nearby on a fix meant somebody who had just moved
+          cities was bounced off the page before it could update, came back,
+          and read the old area name again. */}
+      <LocationCue navigateOnFix={false} />
 
       {/* Places to go, above the dish strip. Somebody who has not decided
           where to eat cannot use a row of dishes yet, and this is the

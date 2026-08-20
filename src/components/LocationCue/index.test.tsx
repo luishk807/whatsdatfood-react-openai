@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { MockedProvider } from "@apollo/client/testing";
 import LocationCue from "@/components/LocationCue";
 import { DiscoveryLocationProvider } from "@/useContext/DiscoveryLocationProvider";
@@ -114,5 +114,61 @@ describe("LocationCue", () => {
     expect(
       screen.getByRole("button", { name: LABELS.enterLocation }),
     ).toBeInTheDocument();
+  });
+});
+
+describe("changing the location of the page you are on", () => {
+  it("does not navigate away when it is a change control", async () => {
+    // The reported bug. On the home page this button changes what the
+    // sections below are showing; navigating to /nearby bounced the reader
+    // off the page before it could update, and coming back they read the old
+    // area name again and concluded the button had done nothing.
+    storeFlushing();
+    getCurrentPosition.mockImplementation((onSuccess) =>
+      onSuccess({ coords: { latitude: 40.7529, longitude: -73.999 } }),
+    );
+
+    render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <MemoryRouter initialEntries={["/"]}>
+          <DiscoveryLocationProvider>
+            <LocationCue navigateOnFix={false} />
+            <Routes>
+              <Route path="/" element={<p>home</p>} />
+              <Route path="/nearby" element={<p>nearby</p>} />
+            </Routes>
+          </DiscoveryLocationProvider>
+        </MemoryRouter>
+      </MockedProvider>,
+    );
+
+    await tapUseMyLocation();
+
+    expect(await screen.findByText("home")).toBeInTheDocument();
+    expect(screen.queryByText("nearby")).not.toBeInTheDocument();
+  });
+
+  it("still navigates where it is a way in", async () => {
+    getCurrentPosition.mockImplementation((onSuccess) =>
+      onSuccess({ coords: { latitude: 40.7529, longitude: -73.999 } }),
+    );
+
+    render(
+      <MockedProvider mocks={[]} addTypename={false}>
+        <MemoryRouter initialEntries={["/"]}>
+          <DiscoveryLocationProvider>
+            <LocationCue />
+            <Routes>
+              <Route path="/" element={<p>home</p>} />
+              <Route path="/nearby" element={<p>nearby</p>} />
+            </Routes>
+          </DiscoveryLocationProvider>
+        </MemoryRouter>
+      </MockedProvider>,
+    );
+
+    await tapUseMyLocation();
+
+    expect(await screen.findByText("nearby")).toBeInTheDocument();
   });
 });

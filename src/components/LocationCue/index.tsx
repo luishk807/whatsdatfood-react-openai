@@ -26,7 +26,7 @@ import { LocationCueInterface } from "@/interfaces/location";
  * quietly stops is the version that gets reported as "the button does
  * nothing".
  */
-const LocationCue: FC<LocationCueInterface> = ({ cuisine }) => {
+const LocationCue: FC<LocationCueInterface> = ({ cuisine, navigateOnFix = true }) => {
   const { location, status, request, choose } = useDiscoveryLocation();
   const { resolve, loading: resolving } = useResolveLocation();
   const navigate = useNavigate();
@@ -72,7 +72,10 @@ const LocationCue: FC<LocationCueInterface> = ({ cuisine }) => {
     }
 
     choose(place);
-    goToNearby(place.label);
+
+    if (navigateOnFix) {
+      goToNearby(place.label);
+    }
   };
 
   // A fix landed for somebody who asked: go, rather than making them tap a
@@ -80,11 +83,22 @@ const LocationCue: FC<LocationCueInterface> = ({ cuisine }) => {
   // the render — navigating while rendering is a side effect during render,
   // and React runs it twice in development.
   useEffect(() => {
-    if (asked.current && status === GEOLOCATION_STATUS.granted && location) {
-      asked.current = false;
+    if (!(asked.current && status === GEOLOCATION_STATUS.granted && location)) {
+      return;
+    }
+
+    asked.current = false;
+
+    // Only where this control is a way *in*. On the home page it is a way to
+    // *change* the location of sections already on screen, and navigating
+    // away meant those sections never visibly updated — somebody standing in
+    // Manhattan tapped it, got bounced to another page, came back and read
+    // "Discover near Flushing" again. The fix had landed; they were just
+    // never shown it.
+    if (navigateOnFix) {
       navigate(buildNearbyPath({ cuisine }));
     }
-  }, [status, location, cuisine, navigate]);
+  }, [status, location, cuisine, navigate, navigateOnFix]);
 
   const message = refused
     ? status === GEOLOCATION_STATUS.denied
