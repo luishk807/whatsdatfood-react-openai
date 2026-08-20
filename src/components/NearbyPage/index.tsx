@@ -4,12 +4,14 @@ import clsx from "clsx";
 import { ListIcon, MapIcon } from "@/components/icons";
 import LocationCue from "@/components/LocationCue";
 import NearbyList from "@/components/NearbyList";
+import RestaurantPreview from "@/components/RestaurantPreview";
 import useDiscoveryLocation from "@/customHooks/useDiscoveryLocation";
 import {
   useNearbyRestaurants,
   useRestaurantsInArea,
 } from "@/customHooks/useNearby";
-import { NEARBY } from "@/customConstants/location";
+import { LOCATION_SOURCE, NEARBY } from "@/customConstants/location";
+import { mapConfigured } from "@/customConstants/map";
 import {
   LOCATION_LABELS,
   MAP_LABELS,
@@ -37,7 +39,7 @@ const NearbyPage: FC = () => {
   const [params] = useSearchParams();
   const cuisine = params.get(NEARBY_PARAMS.cuisine) || undefined;
 
-  const { location } = useDiscoveryLocation();
+  const { location, source } = useDiscoveryLocation();
   const [view, setView] = useState<"list" | "map">("list");
   const [selected, setSelected] = useState<string | null>(null);
   const [areaResults, setAreaResults] = useState<NearbyPlaceType[] | null>(null);
@@ -103,7 +105,7 @@ const NearbyPage: FC = () => {
           aria-label={MAP_LABELS.list + " / " + MAP_LABELS.map}
           className="flex shrink-0 gap-1 rounded-pill border border-line p-1"
         >
-          {(["list", "map"] as const).map((option) => (
+          {(mapConfigured() ? (["list", "map"] as const) : (["list"] as const)).map((option) => (
             <button
               key={option}
               type="button"
@@ -129,7 +131,7 @@ const NearbyPage: FC = () => {
         </p>
       ) : view === "map" ? (
         <div className="flex flex-col gap-3">
-          <div className="h-[55vh] overflow-hidden rounded-card border border-line">
+          <div className="relative h-[55vh] overflow-hidden rounded-card border border-line">
             <Suspense
               fallback={
                 <div className="h-full w-full animate-pulse bg-surface-sunken motion-reduce:animate-none" />
@@ -138,6 +140,7 @@ const NearbyPage: FC = () => {
               <LazyMap
                 places={filtered}
                 centre={location}
+                showMe={source === LOCATION_SOURCE.device}
                 selectedId={selected}
                 onSelect={setSelected}
                 onSearchArea={async (bounds) =>
@@ -146,6 +149,14 @@ const NearbyPage: FC = () => {
                 onRecentre={() => setAreaResults(null)}
               />
             </Suspense>
+
+            {/* Over the map rather than beside it, and only for the pin that
+                was actually tapped. Everything it shows arrived with the pin,
+                so selecting one costs no request. */}
+            <RestaurantPreview
+              place={filtered.find((one) => one.id === selected) ?? null}
+              onClose={() => setSelected(null)}
+            />
           </div>
 
           {/* The list stays under the map rather than being replaced by it.

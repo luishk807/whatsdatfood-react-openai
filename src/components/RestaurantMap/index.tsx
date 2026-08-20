@@ -1,83 +1,207 @@
-import { type FC, useEffect, useRef, useState } from "react";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
-import { NEARBY } from "@/customConstants/location";
+import { type FC, useCallback, useEffect, useRef, useState } from "react";
+import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
+import { RecentreIcon } from "@/components/icons";
+import {
+  MAP_MOVEMENT,
+  MAP_STYLE,
+  MAP_VIEW,
+  MAPBOX_TOKEN,
+} from "@/customConstants/map";
 import { MAP_LABELS } from "@/customConstants/labels";
+import { THEME } from "@/customConstants/theme";
+import useTheme from "@/customHooks/useTheme";
 import { RestaurantMapInterface } from "@/interfaces/location";
+import { createMarker, markerPoint, paintMarker } from "./markers";
 
 /**
  * The map half of nearby discovery.
  *
- * **Leaflet and OpenStreetMap tiles, chosen for not needing a key.** Google
- * Maps and Mapbox both bill per map load and both want a billing account
- * before the first pin renders; this product has no traffic yet and no reason
- * to take on a metered dependency to draw sixteen restaurants. The seam is
- * this one component — the page above it passes places and receives bounds,
- * and knows nothing about the provider. See the note in the README about
- * OSM's tile usage policy before this gets real traffic.
+ * **It draws our data and never fetches any.** Every pin came out of our own
+ * PostgreSQL rows; panning, zooming and "search this area" all resolve against
+ * the same bounds query the list uses. Mapbox is asked for tiles and nothing
+ * else, and neither Google nor OpenAI is reachable from this screen —
+ * identifying a restaurant we do not already hold is the search bar's job, on
+ * a different page. A metered map that only renders is billed per load; a
+ * metered map wired to a moving viewport is billed per drag.
  *
- * **Leaflet is imperative, so it lives behind a ref and is never re-created.**
- * Tearing the map down on every render loses the reader's pan and zoom, which
- * is the whole interaction. The markers are the only thing that gets rebuilt.
+ * **The instance is created once, behind a ref.** Rebuilding it on render
+ * loses the reader's pan and zoom, which is the whole interaction. Markers are
+ * the only thing rebuilt, and even they are repainted rather than replaced
+ * when the selection changes.
  *
  * **This is not the only way to read the results.** The list beside it carries
- * the same places in the same order — a map is unusable with a keyboard and a
- * screen reader, and it is decorative here rather than load-bearing.
+ * the same places in the same order — no keyboard reaches a pin and no screen
+ * reader reads a tile layer, so the map is the appealing half and the list is
+ * the load-bearing one.
  */
 const RestaurantMap: FC<RestaurantMapInterface> = ({
   places,
   centre,
+  showMe,
   selectedId,
   onSelect,
   onSearchArea,
   onRecentre,
 }) => {
   const container = useRef<HTMLDivElement>(null);
-  const map = useRef<L.Map | null>(null);
-  const markers = useRef<Map<string, L.CircleMarker>>(new Map());
+  const map = useRef<mapboxgl.Map | null>(null);
+  const markers = useRef<Map<string, mapboxgl.Marker>>(new Map());
+  const me = useRef<mapboxgl.Marker | null>(null);
+  // Where the view sat when its contents were last fetched. "Moved enough" is
+  // measured against this rather than against the previous frame, so a slow
+  // drift across a city still adds up to having moved.
+  const anchor = useRef<{ lng: number; lat: number; zoom: number } | null>(
+    null,
+  );
   const [moved, setMoved] = useState(false);
+
+  // Read inside a listener that is created once, so it goes through a ref.
+  // Re-subscribing whenever the selection changed would drop the very click
+  // that changed it.
+  const select = useRef(onSelect);
+  select.current = onSelect;
+
+  const { resolved } = useTheme();
+  const style = resolved === THEME.dark ? MAP_STYLE.dark : MAP_STYLE.light;
+
+  const farEnough = useCallback((instance: mapboxgl.Map): boolean => {
+    const from = anchor.current;
+
+    if (!from) {
+      return true;
+    }
+
+    if (Math.abs(instance.getZoom() - from.zoom) >= MAP_MOVEMENT.ZOOM_DELTA) {
+      return true;
+    }
+
+    // Measured against the span currently on screen, so the same gesture
+    // means the same thing at every zoom level.
+    const bounds = instance.getBounds();
+
+    if (!bounds) {
+      return false;
+    }
+
+    const now = instance.getCenter();
+    const width = Math.abs(bounds.getEast() - bounds.getWest());
+    const height = Math.abs(bounds.getNorth() - bounds.getSouth());
+
+    return (
+      Math.abs(now.lng - from.lng) > width * MAP_MOVEMENT.PAN_FRACTION ||
+      Math.abs(now.lat - from.lat) > height * MAP_MOVEMENT.PAN_FRACTION
+    );
+  }, []);
+
+  const anchorHere = (instance: mapboxgl.Map) => {
+    const at = instance.getCenter();
+    anchor.current = { lng: at.lng, lat: at.lat, zoom: instance.getZoom() };
+  };
 
   useEffect(() => {
     if (!container.current || map.current) {
       return;
     }
 
-    const instance = L.map(container.current, {
-      center: [centre.latitude, centre.longitude],
-      zoom: NEARBY.DEFAULT_ZOOM,
-      // The default control sits top-left over the first row of pins on a
-      // phone, and pinch is the gesture anybody actually uses.
-      zoomControl: false,
+    mapboxgl.accessToken = MAPBOX_TOKEN;
+
+    const instance = new mapboxgl.Map({
+      container: container.current,
+      style,
+      center: [centre.longitude, centre.latitude],
+      zoom: MAP_VIEW.DEFAULT_ZOOM,
+      maxZoom: MAP_VIEW.MAX_ZOOM,
+      // One finger scrolls the page, two fingers move the map. The map sits
+      // inside a page that scrolls, and without this a thumb landing on it
+      // captures the drag and the page appears to have frozen.
+      cooperativeGestures: true,
     });
 
-    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 19,
-      // Required by the tile usage policy, and it is the only credit the
-      // people who made this map get.
-      attribution:
-        '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    }).addTo(instance);
+    instance.addControl(
+      new mapboxgl.NavigationControl({ showCompass: false }),
+      "top-right",
+    );
 
-    instance.on("moveend", () => setMoved(true));
+    anchorHere(instance);
+
+    // `originalEvent` is present only when a person did it. Without the check,
+    // our own `easeTo` would offer "search this area" for a move the reader
+    // never made.
+    instance.on("moveend", (event) => {
+      if (!event.originalEvent) {
+        return;
+      }
+
+      setMoved(farEnough(instance));
+    });
+
     map.current = instance;
 
     return () => {
+      markers.current.forEach((marker) => marker.remove());
+      markers.current.clear();
+      me.current?.remove();
+      me.current = null;
       instance.remove();
       map.current = null;
     };
-    // Once. `centre` moving must pan the existing map, not build a new one.
+    // Once. A moving `centre` pans the existing map and the theme swaps the
+    // style on it; neither may build a second one.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    map.current?.setStyle(style);
+  }, [style]);
 
   // Recentre when the reader picks a different place, without disturbing the
   // zoom they chose.
   useEffect(() => {
-    map.current?.setView(
-      [centre.latitude, centre.longitude],
-      map.current.getZoom(),
-    );
+    const instance = map.current;
+
+    if (!instance) {
+      return;
+    }
+
+    instance.easeTo({
+      center: [centre.longitude, centre.latitude],
+      zoom: instance.getZoom(),
+    });
+    anchorHere(instance);
     setMoved(false);
   }, [centre.latitude, centre.longitude]);
+
+  // Where the reader is, drawn unlike a restaurant because it is not one.
+  // Absent when the location was typed: "Flushing" is an area, and a dot in
+  // the middle of it would claim a precision nobody gave us.
+  useEffect(() => {
+    const instance = map.current;
+
+    if (!instance) {
+      return;
+    }
+
+    me.current?.remove();
+    me.current = null;
+
+    if (!showMe) {
+      return;
+    }
+
+    const dot = document.createElement("div");
+    dot.setAttribute("aria-hidden", "true");
+    dot.style.width = "14px";
+    dot.style.height = "14px";
+    dot.style.borderRadius = "9999px";
+    dot.style.background = "var(--color-brand)";
+    dot.style.border = "3px solid var(--color-surface-raised)";
+    dot.style.boxShadow = "0 0 0 1px var(--color-line)";
+
+    me.current = new mapboxgl.Marker({ element: dot })
+      .setLngLat([centre.longitude, centre.latitude])
+      .addTo(instance);
+  }, [showMe, centre.latitude, centre.longitude]);
 
   useEffect(() => {
     const instance = map.current;
@@ -90,36 +214,62 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
     markers.current.clear();
 
     places.forEach((place) => {
-      if (place.latitude == null || place.longitude == null) {
+      const point = markerPoint(place);
+
+      if (!point) {
+        // Never geocoded. Absent from the map rather than placed at a guess,
+        // and still present in the list beside it.
         return;
       }
 
-      // A circle rather than an image pin: no asset to load, no broken icon
-      // when the bundler moves the file, and it takes a colour token.
-      const marker = L.circleMarker([place.latitude, place.longitude], {
-        radius: 9,
-        weight: 2,
-        color: "#ffffff",
-        fillColor: place.top_dish_photo_url ? "#1f8a4c" : "#8a8a8a",
-        fillOpacity: 1,
-      })
-        .addTo(instance)
-        // Keyboard and screen-reader users get the list; this is for the
-        // pointer users who are looking at the pin.
-        .bindTooltip(place.name, { direction: "top" })
-        .on("click", () => onSelect?.(place.id));
+      const element = createMarker(place, {
+        selected: place.id === selectedId,
+      });
 
-      markers.current.set(place.id, marker);
+      element.addEventListener("click", (event) => {
+        // Otherwise the map also sees a click on the canvas and clears the
+        // selection in the same tick it was made.
+        event.stopPropagation();
+        select.current?.(place.id);
+      });
+
+      markers.current.set(
+        place.id,
+        new mapboxgl.Marker({ element }).setLngLat(point).addTo(instance),
+      );
     });
-  }, [places, onSelect]);
+    // `selectedId` is applied by the effect below. Rebuilding every marker
+    // when it changes would destroy the one being tapped.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [places]);
 
-  // The selected pin grows rather than changing colour alone: colour is not
-  // the only signal for anything here.
   useEffect(() => {
-    markers.current.forEach((marker, id) => {
-      marker.setRadius(id === selectedId ? 13 : 9);
+    places.forEach((place) => {
+      const element = markers.current.get(place.id)?.getElement();
+
+      if (element) {
+        paintMarker(element, place, { selected: place.id === selectedId });
+      }
     });
   }, [selectedId, places]);
+
+  const searchHere = () => {
+    const instance = map.current;
+    const bounds = instance?.getBounds();
+
+    if (!instance || !bounds) {
+      return;
+    }
+
+    anchorHere(instance);
+    setMoved(false);
+    onSearchArea?.({
+      north: bounds.getNorth(),
+      south: bounds.getSouth(),
+      east: bounds.getEast(),
+      west: bounds.getWest(),
+    });
+  };
 
   return (
     <div className="relative h-full w-full">
@@ -130,30 +280,19 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
         className="h-full w-full"
       />
 
-      {/* Only after the reader has moved it. Offered before, it invites a tap
-          that re-runs the search they just got. */}
+      {/* Only once the reader has moved it, and moved it far enough to be
+          looking somewhere else. Offered sooner, it invites a tap that
+          re-runs the search they are still reading. */}
       {moved && onSearchArea && (
-        <button
-          type="button"
-          onClick={() => {
-            const bounds = map.current?.getBounds();
-
-            if (!bounds) {
-              return;
-            }
-
-            setMoved(false);
-            onSearchArea({
-              north: bounds.getNorth(),
-              south: bounds.getSouth(),
-              east: bounds.getEast(),
-              west: bounds.getWest(),
-            });
-          }}
-          className="absolute left-1/2 top-3 z-[500] -translate-x-1/2 rounded-pill bg-surface-raised px-4 py-2 text-sm font-medium text-ink shadow-tile"
-        >
-          {MAP_LABELS.searchThisArea}
-        </button>
+        <div className="pointer-events-none absolute inset-x-0 top-3 flex justify-center px-4">
+          <button
+            type="button"
+            onClick={searchHere}
+            className="pointer-events-auto inline-flex min-h-11 items-center rounded-pill border border-line bg-surface-raised px-4 text-sm font-medium text-ink shadow-tile"
+          >
+            {MAP_LABELS.searchThisArea}
+          </button>
+        </div>
       )}
 
       {onRecentre && (
@@ -161,16 +300,25 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
           type="button"
           onClick={() => {
             onRecentre();
-            map.current?.setView(
-              [centre.latitude, centre.longitude],
-              NEARBY.DEFAULT_ZOOM,
-            );
+
+            const instance = map.current;
+
+            if (instance) {
+              instance.easeTo({
+                center: [centre.longitude, centre.latitude],
+                zoom: MAP_VIEW.DEFAULT_ZOOM,
+              });
+              anchorHere(instance);
+            }
+
             setMoved(false);
           }}
-          className="absolute bottom-3 right-3 z-[500] flex h-11 w-11 items-center justify-center rounded-full bg-surface-raised text-ink shadow-tile"
+          /* Sits above the preview card, which rises from the bottom edge on
+             a phone, and clear of the page navigation below it. */
+          className="absolute bottom-3 right-3 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-line bg-surface-raised text-ink shadow-tile"
           aria-label={MAP_LABELS.recentre}
         >
-          ◎
+          <RecentreIcon size={20} />
         </button>
       )}
     </div>

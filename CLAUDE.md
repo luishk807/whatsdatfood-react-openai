@@ -74,9 +74,9 @@ the vote threshold is what keeps a barely-voted dish out of the ranking.
   `@emotion/*`, which only ever came along as its styling engine. The
   per-component `index.css` files are still being deleted as their components
   are touched; do not add new ones.
-- **One dependency was added for the map**: `leaflet` (plus `@types/leaflet`).
-  It is imported by `RestaurantMap` alone and lands in its own chunk. Nothing
-  else in the app may import it.
+- **One dependency was added for the map**: `mapbox-gl`. It is imported by
+  `RestaurantMap` alone and lands in its own chunk. Nothing else in the app may
+  import it.
 - **Icons are inline SVG in `src/components/icons/`.** Every
   `@mui/icons-material` import pulled in `SvgIcon` and therefore the whole
   emotion runtime for the sake of a chevron. Add a new icon to that module
@@ -132,9 +132,12 @@ minute. Design for the phone and let desktop be the override, never the reverse.
 - Vote controls sit in the lower third, within thumb reach.
 - Detail opens as a bottom sheet, not a route change.
 - Dark mode matters; restaurants are dim.
-- Target a main bundle under 250 KiB (currently ~534 KiB / 547,298 bytes).
-  Leaflet is **not** in it: the map is a lazy component inside a lazy route,
-  and its 164 KiB chunk is downloaded only by somebody who taps Map.
+- Target a main bundle under 250 KiB (currently 609 KiB raw / 186 KiB
+  gzipped; the 534 KiB figure here predated several features).
+  Mapbox is **not** in it: the map is a lazy component inside a lazy route,
+  and its 1.78 MiB chunk (505 KiB gzipped) is downloaded only by somebody who
+  taps Map. Check that with `grep -c mapbox dist/main.*.js` after a build —
+  the answer must stay 0.
   Deleting unreferenced components does not move this number — webpack only
   bundles what the entry graph reaches, so dead code costs repo clarity, not
   bytes. Removing MUI and emotion took 90,364 bytes off; the remaining gap is
@@ -484,22 +487,66 @@ it — and the location control is a quieter line under it.
 ## The map
 
 `RestaurantMap`, and it is the only file that knows a map library exists.
+`customConstants/map.ts` is the only other file that names the provider.
 
-- **Leaflet with OpenStreetMap tiles, because they need no key.** Google Maps
-  and Mapbox both bill per load and both want a billing account before the
-  first pin renders. There is no traffic to justify a metered dependency yet,
-  and swapping later is this one component — the page passes places and
-  receives bounds.
-- **It is lazy, inside a lazy route.** Leaflet plus its stylesheet has no
-  business in the bundle somebody downloads to read a menu, so the list is the
-  default view and the map arrives on the tap that shows it.
+**Mapbox GL, replacing Leaflet.** The earlier note here argued for Leaflet
+because OpenStreetMap tiles need no key and Mapbox meters; that call was
+overridden deliberately. What it got right was the seam — the page passes
+places and receives bounds, so the swap was one component, its markers file
+and a token.
+
+- **It draws our data and never fetches any.** Every pin came out of our own
+  PostgreSQL rows via `nearbyRestaurants` and `restaurantsInArea`. Panning,
+  zooming and selecting a pin reach no network at all, and neither Google nor
+  OpenAI is reachable from this screen. A metered map that only renders is
+  billed per load; one wired to a moving viewport is billed per drag, and that
+  distinction is the whole cost argument for this page.
+- **`REACT_APP_MAPBOX_TOKEN` is a *public* token (`pk.`)** and is meant to ship
+  in the bundle — every web map exposes one. It is protected by a URL
+  restriction set on the token in the Mapbox account, not by hiding it. A
+  secret token (`sk.`) must never go here. **Unset, the app offers no map at
+  all** rather than a Map button opening a grey rectangle: the list is the half
+  that always works, so losing the map costs a reader nothing.
+- **It is lazy, inside a lazy route** — and much more so than before. Mapbox is
+  a 1.78 MiB chunk (505 KiB gzipped) against Leaflet's 164 KiB. That is
+  affordable only because it is downloaded by somebody who tapped Map, and it
+  is the price of the swap.
 - **The list is never replaced by the map.** No keyboard reaches a pin and no
   screen reader reads a tile layer, so the same places in the same order stay
-  underneath it. A map is the appealing half and the unusable one.
-- **The Leaflet instance is created once, behind a ref.** Rebuilding it on
-  render loses the reader's pan and zoom, which is the whole interaction.
-- **"Search this area" appears only after the map has moved.** Offered before,
-  it invites a tap that re-runs the search just performed.
+  underneath it. Markers are `aria-hidden`: announcing forty of them would put
+  forty stops in front of the readable half.
+- **The instance is created once, behind a ref.** Rebuilding it on render loses
+  the reader's pan and zoom, which is the whole interaction. Markers are
+  repainted rather than replaced when the selection changes — rebuilding them
+  destroys the one being tapped.
+- **"Search this area" appears only after the map has moved far enough.** Any
+  twitch is not enough; `MAP_MOVEMENT` measures the pan against the span
+  currently on screen so the threshold means the same thing at every zoom.
+  Offered sooner, it invites a tap that re-runs results still being read.
+  Programmatic camera moves are excluded by checking `originalEvent` — our own
+  recentre must not look like the reader going somewhere.
+- **`markers.ts` is the seam for richer pins.** Dish thumbnails, a trending
+  mark, a verified tick and a rank all belong in that file, and the map learns
+  about none of them. It builds DOM markers rather than a clustered GeoJSON
+  layer precisely because of that list: clustering wants Mapbox expressions and
+  sprite images, where a per-restaurant photograph is painful, and a photo in a
+  `<div>` is an `<img>`. That trade holds only while the server caps a map
+  query at `NEARBY.MAP_LIMIT` — forty pins cannot smear. Raise the cap and this
+  has to be revisited rather than stretched.
+- **`cooperativeGestures` is on.** One finger scrolls the page, two move the
+  map. The map sits inside a scrolling page, and without it a thumb landing on
+  the map captures the drag and the page looks frozen.
+- **The preview is a card, not a modal.** `RestaurantPreview` rises from the
+  bottom edge on a phone and sits lower-left from `sm` up, with no backdrop and
+  no scroll lock — the reader is mid-comparison, and a dialog that must be
+  dismissed before the next pin turns browsing into a sequence of decisions.
+  Everything it shows arrived with the pin, so selecting one costs no request.
+- **The "you are here" dot is drawn only for a measured fix.** A typed place is
+  an area; a dot in the middle of Flushing claims a precision nobody gave us.
+- **jsdom has no WebGL**, so `src/test/mapboxMock.ts` stands in — a recorder,
+  not a pretend map. What it makes testable is the part worth testing: that
+  dragging fires no query, that the bounds handed up are the ones on screen,
+  and that our own camera moves do not offer "search this area".
 
 ## Trending, and the honest version of it
 

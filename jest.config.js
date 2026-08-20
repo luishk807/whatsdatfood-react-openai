@@ -20,6 +20,13 @@ module.exports = {
   moduleNameMapper: {
     "\\.(css|less|sass|scss)$": "<rootDir>/src/test/styleMock.ts",
     "\\.(gif|png|jpe?g|svg|webp|avif)$": "<rootDir>/src/test/fileMock.ts",
+    // mapbox-gl needs WebGL and a real layout, neither of which jsdom has:
+    // imported for real it throws on construction and takes every test that
+    // reaches the nearby page down with it. The stand-in records what the map
+    // was asked to do, which is the part worth asserting anyway — that no
+    // query fires until "search this area" is tapped, and that the bounds
+    // handed up are the ones the map was showing.
+    "^mapbox-gl$": "<rootDir>/src/test/mapboxMock.ts",
     "^@/(.*)$": "<rootDir>/src/$1",
   },
   transform: {

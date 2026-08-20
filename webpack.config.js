@@ -74,6 +74,15 @@ module.exports = {
       "process.env.REACT_APP_GRAPHQL_BACKEND_URL": JSON.stringify(
         process.env.REACT_APP_GRAPHQL_BACKEND_URL || "",
       ),
+      // Mapbox's *public* token (pk.), which every web map exposes by
+      // design — there is no way to draw tiles in a browser without one. It
+      // is protected by a URL restriction set on the token in the Mapbox
+      // account, not by hiding it. A secret token (sk.) must never be
+      // defined here: those can edit styles, read the account and mint more
+      // tokens. Absent, the app simply does not offer a map.
+      "process.env.REACT_APP_MAPBOX_TOKEN": JSON.stringify(
+        process.env.REACT_APP_MAPBOX_TOKEN || "",
+      ),
     }),
 
     // Without this the build emitted JavaScript and no page at all. It worked

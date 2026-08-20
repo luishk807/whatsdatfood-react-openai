@@ -160,6 +160,17 @@ export const PinIcon: FC<IconInterface> = (props) => (
   </Svg>
 );
 
+/**
+ * Back to my location, on the map. A crosshair rather than a pin: the pin
+ * already means "a place", and this control means "the middle again".
+ */
+export const RecentreIcon: FC<IconInterface> = (props) => (
+  <Svg {...props}>
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
+  </Svg>
+);
+
 export const MedalIcon: FC<IconInterface> = (props) => (
   <Svg {...props}>
     <circle cx="12" cy="15" r="5.4" />

@@ -80,17 +80,33 @@ export interface NearbyListInterface {
   onSelect?: (id: string) => void;
 }
 
+/** What the map hands back when the reader asks to search where they are
+ * looking. The shape the existing `restaurantsInArea` query already takes. */
+export interface MapBoundsType {
+  north: number;
+  south: number;
+  east: number;
+  west: number;
+}
+
 export interface RestaurantMapInterface {
   places: NearbyPlaceType[];
   centre: CoordinatesType;
+  /**
+   * Draw the "you are here" dot. Only for a measured fix — a typed place is
+   * an area, and a dot in the middle of Flushing claims a precision nobody
+   * gave us.
+   */
+  showMe?: boolean;
   selectedId?: string | null;
   onSelect?: (id: string) => void;
-  /** "Search this area", once the map has been moved. */
-  onSearchArea?: (bounds: {
-    north: number;
-    south: number;
-    east: number;
-    west: number;
-  }) => void;
+  /** "Search this area", once the map has been moved far enough to matter. */
+  onSearchArea?: (bounds: MapBoundsType) => void;
   onRecentre?: () => void;
+}
+
+export interface RestaurantPreviewInterface {
+  /** Null when no pin is selected, so the card is one conditional, not two. */
+  place: NearbyPlaceType | null;
+  onClose: () => void;
 }

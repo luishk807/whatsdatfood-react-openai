@@ -563,6 +563,10 @@ export const MAP_LABELS = {
   recentre: "Back to my location",
   list: "List",
   map: "Map",
+  closePreview: "Close",
+  /** The dish somebody photographed, which is what we know and Google does
+   * not. Never a star rating. */
+  topDish: (dish: string) => `Try the ${dish}`,
 } as const;
 
 /**
