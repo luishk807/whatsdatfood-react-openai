@@ -80,6 +80,17 @@ const NearbyPage: FC = () => {
             ? NEARBY_LABELS.cuisineNearYou(titleCase(cuisine))
             : NEARBY_LABELS.needLocation}
         </h1>
+
+        {/* Said out loud, because with a cuisine the heading already reads
+            like a promise. "Chinese near you" over a bare pair of buttons
+            looks like a page that failed to load its results — the reader
+            has no way to know it is waiting on them rather than broken. */}
+        {cuisine && (
+          <p className="text-center text-sm text-ink-muted">
+            {NEARBY_LABELS.needLocationHelp}
+          </p>
+        )}
+
         <LocationCue cuisine={cuisine} />
       </div>
     );

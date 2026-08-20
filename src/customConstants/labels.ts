@@ -741,6 +741,9 @@ export const NEARBY_LABELS = {
   noPhotos: "No dish photos yet",
   addFirst: "Add the first photo",
   needLocation: "Choose where to look",
+  /** Under a cuisine heading, which on its own reads like a promise of
+   *  results that are about to appear. */
+  needLocationHelp: "Tell us where to look and we will show you what is nearby.",
   results: (count: number) =>
     count === 1 ? "1 restaurant" : `${count} restaurants`,
 } as const;
