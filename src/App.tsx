@@ -12,6 +12,7 @@ const LazyHomepage = lazy(() => import("@/components/Homepage"));
 const LazyResult = lazy(() => import("@/components/MenuResults"));
 const LazyManageMenu = lazy(() => import("@/components/ManageMenu"));
 const LazyNotFound = lazy(() => import("@/components/NotFound"));
+const LazyContact = lazy(() => import("@/components/ContactPage"));
 const LazyPrivacy = lazy(() => import("@/components/Privacy"));
 const LazyTerms = lazy(() => import("@/components/Terms"));
 const LazySignIN = lazy(() => import("@/components/SignInComponent"));
@@ -282,6 +283,20 @@ function App() {
             <Suspense fallback={<Loading style={customStyle} />}>
               <Layout>
                 <LazyHomepage />
+              </Layout>
+            </Suspense>
+          }
+        />
+
+        {/* Public, and deliberately reachable without an account. Somebody
+            reporting that a menu is wrong or that their restaurant is listed
+            with the wrong address is the person least likely to have one. */}
+        <Route
+          path={ROUTES.contact}
+          element={
+            <Suspense fallback={<Loading style={customStyle} />}>
+              <Layout>
+                <LazyContact />
               </Layout>
             </Suspense>
           }

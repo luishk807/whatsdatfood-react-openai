@@ -27,12 +27,12 @@ const Footer = () => (
         <Link to={ROUTES.terms} className="hover:text-ink">
           {LEGAL_LABELS.terms}
         </Link>
-        <a
-          href="mailto:info@whatsdatfood.com"
-          className="hover:text-ink"
-        >
+        {/* A page rather than a mailto:. That link opens nothing at all on a
+            phone with no mail client configured, and on a shared computer it
+            loses the message entirely. */}
+        <Link to={ROUTES.contact} className="hover:text-ink">
           {SITE_LABELS.contact}
-        </a>
+        </Link>
         <span>{SITE_LABELS.copyright}</span>
       </div>
     </div>

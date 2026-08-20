@@ -44,6 +44,7 @@ export const ROUTES = {
   subscription: "/account/subscription",
   manage: "/manage",
   admin: "/admin",
+  contact: "/contact",
   privacy: "/privacy",
   terms: "/terms",
   notFound: "*",

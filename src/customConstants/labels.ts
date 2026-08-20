@@ -694,6 +694,23 @@ export const DISCOVERY_LABELS = {
   seeAllNearby: "See all nearby",
 } as const;
 
+export const CONTACT_LABELS = {
+  title: "Get in touch",
+  blurb:
+    "A menu we have wrong, a restaurant we are missing, or anything else. No account needed.",
+  name: "Your name",
+  email: "Your email",
+  subject: "Subject",
+  message: "Message",
+  submit: "Send message",
+  sending: "Sending…",
+  sent: "Message sent.",
+  /** Names the receipt, because that is the part somebody can check. */
+  sentHelp: "We have emailed you a copy, and we will come back to you.",
+  failed: "That message could not be sent.",
+  unavailable: "The form is not working right now. Please email us at",
+} as const;
+
 export const MAP_LABELS = {
   label: "Map of nearby restaurants",
   searchThisArea: "Search this area",

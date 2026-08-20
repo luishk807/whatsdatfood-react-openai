@@ -200,3 +200,16 @@ export const MENU_EDIT = {
   MAX_DESCRIPTION: 600,
   MAX_SECTION: 60,
 } as const;
+
+/**
+ * Writing to us. The lengths mirror the server's, which is what actually
+ * enforces them — these only stop somebody typing four thousand characters
+ * and then being told about it.
+ */
+export const CONTACT = {
+  MAX_NAME: 120,
+  MAX_SUBJECT: 160,
+  MAX_MESSAGE: 4000,
+  /** Shown when the form cannot send. Somewhere to go beats an apology. */
+  FALLBACK_EMAIL: "info@whatsdatfood.com",
+} as const;

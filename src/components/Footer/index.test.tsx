@@ -28,12 +28,16 @@ describe("Footer", () => {
     expect(screen.queryByText(/lorem/i)).not.toBeInTheDocument();
   });
 
-  it("links contact somewhere real", () => {
+  it("links contact to a page rather than a mail client", () => {
+    // It used to be a mailto:. That opens nothing at all on a phone with no
+    // mail client configured, and on a shared computer it loses the message
+    // entirely — which for the one channel somebody uses to tell us a menu is
+    // wrong is the worst possible failure.
     show();
 
     expect(screen.getByText(SITE_LABELS.contact)).toHaveAttribute(
       "href",
-      "mailto:info@whatsdatfood.com",
+      ROUTES.contact,
     );
   });
 
