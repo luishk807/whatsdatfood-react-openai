@@ -25,7 +25,16 @@ import { _get } from "@/utils";
 export const useNearbyRestaurants = (
   point: CoordinatesType | null,
   cuisine?: string,
-  radiusKm: number = NEARBY.DEFAULT_RADIUS_KM,
+  /**
+   * Left undefined on purpose, which is what lets the server widen.
+   *
+   * It used to default to five kilometres and the full list then showed two
+   * restaurants in Manhattan while the homepage strip — which widens —
+   * showed one 8.7 miles away. Two pages, two answers, from the same
+   * coordinates. Pass a number only where the radius is the reader's choice
+   * rather than ours.
+   */
+  radiusKm?: number,
 ) => {
   const { data, loading, error } = useQuery(NEARBY_RESTAURANTS, {
     variables: {
