@@ -78,6 +78,15 @@ jobs:
         env:
           REACT_APP_BACKEND_URL: ${{ vars.REACT_APP_BACKEND_URL }}
           REACT_APP_GRAPHQL_BACKEND_URL: ${{ vars.REACT_APP_GRAPHQL_BACKEND_URL }}
+          # Mapbox's public token. A variable rather than a secret on purpose:
+          # it is compiled into the bundle and served to every visitor, so
+          # masking it in the log would only hide it from us. What limits it is
+          # the URL restriction on the token itself.
+          #
+          # Unset is not a build failure - the app then offers no map and the
+          # list still works, which is the intended behaviour rather than a
+          # broken deploy.
+          REACT_APP_MAPBOX_TOKEN: ${{ vars.REACT_APP_MAPBOX_TOKEN }}
         run: |
           if [ -z "$REACT_APP_GRAPHQL_BACKEND_URL" ]; then
             echo "REACT_APP_GRAPHQL_BACKEND_URL is not set." >&2
@@ -99,6 +108,35 @@ jobs:
             exit 1
           fi
           echo "API host $host is in the bundle" >> "$GITHUB_STEP_SUMMARY"
+
+      # Says which of the two states shipped, because both are legitimate and
+      # they are indistinguishable from the build log otherwise. "The map is
+      # missing in production" is a report nobody can act on without this.
+      - name: Report whether the map shipped
+        env:
+          REACT_APP_MAPBOX_TOKEN: ${{ vars.REACT_APP_MAPBOX_TOKEN }}
+        run: |
+          case "$REACT_APP_MAPBOX_TOKEN" in
+            "")
+              echo "No REACT_APP_MAPBOX_TOKEN: deployed without a map." \
+                >> "$GITHUB_STEP_SUMMARY"
+              ;;
+            sk.*)
+              # Worth failing the deploy over. A secret token can edit styles,
+              # read the account and mint more tokens, and this build would
+              # publish it to every visitor.
+              echo "REACT_APP_MAPBOX_TOKEN is a SECRET token (sk.)." >&2
+              echo "Only a public token (pk.) may be compiled in." >&2
+              exit 1
+              ;;
+            pk.*)
+              echo "Map enabled." >> "$GITHUB_STEP_SUMMARY"
+              ;;
+            *)
+              echo "REACT_APP_MAPBOX_TOKEN is not a Mapbox token." >&2
+              exit 1
+              ;;
+          esac
 
       - name: Deploy to Cloudflare
         env:
