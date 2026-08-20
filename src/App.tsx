@@ -10,6 +10,7 @@ import { FEATURES } from "@/customConstants/features";
 import { ROUTES } from "@/customConstants/routes";
 const LazyHomepage = lazy(() => import("@/components/Homepage"));
 const LazyResult = lazy(() => import("@/components/MenuResults"));
+const LazyManageMenu = lazy(() => import("@/components/ManageMenu"));
 const LazyNotFound = lazy(() => import("@/components/NotFound"));
 const LazyPrivacy = lazy(() => import("@/components/Privacy"));
 const LazyTerms = lazy(() => import("@/components/Terms"));
@@ -257,6 +258,24 @@ function App() {
             </Suspense>
           }
         />
+        {/* Signed in to reach it at all — `ProtectedRoute` is an `Outlet`
+            wrapper, so this nests rather than wrapping the element. The
+            server refuses `ownerMenu` to anybody without an approved claim
+            on this restaurant; the route guard is convenience and the
+            refusal is the protection. */}
+        <Route element={<ProtectedRoute />}>
+          <Route
+            path={ROUTES.manageMenu}
+            element={
+              <Suspense fallback={<Loading style={customStyle} />}>
+                <Layout>
+                  <LazyManageMenu />
+                </Layout>
+              </Suspense>
+            }
+          />
+        </Route>
+
         <Route
           path={ROUTES.home}
           element={

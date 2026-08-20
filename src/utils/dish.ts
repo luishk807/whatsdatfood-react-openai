@@ -86,7 +86,12 @@ export const groupDishesByCategory = (
  * enough, and mislabelling one as unpriced is a far smaller error than telling
  * someone a $180 omakase costs nothing.
  */
-export const dishPrice = (item: MenuItemType): number | null => {
+export const dishPrice = (
+  // Narrowed to the one field it reads. It used to take a whole
+  // `MenuItemType`, which meant anything holding just a price — an owner's
+  // management row, a submission — had to cast to call it.
+  item: { price?: number | string | null } | null | undefined,
+): number | null => {
   const price = Number(item?.price);
 
   if (!Number.isFinite(price) || price <= 0) {

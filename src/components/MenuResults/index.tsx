@@ -31,6 +31,7 @@ import useDishVotes from "@/customHooks/useDishVotes";
 import useDishPhotoUpload from "@/customHooks/useDishPhotoUpload";
 import FoodCredAward from "@/components/FoodCredAward";
 import TopContributors from "@/components/TopContributors";
+import AddDishAction from "@/components/AddDishAction";
 import SuggestCorrection from "@/components/SuggestCorrection";
 import FoodCredIcon from "@/components/FoodCredIcon";
 import { LEADERBOARD_LABELS } from "@/customConstants/reputation";
@@ -244,6 +245,9 @@ const MenuResults: FC = () => {
             // Easy to miss: this object is assembled field by field, so a new
             // field on the query is invisible here until it is named.
             champion: _get(resp, "champion", null),
+            menu_verified_at: _get(resp, "menu_verified_at", null),
+            menu_updated_at: _get(resp, "menu_updated_at", null),
+            viewer_can_manage: _get(resp, "viewer_can_manage", false),
           });
         }
       }
@@ -414,6 +418,17 @@ const MenuResults: FC = () => {
                 />
               </section>
             ))}
+
+            {/* At the very end of the food, before anything about the
+                product itself. This is for the reader who scrolled the whole
+                menu and can see something is not on it — a different person
+                from the one who just arrived to pick something. */}
+            <AddDishAction
+              slug={restaurant || ""}
+              sections={Object.keys(restaurantMenu)}
+              canContribute={!!user?.id}
+              onAdded={() => handleFetchRestaurant(true)}
+            />
 
             {/* Below the whole menu on purpose. The food is the page and
                 reputation supports it; a leaderboard above the dishes would

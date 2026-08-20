@@ -13,6 +13,16 @@ export const ROUTES = {
   favorites: "/favorites",
   menuResults: "/menu-results/:restaurant",
   /**
+   * The owner's view of their own menu. A route rather than an editing
+   * toggle on the menu page, because the two audiences want different
+   * layouts — not the same layout with extra buttons on it.
+   *
+   * The server refuses `ownerMenu` to anybody without an approved claim on
+   * this restaurant, so typing somebody else's slug here returns an error
+   * rather than their menu.
+   */
+  manageMenu: "/menu-results/:restaurant/manage",
+  /**
    * Nearby discovery: a list and a map of what is around you.
    *
    * The location is a query parameter and never the path, and it is a place
@@ -43,6 +53,9 @@ export const MENU_RESULTS_PARAM = "restaurant";
 
 export const buildMenuResultsPath = (slug: string) =>
   ROUTES.menuResults.replace(`:${MENU_RESULTS_PARAM}`, slug);
+
+export const buildManageMenuPath = (slug: string) =>
+  ROUTES.manageMenu.replace(`:${MENU_RESULTS_PARAM}`, slug);
 
 export const NEARBY_PARAMS = {
   cuisine: "cuisine",

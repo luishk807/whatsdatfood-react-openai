@@ -12,6 +12,8 @@ const decideClaim = jest.fn();
 const resolveReport = jest.fn();
 const loadPending = jest.fn();
 const resolveCorrection = jest.fn();
+const loadPendingDishes = jest.fn();
+const decideDish = jest.fn();
 
 const session: { role_id?: string } = {};
 
@@ -51,6 +53,19 @@ jest.mock("@/customHooks/useMenuCorrections", () => ({
     loadPending,
     resolve: resolveCorrection,
     loading: false,
+  }),
+}));
+
+/**
+ * Like the two above: it reaches Apollo directly, and these tests are about
+ * the queues rather than about the transport.
+ */
+jest.mock("@/customHooks/useMenuEditing", () => ({
+  __esModule: true,
+  default: () => ({
+    loadPendingDishes,
+    decideDish,
+    pendingLoading: false,
   }),
 }));
 
@@ -104,6 +119,8 @@ describe("AdminConsole", () => {
     loadClaims.mockReset().mockResolvedValue([]);
     loadReports.mockReset().mockResolvedValue([]);
     loadPending.mockReset().mockResolvedValue([]);
+    loadPendingDishes.mockReset().mockResolvedValue([]);
+    decideDish.mockReset().mockResolvedValue(undefined);
     decideClaim.mockReset().mockResolvedValue(undefined);
     resolveReport.mockReset().mockResolvedValue(undefined);
     resolveCorrection.mockReset().mockResolvedValue(undefined);

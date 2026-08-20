@@ -528,6 +528,9 @@ export const CUISINE_LABELS = {
  * of the dish.
  */
 export const CORRECTION_LABELS = {
+  /** The second half of the reason list: not a field, but the dish itself. */
+  aboutTheDish: "About the dish",
+  note: "Anything to add",
   open: "Something wrong here?",
   title: "Suggest a correction",
   /** Says plainly that nothing changes on the strength of one suggestion. */
@@ -557,6 +560,102 @@ export const CORRECTION_LABELS = {
  * unusable with a keyboard and a screen reader, so it is the decorative half
  * of nearby discovery and never the only way to read the answer.
  */
+/**
+ * Adding a dish, and what the menu says about where each one came from.
+ *
+ * The tone is the whole design here. Most menus are mostly wrong or mostly
+ * missing, so contributing has to read as normal rather than as reporting a
+ * fault — "Add a dish we missed" admits the gap is ours, which it is.
+ */
+export const MENU_EDIT_LABELS = {
+  addDish: "Add a dish we missed",
+  /** In the review queue, where the reviewer is not the contributor. */
+  queueTitle: "Dishes diners added",
+  queueEmpty: "No dishes waiting.",
+  accept: "Add to menu",
+  reject: "Not on this menu",
+  addTitle: "Add a dish",
+  addIntro:
+    "Menus here are read automatically, so they miss things. If you can see a dish that is not listed, add it.",
+  signInFirst: "Sign in to add a dish",
+  name: "Dish name",
+  namePlaceholder: "Soup dumplings",
+  section: "Part of the menu",
+  sectionPlaceholder: "Small plates",
+  price: "Price",
+  priceHint: "Optional",
+  description: "Description",
+  descriptionHint: "Optional",
+  submit: "Add dish",
+  submitting: "Adding…",
+  cancel: "Cancel",
+  /** Said plainly, because the alternative is somebody adding it twice. */
+  queued: "Added. It will show on the menu while somebody checks it.",
+  published: "Added to the menu.",
+
+  // --- what a dish says about itself ---------------------------------------
+  //
+  // Only ever shown when it changes what a reader should believe. An
+  // extracted dish carries no badge at all: that is almost every dish, and a
+  // label on all of them is a label on none of them.
+  community: "Added by a diner",
+  communityBy: (who: string) => `Added by ${who}`,
+  pending: "Waiting to be checked",
+  ownerVerified: "Confirmed by the restaurant",
+  unavailable: "Not available right now",
+
+  // --- and what the menu as a whole says -----------------------------------
+  menuVerified: "Menu confirmed by the restaurant",
+  menuUpdated: (when: string) => `Menu updated ${when}`,
+} as const;
+
+/**
+ * Managing a menu, for somebody who runs the restaurant.
+ *
+ * A separate mode rather than edit controls sprinkled through the customer
+ * view. A diner deciding what to order should never see a delete button, and
+ * an owner fixing a price should not have to hunt for one between the
+ * photographs.
+ */
+export const MANAGE_MENU_LABELS = {
+  open: "Manage menu",
+  title: "Manage menu",
+  back: "Back to the menu",
+  intro:
+    "Changes here are live straight away. Everything is recorded and can be undone.",
+  pending: (count: number) =>
+    count === 1 ? "1 dish waiting to be checked" : `${count} dishes waiting to be checked`,
+  verifyMenu: "Confirm this menu is right",
+  verifying: "Confirming…",
+  verified: (when: string) => `Confirmed ${when}`,
+  verifyHelp:
+    "Tells diners the restaurant stands behind this menu. Dishes still waiting to be checked are not included.",
+
+  addDish: "Add a dish",
+  edit: "Edit",
+  save: "Save",
+  cancel: "Cancel",
+  markUnavailable: "Mark unavailable",
+  markAvailable: "Back on the menu",
+  archive: "Remove from menu",
+  archiveConfirm: "Remove this dish?",
+  archiveHelp: "Its photos and votes are kept, and you can put it back.",
+  restore: "Put back",
+  approve: "Accept",
+  reject: "Reject",
+  history: "History",
+
+  sections: "Sections",
+  sectionsHelp: "Drag to reorder. Removing a section keeps its dishes.",
+  addSection: "Add a section",
+  renameSection: "Rename",
+  saveSections: "Save sections",
+  moveUp: "Move up",
+  moveDown: "Move down",
+  empty: "No dishes yet.",
+  emptyHelp: "Add the first one, or wait for the menu to be read automatically.",
+} as const;
+
 export const MAP_LABELS = {
   label: "Map of nearby restaurants",
   searchThisArea: "Search this area",

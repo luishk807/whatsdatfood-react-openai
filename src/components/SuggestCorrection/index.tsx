@@ -1,5 +1,5 @@
 import { useState, type FC } from "react";
-import { CORRECTABLE_FIELDS } from "@/customConstants";
+import { CORRECTABLE_FIELDS, CORRECTION_FLAGS } from "@/customConstants";
 import { CORRECTION_LABELS } from "@/customConstants/labels";
 import { SuggestCorrectionInterface } from "@/interfaces/corrections";
 import useMenuCorrections from "@/customHooks/useMenuCorrections";
@@ -19,6 +19,19 @@ import useMenuCorrections from "@/customHooks/useMenuCorrections";
  * The field list deliberately omits allergens, and says so. They are the
  * biggest gap in the data and the obvious thing to crowdsource — and the one
  * field where being wrong can hurt somebody.
+ *
+ * Two shapes share this one form. A **field** correction proposes a
+ * replacement value and the queue can apply it mechanically. A **flag** —
+ * gone, listed twice, something else — says something about the dish as a
+ * whole, where the fix is a judgement rather than a value; approving one
+ * takes the dish off the menu, archives a duplicate, or deliberately does
+ * nothing at all.
+ *
+ * The difference a reader feels is the text box. "No longer on the menu" is
+ * complete on its own, and the reports worth having most are the ones
+ * somebody makes while standing up to leave — so the note goes optional and
+ * the submit button stops requiring it. "Something else" means nothing
+ * without one.
  */
 const SuggestCorrection: FC<SuggestCorrectionInterface> = ({
   dishId,
@@ -54,10 +67,16 @@ const SuggestCorrection: FC<SuggestCorrectionInterface> = ({
     return <p className="text-xs text-ink-muted">{CORRECTION_LABELS.signIn}</p>;
   }
 
+  const flag = CORRECTION_FLAGS.find((one) => one.value === field);
+  // A flag that stands on its own sends an empty note and lets the server
+  // supply the sentence. Two places deciding what "no longer on the menu"
+  // reads as is one place too many.
+  const requiresValue = !flag || flag.needsNote;
+
   const submit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (!value.trim()) {
+    if (requiresValue && !value.trim()) {
       return;
     }
 
@@ -98,17 +117,30 @@ const SuggestCorrection: FC<SuggestCorrectionInterface> = ({
               {option.label}
             </option>
           ))}
+          {/* Grouped, because "Price" and "Listed twice" are not the same
+              kind of answer to "what is wrong" and a flat list of seven
+              reads as though they are. */}
+          <optgroup label={CORRECTION_LABELS.aboutTheDish}>
+            {CORRECTION_FLAGS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </optgroup>
         </select>
       </label>
 
-      <p className="text-[11px] text-ink-muted">
-        {CORRECTION_LABELS.dietaryNote}
-      </p>
+      {!flag && (
+        <p className="text-[11px] text-ink-muted">
+          {CORRECTION_LABELS.dietaryNote}
+        </p>
+      )}
 
       <label className="flex flex-col gap-1 text-[11px] text-ink-muted">
-        {CORRECTION_LABELS.value}
+        {flag ? CORRECTION_LABELS.note : CORRECTION_LABELS.value}
         <input
           value={value}
+          placeholder={flag?.placeholder}
           onChange={(e) => {
             setValue(e.target.value);
             clearError();
@@ -124,7 +156,7 @@ const SuggestCorrection: FC<SuggestCorrectionInterface> = ({
 
       <button
         type="submit"
-        disabled={sending || !value.trim()}
+        disabled={sending || (requiresValue && !value.trim())}
         className="self-start rounded-pill border border-line bg-surface-raised px-3 py-1.5 text-xs font-semibold text-ink hover:border-ink hover:bg-ink hover:text-surface disabled:opacity-50"
       >
         {sending ? CORRECTION_LABELS.sending : CORRECTION_LABELS.submit}

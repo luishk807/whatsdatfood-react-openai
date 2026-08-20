@@ -123,3 +123,80 @@ export const CORRECTABLE_FIELDS = [
   { value: "price", label: "Price" },
   { value: "category", label: "Section" },
 ] as const;
+
+/**
+ * The three reports that are not a new value for a field.
+ *
+ * A field correction proposes a replacement and can be applied mechanically.
+ * These say something about the dish as a whole, where the fix is a judgement
+ * — approving one takes the dish off the menu, archives a duplicate, or
+ * deliberately does nothing at all.
+ *
+ * `needsNote` is the difference that matters at the keyboard. "This is gone"
+ * is complete on its own, and the reports worth having most are the ones
+ * somebody makes while standing up to leave; demanding a sentence to go with
+ * it turns a one-tap report into a form. "Something else" has no meaning
+ * without one.
+ */
+export const CORRECTION_FLAGS = [
+  {
+    value: "availability",
+    label: "No longer on the menu",
+    needsNote: false,
+    placeholder: "Anything to add? (optional)",
+  },
+  {
+    value: "duplicate",
+    label: "Listed twice",
+    needsNote: false,
+    placeholder: "Which other dish? (optional)",
+  },
+  {
+    value: "other",
+    label: "Something else",
+    needsNote: true,
+    placeholder: "What is wrong?",
+  },
+] as const;
+
+export type CorrectionFlag = (typeof CORRECTION_FLAGS)[number]["value"];
+
+/**
+ * Deliberately not derived from the two lists above.
+ *
+ * Allergen and dietary fields are absent from both, and the reason is the
+ * only one in this file worth stating twice: they are where being wrong can
+ * hurt somebody, so they come from the kitchen or from nobody. A test asserts
+ * no dietary field ever appears in either list.
+ */
+export const CORRECTION_FIELD_VALUES = [
+  ...CORRECTABLE_FIELDS.map((one) => one.value),
+  ...CORRECTION_FLAGS.map((one) => one.value),
+] as readonly string[];
+
+/**
+ * Where a dish came from, as the server reports it. The frontend renders
+ * these and computes nothing — same contract as reputation.
+ */
+export const DISH_SOURCE = {
+  ai: "ai_extracted",
+  community: "community",
+  owner: "restaurant_owner",
+  admin: "admin",
+} as const;
+
+export const DISH_VERIFICATION = {
+  unverified: "unverified",
+  pending: "pending",
+  approved: "approved",
+  rejected: "rejected",
+  ownerVerified: "owner_verified",
+} as const;
+
+/** A dish sheet and a card show different amounts of the same truth. */
+export const MENU_EDIT = {
+  /** Longer than this and it is a description, not a name. */
+  MAX_NAME: 120,
+  MAX_DESCRIPTION: 600,
+  MAX_SECTION: 60,
+} as const;

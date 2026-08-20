@@ -42,6 +42,17 @@ export interface MenuItemType {
    * those are two different facts and the product says both.
    */
   first_photographed_by?: string | null;
+  /**
+   * Where the row came from and what has since been established about it.
+   * Two fields because they answer different questions — a dish a diner
+   * added and the owner later confirmed is still community-sourced.
+   */
+  source?: string | null;
+  verification_status?: string | null;
+  /** Off the menu this week, not gone. Keeps its photos and its votes. */
+  is_available?: boolean;
+  /** The diner who added it. Null for the extracted majority. */
+  added_by?: string | null;
   restaurant?: RestaurantType;
 }
 
@@ -94,6 +105,18 @@ export interface RestaurantType {
   } | null;
   /** Denominator for the order share. */
   diner_count?: number;
+  /**
+   * Menu-level trust, said once under the restaurant's name rather than
+   * badged onto every card. Null on both means nobody has ever vouched for
+   * or touched this menu, which is true of almost every restaurant.
+   */
+  menu_verified_at?: string | null;
+  menu_updated_at?: string | null;
+  /**
+   * Whether the viewer may open the management screen. Answered by the
+   * server; hiding the link is not what protects the menu.
+   */
+  viewer_can_manage?: boolean;
 }
 
 export interface RestaurantItemImageType {

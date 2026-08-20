@@ -68,6 +68,9 @@ export const GET_RESTAURANT_BY_SLUG = gql`
         close_time
       }
       diner_count
+      menu_verified_at
+      menu_updated_at
+      viewer_can_manage
       champion {
         username
         display_name
@@ -83,6 +86,10 @@ export const GET_RESTAURANT_BY_SLUG = gql`
         order_count
         ordered_by_me
         first_photographed_by
+        source
+        verification_status
+        is_available
+        added_by
         is_vegetarian
         is_vegan
         is_gluten_free

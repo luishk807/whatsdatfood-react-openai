@@ -1,5 +1,9 @@
 import { FC } from "react";
 import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import MenuTrust from "@/components/MenuTrust";
+import { MANAGE_MENU_LABELS } from "@/customConstants/labels";
+import { buildManageMenuPath } from "@/customConstants/routes";
 import { RestaurantHeaderInterface } from "@/interfaces/venue";
 import { VENUE_LABELS } from "@/customConstants/labels";
 import { ROUTES } from "@/customConstants/routes";
@@ -93,6 +97,27 @@ const RestaurantHeader: FC<RestaurantHeaderInterface> = ({
                 </>
               )}
             </p>
+
+            {/* One line, menu level. Badging every card is unaffordable on a
+                page where two thirds of the tiles already carry an
+                empty-photo prompt, and it renders nothing at all when
+                nothing has happened — which is almost every restaurant. */}
+            <MenuTrust
+              verifiedAt={restaurant?.menu_verified_at}
+              updatedAt={restaurant?.menu_updated_at}
+            />
+
+            {/* Only for somebody the server says may manage it. The link
+                being absent is a convenience; `ownerMenu` refusing is the
+                actual protection. */}
+            {restaurant?.viewer_can_manage && restaurant?.slug && (
+              <Link
+                to={buildManageMenuPath(restaurant.slug)}
+                className="mt-1 inline-flex min-h-9 items-center text-xs font-medium text-ink underline underline-offset-4"
+              >
+                {MANAGE_MENU_LABELS.open}
+              </Link>
+            )}
           </div>
 
           {action && <div className="shrink-0">{action}</div>}

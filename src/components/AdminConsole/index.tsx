@@ -4,6 +4,7 @@ import useMenuCorrections from "@/customHooks/useMenuCorrections";
 import ApiUsagePanel from "@/components/ApiUsagePanel";
 import FeatureStatus from "@/components/FeatureStatus";
 import CorrectionQueue from "@/components/CorrectionQueue";
+import DishSubmissionQueue from "@/components/DishSubmissionQueue";
 import ClaimReview from "@/components/ClaimReview";
 import ReportReview from "@/components/ReportReview";
 import useAuth from "@/customHooks/useAuth";
@@ -14,11 +15,14 @@ import {
 import { MenuCorrectionType } from "@/interfaces/corrections";
 import {
   ADMIN_LABELS,
+  MENU_EDIT_LABELS,
   CORRECTION_LABELS,
   FEATURE_LABELS,
   USAGE_LABELS,
 } from "@/customConstants/labels";
 import { ACCOUNT_TYPE } from "@/customConstants";
+import useMenuEditing from "@/customHooks/useMenuEditing";
+import { ManagedDishType } from "@/interfaces/menu";
 
 /**
  * The decisions only an admin makes: who owns a restaurant, whether a reported
@@ -43,6 +47,12 @@ const AdminConsole: FC = () => {
     loading: correctionsLoading,
   } = useMenuCorrections();
   const [corrections, setCorrections] = useState<MenuCorrectionType[]>([]);
+  const {
+    loadPendingDishes,
+    decideDish,
+    pendingLoading,
+  } = useMenuEditing();
+  const [submissions, setSubmissions] = useState<ManagedDishType[]>([]);
   const [loaded, setLoaded] = useState(false);
 
   const isAdmin = String(user?.role_id ?? "") === ACCOUNT_TYPE.admin;
@@ -55,8 +65,9 @@ const AdminConsole: FC = () => {
     setClaims(await loadClaims());
     setReports(await loadReports());
     setCorrections(await loadCorrections());
+    setSubmissions(await loadPendingDishes());
     setLoaded(true);
-  }, [isAdmin, loadClaims, loadReports, loadCorrections]);
+  }, [isAdmin, loadClaims, loadReports, loadCorrections, loadPendingDishes]);
 
   useEffect(() => {
     refresh();
@@ -67,8 +78,9 @@ const AdminConsole: FC = () => {
     return <p className="text-sm text-ink-muted">{ADMIN_LABELS.notForYou}</p>;
   }
 
-  const busy = loading || correctionsLoading;
-  const waiting = corrections.length + claims.length + reports.length;
+  const busy = loading || correctionsLoading || pendingLoading;
+  const waiting =
+    corrections.length + submissions.length + claims.length + reports.length;
 
   return (
     <section className="flex w-full max-w-3xl flex-col gap-8">
@@ -81,7 +93,25 @@ const AdminConsole: FC = () => {
         )}
       </div>
 
-      {/* Corrections first: they are the cheapest decision here and the one
+      {/* Submissions first: a dish somebody added is already on the menu,
+          labelled, so this is the only queue where waiting has a cost a
+          reader can see. */}
+      <div className="flex flex-col gap-3">
+        <h2 className="text-sm font-semibold text-ink">
+          {MENU_EDIT_LABELS.queueTitle}
+          {submissions.length > 0 && ` (${submissions.length})`}
+        </h2>
+        <DishSubmissionQueue
+          submissions={submissions}
+          loading={pendingLoading && !loaded}
+          onDecide={async (dishId, approve) => {
+            await decideDish(dishId, approve);
+            await refresh();
+          }}
+        />
+      </div>
+
+      {/* Corrections next: they are the cheapest decision here and the one
           that most directly improves what a reader sees. */}
       <div className="flex flex-col gap-3">
         <h2 className="text-sm font-semibold text-ink">

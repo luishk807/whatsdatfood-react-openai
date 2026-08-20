@@ -43,7 +43,7 @@ describe("SuggestCorrection", () => {
     expect(screen.getByText(CORRECTION_LABELS.blurb)).toBeInTheDocument();
   });
 
-  it("offers only the fields the server will accept", async () => {
+  it("offers only the reasons the server will accept", async () => {
     render(<SuggestCorrection dishId={1} canSuggest />);
     await open();
 
@@ -51,7 +51,58 @@ describe("SuggestCorrection", () => {
       .getAllByRole("option")
       .map((o) => (o as HTMLOptionElement).value);
 
-    expect(options).toEqual(["name", "description", "price", "category"]);
+    // Four fields that propose a value, then three flags about the dish
+    // itself. Pinned as a whole list rather than a contains-check, so adding
+    // a reason to the UI that the server would refuse fails here.
+    expect(options).toEqual([
+      "name",
+      "description",
+      "price",
+      "category",
+      "availability",
+      "duplicate",
+      "other",
+    ]);
+  });
+
+  it("lets a flag be sent without a note", async () => {
+    // "This is gone" is complete on its own, and the reports worth having
+    // most are made by somebody standing up to leave. A required text box
+    // loses them.
+    render(<SuggestCorrection dishId={1} canSuggest />);
+    await open();
+
+    await userEvent.selectOptions(screen.getByRole("combobox"), "availability");
+
+    expect(
+      screen.getByRole("button", { name: CORRECTION_LABELS.submit }),
+    ).toBeEnabled();
+  });
+
+  it("still requires one for \"something else\"", async () => {
+    render(<SuggestCorrection dishId={1} canSuggest />);
+    await open();
+
+    await userEvent.selectOptions(screen.getByRole("combobox"), "other");
+
+    expect(
+      screen.getByRole("button", { name: CORRECTION_LABELS.submit }),
+    ).toBeDisabled();
+  });
+
+  it("drops the allergen note once the reason is not a field", async () => {
+    // It explains which *fields* are missing from the list. Beside "listed
+    // twice" it is a non-sequitur.
+    render(<SuggestCorrection dishId={1} canSuggest />);
+    await open();
+
+    expect(screen.getByText(CORRECTION_LABELS.dietaryNote)).toBeInTheDocument();
+
+    await userEvent.selectOptions(screen.getByRole("combobox"), "duplicate");
+
+    expect(
+      screen.queryByText(CORRECTION_LABELS.dietaryNote),
+    ).not.toBeInTheDocument();
   });
 
   it("never offers an allergen field, and says why", async () => {
