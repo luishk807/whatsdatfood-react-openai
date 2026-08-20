@@ -1,4 +1,4 @@
-import { type FC, lazy, Suspense, useEffect, useMemo, useState } from "react";
+import { type FC, lazy, Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import clsx from "clsx";
 import { ListIcon, MapIcon } from "@/components/icons";
@@ -37,7 +37,7 @@ const NearbyPage: FC = () => {
   const [params] = useSearchParams();
   const cuisine = params.get(NEARBY_PARAMS.cuisine) || undefined;
 
-  const { location, nameArea } = useDiscoveryLocation();
+  const { location } = useDiscoveryLocation();
   const [view, setView] = useState<"list" | "map">("list");
   const [selected, setSelected] = useState<string | null>(null);
   const [areaResults, setAreaResults] = useState<NearbyPlaceType[] | null>(null);
@@ -60,12 +60,6 @@ const NearbyPage: FC = () => {
         : shown,
     [areaResults, cuisine, shown],
   );
-
-  useEffect(() => {
-    if (location?.label) {
-      nameArea(location.label);
-    }
-  }, [location?.label, nameArea]);
 
   const place = location?.label;
   const heading = cuisine

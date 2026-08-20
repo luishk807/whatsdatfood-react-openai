@@ -7,7 +7,6 @@ import {
 } from "react";
 import useGeolocation from "@/customHooks/useGeolocation";
 import {
-  GEOLOCATION_STATUS,
   GeolocationStatus,
   LOCATION_SOURCE,
   LOCATION_STORAGE_KEY,
@@ -37,7 +36,10 @@ interface DiscoveryLocationInterface {
   location: ResolvedLocationType | null;
   source: LocationSource | null;
   status: GeolocationStatus;
-  /** Ask the device. Only ever called from a tap. */
+  /**
+   * Ask the device. Only ever called from a tap, and it means *now* — a
+   * stored choice stops outranking the fix from here on.
+   */
   request: () => void;
   choose: (place: ResolvedLocationType) => void;
   forget: () => void;
@@ -85,7 +87,25 @@ export const DiscoveryLocationProvider = ({
   const [chosen, setChosen] = useState<ResolvedLocationType | null>(readStored);
   const [deviceLabel, setDeviceLabel] = useState("");
 
+  // Which source the reader last asked for. A choice normally outranks a
+  // device fix, but not when the reader has just tapped "use my current
+  // location" — at that moment the stored choice is precisely the thing they
+  // are trying to replace, and a fixed precedence made the fix arrive and
+  // change nothing.
+  const [preferred, setPreferred] = useState<LocationSource>(
+    LOCATION_SOURCE.chosen,
+  );
+
+  const requestDevice = useCallback(() => {
+    setPreferred(LOCATION_SOURCE.device);
+    // The old area name belongs to the old point. Kept, it would head the
+    // page "near Flushing" over results measured from somewhere else.
+    setDeviceLabel("");
+    request();
+  }, [request]);
+
   const choose = useCallback((place: ResolvedLocationType) => {
+    setPreferred(LOCATION_SOURCE.chosen);
     setChosen(place);
 
     try {
@@ -111,29 +131,46 @@ export const DiscoveryLocationProvider = ({
   }, []);
 
   const value = useMemo<DiscoveryLocationInterface>(() => {
-    const location = chosen
-      ? chosen
-      : coordinates
-        ? // The label comes from the server, which names the area from the
-          // nearest restaurant it knows. Nothing here reverse-geocodes anybody
-          // to a street.
-          { ...coordinates, label: deviceLabel }
-        : null;
+    // The label comes from the server, which names the area from the nearest
+    // restaurant it knows. Nothing here reverse-geocodes anybody to a street.
+    const device = coordinates ? { ...coordinates, label: deviceLabel } : null;
+
+    // A choice beats a fix — somebody who typed "Flushing" in Brooklyn meant
+    // it — *unless* they have since asked for the device, in which case the
+    // fix beats the choice and a refusal falls back to it rather than losing
+    // it. Tapping a button should never cost somebody the location they set.
+    const usingDevice =
+      preferred === LOCATION_SOURCE.device ? device !== null : chosen === null;
+    const location = (usingDevice ? device : chosen) ?? null;
 
     return {
       location,
-      source: chosen
-        ? LOCATION_SOURCE.chosen
-        : coordinates
+      source: location
+        ? usingDevice
           ? LOCATION_SOURCE.device
-          : null,
-      status: chosen ? GEOLOCATION_STATUS.granted : status,
-      request,
+          : LOCATION_SOURCE.chosen
+        : null,
+      // The device's real state, never a choice standing in for it. Reported
+      // as `granted` whenever anything was stored, "locating…" could not
+      // render and a standing refusal could not be explained — so the button
+      // sat there looking live and doing nothing.
+      status,
+      request: requestDevice,
       choose,
       forget,
       nameArea,
     };
-  }, [chosen, coordinates, deviceLabel, status, request, choose, forget, nameArea]);
+  }, [
+    chosen,
+    coordinates,
+    deviceLabel,
+    preferred,
+    status,
+    requestDevice,
+    choose,
+    forget,
+    nameArea,
+  ]);
 
   return (
     <DiscoveryLocationContext.Provider value={value}>

@@ -43,16 +43,19 @@ const LocationCue: FC<LocationCueInterface> = ({ cuisine }) => {
     status === GEOLOCATION_STATUS.denied ||
     status === GEOLOCATION_STATUS.unavailable;
 
-  const goToNearby = (place?: string) =>
+  const goToNearby = (place: string) =>
     navigate(buildNearbyPath({ cuisine, place }));
 
   const handleDevice = () => {
-    // Already located: no reason to ask the device again.
-    if (location) {
-      goToNearby();
-      return;
-    }
-
+    // Always ask, even while holding a location already.
+    //
+    // This used to short-circuit to `goToNearby()` whenever any location
+    // existed, and on the home page that looked right because the page
+    // changed. On `/nearby` the navigation target *is* the page already open,
+    // so React Router resolved the tap to nothing at all — and `/nearby` is
+    // the one screen where the button has no other possible meaning. Somebody
+    // reading "Near Flushing" who taps "use my current location" is asking to
+    // replace Flushing, not to be shown Flushing again.
     asked.current = true;
     request();
   };
