@@ -349,6 +349,127 @@ approving a change you cannot see is not a decision. "was empty" is called out
 rather than rendered blank: filling a hole and overwriting a fact are different
 things to agree to.
 
+## Editing a menu
+
+The extracted menu is a seed, not a source of truth. It was an inference the
+day it was made and goes stale the week a restaurant reprints, so the two
+people who can fix it get deliberately different powers.
+
+- **A diner adds; a diner never edits.** `AddDishAction` sits at the very end
+  of the menu — after the food, before anything about the product — because it
+  is for the reader who scrolled the whole thing and can see something missing.
+  Rewriting a dish that is already there stays a *suggestion* through the
+  correction queue; letting the same person do it directly is an edit war with
+  extra steps.
+- **The wording admits the gap is ours.** "Add a dish we missed". Menus here
+  are read automatically and they miss things, and nobody files a bug report
+  against a menu.
+- **An owner edits and publishes immediately.** Making a restaurant wait for a
+  moderator to approve its own corrected price would make the feature useless.
+  What makes that safe is `MenuItemRevision`: every change records who made it
+  and what it replaced, so a bad edit is visible and reversible afterwards
+  rather than prevented in advance.
+- **`source` and `verification_status` are separate.** Source is where a row
+  came from and never changes; status is what has since been established. A
+  dish a diner added and the owner later confirmed is still community-sourced,
+  and collapsing them would erase who found it.
+- **`is_available` is not a soft delete.** A restaurant forced to delete a
+  seasonal dish to mark it sold out would lose its photographs and its votes
+  every winter. `deleted_at` is the archive; rejection archives too, because a
+  contributor asking why deserves an answer that still exists.
+- **Pending dishes are shown, labelled.** Hiding one until review means the
+  diner who added it watches nothing happen, and on a menu that is mostly empty
+  the contribution is the point. Vandalism is answered by an owner archiving it
+  in one tap, faster than any queue.
+- **`DishProvenance` renders nothing for an ordinary extracted dish**, which is
+  most of the catalogue. A badge on all of them is a badge on none of them. It
+  speaks only for: not available, confirmed by the restaurant, added by a named
+  diner, waiting to be checked — one at a time.
+- **`MenuTrust` says it once**, under the restaurant's name, and says nothing
+  when nothing has happened. "Menu last updated: never" draws attention to an
+  absence nobody was worried about.
+- **`ManageMenu` is a route, not a toggle.** A diner should never see a delete
+  button and an owner should not hunt for one between the photographs. Removing
+  a dish asks twice; marking one unavailable does not, because that is weekly
+  and reversible. Sections reorder with buttons rather than drag — dragging
+  fights the page scroll on a phone and has no keyboard equivalent.
+- **Every owner method re-checks an approved claim on that specific
+  restaurant.** A global owner role would let whoever held it rewrite every menu
+  in the catalogue, and that bug is invisible until it is catastrophic.
+- **Three correction reasons are flags, not fields.** Gone, listed twice,
+  something else. Approving one takes the dish off the menu, archives it, or
+  deliberately does nothing. They are awarded as *reports*: a flag has no
+  previous value, so the existing branch would have read every one as
+  identifying the dish. Dietary fields are still absent from the whole list.
+
+## Trending, and the word it will not use
+
+`RestaurantTrendingService` and `TrendingRestaurants`, above the dish strip —
+somebody who has not decided where to eat cannot use a row of dishes yet.
+
+- **The server decides what the section is called.** "Enough activity to call
+  this trending" is a rule about the data; a copy in the browser is a second
+  source of truth and the one that goes stale. Below the threshold it says
+  Discover and ranks on what we hold.
+- **Every signal already existed.** Views, votes, orders, favourites, community
+  photographs — all with timestamps and a restaurant behind them. A ranking
+  needing fresh instrumentation reports nothing for a month. `UserSearch` is
+  excluded: it stores a typed string with no restaurant attached.
+- **Recency in three bands, not a decay curve.** A half-life needs a constant
+  nobody can defend; 7/14/30 is legible in the SQL and arguable in a sentence.
+- **A hot pick must have earned it.** With no activity the ranking degenerates
+  to nearest, and the first run in Flushing nominated a Dunkin' Donuts 400
+  metres away as the standout place to eat. It is absent unless something has
+  real activity or a photograph — the loudest element on the page is where an
+  unearned claim does the most damage.
+- **It rotates on the day, never on refresh.** A different answer every reload
+  makes a recommendation feel arbitrary.
+- **The hero is the food**, with the restaurant as its caption. That is the
+  difference between "what should I eat" and "what restaurants are near me".
+- **Restaurant photos have their own weight.** Reusing the dish strip's
+  `TRENDING_WEIGHT_PHOTO` was a real bug: at 2.0, three page views outscored
+  somebody photographing their dinner.
+
+## Where somebody wants recommendations from
+
+`DiscoveryAreaService`, for signed-in people. Guests keep theirs in
+`localStorage` and always have.
+
+- **An area, not a location history.** One row, overwritten, never appended to.
+  A preference somebody keeps for months, not a record of everywhere they have
+  been — building the second while needing the first is how a food app ends up
+  holding a movement log.
+- **A device fix is refused outright.** Precise enough to be a home address,
+  stale within the hour, one tap to ask again.
+- **Stored coordinates are rounded to three decimals** — about 110 metres.
+  Enough to centre a search, not enough to name a building.
+
+## Writing to us
+
+`ContactPage` and `app/api/sendgrid.py`. The footer used to offer a `mailto:`,
+which opens nothing on a phone with no mail client and loses the message
+entirely on a shared computer.
+
+- **The HTML template is in the repository, not a SendGrid dynamic template.**
+  One in their dashboard is production behaviour with no version history and no
+  way to tell which revision sent a message somebody is asking about.
+- **Table markup and inline styles.** Outlook strips a `<style>` block and
+  renders a `div` layout as a stack of full-width blocks. Clean typography
+  inside markup from 1999 is what "modern" means in email.
+- **Two messages.** The enquiry, with reply-to set to the sender; and a receipt
+  quoting what they wrote, because a form with no acknowledgement is
+  indistinguishable from a broken one. A failed receipt does not fail the
+  enquiry, which is already away.
+- **Newlines are stripped from the name and subject and kept in the message.**
+  A newline in a header appends one of the sender's choosing to mail going out
+  with our domain's reputation behind it.
+- **Nothing is stored.** Correspondence belongs in a mailbox somebody answers,
+  not in a table of unsolicited personal information nobody owns.
+- **Five an hour**, the tightest limit here: the only unauthenticated path that
+  sends mail from our domain.
+- **No key is a supported state.** `contactAvailable` lets the page offer an
+  address rather than a form that fails on submit.
+
 ## Signing up, and what a person is called
 
 Registration asks for **three things: a display name, an email and a
