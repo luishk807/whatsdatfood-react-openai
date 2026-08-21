@@ -261,6 +261,38 @@ export const SETTINGS_LABELS = {
   deleting: "Deleting…",
   deleteFailed: "That did not work. Nothing has been deleted — try again.",
 
+  /**
+   * The Settings sections, in their own words.
+   *
+   * `profileBlurb` used to say "How you appear on the photos and reviews you
+   * contribute" on a card sharing a page with an email field, a phone field
+   * and a delete button - which made the sentence true of the card and false
+   * of the page it was on.
+   */
+  hubTitle: "Settings",
+  profileHeading: "Profile",
+  accountHeading: "Account & security",
+  locationHeading: "Location & discovery",
+  privacyHeading: "Contributions & privacy",
+  preferencesHeading: "Food preferences",
+  /** Nothing is behind this yet, and the page says so rather than pretending. */
+  notificationsHeading: "Notifications",
+  notificationsBlurb:
+    "There is nothing to turn on yet. When we start sending anything, this " +
+    "is where you will choose what.",
+  /** Said once, at the top of the account section rather than on a card. */
+  accountPrivate: "Only you can see these.",
+  locationBlurb:
+    "Where we look when you ask what is nearby. Rounded to about a hundred " +
+    "metres, so it can centre a search and cannot name a building.",
+  locationNone: "No saved area.",
+  locationForget: "Forget this area",
+  privacyPublic: "Your public profile",
+  privacyPublicBlurb:
+    "Your display name, your photos and the Food Cred you have earned are " +
+    "visible to anyone. Your email, phone and saved area are not.",
+  photoTitle: "Photo",
+  photoSoon: "Adding a photo is not available yet.",
   profileTitle: "Profile",
   profileBlurb: "How you appear on the photos and reviews you contribute.",
   accountTitle: "Account",
@@ -387,6 +419,12 @@ export const LOCATION_LABELS = {
   finding: "Finding…",
   notFound: "We could not find that place. Try a neighborhood or a ZIP.",
   change: "Change",
+  /**
+   * Which kind of location this is, because the two are kept differently and
+   * somebody deciding whether to forget one should know which they have.
+   */
+  fromDevice: "From your device. Never stored — we ask again each time.",
+  fromChoice: "A place you chose. Saved so we can keep using it.",
   changeLocation: "Change location",
   near: (place: string) => `near ${place}`,
   nearYou: "near you",

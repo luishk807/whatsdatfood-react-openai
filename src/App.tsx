@@ -1,6 +1,8 @@
 import { Suspense, lazy, useEffect } from "react";
 import Layout from "@/components/Layout/Main";
 import UserAccountLayout from "./components/Layout/UserAccount";
+import SettingsLayout from "@/components/SettingsLayout";
+import { SETTINGS_LABELS } from "@/customConstants/labels";
 import { Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -27,7 +29,14 @@ const LazyContributions = lazy(() => import("@/components/Contributions"));
 const LazyContributorProfile = lazy(
   () => import("@/components/ContributorProfile"),
 );
-const LazyUserSettings = lazy(() => import("@/components/UserSettings"));
+const LazySettingsHub = lazy(() => import("@/components/SettingsHub"));
+const LazySettingsProfile = lazy(() => import("@/components/SettingsProfile"));
+const LazySettingsAccount = lazy(() => import("@/components/SettingsAccount"));
+const LazySettingsLocation = lazy(() => import("@/components/SettingsLocation"));
+const LazySettingsPrivacy = lazy(() => import("@/components/SettingsPrivacy"));
+const LazySettingsNotifications = lazy(
+  () => import("@/components/SettingsNotifications"),
+);
 const LazyUserHistory = lazy(() => import("@/components/UserHistory"));
 const LazyUserFavorites = lazy(() => import("@/components/UserFavorites"));
 const LazyOwnerConsole = lazy(() => import("@/components/OwnerConsole"));
@@ -176,23 +185,37 @@ function App() {
               </Suspense>
             }
           />
-          <Route
-            path={ROUTES.accountProfile}
-            element={
-              <Suspense fallback={<Loading style={customStyle} />}>
-                <Layout>
-                  <UserAccountLayout sectionTitle="Profile & account">
-                    <LazyUserSettings />
-                  </UserAccountLayout>
-                </Layout>
-              </Suspense>
-            }
-          />
+          {/* Settings: a list of sections, each its own screen.
+              On a phone a section is a page with a way back; from `lg` up the
+              same routes render beside the list. One set of components. */}
+          {[
+            { path: ROUTES.settings, title: SETTINGS_LABELS.hubTitle, element: <LazySettingsHub /> },
+            { path: ROUTES.settingsProfile, title: SETTINGS_LABELS.profileHeading, element: <LazySettingsProfile /> },
+            { path: ROUTES.settingsAccount, title: SETTINGS_LABELS.accountHeading, element: <LazySettingsAccount /> },
+            { path: ROUTES.settingsLocation, title: SETTINGS_LABELS.locationHeading, element: <LazySettingsLocation /> },
+            { path: ROUTES.settingsPreferences, title: SETTINGS_LABELS.preferencesHeading, element: <LazyTastes embedded /> },
+            { path: ROUTES.settingsPrivacy, title: SETTINGS_LABELS.privacyHeading, element: <LazySettingsPrivacy /> },
+            { path: ROUTES.settingsNotifications, title: SETTINGS_LABELS.notificationsHeading, element: <LazySettingsNotifications /> },
+          ].map((section) => (
+            <Route
+              key={section.path}
+              path={section.path}
+              element={
+                <Suspense fallback={<Loading style={customStyle} />}>
+                  <Layout>
+                    <SettingsLayout title={section.title}>
+                      {section.element}
+                    </SettingsLayout>
+                  </Layout>
+                </Suspense>
+              }
+            />
+          ))}
           {/* The old address. Somebody's bookmark, and the link in any email
               already sent, must still land somewhere. */}
           <Route
-            path={ROUTES.settings}
-            element={<Navigate to={ROUTES.accountProfile} replace />}
+            path={ROUTES.accountProfile}
+            element={<Navigate to={ROUTES.settings} replace />}
           />
           <Route
             path={ROUTES.ratings}

@@ -46,7 +46,7 @@ export const DROPDOWN_MENU = {
   "1": [
     {
       name: "Profile & account",
-      url: ROUTES.accountProfile,
+      url: ROUTES.settings,
     },
     {
       name: "Friends",

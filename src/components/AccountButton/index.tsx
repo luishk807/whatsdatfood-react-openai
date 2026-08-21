@@ -96,7 +96,7 @@ const AccountButton = () => {
           something else. Now the header is the destination and the gear is
           gone. */}
       <Link
-        to={ROUTES.accountProfile}
+        to={ROUTES.settings}
         onClick={() => setOpen(false)}
         className="flex min-h-14 items-center gap-3 px-4 py-3 hover:bg-surface-sunken"
       >

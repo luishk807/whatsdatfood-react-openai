@@ -82,3 +82,15 @@ export interface QuickDiscoveryInterface {
   preferences: TastePreferenceType[];
   loading?: boolean;
 }
+
+export interface TastePreferencesPageInterface {
+  /**
+   * Rendered inside Settings rather than as its own page.
+   *
+   * Drops the heading and the page padding, both of which the settings layout
+   * already provides. The alternative was a second preferences page, and two
+   * pickers that can disagree about which chips exist is the worst possible
+   * thing to have two of.
+   */
+  embedded?: boolean;
+}

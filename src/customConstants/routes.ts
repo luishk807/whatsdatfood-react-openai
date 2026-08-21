@@ -14,9 +14,29 @@ export const ROUTES = {
    * drawer that never needed a page at all. So the route says what the page
    * holds.
    */
-  accountProfile: "/account/profile",
-  /** The old address, kept so existing links and bookmarks still land. */
+  /**
+   * Everything about you, and the only place to look for any of it.
+   *
+   * `/settings` is a list of sections, not a form. It was one long page
+   * holding a display name, a username, an email, a phone, two password
+   * boxes and an irreversible delete control, with Save floating between two
+   * unrelated cards - so every field carried the same weight and the one
+   * that erases your account carried it too. Preferences lived somewhere
+   * else entirely, which meant leaving Settings to change a setting.
+   *
+   * Each section is a real route because on a phone a section is a screen,
+   * and because a URL somebody can be sent is worth more than a scroll
+   * position.
+   */
   settings: "/settings",
+  settingsProfile: "/settings/profile",
+  settingsPreferences: "/settings/preferences",
+  settingsLocation: "/settings/location",
+  settingsNotifications: "/settings/notifications",
+  settingsPrivacy: "/settings/privacy",
+  settingsAccount: "/settings/account",
+  /** The old address, kept so existing links and bookmarks still land. */
+  accountProfile: "/account/profile",
   ratings: "/ratings",
   contributions: "/contributions",
   profile: "/contributor/:username",

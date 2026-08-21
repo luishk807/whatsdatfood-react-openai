@@ -217,7 +217,11 @@ describe("the account header", () => {
       name: new RegExp(ACCOUNT_LABELS.viewProfile),
     });
 
-    expect(header).toHaveAttribute("href", "/account/profile");
+    // `/settings` now, not `/account/profile`. The header has always been the
+    // way into your own account; what changed is that the destination is a
+    // list of everything about you rather than one long form holding four
+    // fields and a delete button.
+    expect(header).toHaveAttribute("href", "/settings");
   });
 
   it("still says who is signed in", async () => {

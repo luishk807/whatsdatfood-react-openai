@@ -46,10 +46,10 @@ const AccountNav: FC<AccountNavInterface> = ({ variant }) => {
           would leave the page reachable only by typing its address. */}
       {user && (
         <Link
-          to={ROUTES.accountProfile}
+          to={ROUTES.settings}
           className={clsx(
             "mb-2 flex min-h-14 items-center gap-3 rounded-card px-3 text-sm hover:bg-surface-sunken",
-            pathname === ROUTES.accountProfile && "bg-surface-sunken",
+            pathname === ROUTES.settings && "bg-surface-sunken",
           )}
         >
           <span className="text-ink-muted">
