@@ -1,193 +1,179 @@
 import { type FC } from "react";
+import {
+  ArrowRight,
+  Award,
+  CakeSlice,
+  Camera,
+  CameraOff,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  CircleCheck,
+  Clock,
+  Coffee,
+  Croissant,
+  Drumstick,
+  EggFried,
+  Eye,
+  EyeOff,
+  Fish,
+  Flag,
+  Flame,
+  Hamburger,
+  Heart,
+  ImagePlus,
+  List,
+  LocateFixed,
+  type LucideIcon,
+  Map,
+  MapPin,
+  Medal,
+  Pencil,
+  Pizza,
+  Plus,
+  Salad,
+  Search,
+  Settings,
+  SlidersHorizontal,
+  Soup,
+  Star,
+  Store,
+  ThumbsDown,
+  ThumbsUp,
+  Trophy,
+  User,
+  Users,
+  Utensils,
+  Wheat,
+  X,
+} from "lucide-react";
 import { IconInterface } from "@/interfaces/icons";
 
 /**
- * The icons the app actually uses, as inline SVG.
+ * Every icon in the application, and the only module that names an icon
+ * library.
  *
- * These replaced `@mui/icons-material`, where every icon pulls in `SvgIcon` and
- * therefore emotion — roughly the entire styling runtime for the sake of a
- * chevron. They are drawn on a 24x24 grid in `currentColor`, so they inherit
- * text colour and need no `dark:` handling.
+ * **Lucide draws these now.** They used to be hand-drawn inline SVG, which was
+ * itself a replacement for `@mui/icons-material` — where every icon pulled in
+ * `SvgIcon` and therefore the whole emotion runtime for the sake of a chevron.
+ * Lucide reintroduces none of that: it is tree-shaken ES modules with no
+ * styling runtime, so only the icons named above are bundled.
  *
- * Every one of them sits inside a control that already carries its own label,
- * so they are `aria-hidden` by default; pass `title` for the rare standalone
- * case and the icon becomes an `img` with an accessible name instead.
+ * The swap was cheap because the hand-drawn set was already drawn in Lucide's
+ * language — 24x24, `currentColor`, round caps — so this is one visual system
+ * becoming the same system with a maintainer, rather than a redesign. **No
+ * call site changed.** All twenty-five of them still import from
+ * `@/components/icons`, which is the point: the module is the seam, so
+ * swapping a library, or replacing one glyph with our own artwork, is an edit
+ * here and nowhere else.
+ *
+ * **Do not import `lucide-react` anywhere but this file.** Two components
+ * reaching for their own icons is how an application ends up with three
+ * chevrons at three weights, and it defeats the seam above.
+ *
+ * `stroke-width` is 1.8 rather than Lucide's default 2, which is the weight
+ * the rest of this interface was drawn at and matches the type.
+ *
+ * Every icon sits inside a control that already carries its own label, so they
+ * are `aria-hidden` by default; pass `title` for the rare standalone case and
+ * the icon becomes an `img` with an accessible name instead.
  */
-const Svg: FC<IconInterface & { children: React.ReactNode; fill?: boolean }> = ({
-  size = 24,
-  className,
-  title,
-  children,
-  fill = false,
-}) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    viewBox="0 0 24 24"
-    width={size}
-    height={size}
-    className={className}
-    fill={fill ? "currentColor" : "none"}
-    stroke={fill ? "none" : "currentColor"}
-    strokeWidth={fill ? undefined : 1.8}
-    strokeLinecap={fill ? undefined : "round"}
-    strokeLinejoin={fill ? undefined : "round"}
-    role={title ? "img" : undefined}
-    aria-hidden={title ? undefined : true}
-    aria-label={title}
-    focusable="false"
-  >
-    {title && <title>{title}</title>}
-    {children}
-  </svg>
-);
 
-export const CloseIcon: FC<IconInterface> = (props) => (
-  <Svg {...props}>
-    <path d="M6 6l12 12M18 6L6 18" />
-  </Svg>
-);
+/** The one stroke weight, set once. */
+const STROKE = 1.8;
 
-export const ScheduleIcon: FC<IconInterface> = (props) => (
-  <Svg {...props}>
-    <circle cx="12" cy="12" r="9" />
-    <path d="M12 7v5.2l3.2 1.9" />
-  </Svg>
-);
+/**
+ * Wrap a Lucide glyph in this application's icon contract.
+ *
+ * Sizing, stroke, focusability and the accessibility default are decided here
+ * and cannot drift per component — which is the whole reason call sites take a
+ * `size` and nothing else.
+ */
+const icon =
+  (Glyph: LucideIcon, { filled = false }: { filled?: boolean } = {}): FC<IconInterface> =>
+  ({ size = 24, className, title }) => (
+    <Glyph
+      size={size}
+      className={className}
+      strokeWidth={STROKE}
+      fill={filled ? "currentColor" : "none"}
+      role={title ? "img" : undefined}
+      aria-hidden={title ? undefined : true}
+      aria-label={title}
+      focusable="false"
+    />
+  );
 
-export const StorefrontIcon: FC<IconInterface> = (props) => (
-  <Svg {...props}>
-    <path d="M3.5 9l1.4-5h14.2l1.4 5" />
-    <path d="M4.5 9.2V20h15V9.2" />
-    <path d="M9.5 20v-5.5h5V20" />
-  </Svg>
-);
+// --- interface ----------------------------------------------------------
 
-export const FlameIcon: FC<IconInterface> = (props) => (
-  <Svg {...props} fill>
-    <path d="M12.9 2.2c.4 2.7 2.2 4 3.4 5.6A6.9 6.9 0 0 1 17.8 12a5.8 5.8 0 0 1-11.6 0c0-1.8.7-3.4 1.9-4.6.1 1.2.7 2 1.5 2.3.9.4 1.6-.3 1.5-1.6-.1-1.5-.2-3.5.8-5.9z" />
-  </Svg>
-);
+export const CloseIcon = icon(X);
+export const ScheduleIcon = icon(Clock);
+export const StorefrontIcon = icon(Store);
+export const ThumbUpIcon = icon(ThumbsUp);
+export const ThumbDownIcon = icon(ThumbsDown);
+export const FlagIcon = icon(Flag);
+export const CheckCircleIcon = icon(CircleCheck);
+export const CheckIcon = icon(Check);
+export const PlusIcon = icon(Plus);
+export const EditIcon = icon(Pencil);
+export const SearchIcon = icon(Search);
+export const SettingsIcon = icon(Settings);
+export const FilterIcon = icon(SlidersHorizontal);
+export const UserIcon = icon(User);
+export const PeopleIcon = icon(Users);
+export const CameraIcon = icon(Camera);
+export const HeartIcon = icon(Heart);
+export const TrophyIcon = icon(Trophy);
+export const AwardIcon = icon(Award);
+export const ArrowRightIcon = icon(ArrowRight);
+export const ChevronLeftIcon = icon(ChevronLeft);
+export const ChevronRightIcon = icon(ChevronRight);
+export const ListIcon = icon(List);
+export const MapIcon = icon(Map);
+export const MedalIcon = icon(Medal);
+export const VisibilityIcon = icon(Eye);
+export const VisibilityOffIcon = icon(EyeOff);
 
-export const NoPhotographyIcon: FC<IconInterface> = (props) => (
-  <Svg {...props}>
-    <path d="M9.4 4h5.2l1.4 2.4H20A1.5 1.5 0 0 1 21.5 8v9.6" />
-    <path d="M19 20H4a1.5 1.5 0 0 1-1.5-1.5V8A1.5 1.5 0 0 1 4 6.4h2" />
-    <path d="M14.6 10.6a3.6 3.6 0 0 1-5 5" />
-    <path d="M3 3l18 18" />
-  </Svg>
-);
-
-export const ThumbUpIcon: FC<IconInterface> = (props) => (
-  <Svg {...props}>
-    <path d="M7.2 10.4V20H4.4A1.4 1.4 0 0 1 3 18.6v-6.8a1.4 1.4 0 0 1 1.4-1.4z" />
-    <path d="M7.2 10.4l4.3-6.8a1.9 1.9 0 0 1 3.3 1.9l-1.5 3.6h5.3A1.9 1.9 0 0 1 20.4 11l-1.5 6.8A1.9 1.9 0 0 1 17 20H7.2" />
-  </Svg>
-);
-
-export const ThumbDownIcon: FC<IconInterface> = (props) => (
-  <Svg {...props}>
-    <g transform="rotate(180 12 12)">
-      <path d="M7.2 10.4V20H4.4A1.4 1.4 0 0 1 3 18.6v-6.8a1.4 1.4 0 0 1 1.4-1.4z" />
-      <path d="M7.2 10.4l4.3-6.8a1.9 1.9 0 0 1 3.3 1.9l-1.5 3.6h5.3A1.9 1.9 0 0 1 20.4 11l-1.5 6.8A1.9 1.9 0 0 1 17 20H7.2" />
-    </g>
-  </Svg>
-);
-
-export const FlagIcon: FC<IconInterface> = (props) => (
-  <Svg {...props}>
-    <path d="M5 21V3.8" />
-    <path d="M5 4.6h12.2l-2 3.9 2 3.9H5" />
-  </Svg>
-);
-
-export const CheckCircleIcon: FC<IconInterface> = (props) => (
-  <Svg {...props}>
-    <circle cx="12" cy="12" r="9" />
-    <path d="M8.1 12.2l2.7 2.7 5.1-5.8" />
-  </Svg>
-);
-
-export const AddAPhotoIcon: FC<IconInterface> = (props) => (
-  <Svg {...props}>
-    <path d="M12.6 4H9.4L8 6.4H4A1.5 1.5 0 0 0 2.5 8v10.5A1.5 1.5 0 0 0 4 20h16a1.5 1.5 0 0 0 1.5-1.5v-6.1" />
-    <circle cx="12" cy="13.2" r="3.6" />
-    <path d="M18.4 2.5v5.8M15.5 5.4h5.8" />
-  </Svg>
-);
-
-export const StarIcon: FC<IconInterface> = (props) => (
-  <Svg {...props} fill>
-    <path d="M12 2.6l2.9 5.9 6.5.95-4.7 4.6 1.1 6.5L12 17.5l-5.8 3.05 1.1-6.5-4.7-4.6 6.5-.95z" />
-  </Svg>
-);
-
-export const VisibilityIcon: FC<IconInterface> = (props) => (
-  <Svg {...props}>
-    <path d="M2.2 12S5.8 5.6 12 5.6 21.8 12 21.8 12 18.2 18.4 12 18.4 2.2 12 2.2 12z" />
-    <circle cx="12" cy="12" r="3.1" />
-  </Svg>
-);
-
-export const VisibilityOffIcon: FC<IconInterface> = (props) => (
-  <Svg {...props}>
-    <path d="M9.8 5.9A9.3 9.3 0 0 1 12 5.6c6.2 0 9.8 6.4 9.8 6.4a17 17 0 0 1-3.2 4" />
-    <path d="M6.3 7.9A16.7 16.7 0 0 0 2.2 12S5.8 18.4 12 18.4a9.6 9.6 0 0 0 3.9-.8" />
-    <path d="M9.9 9.9a3.1 3.1 0 0 0 4.3 4.3" />
-    <path d="M3 3l18 18" />
-  </Svg>
-);
-
-export const ChevronLeftIcon: FC<IconInterface> = (props) => (
-  <Svg {...props}>
-    <path d="M14.8 5.6L8.4 12l6.4 6.4" />
-  </Svg>
-);
-
-export const ChevronRightIcon: FC<IconInterface> = (props) => (
-  <Svg {...props}>
-    <path d="M9.2 5.6L15.6 12l-6.4 6.4" />
-  </Svg>
-);
+/** Filled, because both of these are marks rather than outlines. */
+export const StarIcon = icon(Star, { filled: true });
+export const FlameIcon = icon(Flame, { filled: true });
 
 /**
  * A map pin, for "near me". Not an arrow or a crosshair — both read as
  * "navigate me there", and this only ever means "somewhere around here".
  */
-export const PinIcon: FC<IconInterface> = (props) => (
-  <Svg {...props}>
-    <path d="M12 21.5s7-6.2 7-11.2a7 7 0 1 0-14 0c0 5 7 11.2 7 11.2z" />
-    <circle cx="12" cy="10.2" r="2.6" />
-  </Svg>
-);
+export const PinIcon = icon(MapPin);
 
 /**
  * Back to my location, on the map. A crosshair rather than a pin: the pin
  * already means "a place", and this control means "the middle again".
  */
-export const RecentreIcon: FC<IconInterface> = (props) => (
-  <Svg {...props}>
-    <circle cx="12" cy="12" r="4" />
-    <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
-  </Svg>
-);
+export const RecentreIcon = icon(LocateFixed);
 
-export const MedalIcon: FC<IconInterface> = (props) => (
-  <Svg {...props}>
-    <circle cx="12" cy="15" r="5.4" />
-    <path d="M8.6 10.2L6.2 3.4h11.6l-2.4 6.8" />
-  </Svg>
-);
+/** The upload affordance. A picture with a plus, never a crossed-out camera —
+ * one reads as "waiting", the other as "broken". */
+export const AddAPhotoIcon = icon(ImagePlus);
 
-export const ListIcon: FC<IconInterface> = (props) => (
-  <Svg {...props}>
-    <path d="M8.5 6.5h12M8.5 12h12M8.5 17.5h12" />
-    <path d="M3.6 6.5h.01M3.6 12h.01M3.6 17.5h.01" />
-  </Svg>
-);
+/** A photograph that failed, which is a different statement from one that was
+ * never taken. */
+export const NoPhotographyIcon = icon(CameraOff);
 
-export const MapIcon: FC<IconInterface> = (props) => (
-  <Svg {...props}>
-    <path d="M9.2 4.2L3.6 6.4v13.4l5.6-2.2 5.6 2.2 5.6-2.2V4.2l-5.6 2.2z" />
-    <path d="M9.2 4.2v13.4M14.8 6.4v13.4" />
-  </Svg>
-);
+// --- food -----------------------------------------------------------------
+//
+// Lucide covers most of what a taste category needs. What it cannot draw —
+// sushi, a dumpling, a taco — is in `./food`, drawn in the same language, and
+// the mapping from a category slug to any of these lives in
+// `customConstants/foodIcons.tsx` rather than in a component.
+
+export const CoffeeIcon = icon(Coffee);
+export const PizzaIcon = icon(Pizza);
+export const SoupIcon = icon(Soup);
+export const DessertIcon = icon(CakeSlice);
+export const BakeryIcon = icon(Croissant);
+export const BurgerIcon = icon(Hamburger);
+export const BbqIcon = icon(Drumstick);
+export const BrunchIcon = icon(EggFried);
+export const SaladIcon = icon(Salad);
+export const SeafoodIcon = icon(Fish);
+export const UtensilsIcon = icon(Utensils);
+export const WheatIcon = icon(Wheat);
