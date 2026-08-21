@@ -37,12 +37,24 @@ export interface MarkerState {
 
 const ROOT_CLASS = "wdf-marker";
 
-/** Roles the map never reads; they exist so tests and future work can. */
+/** Roles the map reads to find where a glyph goes. */
 const PIN = "pin";
 const FACE = "face";
 
 const has = (place: NearbyPlaceType): boolean =>
   Boolean(place.top_dish_photo_url);
+
+/**
+ * Where a category glyph goes.
+ *
+ * The three nested nodes were built for exactly this: `root` is the tap
+ * target, `pin` is the drawn shape and `face` is the slot. The map renders a
+ * React icon into it through a portal, so the marker shares one taxonomy with
+ * the taste picker, the homepage tiles and the nearby list rather than
+ * carrying a second copy of it in raw SVG.
+ */
+export const markerFace = (root: HTMLElement): HTMLElement | null =>
+  root.querySelector<HTMLElement>(`[data-role="${FACE}"]`);
 
 export const createMarker = (
   place: NearbyPlaceType,
@@ -68,7 +80,11 @@ export const createMarker = (
 
   const face = document.createElement("span");
   face.dataset.role = FACE;
-  face.style.display = "block";
+  // Centres whatever is rendered into it — a category glyph today, a dish
+  // photograph the day markers carry one.
+  face.style.display = "flex";
+  face.style.alignItems = "center";
+  face.style.justifyContent = "center";
   face.style.width = "100%";
   face.style.height = "100%";
   face.style.borderRadius = "9999px";
@@ -110,6 +126,14 @@ export const paintMarker = (
   pin.style.background = has(place)
     ? "var(--color-brand)"
     : "var(--color-surface-raised)";
+
+  // The glyph inherits this, so it stays legible on both grounds: white on
+  // the brand disc a photographed restaurant gets, ink on the plain one.
+  const face = root.querySelector<HTMLElement>(`[data-role="${FACE}"]`);
+
+  if (face) {
+    face.style.color = has(place) ? "#fff" : "var(--color-ink-muted)";
+  }
   pin.style.border = state.selected
     ? "3px solid var(--color-ink)"
     : `2px solid ${

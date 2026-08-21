@@ -1,8 +1,10 @@
 import { type FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { RecentreIcon } from "@/components/icons";
 import {
+  MAP_MARKER,
   MAP_MOVEMENT,
   MAP_STYLE,
   MAP_VIEW,
@@ -11,9 +13,10 @@ import {
 import { MAP_LABELS } from "@/customConstants/labels";
 import { THEME } from "@/customConstants/theme";
 import useTheme from "@/customHooks/useTheme";
-import { RestaurantMapInterface } from "@/interfaces/location";
+import { NearbyPlaceType, RestaurantMapInterface } from "@/interfaces/location";
 import { clusterPlaces, zoomIntoCluster } from "@/utils/cluster";
-import { createCluster, createMarker, paintMarker } from "./markers";
+import { restaurantCategoryIcon } from "@/customConstants/foodIcons";
+import { createCluster, createMarker, markerFace, paintMarker } from "./markers";
 
 /**
  * The map half of nearby discovery.
@@ -60,6 +63,12 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
   // state rather than something read off the instance. Rounded, so a pinch
   // does not rebuild every marker on every animation frame.
   const [zoom, setZoom] = useState<number>(MAP_VIEW.DEFAULT_ZOOM);
+  // The slots a category glyph is rendered into, collected as the markers
+  // are built. Portals rather than a second React root per pin: they mount
+  // and unmount with this component and cost nothing extra.
+  const [faces, setFaces] = useState<
+    { id: string; node: HTMLElement; place: NearbyPlaceType }[]
+  >([]);
 
   // Read inside a listener that is created once, so it goes through a ref.
   // Re-subscribing whenever the selection changed would drop the very click
@@ -234,6 +243,8 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
     markers.current.forEach((marker) => marker.remove());
     markers.current.clear();
 
+    const slots: { id: string; node: HTMLElement; place: NearbyPlaceType }[] = [];
+
     clusters.forEach((cluster) => {
       const point: [number, number] = [cluster.longitude, cluster.latitude];
 
@@ -266,7 +277,17 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
         place.id,
         new mapboxgl.Marker({ element }).setLngLat(point).addTo(instance),
       );
+
+      const face = markerFace(element);
+
+      if (face) {
+        slots.push({ id: place.id, node: face, place });
+      }
     });
+
+    // One state write per rebuild, not one per pin. It does not re-run this
+    // effect: `clusters` and `zoom` are unchanged by it.
+    setFaces(slots);
     // `selectedId` is applied by the effect below. Rebuilding every marker
     // when it changes would destroy the one being tapped.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -313,6 +334,20 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
         aria-label={MAP_LABELS.label}
         className="h-full w-full"
       />
+
+      {/* A category glyph in each individual pin, so a zoomed-in map says what
+          its places are rather than showing a field of identical white dots.
+          Clusters are untouched — a number is what "several restaurants"
+          means, and a cuisine icon would claim they were all one kind.
+
+          Rendered through a portal into a node the marker already reserved,
+          which is what keeps the taste picker, the homepage tiles, the nearby
+          list and the map on one icon taxonomy. */}
+      {faces.map(({ id, node, place }) => {
+        const Glyph = restaurantCategoryIcon(place);
+
+        return createPortal(<Glyph size={MAP_MARKER.GLYPH_SIZE} />, node, id);
+      })}
 
       {/* Only once the reader has moved it, and moved it far enough to be
           looking somewhere else. Offered sooner, it invites a tap that

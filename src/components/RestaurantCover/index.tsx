@@ -2,7 +2,7 @@ import { type FC, useEffect, useMemo, useState } from "react";
 import clsx from "clsx";
 import { COVER_SOURCE } from "@/customConstants/images";
 import { IMAGERY_LABELS } from "@/customConstants/labels";
-import { foodCategoryIcon } from "@/customConstants/foodIcons";
+import { restaurantCategoryIcon } from "@/customConstants/foodIcons";
 import {
   getRestaurantCoverCandidates,
   needsAttribution,
@@ -51,7 +51,10 @@ const RestaurantCover: FC<RestaurantCoverInterface> = ({
   }, [candidates]);
 
   const candidate = candidates[index] ?? null;
-  const Glyph = foodCategoryIcon(restaurant.cuisine);
+  // Not `restaurant.cuisine` directly: it is null on most of the catalogue,
+  // which gave crossed cutlery to nearly every card. The resolver reads the
+  // name when there is nothing better.
+  const Glyph = restaurantCategoryIcon(restaurant);
 
   return (
     <div

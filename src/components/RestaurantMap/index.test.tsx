@@ -258,3 +258,44 @@ describe("RestaurantMap", () => {
     expect(instance().markers).toHaveLength(2);
   });
 });
+
+describe("what an individual pin says it is", () => {
+  it("draws the restaurant's category rather than an empty circle", () => {
+    // The reported problem: once a cluster broke apart, every place was the
+    // same white dot and the only way to learn what any of them were was to
+    // click all of them.
+    show({ places: [place({ cuisine: "chinese" })] });
+
+    const marker = instance().markers[0].getElement();
+
+    expect(marker.querySelector("svg")).toBeInTheDocument();
+  });
+
+  it("draws a category even when the cuisine column is empty", () => {
+    // Which is most of the catalogue — the classifier reads a menu and 6,783
+    // of 6,786 restaurants have none. `Oh! Bagel Cafe` is the reported case.
+    show({
+      places: [place({ name: "Oh! Bagel Cafe", cuisine: undefined })],
+    });
+
+    expect(
+      instance().markers[0].getElement().querySelector("svg"),
+    ).toBeInTheDocument();
+  });
+
+  it("leaves clusters as numbers", () => {
+    // A number is what "several restaurants" means. A cuisine icon over a
+    // group would claim they were all the same kind of place.
+    show({
+      places: [
+        place(),
+        place({ id: "2", latitude: 40.7102, longitude: -73.9602 }),
+      ],
+    });
+
+    const marker = instance().markers[0].getElement();
+
+    expect(marker.dataset.clusterCount).toBe("2");
+    expect(marker.querySelector("svg")).toBeNull();
+  });
+});

@@ -20,6 +20,8 @@ import {
   TacoIcon,
 } from "@/components/icons/food";
 import { IconInterface } from "@/interfaces/icons";
+import { FoodCategorySourceType } from "@/interfaces/imagery";
+import { resolveFoodCategory } from "@/utils/foodCategory";
 
 /**
  * What a food category looks like, and the only place that decides.
@@ -78,3 +80,15 @@ export const foodCategoryIcons: Record<string, FC<IconInterface>> = {
  */
 export const foodCategoryIcon = (slug?: string | null): FC<IconInterface> =>
   foodCategoryIcons[(slug || "").trim().toLowerCase()] ?? UtensilsIcon;
+
+/**
+ * The glyph for a *restaurant*, which is the entry point every surface uses.
+ *
+ * Structured data first, an unambiguous name token second, crossed cutlery
+ * when neither is confident — `utils/foodCategory.ts` owns that decision. The
+ * nearby list, the map markers, the cover fallback and the homepage tiles all
+ * call this, so "Coffee" is the same drawing in every one of them.
+ */
+export const restaurantCategoryIcon = (
+  restaurant: FoodCategorySourceType,
+): FC<IconInterface> => foodCategoryIcon(resolveFoodCategory(restaurant));

@@ -32,6 +32,17 @@ export interface RestaurantImagerySource {
   cuisine?: string | null;
 }
 
+/**
+ * What `resolveFoodCategory` needs to decide which glyph a place gets.
+ *
+ * The name is admissible here and nowhere else: this picks a 32px drawing, not
+ * a cuisine, so a wrong answer costs an odd icon rather than a wasted journey.
+ */
+export interface FoodCategorySourceType {
+  name?: string | null;
+  cuisine?: string | null;
+}
+
 export interface RestaurantCoverAttribution {
   text: string;
   url?: string | null;

@@ -76,6 +76,9 @@ export const MAP_MARKER = {
   SELECTED_SIZE: 40,
   /** Padding around the dot, so the tap target reaches 44px. */
   TOUCH_PADDING: 6,
+  /** The category glyph inside a pin. Small enough to sit inside the 32px
+   * disc with a ring of colour still showing around it. */
+  GLYPH_SIZE: 17,
 } as const;
 
 /**
