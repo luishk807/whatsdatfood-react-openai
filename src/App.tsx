@@ -6,7 +6,7 @@ import { SETTINGS_LABELS } from "@/customConstants/labels";
 import { Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Loading from "@/components/Loading";
+import PageLoader from "@/components/PageLoader";
 import FeatureRoute from "@/components/FeatureRoute";
 import { FEATURES } from "@/customConstants/features";
 import { ROUTES } from "@/customConstants/routes";
@@ -52,17 +52,13 @@ const LazyTastes = lazy(() => import("@/components/TastePreferencesPage"));
 const LazyPro = lazy(() => import("@/components/ProPage"));
 
 function App() {
-  const customStyle = {
-    width: "30px",
-  };
-
   return (
     <div className="App">
       <Routes>
         <Route
           path={ROUTES.signIn}
           element={
-            <Suspense fallback={<Loading style={customStyle} />}>
+            <Suspense fallback={<PageLoader />}>
               <Layout>
                 <LazySignIN />
               </Layout>
@@ -72,7 +68,7 @@ function App() {
         <Route
           path={ROUTES.createAccount}
           element={
-            <Suspense fallback={<Loading style={customStyle} />}>
+            <Suspense fallback={<PageLoader />}>
               <Layout>
                 <LazyCreateAccount />
               </Layout>
@@ -82,7 +78,7 @@ function App() {
         <Route
           path={ROUTES.logout}
           element={
-            <Suspense fallback={<Loading style={customStyle} />}>
+            <Suspense fallback={<PageLoader />}>
               <Layout>
                 <LazyLogout />
               </Layout>
@@ -100,7 +96,7 @@ function App() {
                 key={path}
                 path={path}
                 element={
-                  <Suspense fallback={<Loading style={customStyle} />}>
+                  <Suspense fallback={<PageLoader />}>
                     <Layout>
                       <LazyPro />
                     </Layout>
@@ -115,7 +111,7 @@ function App() {
         <Route
           path={ROUTES.nearby}
           element={
-            <Suspense fallback={<Loading style={customStyle} />}>
+            <Suspense fallback={<PageLoader />}>
               <Layout>
                 <LazyNearby />
               </Layout>
@@ -125,7 +121,7 @@ function App() {
         <Route
           path={ROUTES.rankings}
           element={
-            <Suspense fallback={<Loading style={customStyle} />}>
+            <Suspense fallback={<PageLoader />}>
               <Layout>
                 <LazyRankings />
               </Layout>
@@ -139,7 +135,7 @@ function App() {
         <Route
           path={ROUTES.tastes}
           element={
-            <Suspense fallback={<Loading style={customStyle} />}>
+            <Suspense fallback={<PageLoader />}>
               <Layout>
                 <LazyTastes />
               </Layout>
@@ -152,7 +148,7 @@ function App() {
         <Route
           path={ROUTES.profile}
           element={
-            <Suspense fallback={<Loading style={customStyle} />}>
+            <Suspense fallback={<PageLoader />}>
               <Layout>
                 <LazyContributorProfile />
               </Layout>
@@ -164,7 +160,7 @@ function App() {
           <Route
             path={ROUTES.account}
             element={
-              <Suspense fallback={<Loading style={customStyle} />}>
+              <Suspense fallback={<PageLoader />}>
                 <Layout>
                   <UserAccountLayout sectionTitle="Account">
                     <LazyUserAccount />
@@ -176,7 +172,7 @@ function App() {
           <Route
             path={ROUTES.friends}
             element={
-              <Suspense fallback={<Loading style={customStyle} />}>
+              <Suspense fallback={<PageLoader />}>
                 <Layout>
                   <UserAccountLayout sectionTitle="Friends">
                     <LazyUserFriendSection />
@@ -201,7 +197,7 @@ function App() {
               key={section.path}
               path={section.path}
               element={
-                <Suspense fallback={<Loading style={customStyle} />}>
+                <Suspense fallback={<PageLoader />}>
                   <Layout>
                     <SettingsLayout title={section.title}>
                       {section.element}
@@ -220,7 +216,7 @@ function App() {
           <Route
             path={ROUTES.ratings}
             element={
-              <Suspense fallback={<Loading style={customStyle} />}>
+              <Suspense fallback={<PageLoader />}>
                 <Layout>
                   <UserAccountLayout sectionTitle="Ratings">
                     <LazyUserRatings />
@@ -232,7 +228,7 @@ function App() {
           <Route
             path={ROUTES.contributions}
             element={
-              <Suspense fallback={<Loading style={customStyle} />}>
+              <Suspense fallback={<PageLoader />}>
                 <Layout>
                   <UserAccountLayout sectionTitle="Your contributions">
                     <LazyContributions />
@@ -244,7 +240,7 @@ function App() {
           <Route
             path={ROUTES.history}
             element={
-              <Suspense fallback={<Loading style={customStyle} />}>
+              <Suspense fallback={<PageLoader />}>
                 <Layout>
                   <UserAccountLayout sectionTitle="History">
                     <LazyUserHistory />
@@ -256,7 +252,7 @@ function App() {
           <Route
             path={ROUTES.manage}
             element={
-              <Suspense fallback={<Loading style={customStyle} />}>
+              <Suspense fallback={<PageLoader />}>
                 <Layout>
                   <UserAccountLayout sectionTitle="Manage">
                     <LazyOwnerConsole />
@@ -268,7 +264,7 @@ function App() {
           <Route
             path={ROUTES.admin}
             element={
-              <Suspense fallback={<Loading style={customStyle} />}>
+              <Suspense fallback={<PageLoader />}>
                 <Layout>
                   <UserAccountLayout sectionTitle="Review">
                     <LazyAdminConsole />
@@ -280,7 +276,7 @@ function App() {
           <Route
             path={ROUTES.favorites}
             element={
-              <Suspense fallback={<Loading style={customStyle} />}>
+              <Suspense fallback={<PageLoader />}>
                 <Layout>
                   <UserAccountLayout sectionTitle="Favorites">
                     <LazyUserFavorites />
@@ -296,7 +292,7 @@ function App() {
         <Route
           path={ROUTES.menuResults}
           element={
-            <Suspense fallback={<Loading style={customStyle} />}>
+            <Suspense fallback={<PageLoader />}>
               <Layout>
                 <LazyResult />
               </Layout>
@@ -312,7 +308,7 @@ function App() {
           <Route
             path={ROUTES.manageMenu}
             element={
-              <Suspense fallback={<Loading style={customStyle} />}>
+              <Suspense fallback={<PageLoader />}>
                 <Layout>
                   <LazyManageMenu />
                 </Layout>
@@ -324,7 +320,7 @@ function App() {
         <Route
           path={ROUTES.home}
           element={
-            <Suspense fallback={<Loading style={customStyle} />}>
+            <Suspense fallback={<PageLoader />}>
               <Layout>
                 <LazyHomepage />
               </Layout>
@@ -338,7 +334,7 @@ function App() {
         <Route
           path={ROUTES.contact}
           element={
-            <Suspense fallback={<Loading style={customStyle} />}>
+            <Suspense fallback={<PageLoader />}>
               <Layout>
                 <LazyContact />
               </Layout>
@@ -351,7 +347,7 @@ function App() {
         <Route
           path={ROUTES.privacy}
           element={
-            <Suspense fallback={<Loading style={customStyle} />}>
+            <Suspense fallback={<PageLoader />}>
               <Layout>
                 <LazyPrivacy />
               </Layout>
@@ -361,7 +357,7 @@ function App() {
         <Route
           path={ROUTES.terms}
           element={
-            <Suspense fallback={<Loading style={customStyle} />}>
+            <Suspense fallback={<PageLoader />}>
               <Layout>
                 <LazyTerms />
               </Layout>

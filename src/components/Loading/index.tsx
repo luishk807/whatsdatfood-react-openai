@@ -1,17 +1,30 @@
 import { FC, useMemo } from "react";
-import "./index.css";
 import { LOADING_TYPES } from "@/customConstants";
 import { LoadingInterface } from "@/interfaces";
-import loadingGif from "@/assets/loading.gif";
 
-/** Was MUI's CircularProgress: a ring with one quarter left transparent. */
-const Circular: FC = () => (
+/**
+ * Was MUI's CircularProgress: a ring with one quarter left transparent.
+ *
+ * Drawn in CSS at both sizes, because the alternative was an animated GIF -
+ * a network request for a spinner, which cannot take the theme and cannot
+ * stop moving for somebody who asked for less motion.
+ */
+const Ring: FC<{ small?: boolean }> = ({ small }) => (
   <span
     role="progressbar"
     aria-label="Loading"
-    className="inline-block h-10 w-10 animate-spin rounded-full border-[3px] border-line border-t-brand motion-reduce:animate-none"
+    className={
+      small
+        ? "inline-block h-4 w-4 animate-spin rounded-full border-2 border-line border-t-brand motion-reduce:animate-none"
+        : "inline-block h-10 w-10 animate-spin rounded-full border-[3px] border-line border-t-brand motion-reduce:animate-none"
+    }
   />
 );
+
+const Circular: FC = () => <Ring />;
+
+/** The inline one, sized to sit inside a text field rather than beside it. */
+const Small: FC = () => <Ring small />;
 
 /** Was MUI's LinearProgress. Indeterminate, so it carries no false progress. */
 const Linear: FC = () => (
@@ -38,9 +51,9 @@ const Loading = ({
       case LOADING_TYPES.CUSTOM:
         return () => (CustomComponent ? <CustomComponent /> : null);
       default:
-        return () => (
-          <img className="loading-icon" src={loadingGif} alt="loading" />
-        );
+        // `SPINER` - the historical default, and an inline-sized ring rather
+        // than the GIF it used to be.
+        return Small;
     }
   }, [type]);
 

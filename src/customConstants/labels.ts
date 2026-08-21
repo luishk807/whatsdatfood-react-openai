@@ -581,6 +581,17 @@ export const HISTORY_LABELS = {
   emptyCta: "Find places nearby",
 } as const;
 
+/**
+ * Said to a screen reader while a page is on its way.
+ *
+ * The route loader was a spinning ring and nothing else, so somebody on a
+ * slow connection using a screen reader was told nothing at all while the
+ * page was blank.
+ */
+export const LOADING_LABELS = {
+  page: "Loading",
+} as const;
+
 export const CHUNK_LABELS = {
   title: "This page is out of date",
   body:
