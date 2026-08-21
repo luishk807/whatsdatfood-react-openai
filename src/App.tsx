@@ -36,6 +36,7 @@ const LazyAdminConsole = lazy(() => import("@/components/AdminConsole"));
 // in the bundle somebody downloads to read a menu.
 const LazyNearby = lazy(() => import("@/components/NearbyPage"));
 const LazyRankings = lazy(() => import("@/components/RankingsPage"));
+const LazyTastes = lazy(() => import("@/components/TastePreferencesPage"));
 // Its own chunk, and never fetched while Pro is hidden: `FeatureRoute`
 // resolves before the child renders, so the bundle for an unlaunched product
 // is not downloaded by people who cannot see it.
@@ -118,6 +119,20 @@ function App() {
             <Suspense fallback={<Loading style={customStyle} />}>
               <Layout>
                 <LazyRankings />
+              </Layout>
+            </Suspense>
+          }
+        />
+        {/* Not behind `ProtectedRoute`: a guest's tastes live in the browser
+            and personalise their homepage just the same, so demanding an
+            account to edit them would lock somebody out of their own
+            choices. */}
+        <Route
+          path={ROUTES.tastes}
+          element={
+            <Suspense fallback={<Loading style={customStyle} />}>
+              <Layout>
+                <LazyTastes />
               </Layout>
             </Suspense>
           }

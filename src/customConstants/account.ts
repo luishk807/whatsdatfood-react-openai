@@ -25,6 +25,10 @@ export const ACCOUNT_GROUPS = [
       // "Ratings" alone is ambiguous - whose?
       { label: "My ratings", route: ROUTES.ratings, icon: "star" },
       { label: "Friends", route: ROUTES.friends, icon: "people" },
+      // Last in the group, and permanent. The homepage asks once and then
+      // never again; this is where somebody comes when their taste changes,
+      // and where the quiet invitation on the front door lands.
+      { label: "Taste preferences", route: ROUTES.tastes, icon: "utensils" },
     ],
   },
   {

@@ -8,6 +8,7 @@ import {
   StarIcon,
   StorefrontIcon,
   UserIcon,
+  UtensilsIcon,
 } from "@/components/icons";
 import { AccountIcon } from "@/customConstants/account";
 import { IconInterface } from "@/interfaces/icons";
@@ -35,6 +36,7 @@ const GLYPHS: Record<AccountIcon, FC<IconInterface>> = {
   people: PeopleIcon,
   storefront: StorefrontIcon,
   gear: SettingsIcon,
+  utensils: UtensilsIcon,
 };
 
 export const AccountRowIcon: FC<{ name: AccountIcon }> = ({ name }) => {

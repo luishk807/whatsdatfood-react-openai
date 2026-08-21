@@ -92,6 +92,27 @@ jest.mock("@/customHooks/useAuth", () => ({
   default: () => ({ user: null }),
 }));
 
+/**
+ * Tastes reach Apollo like every other data hook here, so they are mocked the
+ * same way. The picker's own behaviour — what it offers, when it stops asking,
+ * how a guest's choices merge into an account — is tested where it lives.
+ */
+const tastes = {
+  categories: [] as unknown[],
+  preferences: [] as unknown[],
+  selected: [] as string[],
+  save: jest.fn(),
+  saving: false,
+  saved: false,
+  error: null as string | null,
+  loading: false,
+};
+
+jest.mock("@/customHooks/useTastePreferences", () => ({
+  __esModule: true,
+  default: () => tastes,
+}));
+
 jest.mock("@/customHooks/useFoodCred", () => ({
   __esModule: true,
   default: () => ({

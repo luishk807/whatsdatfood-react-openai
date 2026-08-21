@@ -749,6 +749,59 @@ export const IMAGERY_LABELS = {
   noPhotoYet: "No photos yet",
 } as const;
 
+/**
+ * Taste preferences.
+ *
+ * The tone is the feature: this is an offer, not a form. "Pick a few" rather
+ * than "select your preferences", "Skip for now" rather than "Cancel", and a
+ * line saying plainly what the answer is used for.
+ *
+ * **No ranking superlatives here.** "Best coffee in NYC" is a claim the data
+ * cannot support on a catalogue where 6,783 of 6,786 restaurants have no menu,
+ * and a product that overclaims once is not believed the next time. What these
+ * sections say is what is true: worth trying, popular near you, people are
+ * photographing this. Stronger words are earned later, by votes and photographs
+ * that exist.
+ */
+export const TASTE_LABELS = {
+  title: "What are you into?",
+  blurb: "Pick a few so we can show you better food near you.",
+  save: "Save my tastes",
+  saving: "Saving…",
+  saved: "Saved. Your feed will use these.",
+  skip: "Skip for now",
+  suggestion: (count: number) =>
+    `Pick at least ${count} for better recommendations.`,
+  why: "We use your tastes to personalize nearby recommendations. You can change them anytime.",
+  /** The quiet return, for somebody who skipped. One line, never the card. */
+  reminder: "Personalize your food feed",
+  manageTitle: "Taste preferences",
+  manageBlurb: "What you are into, and what your feed uses.",
+  /**
+   * Group headings. An unrecognised kind is title-cased rather than dropped —
+   * the server may invent one, and a category that silently fails to render
+   * is worse than an unstyled heading.
+   */
+  group: (kind: string) =>
+    kind === "cuisine"
+      ? "Cuisines"
+      : kind === "food"
+        ? "Food and drink"
+        : kind.charAt(0).toUpperCase() + kind.slice(1),
+  /**
+   * Section headings on a personalised homepage.
+   *
+   * Deliberately modest. "Worth trying" and "near you" are things we can
+   * support from what we hold; "#1 sushi in Flushing" is not, and would be a
+   * ranking claim on a catalogue that has barely been voted on.
+   */
+  forYou: (place: string) => `For you near ${place}`,
+  forYouGeneric: "For you",
+  sectionTitle: (taste: string) => `${taste} worth trying`,
+  sectionNear: (taste: string, place: string) => `${taste} near ${place}`,
+  seeAll: "See all",
+} as const;
+
 export const MAP_LABELS = {
   label: "Map of nearby restaurants",
   searchThisArea: "Search this area",

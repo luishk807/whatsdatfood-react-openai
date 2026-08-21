@@ -5,6 +5,8 @@ import CuisineStrip from "@/components/CuisineStrip";
 import LocationBadge from "@/components/LocationBadge";
 import LocationPrompt from "@/components/LocationPrompt";
 import LocationSheet from "@/components/LocationSheet";
+import TasteOnboarding from "@/components/TasteOnboarding";
+import TasteSections from "@/components/TasteSections";
 import TrendingStrip from "@/components/TrendingStrip";
 import TrendingRestaurants from "@/components/TrendingRestaurants";
 import ContributorIntro from "@/components/ContributorIntro";
@@ -13,6 +15,7 @@ import useCuisineTiles from "@/customHooks/useCuisineTiles";
 import useDiscoveryLocation from "@/customHooks/useDiscoveryLocation";
 import { useNearbyDiscovery } from "@/customHooks/useNearby";
 import useTrendingNearby from "@/customHooks/useTrendingNearby";
+import useTastePreferences from "@/customHooks/useTastePreferences";
 
 const LazyMainSearch = lazy(() => import("@/components/MainSearchBar"));
 
@@ -44,6 +47,7 @@ const Homepage: FC = () => {
   const [changing, setChanging] = useState(false);
   const { discovery, loading: discoveryLoading } = useNearbyDiscovery(location);
   const { trending, loading: trendingLoading } = useTrendingNearby(location);
+  const { preferences } = useTastePreferences();
 
   // The server names the area from the nearest restaurant it knows; the
   // browser only ever had coordinates. Nothing here reverse-geocodes anybody
@@ -104,6 +108,22 @@ const Homepage: FC = () => {
       )}
 
       <LocationSheet open={changing} onClose={() => setChanging(false)} />
+
+      {/* Asked once, and only once there is somewhere to apply it. Answered,
+          it disappears; skipped, it becomes one quiet line and does not ask
+          again for a month. */}
+      <TasteOnboarding hasLocation={Boolean(location)} />
+
+      {/* What somebody said they like, above the general ranking — that is
+          the whole point of having asked. Each strip is the nearby query with
+          a cuisine, so the answer for Flushing-and-sushi is shared by
+          everybody interested in sushi in Flushing rather than computed per
+          reader. Nothing here reaches a model. */}
+      <TasteSections
+        preferences={preferences}
+        location={location}
+        place={location?.label}
+      />
 
       {/* Places to go, above the dish strip. Somebody who has not decided
           where to eat cannot use a row of dishes yet, and this is the

@@ -32,6 +32,15 @@ export const ROUTES = {
   nearby: "/nearby",
   /** How Food Cred works, and the leaderboards. */
   rankings: "/rankings",
+  /**
+   * What somebody is into, permanently editable.
+   *
+   * A real route rather than a section buried in settings: the homepage
+   * card is asked once and then never again, so this is where somebody
+   * goes when their taste changes — and a one-line invitation on the front
+   * door has to have somewhere to land.
+   */
+  tastes: "/account/tastes",
 
   /**
    * WhatsDatFood Pro. Every one of these redirects home unless the server
