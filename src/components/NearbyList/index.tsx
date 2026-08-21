@@ -1,7 +1,7 @@
 import { type FC } from "react";
 import { Link } from "react-router-dom";
 import clsx from "clsx";
-import { AddAPhotoIcon } from "@/components/icons";
+import RestaurantCover from "@/components/RestaurantCover";
 import { LOCATION_LABELS, NEARBY_LABELS } from "@/customConstants/labels";
 import { buildMenuResultsPath } from "@/customConstants/routes";
 import { NearbyListInterface } from "@/interfaces/location";
@@ -63,19 +63,11 @@ const NearbyList: FC<NearbyListInterface> = ({
                 : "border-line bg-surface-raised",
             )}
           >
-            {place.top_dish_photo_url ? (
-              <img
-                src={place.top_dish_photo_url}
-                alt=""
-                loading="lazy"
-                decoding="async"
-                className="h-20 w-20 shrink-0 rounded-card object-cover"
-              />
-            ) : (
-              <span className="flex h-20 w-20 shrink-0 items-center justify-center rounded-card bg-surface-sunken text-ink-muted">
-                <AddAPhotoIcon size={20} />
-              </span>
-            )}
+            <RestaurantCover
+              restaurant={place}
+              ratio={undefined}
+              className="h-20 w-20 shrink-0"
+            />
 
             <span className="flex min-w-0 flex-1 flex-col gap-0.5">
               <span className="truncate text-sm font-semibold text-ink">

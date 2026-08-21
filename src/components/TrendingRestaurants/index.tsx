@@ -1,7 +1,8 @@
 import { type FC } from "react";
 import { Link } from "react-router-dom";
 import HotPick from "@/components/HotPick";
-import { AddAPhotoIcon, ChevronRightIcon } from "@/components/icons";
+import RestaurantCover from "@/components/RestaurantCover";
+import { ChevronRightIcon } from "@/components/icons";
 import { LOCATION_LABELS, DISCOVERY_LABELS } from "@/customConstants/labels";
 import { ROUTES, buildMenuResultsPath } from "@/customConstants/routes";
 import {
@@ -39,18 +40,15 @@ const TrendingCard: FC<TrendingCardInterface> = ({ restaurant }) => {
       to={restaurant.slug ? buildMenuResultsPath(restaurant.slug) : "#"}
       className="flex w-40 shrink-0 snap-start flex-col overflow-hidden rounded-card border border-line bg-surface-raised sm:w-auto"
     >
-      {restaurant.top_dish_photo_url ? (
-        <img
-          src={restaurant.top_dish_photo_url}
-          alt=""
-          loading="lazy"
-          className="h-28 w-full object-cover"
-        />
-      ) : (
-        <span className="flex h-28 w-full items-center justify-center bg-surface-sunken text-ink-muted">
-          <AddAPhotoIcon size={20} />
-        </span>
-      )}
+      {/* One rule decides what goes here — see `utils/restaurantImage`. Six
+          identical grey rectangles with a camera in each is what this page
+          used to be, and none of them was a photograph of anything. */}
+      <RestaurantCover
+        restaurant={restaurant}
+        ratio={undefined}
+        rounded="rounded-none"
+        className="h-28 shrink-0"
+      />
 
       <span className="flex flex-1 flex-col gap-0.5 p-2">
         <span className="truncate text-sm font-medium text-ink">

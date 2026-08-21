@@ -711,6 +711,22 @@ export const CONTACT_LABELS = {
   unavailable: "The form is not working right now. Please email us at",
 } as const;
 
+/**
+ * Pictures on a restaurant card, and saying where they came from.
+ *
+ * Attribution is a rule rather than a nicety: Google's terms require the
+ * credit that arrived with a photo to be displayed with it, and the product's
+ * own credibility rests on a reader always being able to tell a diner's
+ * photograph from a borrowed one.
+ */
+export const IMAGERY_LABELS = {
+  viaGoogle: (who: string) => `${who} · Google`,
+  /** Said on a card that borrowed its picture, where there is room. */
+  borrowed: "Photo via Google",
+  /** The invitation the fallback drawing carries on a menu. */
+  noPhotoYet: "No photos yet",
+} as const;
+
 export const MAP_LABELS = {
   label: "Map of nearby restaurants",
   searchThisArea: "Search this area",
@@ -746,6 +762,15 @@ export const NEARBY_LABELS = {
   needLocationHelp: "Tell us where to look and we will show you what is nearby.",
   results: (count: number) =>
     count === 1 ? "1 restaurant" : `${count} restaurants`,
+  /**
+   * Real counts or nothing. Never a rounded-up claim about how popular
+   * somewhere is — the numbers are small and saying so honestly is what makes
+   * them worth believing when they grow.
+   */
+  community: (photos: number, contributors: number) =>
+    contributors > 1
+      ? `${photos} photo${photos === 1 ? "" : "s"} from ${contributors} diners`
+      : `${photos} photo${photos === 1 ? "" : "s"}`,
 } as const;
 
 /**

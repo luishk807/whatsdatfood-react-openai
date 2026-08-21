@@ -1,6 +1,7 @@
 import { type FC } from "react";
 import { Link } from "react-router-dom";
-import { AddAPhotoIcon, CloseIcon } from "@/components/icons";
+import RestaurantCover from "@/components/RestaurantCover";
+import { CloseIcon } from "@/components/icons";
 import {
   LOCATION_LABELS,
   MAP_LABELS,
@@ -59,24 +60,12 @@ const RestaurantPreview: FC<RestaurantPreviewInterface> = ({
           to={place.slug ? buildMenuResultsPath(place.slug) : "#"}
           className="flex gap-3 p-3"
         >
-          {place.top_dish_photo_url ? (
-            <img
-              src={place.top_dish_photo_url}
-              alt=""
-              loading="lazy"
-              className="h-20 w-20 shrink-0 rounded-tile object-cover"
-            />
-          ) : (
-            /* The empty tile is the ask, here as everywhere else: most
-               restaurants have no photograph yet and saying so is what gets
-               the first one taken. */
-            <span className="flex h-20 w-20 shrink-0 flex-col items-center justify-center gap-1 rounded-tile bg-surface-sunken text-ink-muted">
-              <AddAPhotoIcon size={20} />
-              <span className="px-1 text-center text-[10px] leading-tight">
-                {NEARBY_LABELS.noPhotos}
-              </span>
-            </span>
-          )}
+          <RestaurantCover
+            restaurant={place}
+            ratio={undefined}
+            rounded="rounded-tile"
+            className="h-20 w-20 shrink-0"
+          />
 
           <span className="flex min-w-0 flex-1 flex-col gap-0.5 pr-7">
             <span className="truncate text-sm font-semibold text-ink">
@@ -89,11 +78,33 @@ const RestaurantPreview: FC<RestaurantPreviewInterface> = ({
               </span>
             )}
 
-            {place.top_dish_name && (
+            {place.top_dish_name ? (
               /* The dish, not a star rating. What somebody photographed here
                  is the thing this product knows and a review site does not. */
               <span className="truncate text-xs text-ink-muted">
                 {MAP_LABELS.topDish(place.top_dish_name)}
+              </span>
+            ) : (
+              /* Said in the text now that the picture slot draws the cuisine.
+                 The absence still has to be stated — it is the ask, and most
+                 restaurants are in this state — but it no longer has to be
+                 stated by leaving a grey rectangle where a photograph goes. */
+              <span className="truncate text-xs text-ink-muted">
+                {NEARBY_LABELS.noPhotos}
+              </span>
+            )}
+
+            {/* The popularity this product genuinely owns: how many diners
+                have been here and shown their food. Not a star rating out of
+                somebody else's database, and shown only when it is a real
+                number — "0 photos" is a fact nobody needs printed under a
+                line that already says there are none. */}
+            {Boolean(place.photo_count) && (
+              <span className="truncate text-xs text-ink-muted">
+                {NEARBY_LABELS.community(
+                  place.photo_count ?? 0,
+                  place.contributor_count ?? 0,
+                )}
               </span>
             )}
 

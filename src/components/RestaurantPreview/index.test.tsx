@@ -90,3 +90,28 @@ describe("RestaurantPreview", () => {
     expect(onClose).toHaveBeenCalled();
   });
 });
+
+describe("what this community has done here", () => {
+  it("counts the photographs when there are any", () => {
+    // The popularity this product genuinely owns, and the thing a review site
+    // cannot say: how many diners have been here and shown their food.
+    show(place({ photo_count: 4, contributor_count: 3 }));
+
+    expect(screen.getByText(/4 photos from 3 diners/)).toBeInTheDocument();
+  });
+
+  it("does not print a zero under a line that already says none", () => {
+    // "0 photos" beneath "No dish photos yet" is the same fact twice, and the
+    // second version reads as a score.
+    show(place({ photo_count: 0, contributor_count: 0 }));
+
+    expect(screen.queryByText(/0 photo/)).not.toBeInTheDocument();
+  });
+
+  it("does not claim several diners for one person's photos", () => {
+    show(place({ photo_count: 2, contributor_count: 1 }));
+
+    expect(screen.getByText(/2 photos/)).toBeInTheDocument();
+    expect(screen.queryByText(/diners/)).not.toBeInTheDocument();
+  });
+});

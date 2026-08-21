@@ -22,6 +22,20 @@ export interface NearbyPlaceType extends Partial<CoordinatesType> {
   /** Absent unless a diner has photographed something there. */
   top_dish_name?: string | null;
   top_dish_photo_url?: string | null;
+  /**
+   * What this community has actually done here. Facts, both of them — never a
+   * star rating out of somebody else's database, and never a rounded-up claim
+   * about how popular somewhere is. Zero is a real answer, and the card says
+   * "no dish photos yet" rather than hiding the row.
+   */
+  photo_count?: number | null;
+  contributor_count?: number | null;
+  /** Where a card's picture may come from — see `utils/restaurantImage`. */
+  owner_photo_url?: string | null;
+  google_photo_url?: string | null;
+  google_photo_attribution?: string | null;
+  google_photo_attribution_url?: string | null;
+  logo_url?: string | null;
 }
 
 export interface TrendingDishType {
@@ -120,3 +134,4 @@ export interface RestaurantPreviewInterface {
   place: NearbyPlaceType | null;
   onClose: () => void;
 }
+

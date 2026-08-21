@@ -35,6 +35,40 @@ export const IMAGE_SOURCE = {
 } as const;
 
 /**
+ * Where the picture on a restaurant card came from.
+ *
+ * A superset of `IMAGE_SOURCE`, which describes a *dish* photograph. A card
+ * has more places to look — an owner's cover shot, a Google Places photo, a
+ * logo — and the distinction has to survive all the way to the rendered
+ * element, because the rules about each are different: Google imagery carries
+ * an attribution we are obliged to display, and community work is the thing
+ * this product is actually built on.
+ *
+ * `fallback` is not a photograph and never pretends to be one. It is our own
+ * artwork, drawn from the restaurant's cuisine.
+ */
+export const COVER_SOURCE = {
+  community: "community",
+  owner: "owner",
+  google: "google",
+  logo: "logo",
+  fallback: "fallback",
+} as const;
+
+export type CoverSource = (typeof COVER_SOURCE)[keyof typeof COVER_SOURCE];
+
+/**
+ * Widths asked for by a card, so a 140px tile does not download a 1600px
+ * photograph. Google's photo endpoint takes a maximum edge; our own storage
+ * already keeps a small and a medium rendition.
+ */
+export const COVER_WIDTH = {
+  tile: 400,
+  card: 640,
+  hero: 1200,
+} as const;
+
+/**
  * The visibility-driven photo lookup.
  *
  * Dormant. The server no longer searches for dish photography, so every one of
