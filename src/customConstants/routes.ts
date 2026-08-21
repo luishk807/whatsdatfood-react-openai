@@ -86,7 +86,7 @@ export const NEARBY_PARAMS = {
 } as const;
 
 export const buildNearbyPath = (
-  options: { cuisine?: string; place?: string } = {},
+  options: { cuisine?: string; place?: string; view?: "list" | "map" } = {},
 ) => {
   const params = new URLSearchParams();
 
@@ -96,6 +96,13 @@ export const buildNearbyPath = (
 
   if (options.place) {
     params.set(NEARBY_PARAMS.place, options.place);
+  }
+
+  // Carried so a category survives the jump to the map. "Coffee" then "Map"
+  // has to arrive as coffee on a map, not as everything on a map — the filter
+  // and the view are one state and the URL is where it lives.
+  if (options.view === "map") {
+    params.set(NEARBY_PARAMS.view, options.view);
   }
 
   const query = params.toString();

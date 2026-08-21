@@ -92,3 +92,15 @@ export const TASTE_SECTIONS = {
   MIN: 2,
   MAX: 4,
 } as const;
+
+/**
+ * The shortcut row under the search box.
+ *
+ * Four, because a fifth wraps at 390px and a row that wraps stops reading as
+ * a row. "More" carries the rest, so nothing is unreachable — which is what
+ * lets the visible four be personalised without trapping anybody inside their
+ * own preferences.
+ */
+export const QUICK_DISCOVERY = {
+  SHOWN: 4,
+} as const;

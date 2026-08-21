@@ -74,3 +74,11 @@ export interface TasteSectionInterface {
   location: CoordinatesType | null;
   place?: string | null;
 }
+
+export interface QuickDiscoveryInterface {
+  /** Every category the server offers — the same list the picker renders. */
+  categories: TasteCategoryType[];
+  /** Saved tastes. They order the row; they never filter discovery. */
+  preferences: TastePreferenceType[];
+  loading?: boolean;
+}

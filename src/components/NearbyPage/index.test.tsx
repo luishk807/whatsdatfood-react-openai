@@ -343,3 +343,44 @@ describe("when the query fails", () => {
     expect(screen.getByText(NEARBY_LABELS.unavailable)).toBeInTheDocument();
   });
 });
+
+describe("the active category", () => {
+  beforeEach(() => {
+    place.location = { latitude: 40.7686, longitude: -73.8228, label: "Flushing" };
+    place.source = "chosen";
+    nearby.places = [row("1")];
+  });
+
+  it("is visible, because a filter you cannot see is one you cannot undo", () => {
+    // The reader arrives here already filtered, from a shortcut on the front
+    // door. Nothing else on the page says which category is on.
+    show("/nearby?cuisine=italian");
+
+    expect(
+      screen.getByRole("link", { name: /Clear the Italian filter/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("clears back to everything nearby", () => {
+    show("/nearby?cuisine=italian");
+
+    expect(
+      screen.getByRole("link", { name: /Clear the Italian filter/i }),
+    ).toHaveAttribute("href", "/nearby");
+  });
+
+  it("keeps the map when the filter is cleared on the map", () => {
+    // Clearing a category should not also throw away the view somebody chose.
+    show("/nearby?cuisine=italian&view=map");
+
+    expect(
+      screen.getByRole("link", { name: /Clear the Italian filter/i }),
+    ).toHaveAttribute("href", "/nearby?view=map");
+  });
+
+  it("shows no chip when nothing is filtered", () => {
+    show("/nearby");
+
+    expect(screen.queryByRole("link", { name: /Clear the/i })).not.toBeInTheDocument();
+  });
+});

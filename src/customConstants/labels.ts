@@ -209,7 +209,13 @@ export const SHOWCASE_LABELS = {
 export const SEARCH_LABELS = {
   title: "See it before you order it",
   subtitle: "Photos and rankings from the people who ate there.",
-  placeholder: "Search a restaurant",
+  /**
+   * Both questions, in one box. The restaurant-name path is unchanged — it is
+   * what the autocomplete and `resolvePlace` do — and this stops the field
+   * claiming that a name is the only thing it accepts, which was the reason a
+   * reader who wanted coffee had nowhere to start.
+   */
+  placeholder: "Search restaurants or food",
   submit: "Search",
   searching: "Looking…",
   /**
@@ -816,6 +822,23 @@ export const TASTE_LABELS = {
   seeAll: "See all",
 } as const;
 
+/**
+ * The shortcut row under the search box.
+ *
+ * The words stay plain because the row is a set of destinations, not a
+ * feature: "More" and "Map" say exactly what they do, and the caption exists
+ * only so a reader can tell why these four are the four.
+ */
+export const QUICK_LABELS = {
+  label: "Browse food nearby",
+  more: "More",
+  moreTitle: "Browse by category",
+  map: "Map",
+  /** Said quietly, because personalisation nobody can see is just the
+   * product deciding for them. */
+  personalised: "Based on your tastes",
+} as const;
+
 export const MAP_LABELS = {
   label: "Map of nearby restaurants",
   searchThisArea: "Search this area",
@@ -875,6 +898,11 @@ export const NEARBY_LABELS = {
       : `${photos} photo${photos === 1 ? "" : "s"}`,
   inThisArea: "In this area",
   backToNearby: "Back to nearby",
+  /** The active filter, and the way out of it. Shown as a chip because that
+   * is what it is — a thing that is on and can be turned off. */
+  clearFilter: (cuisine: string) => `${cuisine} · clear`,
+  clearFilterLabel: (cuisine: string) => `Clear the ${cuisine} filter`,
+  allFood: "All food nearby",
 } as const;
 
 /**

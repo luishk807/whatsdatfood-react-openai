@@ -2,6 +2,7 @@ import { type FC, lazy, Suspense, useEffect, useState } from "react";
 import { SEARCH_LABELS } from "@/customConstants/labels";
 import PhotoWall from "@/components/PhotoWall";
 import CuisineStrip from "@/components/CuisineStrip";
+import QuickDiscovery from "@/components/QuickDiscovery";
 import LocationBadge from "@/components/LocationBadge";
 import LocationPrompt from "@/components/LocationPrompt";
 import LocationSheet from "@/components/LocationSheet";
@@ -47,7 +48,8 @@ const Homepage: FC = () => {
   const [changing, setChanging] = useState(false);
   const { discovery, loading: discoveryLoading } = useNearbyDiscovery(location);
   const { trending, loading: trendingLoading } = useTrendingNearby(location);
-  const { preferences } = useTastePreferences();
+  const { preferences, categories, loading: tastesLoading } =
+    useTastePreferences();
 
   // The server names the area from the nearest restaurant it knows; the
   // browser only ever had coordinates. Nothing here reverse-geocodes anybody
@@ -87,6 +89,17 @@ const Homepage: FC = () => {
       >
         <LazyMainSearch />
       </Suspense>
+
+      {/* Directly under the search, because it answers the other half of the
+          question the search asks. Somebody who knows the restaurant types
+          its name; somebody who knows they want coffee taps Coffee. The Map
+          button sits here too — it used to be reachable only by scrolling
+          past three sections, which is a poor way to learn a map exists. */}
+      <QuickDiscovery
+        categories={categories}
+        preferences={preferences}
+        loading={tastesLoading}
+      />
 
       {/* Two states, and only ever one of them.
     

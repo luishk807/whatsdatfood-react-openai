@@ -1,7 +1,7 @@
 import { type FC, lazy, Suspense, useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import clsx from "clsx";
-import { ListIcon, MapIcon } from "@/components/icons";
+import { CloseIcon, ListIcon, MapIcon } from "@/components/icons";
 import LocationBadge from "@/components/LocationBadge";
 import LocationSheet from "@/components/LocationSheet";
 import NearbyList from "@/components/NearbyList";
@@ -14,7 +14,7 @@ import {
 import { LOCATION_SOURCE } from "@/customConstants/location";
 import { mapConfigured } from "@/customConstants/map";
 import { MAP_LABELS, NEARBY_LABELS } from "@/customConstants/labels";
-import { NEARBY_PARAMS } from "@/customConstants/routes";
+import { NEARBY_PARAMS, buildNearbyPath } from "@/customConstants/routes";
 
 /**
  * Nearby discovery: a list and a map of what is around you.
@@ -155,6 +155,26 @@ const NearbyPage: FC = () => {
       {/* One line, and a way to change it. Somebody who has told us where to
           look should not be asked again above the answer. */}
       <LocationBadge label={place} onChange={() => setChanging(true)} />
+
+      {/* The active category, and the way out of it.
+    
+          A filter somebody cannot see is a filter they cannot undo, and this
+          page is reached from a shortcut on the front door — so the reader
+          arrives already filtered and has to be told. Clearing it drops the
+          parameter and keeps the view, so clearing on the map leaves you on
+          the map showing everything rather than back on a list. */}
+      {cuisine && (
+        <div className="flex justify-center">
+          <Link
+            to={buildNearbyPath({ view })}
+            aria-label={NEARBY_LABELS.clearFilterLabel(titleCase(cuisine))}
+            className="inline-flex min-h-9 items-center gap-1.5 rounded-pill border border-ink bg-surface-sunken px-3 text-sm text-ink"
+          >
+            {titleCase(cuisine)}
+            <CloseIcon size={14} className="text-ink-muted" />
+          </Link>
+        </div>
+      )}
 
       {nearby.unavailable ? (
         <p className="rounded-card border border-dashed border-line p-6 text-center text-sm text-ink-muted">
