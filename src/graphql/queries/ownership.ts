@@ -24,17 +24,34 @@ export const IS_RESTAURANT_OWNER = gql`
   }
 `;
 
+/**
+ * What the wizard can offer, as the server has it.
+ *
+ * Rendered rather than hardcoded, so enabling a code-based method later
+ * changes the screen without a frontend release - the same reason the
+ * reputation constants hold no point values.
+ */
+export const VERIFICATION_METHODS = gql`
+  query verificationMethods($slug: String!) {
+    verificationMethods(slug: $slug) {
+      key
+      label
+      blurb
+      collects
+    }
+  }
+`;
+
+/**
+ * One input rather than a widening argument list.
+ *
+ * The loose `slug`/`verificationMethod`/`note` arguments still work on the
+ * server and are what the old button sent; this sends everything the wizard
+ * collects, which is what the reviewer actually needs to decide.
+ */
 export const CLAIM_RESTAURANT = gql`
-  mutation claimRestaurant(
-    $slug: String!
-    $verificationMethod: String
-    $note: String
-  ) {
-    claimRestaurant(
-      slug: $slug
-      verificationMethod: $verificationMethod
-      note: $note
-    ) {
+  mutation claimRestaurant($input: ClaimRestaurantInput!) {
+    claimRestaurant(input: $input) {
       id
       status
     }

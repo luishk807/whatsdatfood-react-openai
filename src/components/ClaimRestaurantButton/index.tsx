@@ -1,4 +1,5 @@
 import { FC, useEffect, useState } from "react";
+import ClaimWizard from "@/components/ClaimWizard";
 import { StorefrontIcon } from "@/components/icons";
 import useRestaurantOwnership from "@/customHooks/useRestaurantOwnership";
 import useAuth from "@/customHooks/useAuth";
@@ -7,6 +8,7 @@ import { ClaimStatus } from "@/interfaces/ownership";
 
 interface ClaimRestaurantButtonInterface {
   slug?: string;
+  restaurantName?: string;
 }
 
 const STATUS_LABEL: Record<ClaimStatus, string> = {
@@ -21,10 +23,14 @@ const STATUS_LABEL: Record<ClaimStatus, string> = {
  * Sits on the menu page because that is where an owner will arrive — someone
  * sends them a link to their own restaurant and the data is wrong.
  */
-const ClaimRestaurantButton: FC<ClaimRestaurantButtonInterface> = ({ slug }) => {
+const ClaimRestaurantButton: FC<ClaimRestaurantButtonInterface> = ({
+  slug,
+  restaurantName,
+}) => {
   const { user } = useAuth();
-  const { loadClaims, claim, claiming } = useRestaurantOwnership();
+  const { loadClaims } = useRestaurantOwnership();
   const [status, setStatus] = useState<ClaimStatus | null>(null);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -62,18 +68,27 @@ const ClaimRestaurantButton: FC<ClaimRestaurantButtonInterface> = ({ slug }) => 
   }
 
   return (
-    <button
-      type="button"
-      disabled={claiming}
-      onClick={async () => {
-        await claim(slug);
-        setStatus("pending");
-      }}
-      className="inline-flex items-center gap-1 rounded-full border border-line px-3 py-1 text-xs font-medium text-ink disabled:opacity-50"
-    >
-      <StorefrontIcon size={14} />
-      {OWNER_LABELS.claimCta}
-    </button>
+    <>
+      {/* Opens the wizard rather than submitting. It used to send a slug and
+          nothing else, so every claim reached a moderator as "this person
+          pressed a button" and had to be decided on that. */}
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="inline-flex min-h-11 items-center gap-1 rounded-full border border-line px-3 text-xs font-medium text-ink"
+      >
+        <StorefrontIcon size={14} />
+        {OWNER_LABELS.claimCta}
+      </button>
+
+      <ClaimWizard
+        slug={slug}
+        restaurantName={restaurantName}
+        open={open}
+        onClose={() => setOpen(false)}
+        onSubmitted={() => setStatus("pending")}
+      />
+    </>
   );
 };
 

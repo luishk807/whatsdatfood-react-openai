@@ -81,3 +81,35 @@ export interface DishFactsFormInterface {
   onSave: (changes: Record<string, unknown>) => void;
   onDiscontinue?: (dish: MenuItemType) => void;
 }
+
+/**
+ * A way of proving a connection to a restaurant, as the server offers it.
+ *
+ * `collects` drives which fields the wizard shows, so a method enabled later
+ * asks for what it needs without a frontend change.
+ */
+export interface VerificationMethodType {
+  key: string;
+  label: string;
+  blurb: string;
+  collects: string[];
+}
+
+/** Everything the wizard gathers, in one submission. */
+export interface ClaimSubmission {
+  slug: string;
+  role: string;
+  verificationMethod: string;
+  claimantName?: string;
+  businessEmail?: string;
+  businessPhone?: string;
+  explanation?: string;
+}
+
+export interface ClaimWizardInterface {
+  slug: string;
+  restaurantName?: string;
+  open: boolean;
+  onClose: () => void;
+  onSubmitted: () => void;
+}

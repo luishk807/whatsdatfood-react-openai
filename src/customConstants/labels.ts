@@ -592,6 +592,52 @@ export const LOADING_LABELS = {
   page: "Loading",
 } as const;
 
+/**
+ * The claim wizard.
+ *
+ * **It says what happens next, at every step.** Claiming is the one flow here
+ * where somebody hands over their name and a business email and then waits
+ * for a stranger to decide - so a form that just closes is a form that looks
+ * like it did nothing.
+ *
+ * Nothing promises a timescale we cannot keep, and nothing says "verified"
+ * before a person has agreed.
+ */
+export const CLAIM_LABELS = {
+  title: "Claim this restaurant",
+  intro:
+    "Claiming lets you correct the menu and details. A person reviews every " +
+    "claim before anything changes.",
+  roleStep: "Which are you?",
+  detailsStep: "How can we check?",
+  reviewStep: "Ready to send",
+  nameLabel: "Your full name",
+  nameHint: "As it would appear on business paperwork.",
+  emailLabel: "Business email",
+  emailHint:
+    "An address at the restaurant's own domain helps most. A personal " +
+    "address is fine if that is what you use.",
+  phoneLabel: "Business phone",
+  explanationLabel: "Anything else that helps",
+  explanationHint:
+    "How you are connected to the restaurant, or where we can see it.",
+  back: "Back",
+  next: "Next",
+  submit: "Send claim",
+  submitting: "Sending…",
+  /** Said after, because a form that closes silently looks like it failed. */
+  sentTitle: "Claim sent",
+  sentBody:
+    "A person will look at this. You will keep your access to the rest of " +
+    "the app in the meantime.",
+  close: "Close",
+  failed: "That did not send. Nothing has been submitted — try again.",
+  requiredName: "Add the name a reviewer would recognise.",
+  requiredContact: "Add a business email or a phone number.",
+  /** Shown when the server offers no enabled method at all. */
+  noMethods: "Claiming is not available for this restaurant right now.",
+} as const;
+
 export const CHUNK_LABELS = {
   title: "This page is out of date",
   body:

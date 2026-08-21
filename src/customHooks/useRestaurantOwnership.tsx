@@ -4,11 +4,16 @@ import {
   MY_RESTAURANT_CLAIMS,
   IS_RESTAURANT_OWNER,
   CLAIM_RESTAURANT,
+  VERIFICATION_METHODS,
   UPDATE_RESTAURANT_FACTS,
   UPDATE_DISH_FACTS,
   DISCONTINUE_DISH,
 } from "@/graphql/queries/ownership";
-import { RestaurantClaimType } from "@/interfaces/ownership";
+import {
+  ClaimSubmission,
+  RestaurantClaimType,
+  VerificationMethodType,
+} from "@/interfaces/ownership";
 import { MenuItemType } from "@/interfaces/restaurants";
 import { _get } from "@/utils";
 import useAuth from "@/customHooks/useAuth";
@@ -32,6 +37,11 @@ const useRestaurantOwnership = () => {
     fetchPolicy: "network-only",
   });
   const [claimMutation, { loading: claiming }] = useMutation(CLAIM_RESTAURANT);
+  const [fetchMethods] = useLazyQuery(VERIFICATION_METHODS, {
+    // The list changes when a provider is enabled on the server, which is
+    // not something that happens between two taps.
+    fetchPolicy: "cache-first",
+  });
   const [updateRestaurant, { loading: savingRestaurant }] = useMutation(
     UPDATE_RESTAURANT_FACTS,
   );
@@ -59,14 +69,50 @@ const useRestaurantOwnership = () => {
     [user, checkOwner],
   );
 
+  /**
+   * Submit a claim, with everything the wizard collected.
+   *
+   * One input rather than four arguments: the wizard gains fields as
+   * verification methods are added, and a new field on an input is backward
+   * compatible where a new argument is a rewrite.
+   */
   const claim = useCallback(
-    async (slug: string, verificationMethod?: string, note?: string) => {
+    async (input: ClaimSubmission) => {
       const resp = await claimMutation({
-        variables: { slug, verificationMethod, note },
+        variables: {
+          input: {
+            slug: input.slug,
+            role: input.role,
+            verification_method: input.verificationMethod,
+            claimant_name: input.claimantName || null,
+            business_email: input.businessEmail || null,
+            business_phone: input.businessPhone || null,
+            explanation: input.explanation || null,
+          },
+        },
       });
       return _get(resp, "data.claimRestaurant");
     },
     [claimMutation],
+  );
+
+  const loadVerificationMethods = useCallback(
+    async (slug: string): Promise<VerificationMethodType[]> => {
+      try {
+        const resp = await fetchMethods({ variables: { slug } });
+        return _get<VerificationMethodType[]>(
+          resp,
+          "data.verificationMethods",
+          [],
+        ) ?? [];
+      } catch {
+        // A claim wizard that cannot ask what methods exist should say so
+        // rather than guess at one - the whole point of asking the server is
+        // that the answer changes without a release.
+        return [];
+      }
+    },
+    [fetchMethods],
   );
 
   const saveRestaurantFacts = useCallback(
@@ -105,6 +151,7 @@ const useRestaurantOwnership = () => {
     loadClaims,
     isOwnerOf,
     claim,
+    loadVerificationMethods,
     saveRestaurantFacts,
     saveDishFacts,
     discontinueDish,

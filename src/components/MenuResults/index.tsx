@@ -496,7 +496,10 @@ const MenuResults: FC = () => {
               <p className="max-w-prose text-sm text-ink-muted">
                 {OWNER_LABELS.claimBlurb}
               </p>
-              <ClaimRestaurantButton slug={restaurant} />
+              <ClaimRestaurantButton
+                slug={restaurant}
+                restaurantName={restaurantInfo?.name}
+              />
             </section>
           </div>
         </div>
