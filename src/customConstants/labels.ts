@@ -964,8 +964,19 @@ export const TASTE_LABELS = {
    */
   forYou: (place: string) => `For you near ${place}`,
   forYouGeneric: "For you",
-  sectionTitle: (taste: string) => `${taste} worth trying`,
-  sectionNear: (taste: string, place: string) => `${taste} near ${place}`,
+  /**
+   * Just the category. "Coffee", "Sushi", "Ramen".
+   *
+   * These read "Coffee near Flushing", "Sushi near Flushing", "Ramen near
+   * Flushing" - the same three words repeated down the page, in the same
+   * weight as the word that actually distinguishes one section from the next.
+   * Somebody scrolling had to read each heading carefully to find the one
+   * they wanted, which is the opposite of what a heading is for.
+   *
+   * The place is established once, above, by `forYou` - so repeating it per
+   * section is noise the eye has to skip over four times.
+   */
+  sectionTitle: (taste: string) => taste,
   seeAll: "See all",
 } as const;
 

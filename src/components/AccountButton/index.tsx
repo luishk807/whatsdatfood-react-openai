@@ -119,6 +119,11 @@ const AccountButton = () => {
 
       {groups.map((group) => (
         <div key={group.id} className="border-t border-line py-1">
+          {"label" in group && group.label && (
+            <p className="px-4 pb-1 pt-2 text-xs font-medium uppercase tracking-wide text-ink-muted">
+              {group.label}
+            </p>
+          )}
           {group.items.map((item) => (
             <Link
               key={item.route}

@@ -38,7 +38,7 @@ import {
  * and a product that overclaims once is not believed the next time. Stronger
  * rankings are earned later, by votes and photographs that exist.
  */
-const TasteSection: FC<TasteSectionInterface> = ({ taste, location, place }) => {
+const TasteSection: FC<TasteSectionInterface> = ({ taste, location }) => {
   const { places, loading } = useNearbyRestaurants(location, taste.slug);
   const Glyph = foodCategoryIcon(taste.slug);
 
@@ -49,21 +49,31 @@ const TasteSection: FC<TasteSectionInterface> = ({ taste, location, place }) => 
   }
 
   return (
-    <section className="flex flex-col gap-2">
-      <div className="flex items-baseline justify-between gap-3">
-        <h3 className="flex items-center gap-1.5 text-sm font-semibold text-ink">
-          <Glyph size={16} className="text-ink-muted" />
-          {place
-            ? TASTE_LABELS.sectionNear(taste.name, place)
-            : TASTE_LABELS.sectionTitle(taste.name)}
+    // Tighter above, looser below: the gap between a heading and its own
+    // cards has to read as smaller than the gap to the section before it, or
+    // the eye cannot tell which cards belong to which category.
+    <section className="flex flex-col gap-3">
+      <div className="flex items-center justify-between gap-3">
+        {/* The category is the whole heading. It used to be "Coffee near
+            Flushing", "Sushi near Flushing" - three identical words repeated
+            down the page at the same weight as the one word that tells the
+            sections apart. The place is established once, above. */}
+        <h3 className="flex min-w-0 items-center gap-2 text-base font-semibold text-ink">
+          <Glyph size={20} className="shrink-0 text-ink" />
+          <span className="truncate">
+            {TASTE_LABELS.sectionTitle(taste.name)}
+          </span>
         </h3>
 
+        {/* Aligned with the middle of the title rather than its baseline, and
+            in `ink` rather than `ink-muted` - it was grey-on-grey at 12px,
+            which is both hard to read and hard to notice. */}
         <Link
           to={buildNearbyPath({ cuisine: taste.slug })}
-          className="inline-flex shrink-0 items-center gap-0.5 text-xs text-ink-muted underline underline-offset-2 hover:text-ink"
+          className="inline-flex min-h-11 shrink-0 items-center gap-0.5 text-sm font-medium text-ink hover:underline hover:underline-offset-2"
         >
           {TASTE_LABELS.seeAll}
-          <ChevronRightIcon size={13} />
+          <ChevronRightIcon size={15} />
         </Link>
       </div>
 
@@ -116,7 +126,7 @@ const TasteSections: FC<TasteSectionsInterface> = ({
   }
 
   return (
-    <section aria-labelledby="for-you" className="flex flex-col gap-4">
+    <section aria-labelledby="for-you" className="flex flex-col gap-7">
       <h2 id="for-you" className="text-sm font-semibold text-ink">
         {place ? TASTE_LABELS.forYou(place) : TASTE_LABELS.forYouGeneric}
       </h2>
@@ -126,7 +136,6 @@ const TasteSections: FC<TasteSectionsInterface> = ({
           key={taste.slug}
           taste={taste}
           location={location}
-          place={place}
         />
       ))}
     </section>

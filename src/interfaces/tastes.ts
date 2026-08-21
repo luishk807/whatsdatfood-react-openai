@@ -72,7 +72,6 @@ export interface TasteSectionsInterface {
 export interface TasteSectionInterface {
   taste: TastePreferenceType;
   location: CoordinatesType | null;
-  place?: string | null;
 }
 
 export interface QuickDiscoveryInterface {

@@ -37,6 +37,10 @@ export interface SettingsGroup {
   id: string;
   label: string;
   items: SettingsSection[];
+  /** Rendered only for an admin. Hiding it is not access control - the
+   *  server refuses the queries regardless - it is about not offering a
+   *  door almost nobody can open. */
+  adminOnly?: boolean;
 }
 
 export const SETTINGS_GROUPS: SettingsGroup[] = [
@@ -88,6 +92,28 @@ export const SETTINGS_GROUPS: SettingsGroup[] = [
         label: "Contributions & privacy",
         blurb: "What we store and what other people can see",
         route: ROUTES.settingsPrivacy,
+        available: true,
+      },
+    ],
+  },
+  {
+    /**
+     * The review queue, for the handful of people who can work it.
+     *
+     * It was reachable from the account drawer as an unlabelled ninth row
+     * that looked exactly like Favorites, so the person who works the queues
+     * typed the URL instead. Settings is where somebody looks for what their
+     * account can do, and this is the clearest thing it can do.
+     */
+    id: "admin",
+    label: "Admin",
+    adminOnly: true,
+    items: [
+      {
+        id: "review",
+        label: "Review queue",
+        blurb: "Claims, reported photos and suggested corrections",
+        route: ROUTES.admin,
         available: true,
       },
     ],

@@ -2,6 +2,8 @@ import { type FC } from "react";
 import { Link, useLocation } from "react-router-dom";
 import clsx from "clsx";
 import { ChevronLeftIcon } from "@/components/icons";
+import useAuth from "@/customHooks/useAuth";
+import { ACCOUNT_TYPE } from "@/customConstants";
 import {
   SETTINGS_GROUPS,
   SETTINGS_LABELS_HUB,
@@ -24,6 +26,11 @@ import { SettingsLayoutInterface } from "@/interfaces/settings";
 const SettingsLayout: FC<SettingsLayoutInterface> = ({ title, children }) => {
   const { pathname } = useLocation();
   const onHub = pathname === ROUTES.settings;
+  const { user } = useAuth();
+  const isAdmin = String(user?.role_id ?? "") === ACCOUNT_TYPE.admin;
+  const groups = SETTINGS_GROUPS.filter(
+    (group) => !group.adminOnly || isAdmin,
+  );
 
   return (
     <div className="mx-auto w-full max-w-5xl px-4 pb-16 pt-4">
@@ -47,7 +54,7 @@ const SettingsLayout: FC<SettingsLayoutInterface> = ({ title, children }) => {
           </h1>
 
           <nav className="flex flex-col gap-4">
-            {SETTINGS_GROUPS.map((group) => (
+            {groups.map((group) => (
               <div key={group.id} className="flex flex-col gap-0.5">
                 <p className="px-3 text-xs font-medium uppercase tracking-wide text-ink-muted">
                   {group.label}

@@ -59,6 +59,16 @@ export const ACCOUNT_GROUPS = [
      */
     id: "admin",
     adminOnly: true,
+    /**
+     * The only group with a heading, because it is the only one that is a
+     * different *mode* rather than more of your own things.
+     *
+     * Unlabelled, "Review queue" was the ninth row in the drawer and looked
+     * exactly like Favorites and History - so the person who can work the
+     * queues went to the address bar instead. Hiding a link is not access
+     * control and neither is burying one.
+     */
+    label: "Admin",
     items: [{ label: "Review queue", route: ROUTES.admin, icon: "gear" }],
   },
 ] as const;

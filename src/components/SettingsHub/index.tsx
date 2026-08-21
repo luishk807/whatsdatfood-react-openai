@@ -1,6 +1,8 @@
 import { type FC } from "react";
 import DeleteAccount from "@/components/DeleteAccount";
 import SettingsRow from "@/components/SettingsRow";
+import useAuth from "@/customHooks/useAuth";
+import { ACCOUNT_TYPE } from "@/customConstants";
 import {
   SETTINGS_GROUPS,
   SETTINGS_LABELS_HUB,
@@ -24,9 +26,16 @@ import {
  * heading, separated by a rule - not competing with the rows above it and not
  * one mis-tap from a Save button, which is exactly where it used to be.
  */
-const SettingsHub: FC = () => (
-  <div className="flex w-full max-w-2xl flex-col gap-8">
-    {SETTINGS_GROUPS.map((group) => (
+const SettingsHub: FC = () => {
+  const { user } = useAuth();
+  // Hiding it is not access control - the server refuses these queries
+  // regardless - it is about not offering a door almost nobody can open.
+  const isAdmin = String(user?.role_id ?? "") === ACCOUNT_TYPE.admin;
+  const groups = SETTINGS_GROUPS.filter((group) => !group.adminOnly || isAdmin);
+
+  return (
+    <div className="flex w-full max-w-2xl flex-col gap-8">
+    {groups.map((group) => (
       <section key={group.id} className="flex flex-col gap-2">
         <h2 className="px-1 text-xs font-medium uppercase tracking-wide text-ink-muted">
           {group.label}
@@ -51,8 +60,9 @@ const SettingsHub: FC = () => (
           what it removes rather than saying "are you sure". What changed is
           where it sits. */}
       <DeleteAccount />
-    </section>
-  </div>
-);
+      </section>
+    </div>
+  );
+};
 
 export default SettingsHub;

@@ -17,6 +17,13 @@ import {
  * about a person is findable from this page, and the one control that erases
  * an account does not sit level with the one that changes a nickname.
  */
+let role = "1";
+
+jest.mock("@/customHooks/useAuth", () => ({
+  __esModule: true,
+  default: () => ({ user: { id: 1, username: "diner", role_id: role } }),
+}));
+
 jest.mock("@/components/DeleteAccount", () => ({
   __esModule: true,
   default: () => <button type="button">Delete my account</button>,
@@ -29,11 +36,17 @@ const show = () =>
     </MemoryRouter>,
   );
 
+beforeEach(() => {
+  role = "1";
+});
+
 describe("finding your way", () => {
   it("shows every section that has something behind it", () => {
     show();
 
-    for (const section of SETTINGS_SECTIONS.filter((one) => one.available)) {
+    for (const section of SETTINGS_SECTIONS.filter(
+      (one) => one.available && one.id !== "review",
+    )) {
       expect(
         screen.getByRole("link", { name: new RegExp(section.label) }),
       ).toHaveAttribute("href", section.route);
@@ -45,7 +58,9 @@ describe("finding your way", () => {
     // opening three sections to check.
     show();
 
-    for (const section of SETTINGS_SECTIONS) {
+    for (const section of SETTINGS_SECTIONS.filter(
+      (one) => one.id !== "review",
+    )) {
       expect(screen.getByText(section.blurb)).toBeInTheDocument();
     }
   });
@@ -53,7 +68,7 @@ describe("finding your way", () => {
   it("groups them, because the groups answer 'where would I look'", () => {
     show();
 
-    for (const group of SETTINGS_GROUPS) {
+    for (const group of SETTINGS_GROUPS.filter((one) => !one.adminOnly)) {
       expect(screen.getByText(group.label)).toBeInTheDocument();
     }
   });
@@ -170,5 +185,36 @@ describe("a row you can actually use", () => {
 
     expect(within(link).getByText(section.label)).toBeInTheDocument();
     expect(within(link).getByText(section.blurb)).toBeInTheDocument();
+  });
+});
+
+describe("the review queue", () => {
+  it("is offered to an admin", () => {
+    // It was reachable from an unlabelled ninth row in the account drawer
+    // that looked exactly like Favorites, so the one person who can work the
+    // queues typed the URL instead.
+    role = "2";
+    show();
+
+    expect(
+      screen.getByRole("link", { name: /Review queue/ }),
+    ).toHaveAttribute("href", "/admin");
+  });
+
+  it("is not offered to anybody else", () => {
+    // Hiding it is not access control - the server refuses these queries
+    // regardless - it is about not offering a door almost nobody can open.
+    show();
+
+    expect(
+      screen.queryByRole("link", { name: /Review queue/ }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("is labelled as a different mode rather than more of your own things", () => {
+    role = "2";
+    show();
+
+    expect(screen.getByText("Admin")).toBeInTheDocument();
   });
 });

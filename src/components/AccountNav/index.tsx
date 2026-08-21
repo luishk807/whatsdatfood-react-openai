@@ -68,11 +68,19 @@ const AccountNav: FC<AccountNavInterface> = ({ variant }) => {
         {groups.map((group, index) => (
           <li key={group.id}>
             {/* A rule between groups rather than a heading. The groups say what
-                belongs together; naming them adds words nobody reads. */}
+                belongs together; naming them adds words nobody reads - with
+                one exception below, which is a different mode rather than
+                more of your own things. */}
             {index > 0 && (
               <div
                 className={clsx("border-t border-line", isList ? "my-2" : "my-2")}
               />
+            )}
+
+            {"label" in group && group.label && (
+              <p className="px-3 pb-1 pt-1 text-xs font-medium uppercase tracking-wide text-ink-muted">
+                {group.label}
+              </p>
             )}
 
             <ul className={clsx("flex flex-col", isList ? "gap-px" : "gap-0.5")}>
