@@ -26,6 +26,16 @@ jest.mock("@/customHooks/useAuth", () => ({
   default: () => ({ checkUser }),
 }));
 
+/**
+ * The pitch panel picks its photograph through one hook now, so that is what
+ * is stubbed. Its own behaviour — community first, curated fallback, then the
+ * plain panel — is tested in `utils/heroImage.test.ts`, without a component.
+ */
+jest.mock("@/customHooks/useHeroImage", () => ({
+  __esModule: true,
+  default: () => ({ image: null, loading: false }),
+}));
+
 jest.mock("@/customHooks/useRecentDishPhotos", () => ({
   __esModule: true,
   default: () => ({ photos: [], loading: false }),

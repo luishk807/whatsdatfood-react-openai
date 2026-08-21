@@ -57,3 +57,46 @@ export interface RestaurantCoverInterface {
   eager?: boolean;
   rounded?: string;
 }
+
+import { HeroSource } from "@/customConstants/images";
+import { CuisineTileType } from "@/interfaces/generic";
+
+/**
+ * A community photograph, as the showcase query returns it.
+ *
+ * Structural and forgiving, so `ShowcasePhoto` satisfies it without either
+ * type having to know about the other — the same reason
+ * `RestaurantImagerySource` is shaped this way.
+ */
+export interface HeroCommunityPhotoType {
+  id?: string | number | null;
+  url_s?: string | null;
+  url_m?: string | null;
+  dish_name?: string | null;
+  /** The public display name already shown on the homepage wall. */
+  owner?: string | null;
+}
+
+export interface HeroSourcesType {
+  community?: HeroCommunityPhotoType[];
+  curated?: CuisineTileType[];
+}
+
+export interface HeroImageType {
+  url: string;
+  source: HeroSource;
+  /** Decorative: the panel is aria-hidden and the page heading sits over it. */
+  alt: string;
+  /** The dish, for community work only. Never set for a decorative image. */
+  caption: string | null;
+  credit: { text: string; url?: string | null } | null;
+}
+
+export interface HeroImageInterface {
+  image: HeroImageType | null;
+  /** Rendered over the image, above the scrim. */
+  children?: React.ReactNode;
+  className?: string;
+  /** Above the fold on the page somebody landed on. */
+  eager?: boolean;
+}

@@ -1,5 +1,7 @@
 import { type FC, type FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import AuthButton from "@/components/AuthButton";
+import AuthCard from "@/components/AuthCard";
 import AuthPitch from "@/components/AuthPitch";
 import AuthField from "@/components/AuthField";
 import useAuth from "@/customHooks/useAuth";
@@ -61,9 +63,10 @@ const SignInComponent: FC = () => {
       </div>
 
       <div className="flex w-full items-start justify-center px-4 py-8 lg:w-[45%] lg:items-center">
-        {/* Edge to edge on a phone, a card from `sm` up — the same frame as
-            signing up. */}
-        <div className="flex w-full max-w-[420px] flex-col gap-6 sm:rounded-2xl sm:border sm:border-line sm:bg-surface-raised sm:p-7">
+        {/* Edge to edge on a phone, a card from `sm` up. `AuthCard` is the
+            same frame signing up and signing out use, so the three cannot
+            drift apart the way they had. */}
+        <AuthCard>
           <div className="flex flex-col gap-1">
             <h1 className="text-2xl font-semibold tracking-tight text-ink">
               {AUTH_LABELS.signInTitle}
@@ -101,13 +104,16 @@ const SignInComponent: FC = () => {
               </p>
             )}
 
-            <button
+            {/* The loader stays inside the button: a page-level spinner for
+                a button-level request throws away the form. Disabled while it
+                works, so a second press cannot submit twice. */}
+            <AuthButton
               type="submit"
-              disabled={loading}
-              className="h-12 w-full rounded-pill bg-brand px-4 text-base font-medium text-white hover:bg-brand-strong disabled:opacity-60"
+              busy={loading}
+              busyLabel={AUTH_LABELS.submitting}
             >
-              {loading ? AUTH_LABELS.submitting : AUTH_LABELS.submit}
-            </button>
+              {AUTH_LABELS.submit}
+            </AuthButton>
           </form>
 
           <p className="text-sm text-ink-muted">
@@ -119,7 +125,7 @@ const SignInComponent: FC = () => {
               {AUTH_LABELS.createAccount}
             </Link>
           </p>
-        </div>
+        </AuthCard>
       </div>
     </div>
   );

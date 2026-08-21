@@ -302,6 +302,18 @@ export const AUTH_LABELS = {
   createAccount: "Create account",
   failed: "That username and password did not match.",
   /**
+   * Signing out, which is a farewell rather than a receipt.
+   *
+   * "You are successfully logged out! Thank you!" reads like a printer. This
+   * is the one page somebody sees on their way out, so it says the thing that
+   * might bring them back.
+   */
+  signedOutTitle: "You’re signed out",
+  signedOutBody: "See you next time. Ready to discover something good?",
+  backHome: "Back to homepage",
+  signInAgain: "Sign in again",
+  signingOut: "Signing you out…",
+  /**
    * Signing up. Three fields: a display name, an email and a password.
    *
    * It used to ask for a first name, a last name, a phone number, a username
@@ -747,6 +759,8 @@ export const IMAGERY_LABELS = {
   borrowed: "Photo via Google",
   /** The invitation the fallback drawing carries on a menu. */
   noPhotoYet: "No photos yet",
+  /** A curated photograph credits its photographer and names no dish. */
+  photoBy: (who: string) => `Photo by ${who}`,
 } as const;
 
 /**

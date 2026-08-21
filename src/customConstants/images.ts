@@ -55,6 +55,32 @@ export const COVER_SOURCE = {
   fallback: "fallback",
 } as const;
 
+/**
+ * What is filling a large decorative panel.
+ *
+ * Separate from `COVER_SOURCE`, which describes a card: a hero is allowed to
+ * be decoration, and a card under a restaurant's name is not. The two never
+ * share a value so a panel image can never be mistaken for evidence about a
+ * kitchen.
+ */
+export const HERO_SOURCE = {
+  /** A diner's photograph. Captioned with the dish and who took it. */
+  community: "community",
+  /** Curated Unsplash. Credited, never captioned with a dish. */
+  curated: "curated",
+} as const;
+
+export type HeroSource = (typeof HERO_SOURCE)[keyof typeof HERO_SOURCE];
+
+/**
+ * How many community photographs the hero asks for.
+ *
+ * More than one because it rotates on the day, and because a third-party
+ * refusal should be covered by the next photo rather than dropping to the
+ * fallback. Still a bounded handful: this is decoration.
+ */
+export const HERO_POOL = 12;
+
 export type CoverSource = (typeof COVER_SOURCE)[keyof typeof COVER_SOURCE];
 
 /**
