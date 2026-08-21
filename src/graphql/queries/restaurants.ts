@@ -71,6 +71,7 @@ export const GET_RESTAURANT_BY_SLUG = gql`
       menu_verified_at
       menu_updated_at
       viewer_can_manage
+      is_verified_business
       champion {
         username
         display_name

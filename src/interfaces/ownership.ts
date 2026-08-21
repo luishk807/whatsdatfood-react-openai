@@ -113,3 +113,8 @@ export interface ClaimWizardInterface {
   onClose: () => void;
   onSubmitted: () => void;
 }
+
+export interface VerifiedBadgeInterface {
+  verified?: boolean;
+  className?: string;
+}

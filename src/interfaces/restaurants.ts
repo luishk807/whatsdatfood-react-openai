@@ -65,6 +65,13 @@ export interface RestaurantType {
   name: string;
   address?: string;
   city?: string;
+  /**
+   * Somebody manages this restaurant and an admin agreed.
+   *
+   * Not "has a claim": a claim is a request, and a mark that appeared on
+   * submission would let anybody mark any restaurant verified by asking.
+   */
+  is_verified_business?: boolean;
   /** Ours, worked out from the coordinates. Null where it is not clear. */
   neighborhood?: string;
   country?: string;

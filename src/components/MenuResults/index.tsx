@@ -282,6 +282,7 @@ const MenuResults: FC = () => {
             // Easy to miss: this object is assembled field by field, so a new
             // field on the query is invisible here until it is named.
             champion: _get(resp, "champion", null),
+            is_verified_business: _get(resp, "is_verified_business", false),
             menu_verified_at: _get(resp, "menu_verified_at", null),
             menu_updated_at: _get(resp, "menu_updated_at", null),
             viewer_can_manage: _get(resp, "viewer_can_manage", false),

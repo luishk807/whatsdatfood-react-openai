@@ -638,6 +638,22 @@ export const CLAIM_LABELS = {
   noMethods: "Claiming is not available for this restaurant right now.",
 } as const;
 
+/**
+ * The verified-business mark.
+ *
+ * **It certifies a role, never a purchase.** `MEMBERSHIP_LABELS.notForSale`
+ * already says memberships buy nothing a role decides, and this is the
+ * clearest case: a badge somebody could pay for is not a badge.
+ *
+ * The wording is about who manages the page, not about the food. "Verified"
+ * next to a restaurant's name could easily be read as a quality rating, and
+ * this product's one ranking claim is the community vote.
+ */
+export const VERIFIED_LABELS = {
+  badge: "Verified business",
+  explain: "Someone from this restaurant manages this page.",
+} as const;
+
 export const CHUNK_LABELS = {
   title: "This page is out of date",
   body:

@@ -2,6 +2,7 @@ import { FC } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import MenuTrust from "@/components/MenuTrust";
+import VerifiedBadge from "@/components/VerifiedBadge";
 import { MANAGE_MENU_LABELS } from "@/customConstants/labels";
 import { buildManageMenuPath } from "@/customConstants/routes";
 import { RestaurantHeaderInterface } from "@/interfaces/venue";
@@ -78,9 +79,18 @@ const RestaurantHeader: FC<RestaurantHeaderInterface> = ({
           </button>
 
           <div className="min-w-0 flex-1">
-            <h1 className="text-xl font-semibold leading-tight tracking-tight text-ink sm:text-2xl">
-              {restaurant?.name}
-            </h1>
+            <div className="flex flex-wrap items-center gap-2">
+              <h1 className="text-xl font-semibold leading-tight tracking-tight text-ink sm:text-2xl">
+                {restaurant?.name}
+              </h1>
+
+              {/* Beside the name because it is about this page rather than
+                  about the menu, and absent rather than greyed: most
+                  restaurants have no owner and never will, so a dimmed "not
+                  verified" mark would be a complaint about the catalogue
+                  printed on every restaurant in it. */}
+              <VerifiedBadge verified={restaurant?.is_verified_business} />
+            </div>
 
             <p className="mt-0.5 text-sm text-ink-muted">
               {meta.join(" · ")}
