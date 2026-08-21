@@ -213,3 +213,19 @@ export const CONTACT = {
   /** Shown when the form cannot send. Somewhere to go beats an apology. */
   FALLBACK_EMAIL: "info@whatsdatfood.com",
 } as const;
+
+/**
+ * Waiting for a menu that is being prepared for the first time.
+ *
+ * Polled only while the server says something is running, so a restaurant
+ * whose menu already exists costs one request and never asks again.
+ */
+export const MENU_WAIT = {
+  POLL_MS: 3000,
+  /**
+   * When "this may take a few seconds" stops being true. Ten seconds is past
+   * the point where a reader has decided something is wrong, and the second
+   * message exists to tell them the rest of the page works.
+   */
+  SLOW_AFTER_MS: 10000,
+} as const;

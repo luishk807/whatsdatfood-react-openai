@@ -1,4 +1,12 @@
-import { useState, type FC, useEffect, useMemo, lazy, Suspense } from "react";
+import {
+  useState,
+  type FC,
+  useEffect,
+  useMemo,
+  useRef,
+  lazy,
+  Suspense,
+} from "react";
 import { useParams } from "react-router-dom";
 import {
   RestaurantType,
@@ -24,6 +32,8 @@ import BookmarkButton from "../BookmarkButton";
 import ClaimRestaurantButton from "@/components/ClaimRestaurantButton";
 import TopDishStrip from "@/components/TopDishStrip";
 import DishGrid from "@/components/DishGrid";
+import MenuStatusPanel from "@/components/MenuStatusPanel";
+import useMenuStatus from "@/customHooks/useMenuStatus";
 import DishPhoto from "@/components/DishPhoto";
 import BottomSheet from "@/components/BottomSheet";
 import useDishRanking from "@/customHooks/useDishRanking";
@@ -141,6 +151,33 @@ const MenuResults: FC = () => {
     () => Object.keys(restaurantMenu),
     [restaurantMenu],
   );
+
+  // **Only this section waits.** The restaurant above it came out of a row we
+  // hold and is already on screen; this asks separately whether food is on its
+  // way. Opening a restaurant used to do both in one request, so a busy model
+  // meant fifteen seconds of skeletons and then a page with no restaurant on
+  // it at all.
+  const menuStatus = useMenuStatus(
+    restaurant,
+    categories.length > 0,
+    Boolean(restaurantInfo),
+  );
+  const wasPending = useRef(false);
+
+  useEffect(() => {
+    // It arrived. Pull the menu in without making the reader find a reload
+    // button - `forceNetwork` because the menu query is cache-first and would
+    // otherwise hand back the empty answer it already has.
+    if (wasPending.current && !menuStatus.pending) {
+      handleFetchRestaurant(true);
+    }
+
+    wasPending.current = menuStatus.pending;
+    // handleFetchRestaurant is redefined every render; depending on it would
+    // refetch the menu on every render, which is the loop this file already
+    // warns about twice.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [menuStatus.pending]);
 
   /** Jump targets for the sticky bar: the strip when it exists, then sections. */
   const sections = useMemo<MenuSection[]>(
@@ -383,6 +420,19 @@ const MenuResults: FC = () => {
                 onAddPhoto={handleAddPhoto}
                 uploadingDishId={uploadingDishId}
                 dinerCount={dinerCount}
+              />
+            )}
+
+            {/* Where the food goes when there is no food yet. Renders
+                nothing once there are dishes. */}
+            {categories.length === 0 && (
+              <MenuStatusPanel
+                state={menuStatus.state}
+                slow={menuStatus.slow}
+                onRetry={() => {
+                  menuStatus.retry();
+                  handleFetchRestaurant(true);
+                }}
               />
             )}
 

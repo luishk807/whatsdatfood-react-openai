@@ -150,3 +150,22 @@ export const DISH_HISTORY = gql`
     }
   }
 `;
+
+/**
+ * Whether this restaurant's menu is ready, coming, or not coming.
+ *
+ * Asked separately from the restaurant on purpose. Opening a restaurant used
+ * to generate its menu in the same request, so a busy model meant fifteen
+ * seconds of skeletons and then a page with no restaurant on it. The
+ * restaurant is a row we hold; this is the half that may still be being
+ * worked out.
+ */
+export const MENU_STATUS = gql`
+  query menuStatus($slug: String!) {
+    menuStatus(slug: $slug) {
+      state
+      dish_count
+      working
+    }
+  }
+`;

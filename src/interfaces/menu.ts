@@ -115,3 +115,24 @@ export interface DishSubmissionQueueInterface {
   /** `(id, approve)`, the same shape every other queue here uses. */
   onDecide: (dishId: string, approve: boolean) => Promise<void>;
 }
+
+/**
+ * Where a restaurant's menu has got to.
+ *
+ * `ready` - there are dishes. `pending` - being worked out now. `unavailable`
+ * - we tried and could not read one, or are not going to. The third is not an
+ * error: most restaurants in the world have no menu online, and the page is
+ * still worth reading without one.
+ */
+export interface MenuStatusType {
+  state: "ready" | "pending" | "unavailable";
+  dish_count: number;
+  working: boolean;
+}
+
+export interface MenuStatusPanelInterface {
+  state?: MenuStatusType["state"];
+  /** Past the point where "a few seconds" is an honest thing to say. */
+  slow?: boolean;
+  onRetry?: () => void;
+}

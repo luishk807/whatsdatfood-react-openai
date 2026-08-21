@@ -857,6 +857,36 @@ export const MAP_LABELS = {
  * A restaurant with no community photograph is listed rather than hidden: it
  * is a real place a short walk away, and the empty tile is the ask.
  */
+/**
+ * The menu, while it is still being worked out.
+ *
+ * **Nothing here names a mechanism.** No model, no extraction, no jobs, no
+ * catalogue. Somebody sitting at a table wants to know whether food is about
+ * to appear on their phone; how it gets there is our problem, and a sentence
+ * that mentions ours is a sentence that reads as an excuse.
+ *
+ * Two stages, because the honest thing to say changes. The first few seconds
+ * are a normal wait. Past that it is worth saying the page is usable without
+ * it, so nobody sits watching a panel that may not resolve.
+ */
+export const MENU_STATUS_LABELS = {
+  pendingTitle: "Getting the menu ready",
+  pendingBody:
+    "We're finding dishes and photos for this restaurant. This may take a " +
+    "few seconds the first time.",
+  slowTitle: "Still working on it…",
+  slowBody:
+    "You can browse the restaurant now. The menu will appear as soon as " +
+    "it's ready.",
+  /**
+   * Not an apology and not a dead end. Most restaurants in the world have no
+   * menu online, so this is a normal outcome rather than a fault - and the
+   * page underneath it is still worth reading.
+   */
+  failedTitle: "We couldn't load the menu right now.",
+  retry: "Try again",
+} as const;
+
 export const NEARBY_LABELS = {
   title: "Near you",
   titleNear: (place: string) => `Near ${place}`,

@@ -53,6 +53,22 @@ jest.mock("react-router-dom", () => ({
   useParams: () => ({ restaurant: "chun-hong-kong-cafe" }),
 }));
 
+/**
+ * The menu-status ask is a real Apollo query and this file renders without a
+ * client, mocking the hooks it needs instead. Stubbed `ready` because these
+ * tests are about the dish sheet on a restaurant that has a menu - the panel
+ * that shows while one is being prepared has its own tests.
+ */
+jest.mock("@/customHooks/useMenuStatus", () => ({
+  __esModule: true,
+  default: () => ({
+    state: "ready",
+    pending: false,
+    slow: false,
+    retry: jest.fn(),
+  }),
+}));
+
 jest.mock("@/customHooks/useRestaurantMutations", () => ({
   __esModule: true,
   default: () => ({
