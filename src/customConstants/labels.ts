@@ -864,6 +864,19 @@ export const NEARBY_LABELS = {
   cuisineNearYou: (cuisine: string) => `${cuisine} near you`,
   empty: "No restaurants around here yet.",
   emptyHelp: "Try a wider area, or search for a restaurant by name.",
+  /**
+   * The same page with a filter on it is a different answer, and blaming the
+   * neighbourhood for it sends the reader to the wrong fix.
+   *
+   * "No restaurants around here yet" was shown for "Coffee near you" while
+   * five coffee shops stood within four hundred metres — the filter was the
+   * problem and the sentence pointed at the area. Naming the category, and
+   * offering the one tap that removes it, is the difference between a dead
+   * end and a choice.
+   */
+  emptyFiltered: (category: string) => `No ${category.toLowerCase()} around here yet.`,
+  emptyFilteredHelp: "It may be a little further out, or not on our map yet.",
+  showEverything: "Show everything nearby",
   unavailable: "Nearby search is not available right now.",
   seeDishes: "See dishes",
   noPhotos: "No dish photos yet",

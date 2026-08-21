@@ -240,9 +240,32 @@ describe("one batch at a time", () => {
   it("says plainly when there is nothing nearby", () => {
     // The honest answer for a catalogue that does not cover somewhere yet,
     // and it must not be dressed up as a loading state.
-    show("/nearby?cuisine=chinese");
+    show("/nearby");
 
     expect(screen.getByText(NEARBY_LABELS.empty)).toBeInTheDocument();
+  });
+
+  it("blames the filter rather than the neighbourhood", () => {
+    // This test used to load `?cuisine=chinese` and assert the *unfiltered*
+    // sentence, which is the bug written down: "Coffee near you" showed "No
+    // restaurants around here yet" while five coffee shops stood four hundred
+    // metres away. The area was never the problem.
+    show("/nearby?cuisine=chinese");
+
+    expect(
+      screen.getByText(NEARBY_LABELS.emptyFiltered("Chinese")),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(NEARBY_LABELS.empty)).not.toBeInTheDocument();
+  });
+
+  it("offers one tap out of a filter that found nothing", () => {
+    // Without this the reader's only move is the browser back button, and the
+    // page they came from is the one that sent them here.
+    show("/nearby?cuisine=chinese");
+
+    expect(
+      screen.getByRole("link", { name: NEARBY_LABELS.showEverything }),
+    ).toHaveAttribute("href", "/nearby");
   });
 });
 

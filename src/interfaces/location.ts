@@ -102,6 +102,16 @@ export interface NearbyListInterface {
   /** The pin the reader tapped on the map, so the row can answer it. */
   selectedId?: string | null;
   onSelect?: (id: string) => void;
+  /**
+   * The category being filtered on, already in display form.
+   *
+   * Only the empty state uses it, and only to stop blaming the neighbourhood
+   * for a filter: "no coffee around here" and "no restaurants around here"
+   * are different facts and lead to different next moves.
+   */
+  filterLabel?: string;
+  /** Where "show everything nearby" goes — the same page without the filter. */
+  clearFilterHref?: string;
 }
 
 /** What the map hands back when the reader asks to search where they are

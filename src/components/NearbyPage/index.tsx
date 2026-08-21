@@ -7,6 +7,7 @@ import LocationSheet from "@/components/LocationSheet";
 import NearbyList from "@/components/NearbyList";
 import RestaurantPreview from "@/components/RestaurantPreview";
 import useDiscoveryLocation from "@/customHooks/useDiscoveryLocation";
+import useTasteCategories from "@/customHooks/useTasteCategories";
 import {
   useNearbyRestaurants,
   useRestaurantsInArea,
@@ -15,6 +16,7 @@ import { LOCATION_SOURCE } from "@/customConstants/location";
 import { mapConfigured } from "@/customConstants/map";
 import { MAP_LABELS, NEARBY_LABELS } from "@/customConstants/labels";
 import { NEARBY_PARAMS, buildNearbyPath } from "@/customConstants/routes";
+import { categoryLabel } from "@/utils/categoryLabel";
 
 /**
  * Nearby discovery: a list and a map of what is around you.
@@ -55,6 +57,10 @@ const NearbyPage: FC = () => {
   const [selected, setSelected] = useState<string | null>(null);
   const [changing, setChanging] = useState(false);
 
+  const { categories } = useTasteCategories();
+  // What the server calls this category. Deriving it from the slug gave
+  // "Dim_sum" in the heading and "Bbq" in the chip.
+  const cuisineName = cuisine ? categoryLabel(cuisine, categories) : "";
   const nearby = useNearbyRestaurants(location, cuisine);
   const area = useRestaurantsInArea(cuisine);
 
@@ -81,8 +87,8 @@ const NearbyPage: FC = () => {
   const place = location?.label;
   const heading = cuisine
     ? place
-      ? NEARBY_LABELS.cuisineNear(titleCase(cuisine), place)
-      : NEARBY_LABELS.cuisineNearYou(titleCase(cuisine))
+      ? NEARBY_LABELS.cuisineNear(cuisineName, place)
+      : NEARBY_LABELS.cuisineNearYou(cuisineName)
     : place
       ? NEARBY_LABELS.titleNear(place)
       : NEARBY_LABELS.title;
@@ -167,10 +173,10 @@ const NearbyPage: FC = () => {
         <div className="flex justify-center">
           <Link
             to={buildNearbyPath({ view })}
-            aria-label={NEARBY_LABELS.clearFilterLabel(titleCase(cuisine))}
+            aria-label={NEARBY_LABELS.clearFilterLabel(cuisineName)}
             className="inline-flex min-h-9 items-center gap-1.5 rounded-pill border border-ink bg-surface-sunken px-3 text-sm text-ink"
           >
-            {titleCase(cuisine)}
+            {cuisineName}
             <CloseIcon size={14} className="text-ink-muted" />
           </Link>
         </div>
@@ -217,6 +223,8 @@ const NearbyPage: FC = () => {
             places={places}
             selectedId={selected}
             onSelect={setSelected}
+            filterLabel={cuisine ? cuisineName : undefined}
+            clearFilterHref={buildNearbyPath({ view })}
           />
         </div>
       ) : (
@@ -225,6 +233,8 @@ const NearbyPage: FC = () => {
           loading={nearby.loading || area.loading}
           selectedId={selected}
           onSelect={setSelected}
+          filterLabel={cuisine ? cuisineName : undefined}
+          clearFilterHref={buildNearbyPath({ view })}
         />
       )}
 
@@ -250,8 +260,5 @@ const NearbyPage: FC = () => {
     </div>
   );
 };
-
-const titleCase = (value: string) =>
-  value.charAt(0).toUpperCase() + value.slice(1);
 
 export default NearbyPage;

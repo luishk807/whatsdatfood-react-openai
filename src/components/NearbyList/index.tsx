@@ -24,6 +24,8 @@ const NearbyList: FC<NearbyListInterface> = ({
   loading,
   selectedId,
   onSelect,
+  filterLabel,
+  clearFilterHref,
 }) => {
   if (loading && !places.length) {
     return (
@@ -38,11 +40,30 @@ const NearbyList: FC<NearbyListInterface> = ({
     );
   }
 
+  // Nothing found, and *why* nothing was found is the whole message. With a
+  // category filter on, the neighbourhood is usually not the problem: the
+  // page said "No restaurants around here yet" for Coffee while five coffee
+  // shops stood within four hundred metres of the reader. Blaming the area
+  // sends somebody to widen a search that was never too narrow, so the
+  // filtered version names the filter and offers the tap that drops it.
   if (!places.length) {
     return (
-      <div className="flex flex-col gap-1 rounded-card border border-dashed border-line p-6 text-center">
-        <p className="text-sm font-medium text-ink">{NEARBY_LABELS.empty}</p>
-        <p className="text-sm text-ink-muted">{NEARBY_LABELS.emptyHelp}</p>
+      <div className="flex flex-col items-center gap-1 rounded-card border border-dashed border-line p-6 text-center">
+        <p className="text-sm font-medium text-ink">
+          {filterLabel ? NEARBY_LABELS.emptyFiltered(filterLabel) : NEARBY_LABELS.empty}
+        </p>
+        <p className="text-sm text-ink-muted">
+          {filterLabel ? NEARBY_LABELS.emptyFilteredHelp : NEARBY_LABELS.emptyHelp}
+        </p>
+
+        {filterLabel && clearFilterHref && (
+          <Link
+            to={clearFilterHref}
+            className="mt-2 inline-flex min-h-11 items-center rounded-pill border border-ink px-4 text-sm font-medium text-ink hover:bg-surface-sunken"
+          >
+            {NEARBY_LABELS.showEverything}
+          </Link>
+        )}
       </div>
     );
   }
