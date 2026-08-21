@@ -130,3 +130,27 @@ describe("RestaurantCover", () => {
   });
 
 });
+
+describe("the size belongs to whoever places the card", () => {
+  it("does not impose a width the caller did not ask for", () => {
+    // The mobile bug. This forced `w-full`, and a caller asking for `w-20`
+    // lost — Tailwind utilities of equal specificity are decided by their
+    // order in the stylesheet, not by their order in the class attribute. So
+    // every row of the nearby list became a full-width photograph with the
+    // restaurant's name crushed into a column one word wide.
+    const { container } = render(
+      <RestaurantCover restaurant={{}} className="h-20 w-20 shrink-0" />,
+    );
+
+    expect(container.firstChild).toHaveClass("w-20");
+    expect(container.firstChild).not.toHaveClass("w-full");
+  });
+
+  it("still lets a caller ask for the full width", () => {
+    const { container } = render(
+      <RestaurantCover restaurant={{}} className="h-28 w-full" />,
+    );
+
+    expect(container.firstChild).toHaveClass("w-full");
+  });
+});

@@ -55,8 +55,18 @@ const RestaurantCover: FC<RestaurantCoverInterface> = ({
 
   return (
     <div
+      /* No width of its own, deliberately.
+       *
+       * This used to force `w-full`, and a caller asking for `w-20` lost:
+       * Tailwind utilities of equal specificity are decided by their order in
+       * the stylesheet, not by their order in the class attribute, so the
+       * caller's width was silently ignored. On a phone that turned every row
+       * of the nearby list into a full-width photograph with the restaurant's
+       * name crushed into a column one word wide.
+       *
+       * The size belongs to whoever is placing the card. */
       className={clsx(
-        "relative w-full overflow-hidden bg-surface-sunken",
+        "relative overflow-hidden bg-surface-sunken",
         rounded,
         className,
       )}

@@ -47,7 +47,7 @@ const TrendingCard: FC<TrendingCardInterface> = ({ restaurant }) => {
         restaurant={restaurant}
         ratio={undefined}
         rounded="rounded-none"
-        className="h-28 shrink-0"
+        className="h-28 w-full shrink-0"
       />
 
       <span className="flex flex-1 flex-col gap-0.5 p-2">

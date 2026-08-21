@@ -80,7 +80,7 @@ const TasteSection: FC<TasteSectionInterface> = ({ taste, location, place }) => 
                 restaurant={one}
                 ratio={undefined}
                 rounded="rounded-none"
-                className="h-24 shrink-0"
+                className="h-24 w-full shrink-0"
               />
 
               <span className="flex flex-1 flex-col gap-0.5 p-2">
