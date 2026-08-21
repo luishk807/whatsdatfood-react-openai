@@ -123,6 +123,14 @@ export const UserIcon = icon(User);
 export const PeopleIcon = icon(Users);
 export const CameraIcon = icon(Camera);
 export const HeartIcon = icon(Heart);
+/**
+ * Saved. The filled counterpart, here rather than hand-drawn in
+ * `BookmarkButton` - which had its own SVG heart at its own stroke width, the
+ * second time a component has kept a private icon set (`AccountButton/icons`
+ * was the first). Two hearts at two weights on one page is how the seam
+ * stops being a seam.
+ */
+export const HeartFilledIcon = icon(Heart, { filled: true });
 export const TrophyIcon = icon(Trophy);
 export const AwardIcon = icon(Award);
 export const ArrowRightIcon = icon(ArrowRight);

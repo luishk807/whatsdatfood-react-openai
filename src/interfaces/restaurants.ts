@@ -65,6 +65,8 @@ export interface RestaurantType {
   name: string;
   address?: string;
   city?: string;
+  /** Ours, worked out from the coordinates. Null where it is not clear. */
+  neighborhood?: string;
   country?: string;
   createdAt?: string;
   deletedAt?: null;

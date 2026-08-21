@@ -543,6 +543,25 @@ export const FAVORITE_LABELS = {
   signInToSave: "Sign in to save restaurants",
   savedToast: "Saved",
   failed: "Could not save that. Try again.",
+
+  /**
+   * The saved list.
+   *
+   * It was three columns - a name, a date and the word "delete" - which said
+   * nothing about the food and made a saved restaurant look like a row in an
+   * admin table. The date in particular answered a question nobody asks:
+   * somebody opening this is deciding where to eat, not auditing when they
+   * pressed a heart.
+   */
+  pageTitle: "Saved",
+  pageBlurb: "Restaurants you saved to come back to.",
+  emptyTitle: "Nothing saved yet.",
+  emptyBody:
+    "Tap the heart on a restaurant to keep it here for when you are deciding " +
+    "where to eat.",
+  emptyCta: "Find places nearby",
+  /** Said on the card itself, because the heart is the only control on it. */
+  removeFrom: (name: string) => `Remove ${name} from saved`,
 } as const;
 
 export const CHUNK_LABELS = {

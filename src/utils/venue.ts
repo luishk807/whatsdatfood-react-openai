@@ -76,3 +76,24 @@ export const hasDetails = (restaurant?: RestaurantType | null): boolean => {
       (restaurant.businessHours?.length ?? 0) > 0,
   );
 };
+
+/**
+ * One quiet line under a saved restaurant's name.
+ *
+ * Neighbourhood if we know it, city otherwise, and nothing at all when we
+ * know neither - which is honest and is the case for a great many rows. The
+ * saved list used to print the date it was saved here instead, which answered
+ * a question nobody asks: somebody opening that page is deciding where to eat
+ * tonight, not auditing when they pressed a heart.
+ */
+export const venueLabel = (restaurant?: RestaurantType | null): string => {
+  const parts = [
+    restaurant?.neighborhood?.trim(),
+    restaurant?.city?.trim(),
+  ].filter(Boolean);
+
+  // The city is a fallback for the neighbourhood, not an addition to it -
+  // "Flushing, Queens" reads fine and "Midtown, New York" is two names for
+  // one place.
+  return parts[0] ?? "";
+};

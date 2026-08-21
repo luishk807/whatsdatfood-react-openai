@@ -4,6 +4,7 @@ import {
   hasDetails,
   michelinStars,
   priceRange,
+  venueLabel,
 } from "./venue";
 import { RestaurantType } from "@/interfaces/restaurants";
 
@@ -118,5 +119,42 @@ describe("hasDetails", () => {
 
   it("ignores whitespace-only fields", () => {
     expect(hasDetails(venue({ phone: "   ", description: "  " }))).toBe(false);
+  });
+});
+
+describe("the line under a saved restaurant's name", () => {
+  it("uses the neighbourhood when we know it", () => {
+    expect(
+      venueLabel(venue({ neighborhood: "Midtown", city: "New York" })),
+    ).toBe("Midtown");
+  });
+
+  it("falls back to the city", () => {
+    // Most of the catalogue has no neighbourhood: `neighborhoods.py` refuses
+    // to guess, same as the cuisine classifier.
+    expect(venueLabel(venue({ city: "New York" }))).toBe("New York");
+  });
+
+  it("never prints both", () => {
+    // The city is a fallback for the neighbourhood, not an addition to it -
+    // "Midtown, New York" is two names for one place.
+    expect(
+      venueLabel(venue({ neighborhood: "Midtown", city: "New York" })),
+    ).not.toContain("New York");
+  });
+
+  it("says nothing when we know neither", () => {
+    // Rather than a dash or an empty line pretending to be information.
+    expect(venueLabel(venue())).toBe("");
+  });
+
+  it("ignores whitespace masquerading as a value", () => {
+    expect(venueLabel(venue({ neighborhood: "  ", city: "Queens" }))).toBe(
+      "Queens",
+    );
+  });
+
+  it("copes with no restaurant at all", () => {
+    expect(venueLabel(null)).toBe("");
   });
 });

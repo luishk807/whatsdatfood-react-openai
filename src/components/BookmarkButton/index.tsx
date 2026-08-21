@@ -1,26 +1,12 @@
 import { type FC, useCallback, useEffect, useRef, useState } from "react";
 import clsx from "clsx";
+import { HeartFilledIcon, HeartIcon } from "@/components/icons";
 import useAuth from "@/customHooks/useAuth";
 import useUserFavorite from "@/customHooks/useUserFavorites";
 import useSnackbarHook from "@/customHooks/useSnackBar";
 import { FAVORITE_LABELS } from "@/customConstants/labels";
 import { BookmarkButtonInterface } from "@/interfaces/favorites";
 
-const HeartIcon: FC<{ filled: boolean }> = ({ filled }) => (
-  <svg
-    width="20"
-    height="20"
-    viewBox="0 0 24 24"
-    fill={filled ? "currentColor" : "none"}
-    stroke="currentColor"
-    strokeWidth="2"
-    strokeLinecap="round"
-    strokeLinejoin="round"
-    aria-hidden="true"
-  >
-    <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21.2l7.8-7.7 1-1.1a5.5 5.5 0 0 0 0-7.8z" />
-  </svg>
-);
 
 /**
  * Saving a restaurant.
@@ -30,7 +16,11 @@ const HeartIcon: FC<{ filled: boolean }> = ({ filled }) => (
  * error - and it logged the answer to the console while it was at it. Signed
  * out it now asks nothing, and says what to do instead of reporting a failure.
  */
-const BookmarkButton: FC<BookmarkButtonInterface> = ({ slug, defaultValue }) => {
+const BookmarkButton: FC<BookmarkButtonInterface> = ({
+  slug,
+  defaultValue,
+  onChange,
+}) => {
   const { user } = useAuth();
   const { saveFavorites, isUserFavorite } = useUserFavorite();
   const { SnackbarComponent, showSnackBar } = useSnackbarHook();
@@ -82,6 +72,10 @@ const BookmarkButton: FC<BookmarkButtonInterface> = ({ slug, defaultValue }) => 
     } finally {
       setBusy(false);
       await refresh();
+      // Lets a list that is *about* saved restaurants drop the row that
+      // just stopped being one, without owning a second copy of the
+      // toggle.
+      onChange?.(!isSaved);
     }
   };
 
@@ -106,7 +100,7 @@ const BookmarkButton: FC<BookmarkButtonInterface> = ({ slug, defaultValue }) => 
           isSaved ? "text-danger" : "text-ink-muted hover:text-ink",
         )}
       >
-        <HeartIcon filled={isSaved} />
+        {isSaved ? <HeartFilledIcon size={20} /> : <HeartIcon size={20} />}
       </button>
     </>
   );
