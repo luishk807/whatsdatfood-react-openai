@@ -146,3 +146,15 @@ export interface LocationBadgeInterface {
   onChange: () => void;
 }
 
+/**
+ * Pins grouped for the zoom they are about to be drawn at.
+ *
+ * A lone restaurant is a cluster of one, so the map has a single list to
+ * render and cannot draw the same place twice.
+ */
+export interface PlaceClusterType {
+  id: string;
+  latitude: number;
+  longitude: number;
+  places: NearbyPlaceType[];
+}
