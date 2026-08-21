@@ -128,3 +128,24 @@ export const NEARBY_DISCOVERY = gql`
     }
   }
 `;
+
+/**
+ * Whether we are still finding out what is around a point.
+ *
+ * Separate from the results on purpose. `nearbyRestaurants` answers out of our
+ * own rows and returns; this says whether a look at somewhere we have never
+ * been is still running, so the page can show one quiet line and ask again
+ * rather than making anybody wait.
+ */
+export const NEARBY_COVERAGE = gql`
+  query nearbyCoverage($latitude: Float!, $longitude: Float!, $cuisine: String) {
+    nearbyCoverage(
+      latitude: $latitude
+      longitude: $longitude
+      cuisine: $cuisine
+    ) {
+      cell
+      searching
+    }
+  }
+`;

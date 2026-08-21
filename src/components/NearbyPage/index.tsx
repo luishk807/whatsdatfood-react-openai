@@ -182,6 +182,19 @@ const NearbyPage: FC = () => {
         </div>
       )}
 
+      {/* Looking somewhere we have never looked. One quiet line, under the
+          results that are already on screen - never a spinner in place of
+          them, and never a word about how any of it works. */}
+      {nearby.discovering && (
+        <p
+          role="status"
+          className="flex items-center justify-center gap-2 text-sm text-ink-muted"
+        >
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-ink-muted motion-reduce:animate-none" />
+          {NEARBY_LABELS.findingMore}
+        </p>
+      )}
+
       {nearby.unavailable ? (
         <p className="rounded-card border border-dashed border-line p-6 text-center text-sm text-ink-muted">
           {NEARBY_LABELS.unavailable}

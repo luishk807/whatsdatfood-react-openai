@@ -1,6 +1,7 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLazyQuery, useQuery } from "@apollo/client";
 import {
+  NEARBY_COVERAGE,
   NEARBY_DISCOVERY,
   NEARBY_RESTAURANTS,
   RESOLVE_LOCATION,
@@ -59,7 +60,7 @@ export const useNearbyRestaurants = (
     [point?.latitude, point?.longitude],
   );
 
-  const { data, loading, error, fetchMore } = useQuery(NEARBY_RESTAURANTS, {
+  const { data, loading, error, fetchMore, refetch } = useQuery(NEARBY_RESTAURANTS, {
     variables: {
       latitude: at?.latitude ?? 0,
       longitude: at?.longitude ?? 0,
@@ -77,6 +78,54 @@ export const useNearbyRestaurants = (
   });
 
   const places = _get<NearbyPlaceType[]>(data, "nearbyRestaurants", []) ?? [];
+
+  // **Nobody waits for this.** The list above is already answered from our
+  // own rows; this only says whether we are also going and looking at
+  // somewhere we have never looked. Outside the handful of areas somebody had
+  // run an import script for, "use my location" used to return an empty page
+  // forever, and the reader had no way to know that was why.
+  const {
+    data: coverage,
+    startPolling,
+    stopPolling,
+  } = useQuery(NEARBY_COVERAGE, {
+    variables: {
+      latitude: at?.latitude ?? 0,
+      longitude: at?.longitude ?? 0,
+      cuisine,
+    },
+    skip: !point,
+    // Always asked, never cached: "are we still looking" is the one thing
+    // here whose answer is different a second later.
+    fetchPolicy: "network-only",
+  });
+
+  const discovering = _get<boolean>(coverage, "nearbyCoverage.searching", false);
+  const wasDiscovering = useRef(false);
+
+  // Polled only while something is actually running, so a covered area -
+  // which is almost every area, almost always - costs one request and then
+  // nothing at all.
+  useEffect(() => {
+    if (discovering) {
+      startPolling(NEARBY.COVERAGE_POLL_MS);
+    } else {
+      stopPolling();
+    }
+
+    return stopPolling;
+  }, [discovering, startPolling, stopPolling]);
+
+  useEffect(() => {
+    // Finished. Ask for the list again, because the whole point was that it
+    // now contains places it did not a moment ago - and do it without making
+    // the reader find a reload button.
+    if (wasDiscovering.current && !discovering) {
+      refetch();
+    }
+
+    wasDiscovering.current = discovering;
+  }, [discovering, refetch]);
 
   // Set when a batch comes back short, which the length alone cannot express
   // once several pages have accumulated.
@@ -118,6 +167,8 @@ export const useNearbyRestaurants = (
     // The frontend deploys ahead of the API routinely, so a field the server
     // does not have yet is "not available", never "there is nothing near you".
     unavailable: Boolean(error),
+    /** True while we are looking somewhere new. Never blocks anything. */
+    discovering,
   };
 };
 

@@ -877,6 +877,15 @@ export const NEARBY_LABELS = {
   emptyFiltered: (category: string) => `No ${category.toLowerCase()} around here yet.`,
   emptyFilteredHelp: "It may be a little further out, or not on our map yet.",
   showEverything: "Show everything nearby",
+  /**
+   * Shown while we are looking somewhere we have never looked before.
+   *
+   * Says what is happening to the reader and nothing about how. "Overpass",
+   * "import" and "catalogue" are our problems - somebody standing on a corner
+   * wanting lunch has no use for any of them, and the sentence has to be true
+   * whether we find thirty more places or none.
+   */
+  findingMore: "Finding more places nearby…",
   unavailable: "Nearby search is not available right now.",
   seeDishes: "See dishes",
   noPhotos: "No dish photos yet",

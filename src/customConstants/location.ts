@@ -48,6 +48,15 @@ export type LocationSource =
 export const LOCATION_STORAGE_KEY = "wdf.location";
 
 export const NEARBY = {
+  /**
+   * How often to ask whether we have finished looking at somewhere new.
+   *
+   * Only ever polled while a look is actually running, which is once per
+   * unfamiliar area and never again. Three seconds is slow enough to be
+   * invisible on a bill and fast enough that results appear while somebody is
+   * still reading the first screen of them.
+   */
+  COVERAGE_POLL_MS: 3000,
   /** Matches `NEARBY_RADIUS_KM_DEFAULT` on the server, which is what decides. */
   DEFAULT_RADIUS_KM: 5,
   /** The strip on the front door. A screenful, not a catalogue. */
