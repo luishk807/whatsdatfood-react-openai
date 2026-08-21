@@ -564,6 +564,23 @@ export const FAVORITE_LABELS = {
   removeFrom: (name: string) => `Remove ${name} from saved`,
 } as const;
 
+/**
+ * Recently viewed, and what was typed to get there.
+ *
+ * The page was a name and a formatted timestamp per row, which is precise and
+ * unreadable - nobody wants to know they opened a restaurant at 14:32 on a
+ * Tuesday, they want to know whether it was today.
+ */
+export const HISTORY_LABELS = {
+  viewedTitle: "Recently viewed",
+  searchesTitle: "Recent searches",
+  emptyTitle: "Nothing here yet.",
+  emptyBody:
+    "Restaurants you open show up here, so you can find your way back to " +
+    "one you liked the look of.",
+  emptyCta: "Find places nearby",
+} as const;
+
 export const CHUNK_LABELS = {
   title: "This page is out of date",
   body:

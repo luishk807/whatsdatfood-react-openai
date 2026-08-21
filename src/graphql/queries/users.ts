@@ -98,13 +98,9 @@ export const GET_USER_FAVORITES = gql`
           id
           name
           slug
-        }
-        user {
-          id
-          display_name
-          first_name
-          last_name
-          email
+          city
+          neighborhood
+          cuisine
         }
       }
       totalItems
@@ -158,6 +154,9 @@ export const GET_USER_VIEWED = gql`
           id
           name
           slug
+          city
+          neighborhood
+          cuisine
         }
       }
       totalItems
