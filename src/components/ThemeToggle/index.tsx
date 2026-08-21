@@ -14,6 +14,10 @@ const OPTIONS: ThemeOptionInterface[] = [
 /**
  * Three choices, one button.
  *
+ * The flat variant lives in a 256px account menu, which is the constraint
+ * that shapes it: small text, tight padding, and every part allowed to shrink.
+ * Without `min-w-0` the three buttons simply overflowed the panel.
+ *
  * Not a light/dark flip: "follow my machine" is a real answer and a two-state
  * toggle cannot express it - the first tap pins you to one theme forever. But
  * three controls sitting in the header is three controls of noise for
@@ -65,15 +69,23 @@ const ThemeToggle: FC<ThemeToggleInterface> = ({ expanded = false }) => {
           setOpen(false);
         }}
         className={clsx(
-          "flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors motion-reduce:transition-none",
-          flat ? "flex-1 justify-center" : "w-full text-left",
+          "flex items-center rounded-lg py-2 transition-colors motion-reduce:transition-none",
+          flat
+            // `min-w-0` is the fix rather than a refinement. A flex item
+            // defaults to `min-width: auto`, so `flex-1` could not shrink
+            // these below their own text and all three overflowed the 256px
+            // account menu instead — "Dark" was clipped off the right edge.
+            // Tighter spacing on top, so the labels still fit at that width
+            // rather than merely truncating.
+            ? "min-w-0 flex-1 justify-center gap-1.5 px-2 text-xs"
+            : "w-full gap-2 px-3 text-left text-sm",
           selected
             ? "bg-surface-sunken font-medium text-ink"
             : "text-ink-muted hover:text-ink",
         )}
       >
-        {option.icon}
-        <span>{option.label}</span>
+        <span className="shrink-0">{option.icon}</span>
+        <span className={clsx(flat && "truncate")}>{option.label}</span>
       </button>
     );
   };

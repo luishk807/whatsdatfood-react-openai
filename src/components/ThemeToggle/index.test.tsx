@@ -143,3 +143,45 @@ describe("ThemeToggle", () => {
     expect(document.documentElement.getAttribute(THEME_ATTRIBUTE)).toBe(THEME.dark);
   });
 });
+
+describe("inside the account menu", () => {
+  /**
+   * The panel is 256px wide with 16px of padding either side, so the three
+   * buttons have 224px between them. They used to overflow it and "Dark" was
+   * clipped off the right edge — a flex item defaults to `min-width: auto`,
+   * so `flex-1` could not shrink them below their own text.
+   */
+  it("lets every option shrink rather than overflow", () => {
+    render(<ThemeToggle expanded />);
+
+    for (const label of [
+      THEME_LABELS.system,
+      THEME_LABELS.light,
+      THEME_LABELS.dark,
+    ]) {
+      const button = screen.getByRole("button", { name: label });
+
+      expect(button.className).toContain("min-w-0");
+      expect(button.className).toContain("flex-1");
+    }
+  });
+
+  it("keeps the icon at full size while the label gives way", () => {
+    // Shrinking the icon would make the selected state harder to read than
+    // the word it sits beside.
+    render(<ThemeToggle expanded />);
+
+    const button = screen.getByRole("button", { name: THEME_LABELS.dark });
+
+    expect(button.querySelector(".shrink-0")).not.toBeNull();
+    expect(button.querySelector(".truncate")).not.toBeNull();
+  });
+
+  it("still shows all three, so 'system' stays reachable", () => {
+    // The reason this is three-way at all: a two-state toggle pins somebody
+    // to one theme the moment they touch it.
+    render(<ThemeToggle expanded />);
+
+    expect(screen.getAllByRole("button")).toHaveLength(3);
+  });
+});
