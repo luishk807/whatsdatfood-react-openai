@@ -77,10 +77,182 @@ the vote threshold is what keeps a barely-voted dish out of the ranking.
 - **One dependency was added for the map**: `mapbox-gl`. It is imported by
   `RestaurantMap` alone and lands in its own chunk. Nothing else in the app may
   import it.
-- **Icons are inline SVG in `src/components/icons/`.** Every
-  `@mui/icons-material` import pulled in `SvgIcon` and therefore the whole
-  emotion runtime for the sake of a chevron. Add a new icon to that module
-  rather than reaching for a package.
+- **Every icon comes from `src/components/icons/`, and Lucide draws them.**
+  That module is the only file allowed to import `lucide-react`. Lucide
+  replaced a hand-drawn set which had itself replaced `@mui/icons-material` —
+  where every icon pulled in `SvgIcon` and therefore the whole emotion runtime
+  for the sake of a chevron. Lucide reintroduces none of that: tree-shaken ES
+  modules, no styling runtime, +7 KiB for the whole set. Two components
+  reaching for their own icons is how an app ends up with three chevrons at
+  three weights, and it defeats the seam. `AccountButton/icons.tsx` was a
+  second hand-drawn set doing exactly that; it is now a lookup into the one
+  module.
+- **What Lucide cannot draw lives in `icons/food.tsx`** — sushi, a dumpling, a
+  taco, noodles — on the same 24x24 grid at the same stroke. A second icon
+  family for four glyphs would put two visual languages on one row; these are
+  also the first WhatsDatFood food illustrations, which is where this was
+  going anyway.
+
+## Category slugs, icons, and the line between them
+
+`customConstants/foodIcons.tsx` maps a category slug to a component and is the
+only file that decides how food is drawn. Three surfaces use it: the taste
+picker, the cuisine tiles, and the fallback on a restaurant card with no
+photograph.
+
+- **The database stores `coffee`, never `CoffeeIcon`.** A slug is business
+  data; a component name is a rendering decision that changes. Storing the
+  latter makes redrawing an icon a migration over everybody's saved
+  preferences. A test asserts no category carries an icon identifier.
+- **No flags for a cuisine.** Cuisine does not map onto nationality — a Chinese
+  restaurant in Flushing is a Queens restaurant — and a flag makes a claim
+  about a country where the card is about food. Every cuisine is drawn as
+  something you would eat.
+- **Never an emoji**, for the reason `FoodCredIcon` already gives: a different
+  picture on every platform, no theme colour, and unswappable without editing
+  every call site.
+- An unknown slug renders crossed cutlery rather than nothing. A category
+  invented on the server must not leave a hole in the page.
+
+## What goes on a restaurant card
+
+`utils/restaurantImage.ts` decides, and `RestaurantCover` draws it. The
+homepage used to show six identical grey rectangles with a camera in each.
+
+Priority: **community photo → owner cover → Google Places photo → logo →
+our own cuisine artwork.**
+
+- **Community work outranks everything, permanently.** The order is applied at
+  render and nothing is written back over an image row, so the first upload at
+  a restaurant replaces the borrowed picture everywhere. Google imagery
+  physically cannot overwrite a contribution because it is never stored beside
+  one.
+- **The whole ordered list is returned, not just the winner.** A 403 is the
+  common case — third-party hosts refuse hotlinks constantly and a Google photo
+  resource expires — so the card walks to the next candidate. `fallback` is
+  always last and always present, which is what guarantees a card is never
+  empty and never shows the broken-image glyph.
+- **Attribution travels with the candidate**, not beside it, so a card cannot
+  render a Google photo while missing the credit Google's terms require.
+- **Nothing is copied into our storage.** Google's terms permit caching the
+  place identifier, not the photograph. We persist the reference; the picture
+  is fetched through the supported flow.
+- **No Google call was added to the free discovery path.** `nearbyRestaurants`
+  and `restaurantsInArea` are our own PostgreSQL rows and reach no third party
+  at all — `tests/test_discovery_is_free.py` enforces it. There is no existing
+  Google response on that path to piggyback a photo field onto, so the tiers
+  wired and live today are community, owner and the cuisine fallback. A Google
+  photo reference is populated only where a Place Details call already happens
+  for another reason, and served from our row afterwards. **Do not wire a photo
+  lookup into the nearby path** to fill the gap; that turns the front door into
+  a per-visitor charge.
+- **A dish tile is not a restaurant card.** "Help put ___ on the food map" is
+  about dishes that need *community* photos, so a restaurant photo must never
+  fill that slot — it would tell the reader the dish is already photographed.
+
+## Nearby results come ten at a time
+
+- **`NEARBY.PAGE_SIZE` is 10**, matching `NEARBY_PAGE_SIZE` on the server.
+  Opening a cuisine tile costs one query over ten rows; it used to fetch forty
+  and throw most away.
+- **Paging is an `offset`, and the radius widens per page.** Page one stops at
+  the tightest radius that fills it, so ten restaurants within a mile and a
+  half is what a dense city returns — nothing three towns away is offered to
+  pad the list. Stable because a wider circle is a superset of a tighter one in
+  the same distance order, so an offset never skips or repeats.
+- **"Show more" is a tap, never a scroll.** An infinite list spends a query
+  every time a thumb drifts.
+- **The cuisine goes to the server.** `restaurantsInArea` takes one now; the
+  page used to filter what came back, which turned "the ten nearest Italian
+  places" into "however many of ten happen to be Italian" — usually none.
+- **Coordinates are rounded before they become a cache key** (`utils/geo.ts`,
+  three decimals; map bounds two, rounded outward so a box never shrinks). An
+  unrounded GPS fix differs in the sixth decimal between readings, so every
+  re-read was a fresh request for restaurants that had not moved.
+- **List → Map fetches nothing.** The map is handed the array the list already
+  has. Panning and zooming fetch nothing. Only "Search this area" spends a
+  query, and only ten rows of one.
+
+## The map clusters now
+
+`utils/cluster.ts`, and it is the promised revisit of the DOM-marker trade.
+`markers.ts` justified DOM markers on the grounds that the server capped a map
+query at forty pins so they could never smear — and warned that raising the cap
+meant revisiting rather than stretching. Paging raised it.
+
+- **The grouping runs before any marker is built**, so the marker stays a
+  `<div>` that can hold a dish photograph. Mapbox's own clustering would need
+  circle and symbol layers and sprite images, which is exactly what
+  `markers.ts` exists to avoid.
+- **Pixels, not degrees.** Everything is projected to Web Mercator at the
+  current zoom and bucketed on a 64px grid, so "too close to draw separately"
+  means the same thing at every zoom.
+- **A lone pin is a cluster of one**, so the map renders one list and cannot
+  draw a restaurant twice.
+- **Tapping a cluster is a camera move, never a search.** It zooms over places
+  already in hand. A test asserts no query fires, and that our own `easeTo`
+  does not then offer "Search this area".
+
+## The homepage knows where you are
+
+- **A permission already granted is resumed silently.** `useGeolocation` acts
+  on `permissions.query` reporting `granted` — no dialog appears, because the
+  reader already agreed. Without it, somebody who granted yesterday came back
+  to a homepage with every nearby section missing, because a device fix is
+  deliberately never written to disk.
+- **A first-time visitor is never prompted on load.** Only an explicit standing
+  grant resumes; `prompt` is left alone, and so is a browser with no Permissions
+  API — guessing there would mean prompting a stranger on arrival, which is how
+  a permission gets blocked at the browser level where the page cannot reach it.
+- **Two states, one of them only.** `LocationPrompt` pitches ("Discover food
+  near you") to somebody we cannot place; `LocationBadge` is one line with
+  "Change" for somebody we can. The old page showed the same large pair of
+  buttons in both cases, asking a reader something they had already answered,
+  above sections already using the answer.
+- **`LocationSheet` is the one way to change it**, on the homepage and on
+  `/nearby`. It wraps `LocationCue` — one location control, one provider. The
+  earlier "never unmount `LocationCue`" rule was about its navigate-on-fix
+  effect; nothing navigates from the homepage and the request belongs to
+  `DiscoveryLocationProvider`, which outlives both.
+
+## Taste preferences
+
+`TastePreferencePicker` is the one picker; the homepage card and
+`/account/tastes` differ by a heading and a Skip button.
+
+- **Never at sign-up.** Registration is three fields and stays three. This asks
+  later, on a page somebody is already using — and **only once there is a
+  location**, because "Coffee near you" is a promise the page cannot keep
+  without one.
+- **Chips, one bit each.** "I am interested in this" is the whole statement. No
+  1-5 rating, no minimum enforced, and an empty save is valid — somebody who
+  wants no personalisation must be able to say so. A test asserts no range,
+  radio or checkbox input exists.
+- **Asked once.** Answered removes the card; skipped leaves one quiet line and
+  does not ask again for thirty days. A card that reappears every visit is
+  nagging.
+- **A guest personalises too**, in `localStorage`, and `/account/tastes` is not
+  behind `ProtectedRoute`. Signing in **merges additively** and clears the local
+  copy only after the server has it — a failed merge must never discard what
+  somebody picked.
+- **Explicit choices belong to the person.** `source` is the load-bearing
+  column: an inference may fill a gap and nothing more. It cannot overwrite,
+  remove, or revive a taste somebody deliberately deselected. A test holds each
+  of those.
+- **Personalisation reaches no model.** "Sushi near you" is
+  `nearbyRestaurants(cuisine: "japanese")` — the filter that already existed,
+  pointed at a taste somebody chose. Flushing-and-sushi is the same answer for
+  everybody interested in sushi in Flushing, shared through the Apollo cache.
+- **Two to four sections, never one per taste.** More and the page stops being
+  a recommendation and becomes an index.
+- **No superlatives.** "Worth trying", "popular near you" — never "best in
+  NYC" or "#1". 6,783 of 6,786 restaurants have no menu; a ranking claim here
+  is one the data cannot support, and a product that overclaims once is not
+  believed the next time.
+- **Nothing dietary is offered yet.** The schema allows a third `kind`, the
+  seed does not use it: a dietary preference should probably filter rather than
+  rank, and being wrong about one can hurt somebody. Same rule as
+  `CORRECTABLE_FIELDS`.
 
 ## Design system
 
@@ -132,8 +304,9 @@ minute. Design for the phone and let desktop be the override, never the reverse.
 - Vote controls sit in the lower third, within thumb reach.
 - Detail opens as a bottom sheet, not a route change.
 - Dark mode matters; restaurants are dim.
-- Target a main bundle under 250 KiB (currently 609 KiB raw / 186 KiB
-  gzipped; the 534 KiB figure here predated several features).
+- Target a main bundle under 250 KiB (currently 631 KiB raw; the 609 KiB
+  figure predated Lucide, taste preferences and the cover-image system, which
+  together cost 22 KiB).
   Mapbox is **not** in it: the map is a lazy component inside a lazy route,
   and its 1.78 MiB chunk (505 KiB gzipped) is downloaded only by somebody who
   taps Map. Check that with `grep -c mapbox dist/main.*.js` after a build —
