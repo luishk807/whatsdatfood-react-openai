@@ -135,3 +135,14 @@ export interface RestaurantPreviewInterface {
   onClose: () => void;
 }
 
+export interface LocationSheetInterface {
+  open: boolean;
+  onClose: () => void;
+}
+
+export interface LocationBadgeInterface {
+  /** The area name. Empty until the server has named it — never an address. */
+  label?: string | null;
+  onChange: () => void;
+}
+

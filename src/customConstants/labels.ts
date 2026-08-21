@@ -373,6 +373,28 @@ export const LOCATION_LABELS = {
   near: (place: string) => `near ${place}`,
   nearYou: "near you",
   useLocationAgain: "Use my current location",
+  /**
+   * The first-time state, which is a pitch rather than a form.
+   *
+   * A brand-new visitor is never prompted by the browser on load — that is
+   * the intrusion that gets a permission blocked at the browser level — so
+   * this has to earn the tap. It says what they get, not what we want.
+   */
+  discoverTitle: "Discover food near you",
+  discoverBlurb: "Choose your location to see nearby restaurants and dishes.",
+  /** The sheet heading, once somebody is changing an answer they gave. */
+  chooseTitle: "Where should we look?",
+  /** Says plainly what a location is for, and what it is not for. */
+  privacyNote:
+    "We use this to find restaurants near you. It is never shown on your profile.",
+  /**
+   * The compact indicator that replaces the pitch once we know.
+   *
+   * A device fix arrives before the server has named the area, so the label
+   * can be empty for a moment; "Near you" is vague and true, which is the
+   * right pair of properties for a heading about somebody position.
+   */
+  unnamedArea: "Near you",
   /** Distances are shown in miles: this is New York. */
   miles: (value: number) =>
     value < 0.1 ? "Just here" : `${value.toFixed(1)} mi`,

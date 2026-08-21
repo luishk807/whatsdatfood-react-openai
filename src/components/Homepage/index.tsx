@@ -1,8 +1,10 @@
-import { type FC, lazy, Suspense, useEffect } from "react";
+import { type FC, lazy, Suspense, useEffect, useState } from "react";
 import { SEARCH_LABELS } from "@/customConstants/labels";
 import PhotoWall from "@/components/PhotoWall";
 import CuisineStrip from "@/components/CuisineStrip";
-import LocationCue from "@/components/LocationCue";
+import LocationBadge from "@/components/LocationBadge";
+import LocationPrompt from "@/components/LocationPrompt";
+import LocationSheet from "@/components/LocationSheet";
 import TrendingStrip from "@/components/TrendingStrip";
 import TrendingRestaurants from "@/components/TrendingRestaurants";
 import ContributorIntro from "@/components/ContributorIntro";
@@ -39,6 +41,7 @@ const Homepage: FC = () => {
   const { photos, loading } = useRecentDishPhotos();
   const { tiles, loading: tilesLoading } = useCuisineTiles();
   const { location, nameArea } = useDiscoveryLocation();
+  const [changing, setChanging] = useState(false);
   const { discovery, loading: discoveryLoading } = useNearbyDiscovery(location);
   const { trending, loading: trendingLoading } = useTrendingNearby(location);
 
@@ -51,11 +54,16 @@ const Homepage: FC = () => {
     }
   }, [discovery?.area_label, nameArea]);
 
-  /** Both discovery sections send the reader to the same control. */
-  const scrollToLocationCue = () =>
-    document
-      .getElementById("discovery-place-cue")
-      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  /**
+   * Every "Change" on this page opens the same sheet.
+   *
+   * It used to scroll to a control further up, which only worked because that
+   * control was permanently on screen. Now that a known location collapses to
+   * one line, there is nothing to scroll to — and a sheet is the better answer
+   * anyway: the reader keeps their place instead of being sent to the top of
+   * the page to answer a question about the section they were reading.
+   */
+  const changeLocation = () => setChanging(true);
 
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 pb-16 pt-8 sm:pt-14">
@@ -76,18 +84,26 @@ const Homepage: FC = () => {
         <LazyMainSearch />
       </Suspense>
 
-      {/* Under the search, quieter than it: somebody who knows the name should
-          type it, and this is for everybody else.
+      {/* Two states, and only ever one of them.
+    
+          Not knowing where somebody is gets the full pitch; knowing gets one
+          line and a way to change it. The old version showed the same pair of
+          large buttons in both cases, so a reader who had already answered was
+          asked again on every visit, above sections that were already using
+          the answer.
 
-          Always rendered, never conditionally. It used to be hidden once a
-          location was known, which unmounted the component in the same render
-          the fix arrived in — so the effect that navigates to the results
-          never ran and the button did nothing. */}
-      {/* Not a way in — a way to change what the sections below are showing.
-          Navigating to /nearby on a fix meant somebody who had just moved
-          cities was bounced off the page before it could update, came back,
-          and read the old area name again. */}
-      <LocationCue navigateOnFix={false} />
+          Unmounting the prompt on a fix is safe here, and was not always:
+          the earlier bug was that `LocationCue` owned a navigate-on-fix effect
+          which could not run once unmounted. Nothing navigates from this page,
+          and the request itself belongs to `DiscoveryLocationProvider`, which
+          outlives both of these. */}
+      {location ? (
+        <LocationBadge label={location.label} onChange={changeLocation} />
+      ) : (
+        <LocationPrompt />
+      )}
+
+      <LocationSheet open={changing} onClose={() => setChanging(false)} />
 
       {/* Places to go, above the dish strip. Somebody who has not decided
           where to eat cannot use a row of dishes yet, and this is the
@@ -96,14 +112,14 @@ const Homepage: FC = () => {
         trending={trending}
         loading={trendingLoading}
         hasLocation={Boolean(location)}
-        onChangeLocation={scrollToLocationCue}
+        onChangeLocation={changeLocation}
       />
 
       <TrendingStrip
         discovery={discovery}
         loading={discoveryLoading}
         hasLocation={Boolean(location)}
-        onChangeLocation={scrollToLocationCue}
+        onChangeLocation={changeLocation}
       />
 
       <PhotoWall photos={photos} loading={loading} />
