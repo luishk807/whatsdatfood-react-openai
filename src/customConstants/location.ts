@@ -54,6 +54,23 @@ export const NEARBY = {
   TRENDING_LIMIT: 10,
   /** Six restaurants: two rows of three on a desktop, a swipe on a phone. */
   TRENDING_RESTAURANTS: 6,
+  /**
+   * One batch of results, and what "Show more" adds.
+   *
+   * Ten is a screenful on a phone and it is also the cost ceiling: somebody
+   * who opens a cuisine tile and decides in twenty seconds has cost one query
+   * over ten rows. Everything past the first batch is asked for by a tap,
+   * never fetched because a page opened. Matches `NEARBY_PAGE_SIZE` on the
+   * server, which is what actually decides.
+   */
+  PAGE_SIZE: 10,
+  /**
+   * The ceiling on pins the map will hold at once.
+   *
+   * Reached by paging now rather than in one request, and the reason it can
+   * be reached at all is that the markers cluster — forty individual pins on
+   * a zoomed-out map is the smear that `utils/cluster.ts` exists to prevent.
+   */
   MAP_LIMIT: 40,
   // There is deliberately no fallback centre. A map opened on a guessed
   // location shows real restaurants at real distances from somewhere the

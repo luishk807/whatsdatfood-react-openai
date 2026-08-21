@@ -1,5 +1,5 @@
-import { MAP_MARKER } from "@/customConstants/map";
-import { NearbyPlaceType } from "@/interfaces/location";
+import { MAP_CLUSTER, MAP_MARKER } from "@/customConstants/map";
+import { NearbyPlaceType, PlaceClusterType } from "@/interfaces/location";
 
 /**
  * What a restaurant looks like on the map, and the only place that decides.
@@ -18,13 +18,18 @@ import { NearbyPlaceType } from "@/interfaces/location";
  * rebuilding the geometry every marker depends on.
  *
  * **DOM markers rather than a clustered GeoJSON layer**, and the reason is
- * that future list. Clustering wants circle and symbol layers styled with
- * Mapbox expressions, where a per-restaurant photograph means loading every
- * image into the style as a sprite. A dish photo in a `<div>` is an `<img>`.
- * The trade is that DOM markers do not thin themselves out at low zoom, which
- * is affordable only because the server caps a map query at `NEARBY.MAP_LIMIT`
- * — forty pins never overlap into a smear. Raise that cap and this decision
- * has to be revisited rather than stretched.
+ * that future list. Mapbox's own clustering wants circle and symbol layers
+ * styled with expressions, where a per-restaurant photograph means loading
+ * every image into the style as a sprite. A dish photo in a `<div>` is an
+ * `<img>`.
+ *
+ * That trade used to be paid for by the server capping a map query at forty
+ * pins — with the note that raising the cap meant revisiting this rather than
+ * stretching it. Paging raised it. **This is the revisit, and the decision
+ * stands**: the grouping moved to `utils/cluster.ts`, which runs before any
+ * marker is built, so pins thin out at low zoom while the marker itself stays
+ * a `<div>` that can hold a photograph. The map is handed groups and never
+ * learns how they were formed.
  */
 export interface MarkerState {
   selected: boolean;
@@ -117,10 +122,67 @@ export const paintMarker = (
   root.style.zIndex = state.selected ? "2" : "1";
 };
 
-/** Where a marker sits, or null for a restaurant we never geocoded. */
-export const markerPoint = (
-  place: NearbyPlaceType,
-): [number, number] | null =>
-  place.longitude == null || place.latitude == null
-    ? null
-    : [place.longitude, place.latitude];
+
+// --- groups ---------------------------------------------------------------
+
+const CLUSTER_CLASS = "wdf-cluster";
+
+/**
+ * A group of restaurants too close together to draw separately.
+ *
+ * Deliberately unlike a pin rather than a bigger one: a reader has to be able
+ * to tell "one restaurant" from "eight restaurants" without counting pixels,
+ * so this is a filled disc carrying a number where a pin is a ring.
+ *
+ * **It is a camera control, not a result.** Tapping it zooms in on places
+ * already in hand — no query, no request, nothing billed. That is the same
+ * promise tapping a single pin makes, and it is why zooming into a cluster
+ * must never be read as permission to search.
+ */
+export const createCluster = (
+  cluster: PlaceClusterType,
+  onZoom: () => void,
+): HTMLElement => {
+  const root = document.createElement("div");
+  root.className = CLUSTER_CLASS;
+  root.dataset.clusterCount = String(cluster.places.length);
+  // The list beside the map carries every one of these restaurants in the
+  // same order, so the map is a second way to reach them rather than the only
+  // one. Announcing a group whose members are all already in the list would
+  // put a stop in front of the readable half for no new information.
+  root.setAttribute("aria-hidden", "true");
+  root.style.cursor = "pointer";
+  root.style.padding = `${MAP_MARKER.TOUCH_PADDING}px`;
+  root.style.lineHeight = "0";
+
+  const disc = document.createElement("span");
+  const big = cluster.places.length >= MAP_CLUSTER.LARGE_COUNT;
+  const size = big ? MAP_CLUSTER.LARGE_SIZE : MAP_CLUSTER.SIZE;
+
+  disc.style.display = "flex";
+  disc.style.alignItems = "center";
+  disc.style.justifyContent = "center";
+  disc.style.width = `${size}px`;
+  disc.style.height = `${size}px`;
+  disc.style.borderRadius = "9999px";
+  disc.style.boxSizing = "border-box";
+  // Tokens, not hexes: the map flips with the rest of the page, and a marker
+  // painted in a literal colour is the one thing that does not.
+  disc.style.background = "var(--color-surface-raised)";
+  disc.style.border = "2px solid var(--color-ink)";
+  disc.style.color = "var(--color-ink)";
+  disc.style.fontSize = big ? "13px" : "12px";
+  disc.style.fontWeight = "600";
+  disc.style.boxShadow = "0 2px 8px rgb(0 0 0 / 0.25)";
+  disc.textContent = String(cluster.places.length);
+
+  root.appendChild(disc);
+  root.addEventListener("click", (event) => {
+    // Otherwise the map also sees a click on the canvas and clears the
+    // selection in the same tick.
+    event.stopPropagation();
+    onZoom();
+  });
+
+  return root;
+};

@@ -12,6 +12,7 @@ export const NEARBY_RESTAURANTS = gql`
     $radiusKm: Float
     $limit: Int
     $cuisine: String
+    $offset: Int
   ) {
     nearbyRestaurants(
       latitude: $latitude
@@ -19,6 +20,7 @@ export const NEARBY_RESTAURANTS = gql`
       radiusKm: $radiusKm
       limit: $limit
       cuisine: $cuisine
+      offset: $offset
     ) {
       id
       slug
@@ -33,6 +35,8 @@ export const NEARBY_RESTAURANTS = gql`
       distance_km
       top_dish_name
       top_dish_photo_url
+      photo_count
+      contributor_count
     }
   }
 `;
@@ -44,6 +48,8 @@ export const RESTAURANTS_IN_AREA = gql`
     $east: Float!
     $west: Float!
     $limit: Int
+    $cuisine: String
+    $offset: Int
   ) {
     restaurantsInArea(
       north: $north
@@ -51,6 +57,8 @@ export const RESTAURANTS_IN_AREA = gql`
       east: $east
       west: $west
       limit: $limit
+      cuisine: $cuisine
+      offset: $offset
     ) {
       id
       slug
@@ -65,6 +73,8 @@ export const RESTAURANTS_IN_AREA = gql`
       distance_km
       top_dish_name
       top_dish_photo_url
+      photo_count
+      contributor_count
     }
   }
 `;

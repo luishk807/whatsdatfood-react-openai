@@ -785,6 +785,19 @@ export const NEARBY_LABELS = {
   results: (count: number) =>
     count === 1 ? "1 restaurant" : `${count} restaurants`,
   /**
+   * Every further batch is asked for, never fetched because a page opened.
+   *
+   * Named rather than an infinite scroll: a reader deciding where to eat in
+   * under a minute is served better by a list that ends than by one that
+   * grows under their thumb, and every batch is a query somebody chose to
+   * spend.
+   */
+  showMore: "Show more restaurants",
+  /** The same, for results the reader asked for by moving the map. */
+  showMoreArea: "Show more in this area",
+  loadingMore: "Loading…",
+  /** Said above results measured from somewhere the reader panned to. */
+  /**
    * Real counts or nothing. Never a rounded-up claim about how popular
    * somewhere is — the numbers are small and saying so honestly is what makes
    * them worth believing when they grow.
@@ -793,6 +806,8 @@ export const NEARBY_LABELS = {
     contributors > 1
       ? `${photos} photo${photos === 1 ? "" : "s"} from ${contributors} diners`
       : `${photos} photo${photos === 1 ? "" : "s"}`,
+  inThisArea: "In this area",
+  backToNearby: "Back to nearby",
 } as const;
 
 /**

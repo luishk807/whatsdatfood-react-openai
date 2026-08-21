@@ -1,4 +1,4 @@
-import { type FC, useCallback, useEffect, useRef, useState } from "react";
+import { type FC, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import { RecentreIcon } from "@/components/icons";
@@ -12,7 +12,8 @@ import { MAP_LABELS } from "@/customConstants/labels";
 import { THEME } from "@/customConstants/theme";
 import useTheme from "@/customHooks/useTheme";
 import { RestaurantMapInterface } from "@/interfaces/location";
-import { createMarker, markerPoint, paintMarker } from "./markers";
+import { clusterPlaces, zoomIntoCluster } from "@/utils/cluster";
+import { createCluster, createMarker, paintMarker } from "./markers";
 
 /**
  * The map half of nearby discovery.
@@ -55,6 +56,10 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
     null,
   );
   const [moved, setMoved] = useState(false);
+  // The grouping depends on how far in the reader is, so the zoom has to be
+  // state rather than something read off the instance. Rounded, so a pinch
+  // does not rebuild every marker on every animation frame.
+  const [zoom, setZoom] = useState<number>(MAP_VIEW.DEFAULT_ZOOM);
 
   // Read inside a listener that is created once, so it goes through a ref.
   // Re-subscribing whenever the selection changed would drop the very click
@@ -125,10 +130,14 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
 
     anchorHere(instance);
 
-    // `originalEvent` is present only when a person did it. Without the check,
-    // our own `easeTo` would offer "search this area" for a move the reader
-    // never made.
     instance.on("moveend", (event) => {
+      // Tracked for every move including our own, because the pins have to
+      // regroup after a camera move just as much as after a drag.
+      setZoom(Math.round(instance.getZoom() * 2) / 2);
+
+      // `originalEvent` is present only when a person did it. Without the
+      // check, our own `easeTo` — recentring, or zooming into a cluster —
+      // would offer "search this area" for a move the reader never made.
       if (!event.originalEvent) {
         return;
       }
@@ -203,6 +212,18 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
       .addTo(instance);
   }, [showMe, centre.latitude, centre.longitude]);
 
+  /**
+   * The pins, grouped for the zoom they are about to be drawn at.
+   *
+   * Forty individual markers on a city-wide view is an unreadable smear, and
+   * paging means there can now be forty. `utils/cluster.ts` does the
+   * arithmetic; this component only draws the answer.
+   */
+  const clusters = useMemo(
+    () => clusterPlaces(places, zoom),
+    [places, zoom],
+  );
+
   useEffect(() => {
     const instance = map.current;
 
@@ -213,18 +234,26 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
     markers.current.forEach((marker) => marker.remove());
     markers.current.clear();
 
-    places.forEach((place) => {
-      const point = markerPoint(place);
+    clusters.forEach((cluster) => {
+      const point: [number, number] = [cluster.longitude, cluster.latitude];
 
-      if (!point) {
-        // Never geocoded. Absent from the map rather than placed at a guess,
-        // and still present in the list beside it.
+      if (cluster.places.length > 1) {
+        const element = createCluster(cluster, () => {
+          // A camera move over places already in hand. No query, nothing
+          // billed — the same promise tapping a single pin makes.
+          instance.easeTo({ center: point, zoom: zoomIntoCluster(zoom) });
+        });
+
+        markers.current.set(
+          cluster.id,
+          new mapboxgl.Marker({ element }).setLngLat(point).addTo(instance),
+        );
+
         return;
       }
 
-      const element = createMarker(place, {
-        selected: place.id === selectedId,
-      });
+      const place = cluster.places[0];
+      const element = createMarker(place, { selected: place.id === selectedId });
 
       element.addEventListener("click", (event) => {
         // Otherwise the map also sees a click on the canvas and clears the
@@ -241,17 +270,22 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
     // `selectedId` is applied by the effect below. Rebuilding every marker
     // when it changes would destroy the one being tapped.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [places]);
+  }, [clusters, zoom]);
 
   useEffect(() => {
-    places.forEach((place) => {
+    clusters.forEach((cluster) => {
+      if (cluster.places.length > 1) {
+        return;
+      }
+
+      const place = cluster.places[0];
       const element = markers.current.get(place.id)?.getElement();
 
       if (element) {
         paintMarker(element, place, { selected: place.id === selectedId });
       }
     });
-  }, [selectedId, places]);
+  }, [selectedId, clusters]);
 
   const searchHere = () => {
     const instance = map.current;

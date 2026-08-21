@@ -77,3 +77,34 @@ export const MAP_MARKER = {
   /** Padding around the dot, so the tap target reaches 44px. */
   TOUCH_PADDING: 6,
 } as const;
+
+/**
+ * When pins stop being readable individually.
+ *
+ * The marker file used to justify DOM markers on the grounds that the server
+ * capped a map query at forty pins, so they could never smear — and warned
+ * that raising the cap had to mean revisiting the decision rather than
+ * stretching it. Paging raised it. This is the revisit: the pins group before
+ * they are built, so the marker stays a `<div>` that can hold a photograph and
+ * the map still reads at a city-wide zoom.
+ */
+export const MAP_CLUSTER = {
+  /**
+   * Screen distance below which two pins are one. Slightly wider than the
+   * 44px touch target, so a cluster never hides a pin somebody could
+   * otherwise have hit.
+   */
+  GRID_PX: 64,
+  /** How far a tap on a cluster goes in. Two levels quarters the ground each
+   * pixel covers, which reliably splits anything merely close. */
+  ZOOM_STEP: 2,
+  /** Two restaurants in one building cannot be separated by zooming, and
+   * flying to street level to fail at it is worse than stopping. */
+  MAX_ZOOM: 18,
+  /** Geometry for the grouped marker. Bigger than a pin because it carries a
+   * number that has to be readable at arm's length. */
+  SIZE: 38,
+  LARGE_SIZE: 46,
+  /** Past this many, the marker grows. */
+  LARGE_COUNT: 10,
+} as const;

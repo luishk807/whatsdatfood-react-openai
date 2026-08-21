@@ -45,7 +45,14 @@ const instance = (): FakeMap => {
 
 describe("RestaurantMap", () => {
   it("puts a marker on each restaurant that has coordinates", () => {
-    show({ places: [place(), place({ id: "2", name: "Russ & Daughters" })] });
+    // Far enough apart to stay separate pins. Two restaurants at the *same*
+    // coordinates are one marker now, which is the clustering below.
+    show({
+      places: [
+        place(),
+        place({ id: "2", name: "Russ & Daughters", latitude: 40.79 }),
+      ],
+    });
 
     expect(instance().markers).toHaveLength(2);
   });
@@ -159,6 +166,86 @@ describe("RestaurantMap", () => {
     await userEvent.click(instance().markers[0].getElement());
 
     expect(onSelect).toHaveBeenCalledWith("1");
+  });
+
+  it("groups restaurants that would otherwise overlap", () => {
+    // Twenty metres apart, at a zoom where that is one dot. Drawing them
+    // separately is the smear clustering exists to prevent.
+    show({
+      places: [
+        place(),
+        place({ id: "2", latitude: 40.7102, longitude: -73.9602 }),
+        place({ id: "3", latitude: 40.7104, longitude: -73.9601 }),
+      ],
+    });
+
+    expect(instance().markers).toHaveLength(1);
+    expect(
+      instance().markers[0].getElement().dataset.clusterCount,
+    ).toBe("3");
+  });
+
+  it("never fetches because a cluster was tapped", async () => {
+    // A cluster is a camera control, not a result. Zooming into one moves
+    // over places already in hand — no query, nothing billed. If this ever
+    // fails, browsing the map has grown a bill.
+    const onSearchArea = jest.fn();
+    const onSelect = jest.fn();
+
+    show({
+      onSearchArea,
+      onSelect,
+      places: [
+        place(),
+        place({ id: "2", latitude: 40.7102, longitude: -73.9602 }),
+      ],
+    });
+
+    await userEvent.click(instance().markers[0].getElement());
+
+    expect(onSearchArea).not.toHaveBeenCalled();
+    // And it is not a selection either — there is no single restaurant to
+    // preview yet.
+    expect(onSelect).not.toHaveBeenCalled();
+  });
+
+  it("does not offer to search the area after zooming into a cluster", () => {
+    // The camera moved, but the reader did not go looking somewhere else.
+    // Offering the search here invites a tap that re-runs what is on screen.
+    const onSearchArea = jest.fn();
+
+    show({
+      onSearchArea,
+      places: [
+        place(),
+        place({ id: "2", latitude: 40.7102, longitude: -73.9602 }),
+      ],
+    });
+
+    act(() => {
+      instance().markers[0].getElement().click();
+    });
+
+    expect(
+      screen.queryByRole("button", { name: MAP_LABELS.searchThisArea }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("splits a cluster once the reader is close enough", () => {
+    // The promise a cluster makes when it is tapped: there really are
+    // separate restaurants in there.
+    show({
+      places: [
+        place(),
+        place({ id: "2", latitude: 40.7102, longitude: -73.9602 }),
+      ],
+    });
+
+    expect(instance().markers).toHaveLength(1);
+
+    act(() => instance().moveTo(-73.96, 40.71, 18));
+
+    expect(instance().markers).toHaveLength(2);
   });
 
   it("draws the reader only when the fix was measured", () => {

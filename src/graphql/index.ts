@@ -56,6 +56,49 @@ const cache = new InMemoryCache({
         getRestaurantImage: {
           keyArgs: ["id"],
         },
+
+        /**
+         * Nearby results arrive one batch at a time and accumulate.
+         *
+         * `keyArgs` deliberately omits `offset`: every page of the same
+         * search belongs in one list, and including it would file page two
+         * under its own key so "Show more" replaced the results instead of
+         * extending them. Everything that genuinely changes *which* search
+         * this is — where, how wide, what cuisine — is in the key, so
+         * changing the location starts a new list rather than appending to
+         * somebody else's.
+         *
+         * Written positionally rather than concatenated, so re-requesting a
+         * page already held overwrites it instead of duplicating it.
+         */
+        nearbyRestaurants: {
+          keyArgs: ["latitude", "longitude", "radiusKm", "cuisine"],
+          merge: (existing: unknown[] = [], incoming: unknown[], options) => {
+            const merged = existing.slice();
+            const start = (options.args?.offset as number) ?? 0;
+
+            incoming.forEach((row, index) => {
+              merged[start + index] = row;
+            });
+
+            return merged;
+          },
+        },
+
+        /** The same, keyed on the box the reader was looking at. */
+        restaurantsInArea: {
+          keyArgs: ["north", "south", "east", "west", "cuisine"],
+          merge: (existing: unknown[] = [], incoming: unknown[], options) => {
+            const merged = existing.slice();
+            const start = (options.args?.offset as number) ?? 0;
+
+            incoming.forEach((row, index) => {
+              merged[start + index] = row;
+            });
+
+            return merged;
+          },
+        },
       },
     },
   },

@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useLazyQuery, useQuery } from "@apollo/client";
 import {
   NEARBY_DISCOVERY,
@@ -9,11 +9,25 @@ import {
 import { NEARBY } from "@/customConstants/location";
 import {
   CoordinatesType,
+  MapBoundsType,
   NearbyDiscoveryType,
   NearbyPlaceType,
   ResolvedLocationType,
 } from "@/interfaces/location";
+import { normalizeBounds, roundPoint } from "@/utils/geo";
 import { _get } from "@/utils";
+
+/**
+ * Whether a full batch came back, which is the only "is there more" signal
+ * this needs.
+ *
+ * A server-side total would be a second aggregate on every page for a number
+ * nobody displays. A short page means the end; a full one means try again,
+ * and the worst case is one request that returns nothing and hides the
+ * button — which is exactly what it should do.
+ */
+const looksLikeMore = (count: number): boolean =>
+  count > 0 && count % NEARBY.PAGE_SIZE === 0;
 
 /**
  * Restaurants near a point.
@@ -29,57 +43,180 @@ export const useNearbyRestaurants = (
    * Left undefined on purpose, which is what lets the server widen.
    *
    * It used to default to five kilometres and the full list then showed two
-   * restaurants in Manhattan while the homepage strip — which widens —
-   * showed one 8.7 miles away. Two pages, two answers, from the same
-   * coordinates. Pass a number only where the radius is the reader's choice
-   * rather than ours.
+   * restaurants in Manhattan while the homepage strip — which widens — showed
+   * one 8.7 miles away. Two pages, two answers, from the same coordinates.
+   * Pass a number only where the radius is the reader's choice rather than
+   * ours.
    */
   radiusKm?: number,
 ) => {
-  const { data, loading, error } = useQuery(NEARBY_RESTAURANTS, {
+  // Rounded before it becomes a cache key. An unrounded device fix differs in
+  // the sixth decimal between readings, so every re-read was a fresh network
+  // request for restaurants that had not moved.
+  const at = useMemo(
+    () => roundPoint(point),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [point?.latitude, point?.longitude],
+  );
+
+  const { data, loading, error, fetchMore } = useQuery(NEARBY_RESTAURANTS, {
     variables: {
-      latitude: point?.latitude ?? 0,
-      longitude: point?.longitude ?? 0,
+      latitude: at?.latitude ?? 0,
+      longitude: at?.longitude ?? 0,
       radiusKm,
-      limit: NEARBY.MAP_LIMIT,
+      limit: NEARBY.PAGE_SIZE,
+      offset: 0,
       cuisine,
     },
     skip: !point,
+    // Opening a cuisine tile, switching to the map and coming back must not
+    // re-ask. Nothing on this path reaches a third party, but it is still a
+    // round trip for an answer already on the page.
     fetchPolicy: "cache-first",
+    notifyOnNetworkStatusChange: true,
   });
 
+  const places = _get<NearbyPlaceType[]>(data, "nearbyRestaurants", []) ?? [];
+
+  // Set when a batch comes back short, which the length alone cannot express
+  // once several pages have accumulated.
+  const [ended, setEnded] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
+
+  // A different search is a different list. Without this, exhausting Italian
+  // in Flushing would hide "Show more" for Chinese in Manhattan.
+  useEffect(() => {
+    setEnded(false);
+  }, [at?.latitude, at?.longitude, cuisine, radiusKm]);
+
+  const showMore = useCallback(async () => {
+    setLoadingMore(true);
+
+    try {
+      const resp = await fetchMore({ variables: { offset: places.length } });
+      const added =
+        _get<NearbyPlaceType[]>(resp, "data.nearbyRestaurants", [])?.length ?? 0;
+
+      if (added < NEARBY.PAGE_SIZE) {
+        setEnded(true);
+      }
+    } catch {
+      // Rate limited, or offline. The results already on screen stand, and
+      // the button comes back for another try.
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [fetchMore, places.length]);
+
   return {
-    places: _get<NearbyPlaceType[]>(data, "nearbyRestaurants", []) ?? [],
+    places,
     loading,
+    loadingMore,
+    /** Never guessed at: a short batch is the end of the list. */
+    hasMore: !ended && looksLikeMore(places.length),
+    showMore,
     // The frontend deploys ahead of the API routinely, so a field the server
     // does not have yet is "not available", never "there is nothing near you".
     unavailable: Boolean(error),
   };
 };
 
-/** "Search this area", after the map has been moved. */
-export const useRestaurantsInArea = () => {
-  const [run, { loading }] = useLazyQuery(RESTAURANTS_IN_AREA, {
-    fetchPolicy: "network-only",
+/**
+ * "Search this area", after the map has been moved — and every batch after it.
+ *
+ * **The cuisine goes to the server now.** The page used to filter whatever
+ * came back, which turned "the ten nearest Italian places in view" into
+ * "however many of the ten nearest places happen to be Italian" — routinely
+ * none, on a map the reader had just chosen deliberately.
+ *
+ * Results are held here rather than in the page because they are transient:
+ * recentring drops them and the standing nearby list takes over again.
+ */
+export const useRestaurantsInArea = (cuisine?: string) => {
+  const [run] = useLazyQuery(RESTAURANTS_IN_AREA, {
+    // The catalogue changes on the timescale of an import, so asking twice
+    // for the same box is a round trip for an answer already held. The box is
+    // rounded before it is asked about, which is what makes repeat taps hit.
+    fetchPolicy: "cache-first",
   });
 
-  const search = useCallback(
-    async (bounds: {
-      north: number;
-      south: number;
-      east: number;
-      west: number;
-    }): Promise<NearbyPlaceType[]> => {
+  const [places, setPlaces] = useState<NearbyPlaceType[] | null>(null);
+  const [box, setBox] = useState<MapBoundsType | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [ended, setEnded] = useState(false);
+
+  const page = useCallback(
+    async (bounds: MapBoundsType, offset: number): Promise<NearbyPlaceType[]> => {
       const resp = await run({
-        variables: { ...bounds, limit: NEARBY.MAP_LIMIT },
+        variables: { ...bounds, limit: NEARBY.PAGE_SIZE, offset, cuisine },
       });
 
       return _get<NearbyPlaceType[]>(resp, "data.restaurantsInArea", []) ?? [];
     },
-    [run],
+    [run, cuisine],
   );
 
-  return { search, loading };
+  const search = useCallback(
+    async (bounds: MapBoundsType): Promise<NearbyPlaceType[]> => {
+      const normalized = normalizeBounds(bounds);
+
+      setLoading(true);
+      setBox(normalized);
+      setEnded(false);
+
+      try {
+        const rows = await page(normalized, 0);
+
+        setPlaces(rows);
+        setEnded(rows.length < NEARBY.PAGE_SIZE);
+
+        return rows;
+      } catch {
+        setPlaces([]);
+        setEnded(true);
+
+        return [];
+      } finally {
+        setLoading(false);
+      }
+    },
+    [page],
+  );
+
+  const showMore = useCallback(async () => {
+    if (!box || !places) {
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const rows = await page(box, places.length);
+
+      setPlaces([...places, ...rows]);
+      setEnded(rows.length < NEARBY.PAGE_SIZE);
+    } catch {
+      // As above: what is on screen stands.
+    } finally {
+      setLoading(false);
+    }
+  }, [box, page, places]);
+
+  /** Back to the standing nearby list — the reader recentred. */
+  const clear = useCallback(() => {
+    setPlaces(null);
+    setBox(null);
+    setEnded(false);
+  }, []);
+
+  return {
+    places,
+    search,
+    showMore,
+    clear,
+    loading,
+    hasMore: !ended && Boolean(places?.length),
+  };
 };
 
 /** A typed neighbourhood, city, ZIP or address, turned into a point. */
