@@ -7,6 +7,7 @@ import ThemeToggle from "@/components/ThemeToggle";
 import { ROUTES } from "@/customConstants/routes";
 import { ACCOUNT_GROUPS, ACCOUNT_LABELS } from "@/customConstants/account";
 import { ACCOUNT_TYPE } from "@/customConstants";
+import { ChevronRightIcon } from "@/components/icons";
 import { AccountRowIcon, PersonIcon } from "./icons";
 
 /**
@@ -86,19 +87,35 @@ const AccountButton = () => {
 
   const rows = user ? (
     <>
-      <div className="flex items-center gap-3 px-4 py-3">
+      {/* The whole row is the way in, not just the words.
+    
+          It used to be "luis1 / Signed in as" — a caption, unclickable, above
+          a menu whose last row was a gear marked "Settings" leading to the
+          page about this person. The one place a reader looks for themselves
+          did nothing, and the page about them was filed under a word for
+          something else. Now the header is the destination and the gear is
+          gone. */}
+      <Link
+        to={ROUTES.accountProfile}
+        onClick={() => setOpen(false)}
+        className="flex min-h-14 items-center gap-3 px-4 py-3 hover:bg-surface-sunken"
+      >
         <span className="text-ink-muted">
           <PersonIcon />
         </span>
-        <span className="min-w-0">
+        <span className="min-w-0 flex-1">
           <span className="block truncate text-sm font-medium text-ink">
             {username}
           </span>
           <span className="block text-xs text-ink-muted">
-            {ACCOUNT_LABELS.signedInAs}
+            {ACCOUNT_LABELS.viewProfile}
           </span>
         </span>
-      </div>
+        {/* Says it is a destination without needing to be read. */}
+        <span aria-hidden="true" className="shrink-0 text-ink-muted">
+          <ChevronRightIcon size={16} />
+        </span>
+      </Link>
 
       {groups.map((group) => (
         <div key={group.id} className="border-t border-line py-1">

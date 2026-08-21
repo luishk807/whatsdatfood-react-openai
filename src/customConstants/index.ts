@@ -45,8 +45,8 @@ export const LOGOUT_MENU = {
 export const DROPDOWN_MENU = {
   "1": [
     {
-      name: "Setting",
-      url: ROUTES.settings,
+      name: "Profile & account",
+      url: ROUTES.accountProfile,
     },
     {
       name: "Friends",

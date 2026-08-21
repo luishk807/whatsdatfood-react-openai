@@ -44,10 +44,11 @@ export const ACCOUNT_GROUPS = [
       },
     ],
   },
-  {
-    id: "account",
-    items: [{ label: "Settings", route: ROUTES.settings, icon: "gear" }],
-  },
+  // There is no "account" group any more. It held one row, "Settings", whose
+  // page is a display name, a username, an email and a phone — identity, not
+  // settings. It is reached from the profile header at the top of the drawer,
+  // which is where somebody looks for their own account, and the one real
+  // setting is the appearance control below.
   {
     /**
      * Admins only, and the reason this group exists at all: `/admin` was
@@ -64,6 +65,15 @@ export const ACCOUNT_GROUPS = [
 
 export const ACCOUNT_LABELS = {
   open: "Your account",
+  /**
+   * The header is the way into the account itself.
+   *
+   * It used to be two lines of dead text over a menu whose last row was a
+   * gear marked "Settings" — so the one place a reader looks for themselves
+   * was the one place that did nothing, and the page about them was filed
+   * under a word for something else.
+   */
+  viewProfile: "View profile & account",
   /**
    * Signed out. The same control, because a visitor tapping the person icon
    * wants either to sign in or to change the theme, and both live behind it.

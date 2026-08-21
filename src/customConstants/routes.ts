@@ -5,6 +5,17 @@ export const ROUTES = {
   logout: "/logout",
   account: "/account",
   friends: "/friends",
+  /**
+   * Who you are and how to reach you.
+   *
+   * Called `settings` in the code and "Settings" on screen, and it was
+   * neither: the page is a display name, a username, an email and a phone,
+   * while the only actual setting — the theme — is a control in the account
+   * drawer that never needed a page at all. So the route says what the page
+   * holds.
+   */
+  accountProfile: "/account/profile",
+  /** The old address, kept so existing links and bookmarks still land. */
   settings: "/settings",
   ratings: "/ratings",
   contributions: "/contributions",

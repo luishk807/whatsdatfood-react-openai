@@ -51,13 +51,17 @@ describe("AccountButton", () => {
       .getAllByRole("link")
       .map((link) => link.textContent?.trim());
 
-    // Contributions first: photos are what the product is, and the only entry
-    // here about what somebody has given rather than what they have kept.
-    // Favorites and History follow; Settings is utility and used to come first.
-    expect(labels[0]).toBe("Your contributions");
-    expect(labels[1]).toBe("Favorites");
-    expect(labels[2]).toBe("History");
-    expect(labels.indexOf("Settings")).toBeGreaterThan(labels.indexOf("Friends"));
+    // The account header leads, because it is who you are. Then the food:
+    // contributions first, being the only entry about what somebody has given
+    // rather than what they have kept.
+    expect(labels[0]).toContain(ACCOUNT_LABELS.viewProfile);
+    expect(labels[1]).toBe("Your contributions");
+    expect(labels[2]).toBe("Favorites");
+    expect(labels[3]).toBe("History");
+    // "Settings" is gone. Its page was a display name, a username, an email
+    // and a phone — identity, not settings — and it is reached from the
+    // header now. The one real setting is the appearance control below.
+    expect(labels).not.toContain("Settings");
     expect(labels[labels.length - 1]).toBe(ACCOUNT_LABELS.logOut);
   });
 
@@ -120,7 +124,9 @@ describe("AccountButton", () => {
       .getAllByRole("menu")
       .filter((menu) => menu.className.includes("bottom-0"));
 
-    await userEvent.click(within(sheet).getByText("luis"));
+    // Something inert: the header is a link now and closing on it is
+    // deliberate, so it cannot stand in for "a tap that goes nowhere".
+    await userEvent.click(within(sheet).getByText(ACCOUNT_LABELS.appearance));
 
     expect(within(sheet).getByText("Favorites")).toBeInTheDocument();
   });
@@ -192,5 +198,53 @@ describe("AccountButton", () => {
     expect(
       screen.getAllByRole("group", { name: THEME_LABELS.toggle }).length,
     ).toBeGreaterThan(0);
+  });
+});
+
+describe("the account header", () => {
+  it("is the way into your own account", async () => {
+    // It used to be a caption — "luis1 / Signed in as" — above a menu whose
+    // last row was a gear called "Settings" leading to the page about this
+    // person. The one place a reader looks for themselves did nothing.
+    show();
+    await openMenu();
+
+    const [sheet] = screen
+      .getAllByRole("menu")
+      .filter((menu) => menu.className.includes("bottom-0"));
+
+    const header = within(sheet).getByRole("link", {
+      name: new RegExp(ACCOUNT_LABELS.viewProfile),
+    });
+
+    expect(header).toHaveAttribute("href", "/account/profile");
+  });
+
+  it("still says who is signed in", async () => {
+    show();
+    await openMenu();
+
+    const [sheet] = screen
+      .getAllByRole("menu")
+      .filter((menu) => menu.className.includes("bottom-0"));
+
+    expect(within(sheet).getByText("luis")).toBeInTheDocument();
+  });
+
+  it("keeps a thumb-sized target", async () => {
+    // The whole row, not the words: a caption-sized link inside a drawer is
+    // what a thumb misses.
+    show();
+    await openMenu();
+
+    const [sheet] = screen
+      .getAllByRole("menu")
+      .filter((menu) => menu.className.includes("bottom-0"));
+
+    const header = within(sheet).getByRole("link", {
+      name: new RegExp(ACCOUNT_LABELS.viewProfile),
+    });
+
+    expect(header.className).toMatch(/min-h-14/);
   });
 });

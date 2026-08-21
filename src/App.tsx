@@ -1,7 +1,7 @@
 import { Suspense, lazy, useEffect } from "react";
 import Layout from "@/components/Layout/Main";
 import UserAccountLayout from "./components/Layout/UserAccount";
-import { Routes, Route } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 import "./App.css";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Loading from "@/components/Loading";
@@ -177,16 +177,22 @@ function App() {
             }
           />
           <Route
-            path={ROUTES.settings}
+            path={ROUTES.accountProfile}
             element={
               <Suspense fallback={<Loading style={customStyle} />}>
                 <Layout>
-                  <UserAccountLayout sectionTitle="Settings">
+                  <UserAccountLayout sectionTitle="Profile & account">
                     <LazyUserSettings />
                   </UserAccountLayout>
                 </Layout>
               </Suspense>
             }
+          />
+          {/* The old address. Somebody's bookmark, and the link in any email
+              already sent, must still land somewhere. */}
+          <Route
+            path={ROUTES.settings}
+            element={<Navigate to={ROUTES.accountProfile} replace />}
           />
           <Route
             path={ROUTES.ratings}
