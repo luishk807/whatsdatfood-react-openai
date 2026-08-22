@@ -67,6 +67,18 @@
   --height-header: 3.5rem;
   --offset-header: calc(var(--height-header) + 1px);
 
+  /* How tall the pinned map is on a phone, where it sits above the list
+     rather than beside it.
+     
+     A variable rather than an `@supports` *variant* on the element. Written
+     as a variant, Tailwind emits the `@supports` block after every
+     breakpoint rule in the layer - so `height: 42dvh` won at `lg` too, where
+     the map is supposed to fill its column, and left a blank half-screen
+     under it. Same specificity, later rule, no media query: it beat
+     `lg:h-full` everywhere. Resolving the fallback here keeps one height
+     class on the element, so the breakpoint that overrides it actually can. */
+  --height-map-phone: 42vh;
+
   /* The menu-preparation bar. Indeterminate on purpose: the backend does not
      know how far through an extraction is, so the bar sweeps rather than
      fills and no number is ever claimed. Registered here because Tailwind 4
@@ -80,6 +92,15 @@
  * photography - but it is a choice, not an imposition. These are plain custom
  * property overrides rather than a media query, so the toggle controls them.
  */
+/* `dvh` tracks Safari's toolbar sliding in and out; `vh` does not, so a map
+   sized in `vh` is cut off exactly when the toolbar returns. The `vh` above
+   stays as the fallback for anything without `dvh`. */
+@supports (height: 1dvh) {
+  :root {
+    --height-map-phone: 42dvh;
+  }
+}
+
 [data-theme="dark"] {
   --color-surface: oklch(16% 0.008 60);
   --color-surface-raised: oklch(20% 0.009 60);

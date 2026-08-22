@@ -227,6 +227,37 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
     map.current?.setStyle(style);
   }, [style]);
 
+  /**
+   * Tell the map when its container changes size.
+   *
+   * Mapbox reads the container once and then sizes its canvas to what it
+   * measured. Nothing about a CSS breakpoint, a pane becoming viewport-tall,
+   * or a devtools panel opening reaches it — the canvas keeps the old
+   * dimensions and the map renders into part of its box with dead space
+   * around it. A window resize happens to fire its own listener; going from
+   * the stacked layout to the split one does not.
+   *
+   * `resize()` on the instance that already exists, deliberately: it keeps
+   * the centre, the zoom, every marker, the clusters and whatever the reader
+   * had selected. Rebuilding the map to fit a new box would throw all of
+   * that away, and it is the one thing that must never happen while somebody
+   * is scrolling.
+   */
+  useEffect(() => {
+    const instance = map.current;
+    const node = container.current;
+
+    if (!instance || !node || typeof ResizeObserver === "undefined") {
+      return;
+    }
+
+    const observer = new ResizeObserver(() => instance.resize());
+
+    observer.observe(node);
+
+    return () => observer.disconnect();
+  }, []);
+
   // Recentre when the reader picks a different place, without disturbing the
   // zoom they chose.
   useEffect(() => {

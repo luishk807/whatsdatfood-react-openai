@@ -197,10 +197,26 @@ our own cuisine artwork.**
   because offsetting by the bar alone leaves a sliver of scrolling content
   above whatever is pinned.
 - **Below `lg` the map pins above the list instead.** One thumb, one column:
-  the map holds the top of the screen at `42dvh` and the results scroll under
-  it. `dvh` rather than `vh` — Safari's toolbar makes them differ by the
-  height of a restaurant card, and a map sized in `vh` is cut off exactly
-  when the toolbar slides back.
+  the map holds the top of the screen at `--height-map-phone` and the results
+  scroll under it. `dvh` rather than `vh` — Safari's toolbar makes them differ
+  by the height of a restaurant card, and a map sized in `vh` is cut off
+  exactly when the toolbar slides back.
+- **That fallback is a variable, never an `@supports` variant on the
+  element.** Written as `[@supports(height:1dvh)]:h-[42dvh]`, Tailwind emits
+  the block *after* every breakpoint rule in the layer — same specificity,
+  later rule, no media query — so it beat `lg:h-full` at every width and the
+  map drew into the top of the workspace with a blank half-screen under it.
+  Resolving the fallback on `:root` keeps one height class on the element, so
+  the breakpoint that overrides it actually can. When a responsive height
+  looks ignored, read the built CSS and compare rule positions rather than
+  adding `!important`.
+- **The map is told when its box changes; it is never rebuilt.** Mapbox sizes
+  its canvas to the container it measured once, and no CSS breakpoint reaches
+  it — a window resize fires its own listener, going from stacked to split
+  does not. A `ResizeObserver` calls `resize()` on the existing instance,
+  which keeps the centre, the zoom, the markers, the clusters and the
+  selection. Rebuilding to fit a new box throws all of that away while
+  somebody is mid-scroll.
 - **Hover and selection are two states.** Hover is a preview lasting exactly
   as long as the pointer or the focus; a choice survives the pointer moving
   on. They were one, so tapping a pin and then reading down the list threw the

@@ -37,6 +37,7 @@ export class FakeMap {
   controls: unknown[] = [];
   style: string;
   removed = false;
+  resizes = 0;
 
   private centre: { lng: number; lat: number };
   private zoom: number;
@@ -104,6 +105,12 @@ export class FakeMap {
 
   setStyle(style: string) {
     this.style = style;
+  }
+
+  /** Counted, because the contract is "told about a new box, never rebuilt". */
+  resize() {
+    this.resizes += 1;
+    return this;
   }
 
   addControl(control: unknown) {

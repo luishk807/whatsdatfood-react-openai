@@ -340,7 +340,7 @@ const NearbyPage: FC = () => {
               list is the half that always works, so it is what a screen
               reader and a keyboard reach first. On a phone the map is on
               top, which is the view somebody asked for by tapping Map. */}
-          <div className="sticky top-[var(--offset-header)] z-10 -mx-4 h-[42vh] overflow-hidden border-y border-line bg-surface px-0 [@supports(height:1dvh)]:h-[42dvh] sm:mx-0 sm:rounded-card sm:border lg:static lg:z-auto lg:order-2 lg:h-full lg:border">
+          <div className="sticky top-[var(--offset-header)] z-10 -mx-4 h-[var(--height-map-phone)] overflow-hidden border-y border-line bg-surface px-0 sm:mx-0 sm:rounded-card sm:border lg:static lg:z-auto lg:order-2 lg:h-full lg:border">
             <Suspense
               fallback={
                 <div className="h-full w-full animate-pulse bg-surface-sunken motion-reduce:animate-none" />

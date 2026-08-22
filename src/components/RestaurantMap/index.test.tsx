@@ -559,3 +559,49 @@ describe("the name beside the pin", () => {
     expect(popup.content?.querySelector("b")).toBeNull();
   });
 });
+
+describe("when the container changes size", () => {
+  /** jsdom has no ResizeObserver, so the component's guard would skip it. */
+  const observers: (() => void)[] = [];
+
+  beforeEach(() => {
+    observers.length = 0;
+    (window as unknown as { ResizeObserver: unknown }).ResizeObserver = class {
+      constructor(private fire: () => void) {
+        observers.push(() => this.fire());
+      }
+      observe() {}
+      disconnect() {}
+    };
+  });
+
+  afterEach(() => {
+    delete (window as unknown as { ResizeObserver?: unknown }).ResizeObserver;
+  });
+
+  it("tells the existing map about its new box", () => {
+    // Mapbox measures the container once and sizes its canvas to what it
+    // found. A CSS breakpoint, a pane becoming viewport-tall, devtools
+    // opening - none of it reaches the map, so the canvas keeps the old
+    // dimensions and the map draws into part of its box with dead space
+    // around it.
+    show();
+
+    act(() => observers.forEach((fire) => fire()));
+
+    expect(instance().resizes).toBeGreaterThan(0);
+  });
+
+  it("does not rebuild the map to fit a new box", () => {
+    // Rebuilding would throw away the centre, the zoom, every marker and
+    // whatever the reader had selected - while they are mid-scroll.
+    show();
+
+    const before = instance();
+
+    act(() => observers.forEach((fire) => fire()));
+
+    expect(instance()).toBe(before);
+    expect(before.removed).toBe(false);
+  });
+});

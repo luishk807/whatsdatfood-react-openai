@@ -1,6 +1,8 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
+import { readFileSync } from "fs";
+import { join } from "path";
 import { MockedProvider } from "@apollo/client/testing";
 import NearbyPage from "@/components/NearbyPage";
 import { LOCATION_LABELS, NEARBY_LABELS } from "@/customConstants/labels";
@@ -553,18 +555,31 @@ describe("keeping the map in view on a phone", () => {
     expect(mapPanel(container)?.className).not.toMatch(/fixed/);
   });
 
-  it("measures itself against the visible viewport, not a fixed pixel count", async () => {
-    // `dvh` shrinks and grows with Safari's toolbar; `vh` does not, so a map
-    // sized in `vh` is cut off exactly when the toolbar slides back in. The
-    // `vh` value stays as the fallback for anything without `dvh`.
+  it("takes its phone height from the shared token", async () => {
+    // One height class on the element, so the breakpoint that overrides it
+    // actually can. Written as an `@supports` *variant* instead, Tailwind
+    // emits that block after every breakpoint rule in the layer - same
+    // specificity, later rule, no media query - so `height: 42dvh` won at
+    // `lg` too, where the map is supposed to fill its column, and left a
+    // blank half-screen underneath it.
     const { container } = show("/nearby?view=map");
 
     await screen.findByRole("link", { name: /restaurant 1/i });
 
     const className = mapPanel(container)?.className ?? "";
 
-    expect(className).toContain("dvh");
-    expect(className).toContain("vh]");
+    expect(className).toContain("h-[var(--height-map-phone)]");
+    expect(className).not.toMatch(/@supports/);
+  });
+
+  it("fills its column once the split takes over", async () => {
+    // The reported blank area: the map drew into the top of a
+    // viewport-height workspace and left the rest empty.
+    const { container } = show("/nearby?view=map");
+
+    await screen.findByRole("link", { name: /restaurant 1/i });
+
+    expect(mapPanel(container)?.className).toContain("lg:h-full");
   });
 
   it("stops being pinned to the top once the split takes over", async () => {
@@ -634,5 +649,26 @@ describe("who owns the scroll in the workspace", () => {
     const more = screen.getByRole("button", { name: NEARBY_LABELS.showMore });
 
     expect(resultsPane(container)?.contains(more)).toBe(true);
+  });
+});
+
+describe("the phone map height still falls back", () => {
+  // The guarantee moved out of the component and into the stylesheet, so
+  // this is where it has to be checked. `dvh` tracks Safari's toolbar
+  // sliding in and out; `vh` does not, so a map sized only in `vh` is cut
+  // off exactly when the toolbar returns - and a browser without `dvh` needs
+  // something to fall back to.
+  const css = readFileSync(
+    join(__dirname, "..", "..", "index.css"),
+    "utf8",
+  );
+
+  it("defines the token in vh first", () => {
+    expect(css).toMatch(/--height-map-phone:\s*42vh/);
+  });
+
+  it("upgrades it to dvh where that is supported", () => {
+    expect(css).toMatch(/@supports \(height: 1dvh\)/);
+    expect(css).toMatch(/--height-map-phone:\s*42dvh/);
   });
 });
