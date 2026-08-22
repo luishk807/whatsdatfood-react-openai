@@ -292,7 +292,11 @@ export const SETTINGS_LABELS = {
     "Your display name, your photos and the Food Cred you have earned are " +
     "visible to anyone. Your email, phone and saved area are not.",
   photoTitle: "Photo",
-  photoSoon: "Adding a photo is not available yet.",
+  photoAdd: "Add a photo",
+  photoChange: "Change photo",
+  photoUploading: "Uploading…",
+  photoHint: "Shown beside your reviews and on the leaderboard.",
+  photoFailed: "That photo did not upload. Try again.",
   profileTitle: "Profile",
   profileBlurb: "How you appear on the photos and reviews you contribute.",
   accountTitle: "Account",

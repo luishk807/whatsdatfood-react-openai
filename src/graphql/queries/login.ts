@@ -21,6 +21,7 @@ export const CHECK_AUTH = gql`
     checkAuth {
       id
       display_name
+      avatar_url
       username
       first_name
       last_name

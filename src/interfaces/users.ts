@@ -98,6 +98,8 @@ export interface CreateUserInputType {
 }
 
 export interface UserType {
+  /** A square photograph of the person. Null is the normal case. */
+  avatar_url?: string | null;
   id: number;
   /** Absent on every account created before the column existed. */
   display_name?: string;

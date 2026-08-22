@@ -114,6 +114,7 @@ export const GET_USER_DETAIL = gql`
   query userDetail {
     userDetail {
       display_name
+      avatar_url
       first_name
       last_name
       email
