@@ -561,14 +561,25 @@ describe("the name beside the pin", () => {
 });
 
 describe("when the container changes size", () => {
-  /** jsdom has no ResizeObserver, so the component's guard would skip it. */
-  const observers: (() => void)[] = [];
+  /**
+   * jsdom has no ResizeObserver, so the component's guard would skip it.
+   *
+   * The fake reports a size, because a real one always does and the component
+   * now reads it: a callback carrying no entries was letting these tests pass
+   * a resize that a browser would never send. Firing with the same size twice
+   * has to be a no-op, which is the point of the guard.
+   */
+  const observers: ((width: number, height: number) => void)[] = [];
 
   beforeEach(() => {
     observers.length = 0;
     (window as unknown as { ResizeObserver: unknown }).ResizeObserver = class {
-      constructor(private fire: () => void) {
-        observers.push(() => this.fire());
+      constructor(
+        private fire: (entries: { contentRect: DOMRectReadOnly }[]) => void,
+      ) {
+        observers.push((width, height) =>
+          this.fire([{ contentRect: { width, height } as DOMRectReadOnly }]),
+        );
       }
       observe() {}
       disconnect() {}
@@ -587,9 +598,25 @@ describe("when the container changes size", () => {
     // around it.
     show();
 
-    act(() => observers.forEach((fire) => fire()));
+    act(() => observers.forEach((fire) => fire(800, 600)));
 
     expect(instance().resizes).toBeGreaterThan(0);
+  });
+
+  it("ignores a callback that reports the same box", () => {
+    // A ResizeObserver fires for sub-pixel churn as well as real changes, and
+    // a WebGL canvas resized mid-scroll is a visible blink rather than a
+    // no-op. This is what stopped the map flickering on a phone.
+    show();
+
+    act(() => observers.forEach((fire) => fire(800, 600)));
+
+    const after = instance().resizes;
+
+    act(() => observers.forEach((fire) => fire(800, 600)));
+    act(() => observers.forEach((fire) => fire(800.4, 599.6)));
+
+    expect(instance().resizes).toBe(after);
   });
 
   it("does not rebuild the map to fit a new box", () => {
@@ -599,7 +626,7 @@ describe("when the container changes size", () => {
 
     const before = instance();
 
-    act(() => observers.forEach((fire) => fire()));
+    act(() => observers.forEach((fire) => fire(800, 600)));
 
     expect(instance()).toBe(before);
     expect(before.removed).toBe(false);

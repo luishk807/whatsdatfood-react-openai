@@ -654,10 +654,16 @@ describe("who owns the scroll in the workspace", () => {
 
 describe("the phone map height still falls back", () => {
   // The guarantee moved out of the component and into the stylesheet, so
-  // this is where it has to be checked. `dvh` tracks Safari's toolbar
-  // sliding in and out; `vh` does not, so a map sized only in `vh` is cut
-  // off exactly when the toolbar returns - and a browser without `dvh` needs
-  // something to fall back to.
+  // this is where it has to be checked.
+  //
+  // This asserted `dvh` until the map was seen flickering on a phone. `dvh`
+  // tracks the *dynamic* viewport, so it changes on every frame Safari's
+  // toolbar slides - which is exactly while somebody is scrolling - and each
+  // change resized the box, fired the map's ResizeObserver and resized a
+  // WebGL canvas mid-scroll. `svh` is the *small* viewport height: the size
+  // with the toolbar showing, and it does not move. It cannot be cut off
+  // when the toolbar returns either, which is the failure `vh` has and the
+  // reason `dvh` was reached for in the first place.
   const css = readFileSync(
     join(__dirname, "..", "..", "index.css"),
     "utf8",
@@ -667,9 +673,15 @@ describe("the phone map height still falls back", () => {
     expect(css).toMatch(/--height-map-phone:\s*42vh/);
   });
 
-  it("upgrades it to dvh where that is supported", () => {
-    expect(css).toMatch(/@supports \(height: 1dvh\)/);
-    expect(css).toMatch(/--height-map-phone:\s*42dvh/);
+  it("upgrades it to svh where that is supported", () => {
+    expect(css).toMatch(/@supports \(height: 1svh\)/);
+    expect(css).toMatch(/--height-map-phone:\s*42svh/);
+  });
+
+  it("does not size the phone map in dvh", () => {
+    // The unit that made it flicker. Named so a future tidy-up cannot
+    // reintroduce it as an obvious-looking improvement.
+    expect(css).not.toMatch(/--height-map-phone:\s*\d+dvh/);
   });
 });
 

@@ -106,12 +106,24 @@
  * photography - but it is a choice, not an imposition. These are plain custom
  * property overrides rather than a media query, so the toggle controls them.
  */
-/* `dvh` tracks Safari's toolbar sliding in and out; `vh` does not, so a map
-   sized in `vh` is cut off exactly when the toolbar returns. The `vh` above
-   stays as the fallback for anything without `dvh`. */
-@supports (height: 1dvh) {
+/* **`svh`, not `dvh` - and the difference is the map flickering or not.**
+   Both answer "how tall is the viewport" and they disagree about when.
+   `dvh` is defined to track the *dynamic* viewport, so on iOS Safari it
+   changes on every frame the toolbar slides in or out - which is precisely
+   while somebody is scrolling. Each change resized this box, which fired the
+   map's ResizeObserver, which resized a WebGL canvas mid-scroll. That is the
+   blink.
+
+   `svh` is the *small* viewport height: the size with the toolbar showing,
+   fixed, and it does not move while scrolling. So the box stays still and
+   nothing downstream is asked to react. It also cannot be cut off when the
+   toolbar returns, which is the failure `vh` has and the reason `dvh` was
+   reached for in the first place - `svh` gets that without the movement.
+
+   The `vh` above stays as the fallback for anything without `svh`. */
+@supports (height: 1svh) {
   :root {
-    --height-map-phone: 42dvh;
+    --height-map-phone: 42svh;
   }
 }
 

@@ -251,7 +251,35 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
       return;
     }
 
-    const observer = new ResizeObserver(() => instance.resize());
+    // **Only when the box actually changed size.** A ResizeObserver fires for
+    // sub-pixel churn too, and a WebGL canvas resized mid-scroll is a visible
+    // blink rather than a no-op. `svh` stops the phone map's height moving at
+    // all, which is the real fix; this is the guard for everything else that
+    // can nudge a box by a fraction - a scrollbar appearing beside the
+    // results, a zoom level, a rotation.
+    let width = node.clientWidth;
+    let height = node.clientHeight;
+
+    const observer = new ResizeObserver((entries) => {
+      const box = entries[0]?.contentRect;
+
+      if (!box) {
+        return;
+      }
+
+      // Whole pixels: the canvas is sized in them, so a change smaller than
+      // one cannot alter what is drawn.
+      const nextWidth = Math.round(box.width);
+      const nextHeight = Math.round(box.height);
+
+      if (nextWidth === width && nextHeight === height) {
+        return;
+      }
+
+      width = nextWidth;
+      height = nextHeight;
+      instance.resize();
+    });
 
     observer.observe(node);
 
