@@ -322,6 +322,34 @@ meant revisiting rather than stretching. Paging raised it.
   effect; nothing navigates from the homepage and the request belongs to
   `DiscoveryLocationProvider`, which outlives both.
 
+## The homepage tells one story
+
+Search → what is popular → what *you* like → explore → contribute → earn
+recognition. The order is the argument: somebody arriving has not decided
+where to eat, so the broad question is answered before the narrow one.
+
+- **Popular leads, For You follows.** They used to be the other way round,
+  which asked a reader to care about their saved tastes before the page had
+  shown them anything. Saved tastes shape the Popular ranking rather than
+  replacing it, so the personalisation is in both.
+- **Cross-section deduplication runs down the page** — Popular's restaurants,
+  including its hot pick, are excluded from the taste rows beneath it. Seeing
+  the loudest thing on the front door again four rows later is the repetition
+  a reader notices most.
+- **It is a preference, never a guarantee.** `withoutSeen` abandons filtering
+  entirely when it would leave a row below `NEARBY.MIN_AFTER_DEDUPE`, because
+  on a catalogue this size a thin row costs the reader a real recommendation
+  to gain a cosmetic tidiness. Half-deduplicated is the worst of both.
+- **A few taste rows, then "Show more tastes".** Somebody who saved eight
+  things does not want eight rows on arrival — that is the page becoming an
+  index instead of deciding for them — but a hard cap silently discards
+  preferences they deliberately chose, so the rest is one tap away.
+- **"New around you" does not exist**, and must not be approximated.
+  `created_at` is the OpenStreetMap import date, not an opening date, and
+  labelling imported restaurants as new is a claim the data cannot support.
+  The section arrives when a trustworthy `opened_at` does; nothing assumes its
+  absence, so adding it later is additive.
+
 ## Taste preferences
 
 `TastePreferencePicker` is the one picker; the homepage card and

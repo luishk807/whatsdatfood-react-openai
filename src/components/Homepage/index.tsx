@@ -1,4 +1,4 @@
-import { type FC, lazy, Suspense, useEffect, useState } from "react";
+import { type FC, lazy, Suspense, useEffect, useState, useMemo } from "react";
 import { SEARCH_LABELS } from "@/customConstants/labels";
 import PhotoWall from "@/components/PhotoWall";
 import CuisineStrip from "@/components/CuisineStrip";
@@ -69,6 +69,22 @@ const Homepage: FC = () => {
   const { trending, loading: trendingLoading } = useTrendingNearby(
     location,
     guestTastes,
+  );
+
+  /**
+   * What Popular already showed, so the sections under it can avoid repeating
+   * it.
+   *
+   * Priority runs down the page: Popular leads, For You follows. The hot pick
+   * counts too — it is the loudest thing on the front door, and seeing it
+   * again four rows later is the repetition a reader notices most.
+   */
+  const popularIds = useMemo(
+    () => [
+      ...(trending?.hot_pick ? [trending.hot_pick.id] : []),
+      ...(trending?.restaurants ?? []).map((one) => one.id),
+    ],
+    [trending],
   );
 
   // The server names the area from the nearest restaurant it knows; the
@@ -147,25 +163,35 @@ const Homepage: FC = () => {
           again for a month. */}
       <TasteOnboarding hasLocation={Boolean(location)} />
 
-      {/* What somebody said they like, above the general ranking — that is
-          the whole point of having asked. Each strip is the nearby query with
-          a cuisine, so the answer for Flushing-and-sushi is shared by
-          everybody interested in sushi in Flushing rather than computed per
-          reader. Nothing here reaches a model. */}
-      <TasteSections
-        preferences={preferences}
-        location={location}
-        place={location?.label}
-      />
-
-      {/* Places to go, above the dish strip. Somebody who has not decided
-          where to eat cannot use a row of dishes yet, and this is the
-          section that answers first. */}
+      {/* **Popular first, then what you like.** Somebody arriving has not
+          decided where to eat, and the strongest answer to "where should I
+          go" is what is actually worth going to nearby — saved tastes shape
+          that ranking rather than replacing it. For You follows, because it
+          is the narrower question and only useful once the broad one has been
+          answered. */}
       <TrendingRestaurants
         trending={trending}
         loading={trendingLoading}
         hasLocation={Boolean(location)}
         onChangeLocation={changeLocation}
+      />
+
+      {/* What somebody said they like, under the general ranking. Each strip
+          is the nearby query with a cuisine, so the answer for
+          Flushing-and-sushi is shared by everybody interested in sushi in
+          Flushing rather than computed per reader. Nothing here reaches a
+          model.
+
+          `exclude` is the cross-section rule: a restaurant that just led
+          Popular does not need to lead Coffee as well. It is a preference,
+          not a guarantee — a row that would be left thin keeps what it had,
+          because on this catalogue repetition beats a heading over two weak
+          results. */}
+      <TasteSections
+        preferences={preferences}
+        location={location}
+        place={location?.label}
+        exclude={popularIds}
       />
 
       <TrendingStrip

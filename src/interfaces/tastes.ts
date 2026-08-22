@@ -63,6 +63,14 @@ export interface TasteOnboardingInterface {
 }
 
 export interface TasteSectionsInterface {
+  /**
+   * Restaurant ids a higher section already showed.
+   *
+   * A preference rather than a guarantee: a row that would be left thin keeps
+   * what it had, because on this catalogue repetition beats a heading over
+   * two weak results.
+   */
+  exclude?: string[];
   preferences: TastePreferenceType[];
   location: CoordinatesType | null;
   /** The area name, for a heading. Never an address. */
@@ -70,6 +78,8 @@ export interface TasteSectionsInterface {
 }
 
 export interface TasteSectionInterface {
+  /** Ids a higher section already showed. See `TasteSectionsInterface`. */
+  exclude?: string[];
   taste: TastePreferenceType;
   location: CoordinatesType | null;
 }

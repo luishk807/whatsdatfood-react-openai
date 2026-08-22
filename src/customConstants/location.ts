@@ -49,6 +49,16 @@ export const LOCATION_STORAGE_KEY = "wdf.location";
 
 export const NEARBY = {
   /**
+   * How many results a section must keep after cross-section deduplication
+   * for the deduplication to be worth applying at all.
+   *
+   * Below this, filtering is abandoned and the section shows what it had. A
+   * row stripped to two weak results is worse than one repeating a restaurant
+   * from the section above: the reader loses a real recommendation to gain a
+   * tidiness they never asked for.
+   */
+  MIN_AFTER_DEDUPE: 3,
+  /**
    * How often to ask whether we have finished looking at somewhere new.
    *
    * Only ever polled while a look is actually running, which is once per

@@ -89,6 +89,8 @@ export const TASTE_PICKER = {
  * on a phone.
  */
 export const TASTE_SECTIONS = {
+  /** Restaurants per saved taste. Enough to choose from, few enough to scan. */
+  PER_ROW: 4,
   MIN: 2,
   MAX: 4,
 } as const;

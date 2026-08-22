@@ -945,6 +945,15 @@ export const IMAGERY_LABELS = {
  * that exist.
  */
 export const TASTE_LABELS = {
+  /**
+   * The rest of somebody's saved tastes, on request.
+   *
+   * A hard cap silently discards preferences they deliberately chose; this
+   * admits there are more and costs one tap. Counted, so the tap is a known
+   * quantity rather than an open door.
+   */
+  showMore: (count: number) =>
+    count === 1 ? "Show 1 more taste" : `Show ${count} more tastes`,
   title: "What are you into?",
   blurb: "Pick a few so we can show you better food near you.",
   save: "Save my tastes",

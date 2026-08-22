@@ -1,4 +1,4 @@
-import { type FC, useMemo } from "react";
+import { type FC, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { ChevronRightIcon } from "@/components/icons";
 import RestaurantCover from "@/components/RestaurantCover";
@@ -8,6 +8,7 @@ import { TASTE_SECTIONS } from "@/customConstants/tastes";
 import { buildMenuResultsPath, buildNearbyPath } from "@/customConstants/routes";
 import { useNearbyRestaurants } from "@/customHooks/useNearby";
 import { orderedTastes } from "@/utils/tastes";
+import { withoutSeen } from "@/utils/dedupe";
 import { milesFrom } from "@/utils/distance";
 import {
   TasteSectionInterface,
@@ -38,13 +39,24 @@ import {
  * and a product that overclaims once is not believed the next time. Stronger
  * rankings are earned later, by votes and photographs that exist.
  */
-const TasteSection: FC<TasteSectionInterface> = ({ taste, location }) => {
+const TasteSection: FC<TasteSectionInterface> = ({
+  taste,
+  location,
+  exclude,
+}) => {
   const { places, loading } = useNearbyRestaurants(location, taste.slug);
   const Glyph = foodCategoryIcon(taste.slug);
 
+  // What Popular already led with, dropped — unless dropping it would leave
+  // the row thin, in which case the repetition is the lesser problem.
+  const shown = useMemo(
+    () => withoutSeen(places, exclude ?? []).slice(0, TASTE_SECTIONS.PER_ROW),
+    [places, exclude],
+  );
+
   // Nothing found is silence, not an apology. A heading over an empty row
   // makes the catalogue look broken rather than uneven.
-  if (loading || !places.length) {
+  if (loading || !shown.length) {
     return null;
   }
 
@@ -80,7 +92,7 @@ const TasteSection: FC<TasteSectionInterface> = ({ taste, location }) => {
       {/* A swipe on a phone, a grid once there is width — the same shape as
           every other strip on this page. */}
       <ul className="no-scrollbar -mx-4 flex snap-x snap-mandatory scroll-pl-4 gap-3 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-3 sm:overflow-visible sm:px-0 lg:grid-cols-4">
-        {places.slice(0, 4).map((one) => (
+        {shown.map((one) => (
           <li key={one.id} className="w-40 shrink-0 snap-start sm:w-auto">
             <Link
               to={one.slug ? buildMenuResultsPath(one.slug) : "#"}
@@ -113,21 +125,36 @@ const TasteSections: FC<TasteSectionsInterface> = ({
   preferences,
   location,
   place,
+  exclude,
 }) => {
-  // Explicit first, then capped. What somebody said outranks what we guessed,
-  // and four strips is where a recommendation becomes an index.
-  const shown = useMemo(
-    () => orderedTastes(preferences).slice(0, TASTE_SECTIONS.MAX),
-    [preferences],
-  );
+  const [expanded, setExpanded] = useState(false);
+
+  // Explicit first. What somebody said outranks anything we merely inferred.
+  const ordered = useMemo(() => orderedTastes(preferences), [preferences]);
+
+  /**
+   * A few strips, then a way to ask for the rest.
+   *
+   * Somebody who picked eight things does not want eight rows on arrival — at
+   * that point the page stops recommending and becomes an index, which is the
+   * one job the homepage exists to do *for* them. But a hard cap silently
+   * throws away preferences they deliberately saved, so the remainder is one
+   * tap away rather than gone.
+   */
+  const shown = expanded ? ordered : ordered.slice(0, TASTE_SECTIONS.MAX);
+  const hidden = ordered.length - shown.length;
 
   if (!location || !shown.length) {
     return null;
   }
 
   return (
-    <section aria-labelledby="for-you" className="flex flex-col gap-7">
-      <h2 id="for-you" className="text-sm font-semibold text-ink">
+    // Tighter than it was. Each strip carries its own heading and its own
+    // cards, so the space between them only has to separate them - at the old
+    // spacing four saved tastes filled a screen and a half on a phone before
+    // anything else on the page had a chance.
+    <section aria-labelledby="for-you" className="flex flex-col gap-5">
+      <h2 id="for-you" className="text-base font-semibold text-ink">
         {place ? TASTE_LABELS.forYou(place) : TASTE_LABELS.forYouGeneric}
       </h2>
 
@@ -136,8 +163,19 @@ const TasteSections: FC<TasteSectionsInterface> = ({
           key={taste.slug}
           taste={taste}
           location={location}
+          exclude={exclude}
         />
       ))}
+
+      {hidden > 0 && (
+        <button
+          type="button"
+          onClick={() => setExpanded(true)}
+          className="mx-auto min-h-11 rounded-pill border border-line px-4 text-sm font-medium text-ink hover:bg-surface-sunken"
+        >
+          {TASTE_LABELS.showMore(hidden)}
+        </button>
+      )}
     </section>
   );
 };

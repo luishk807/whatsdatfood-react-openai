@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import TasteSections from "@/components/TasteSections";
 import { TASTE_LABELS } from "@/customConstants/labels";
@@ -26,7 +27,7 @@ const place = (id: string, name: string) => ({
   distance_km: 0.4,
 });
 
-const show = () =>
+const show = (over: Record<string, unknown> = {}) =>
   render(
     <MemoryRouter>
       <TasteSections
@@ -36,12 +37,18 @@ const show = () =>
           { slug: "coffee", name: "Coffee", kind: "food", source: "explicit" },
           { slug: "sushi", name: "Sushi", kind: "food", source: "explicit" },
         ]}
+        {...over}
       />
     </MemoryRouter>,
   );
 
 beforeEach(() => {
-  nearby = [place("1", "Dunkin"), place("2", "Busy Bee")];
+  nearby = [
+    place("1", "Dunkin"),
+    place("2", "Busy Bee"),
+    place("3", "Sweet Cake"),
+    place("4", "Heytea"),
+  ];
 });
 
 describe("the section headings", () => {
@@ -121,5 +128,82 @@ describe("when a category has nothing nearby", () => {
     expect(
       screen.queryByRole("heading", { name: "Coffee" }),
     ).not.toBeInTheDocument();
+  });
+});
+
+describe("keeping the page short", () => {
+  const many = [
+    "coffee",
+    "sushi",
+    "bbq",
+    "dim_sum",
+    "ramen",
+    "tacos",
+  ].map((slug) => ({ slug, name: slug, kind: "food", source: "explicit" }));
+
+  it("does not open with a row per saved taste", async () => {
+    // Somebody who picked six things does not want six rows on arrival. At
+    // that point the page stops recommending and becomes an index, which is
+    // the one job it exists to do for them.
+    show({ preferences: many });
+
+    const headings = await screen.findAllByRole("heading", { level: 3 });
+
+    expect(headings.length).toBeLessThan(many.length);
+  });
+
+  it("offers the rest rather than discarding them", async () => {
+    // A hard cap silently throws away preferences somebody deliberately
+    // saved.
+    show({ preferences: many });
+
+    expect(
+      await screen.findByRole("button", { name: /more taste/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("shows them all once asked", async () => {
+    show({ preferences: many });
+
+    await userEvent.click(
+      await screen.findByRole("button", { name: /more taste/i }),
+    );
+
+    expect(await screen.findAllByRole("heading", { level: 3 })).toHaveLength(
+      many.length,
+    );
+  });
+
+  it("offers nothing to expand when everything already fits", async () => {
+    show({ preferences: many.slice(0, 2) });
+
+    await screen.findAllByRole("heading", { level: 3 });
+
+    expect(
+      screen.queryByRole("button", { name: /more taste/i }),
+    ).not.toBeInTheDocument();
+  });
+});
+
+describe("not repeating what Popular already showed", () => {
+  it("drops a restaurant the section above led with", async () => {
+    // Three sections leading with the same name reads as a page with one
+    // idea rather than three.
+    show({ exclude: ["1"] });
+
+    await screen.findAllByRole("heading", { level: 3 });
+
+    expect(screen.queryByText("Dunkin")).not.toBeInTheDocument();
+    expect(screen.getAllByText("Busy Bee").length).toBeGreaterThan(0);
+  });
+
+  it("keeps a row intact rather than leaving it thin", async () => {
+    // Relevance beats tidiness: on this catalogue repetition is better than
+    // a heading over one weak result.
+    show({ exclude: ["1", "2", "3"] });
+
+    await screen.findAllByRole("heading", { level: 3 });
+
+    expect(screen.getAllByText("Dunkin").length).toBeGreaterThan(0);
   });
 });
