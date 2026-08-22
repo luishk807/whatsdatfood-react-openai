@@ -171,7 +171,22 @@ our own cuisine artwork.**
   re-read was a fresh request for restaurants that had not moved.
 - **List → Map fetches nothing.** The map is handed the array the list already
   has. Panning and zooming fetch nothing. Only "Search this area" spends a
-  query, and only ten rows of one.
+  query, and only ten rows of one. Pointing at a row spends nothing either.
+- **On the map view from `lg`, the results are a column and the map is pinned
+  beside them** (`45fr_55fr`, `lg:sticky`). Stacked, the relationship broke the
+  moment the reader scrolled: the map went up past the top of the window and
+  hovering a result changed something nobody could see. Below `lg` it stays a
+  tab — a phone has room for one of these at a time, and half a map beside
+  half a list is neither. It splits inside the app-wide `max-w-5xl`; widening
+  one page past the header and footer is a shell decision, not a page one.
+- **Hover and selection are two states.** Hover is a preview lasting exactly
+  as long as the pointer or the focus; a choice survives the pointer moving
+  on. They were one, so tapping a pin and then reading down the list threw the
+  choice away on the very next row. Focus does everything hover does — the map
+  is the half no keyboard reaches. **Only the map may scroll the list**
+  (`scrollToId`, `block: "nearest"`): a row that scrolls itself under a
+  pointer travelling down it is the list fighting its reader, which is the
+  same trap the category bar hit.
 
 ## The map clusters now
 
@@ -192,6 +207,21 @@ meant revisiting rather than stretching. Paging raised it.
 - **Tapping a cluster is a camera move, never a search.** It zooms over places
   already in hand. A test asserts no query fires, and that our own `easeTo`
   does not then offer "Search this area".
+- **Hovering a result reveals it even when a cluster is hiding it.**
+  `findCluster`/`placeInClusters` find the place, and the map draws *one extra
+  pin* at its own coordinates above the group, carrying its name — the only
+  marker that does, because it is the only one that appears on top of others
+  and would otherwise be an eighth anonymous dot. The zoom is never touched:
+  expanding the group for real would let a mouse crossing a list rewrite the
+  view the reader chose. Mapbox's `getClusterExpansionZoom`/`getClusterLeaves`
+  are the API for doing it that way and are unavailable to us anyway — the
+  grouping is ours precisely so a marker can stay a `<div>`.
+- **The camera moves only when it has to.** `insideView` measures an inset
+  against the visible span, so "near the edge" means the same thing at every
+  zoom and a pin two pixels inside the frame still counts as missed. A place
+  already comfortably on screen is emphasised where it stands and nothing
+  moves — which is the common case, since the list and the map show the same
+  ten results. When it does move it is a short pan at the same zoom.
 
 ## The homepage knows where you are
 
@@ -340,6 +370,27 @@ minute. Design for the phone and let desktop be the override, never the reverse.
   heading "Popular picks · not yet voted on" — a contradiction, printed above a
   copy of the top of the menu. Do not reintroduce a fallback: the ranking is the
   product, and claiming it early is what makes it untrustworthy.
+- **A menu being prepared looks like work, not like a missing page.**
+  `MenuStatusPanel` names what is happening to the *restaurant* over an
+  indeterminate bar. It used to be a two-pixel pulsing dot, on the theory that
+  a spinner reads as "nothing here works" — the wrong trade for the one panel
+  on the page that genuinely is working, over a wait measured in tens of
+  seconds, on a catalogue where most restaurants have no menu and "this looks
+  broken" is the impression worth spending pixels to prevent. **Never a
+  percentage**: the server does not know how far through an extraction is, and
+  a test asserts the bar carries no `aria-valuenow`. It always says the work
+  continues in the background, because it does and nobody should sit guarding
+  it. "Add a dish we missed" is absent while the first menu is still coming —
+  over an empty page it claims we finished looking and came up short.
+- **"Try again" runs the restaurant query, never a retry mutation.** There is
+  exactly one call site allowed to generate a menu and
+  `tests/test_menus_stay_demand_driven.py` fails if a second appears, so retry
+  lands on the same one and is refused by the same claim, backoff and budget
+  guards however often it is pressed. It is drawn only when the server sends
+  `retryable` — a restaurant out of attempts gets the sentence and no button.
+- **Polling backs off and stops.** `utils/menuPolling.ts`, 3s → 8s → 20s, ended
+  by every terminal state and by unmount. It cannot reach a model by
+  construction; free of AI cost is not free of server.
 - **A missing price is `—`, never `$0.00`.** Use `dishPrice`, which treats zero
   as absent. The extraction leaves price null or zero across most of a menu, and
   a currency formatter turns that into a claim that a $180 omakase is free.
