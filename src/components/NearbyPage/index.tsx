@@ -166,6 +166,10 @@ const NearbyPage: FC = () => {
    * supposed to remove. Tapping the *card* never scrolls anything.
    */
   const showOnMap = useCallback((id: string) => {
+    // Marked on both halves, but **no card opens**. The preview belongs to a
+    // tap on the pin itself: a card that throws up a second card over the map
+    // the instant you ask to see where something is has covered the thing you
+    // asked to see.
     setChosen({ id, fromMap: false });
     setFocus((current) => ({ id, nonce: (current?.nonce ?? 0) + 1 }));
 

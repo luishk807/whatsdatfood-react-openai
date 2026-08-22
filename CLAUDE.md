@@ -279,6 +279,20 @@ meant revisiting rather than stretching. Paging raised it.
   view the reader chose. Mapbox's `getClusterExpansionZoom`/`getClusterLeaves`
   are the API for doing it that way and are unavailable to us anyway — the
   grouping is ours precisely so a marker can stay a `<div>`.
+- **A camera effect fires from an intent, never from the camera having
+  moved.** `clusters` is recomputed from `zoom` and `zoom` is set on every
+  `moveend`, so any effect listing it as a dependency re-runs whenever the map
+  moves — including when the *reader* moves it. Both camera effects did, and
+  the result was a map that could not be zoomed: tapping `+` zoomed in, the
+  effect re-ran, and it dragged the view back to whatever was still selected.
+  They read the grouping through a ref now and depend on `activeId` and the
+  focus nonce alone. If a camera effect ever needs `clusters`, it is the wrong
+  effect.
+- **The location button on a row focuses; it does not open the card.**
+  `fromMap` says where a choice came from, and the two ask different
+  questions: tapping a pin asks "what is this", which the card answers, while
+  tapping a row's button asks "where is this" — answered by the camera going
+  there, and answered worse by a card sliding over the map to cover it.
 - **The camera moves only when it has to.** `insideView` measures an inset
   against the visible span, so "near the edge" means the same thing at every
   zoom and a pin two pixels inside the frame still counts as missed. A place

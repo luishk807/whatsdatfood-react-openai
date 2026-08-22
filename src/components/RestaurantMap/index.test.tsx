@@ -758,3 +758,93 @@ describe("recognition on the map", () => {
     expect(disc?.style.outline).toBe("");
   });
 });
+
+describe("who owns the camera after a focus", () => {
+  const two = [
+    place({ id: "a", name: "Dunkin'" }),
+    place({ id: "b", name: "Los Marinillos", latitude: 40.8, longitude: -73.9 }),
+  ];
+
+  const render_ = (props: Record<string, unknown>) =>
+    render(
+      <MemoryRouter>
+        <RestaurantMap places={two} centre={centre} {...props} />
+      </MemoryRouter>,
+    );
+
+  it("goes there once when asked", () => {
+    render_({ focus: { id: "b", nonce: 1 } });
+
+    expect(instance().getCenter().lat).toBeCloseTo(40.8, 2);
+  });
+
+  it("leaves the zoom alone once the reader changes it", () => {
+    // The reported bug. `clusters` is recomputed from `zoom` and `zoom` is
+    // set on every `moveend`, so a camera effect listing it re-ran every time
+    // the map moved - including when the *reader* moved it. Tapping + zoomed
+    // in, the effect re-ran, and it dragged the camera back to the focused
+    // restaurant at a zoom floor. The controls looked broken.
+    const { rerender } = render_({ focus: { id: "b", nonce: 1 } });
+
+    act(() => instance().moveTo(-73.9, 40.8, 17));
+
+    rerender(
+      <MemoryRouter>
+        <RestaurantMap
+          places={two}
+          centre={centre}
+          focus={{ id: "b", nonce: 1 }}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(instance().getZoom()).toBe(17);
+  });
+
+  it("leaves the centre alone once the reader pans away", () => {
+    render_({ focus: { id: "b", nonce: 1 }, selectedId: "b" });
+
+    act(() => instance().moveTo(-73.5, 41.2, 14));
+
+    expect(instance().getCenter().lng).toBeCloseTo(-73.5, 2);
+    expect(instance().getCenter().lat).toBeCloseTo(41.2, 2);
+  });
+
+  it("does not drag a still-selected restaurant back into view", () => {
+    // Selection persists after the camera move, and a selection is not a
+    // request to keep looking at something.
+    render_({ selectedId: "b" });
+
+    act(() => instance().moveTo(-73.5, 41.2, 16));
+
+    expect(instance().getCenter().lng).toBeCloseTo(-73.5, 2);
+  });
+
+  it("goes again when the same restaurant is asked for a second time", () => {
+    // The nonce is the whole mechanism: React sees an identical prop
+    // otherwise and does nothing.
+    const { rerender } = render_({ focus: { id: "b", nonce: 1 } });
+
+    act(() => instance().moveTo(-73.5, 41.2, 14));
+
+    rerender(
+      <MemoryRouter>
+        <RestaurantMap
+          places={two}
+          centre={centre}
+          focus={{ id: "b", nonce: 2 }}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(instance().getCenter().lat).toBeCloseTo(40.8, 2);
+  });
+
+  it("never offers to search the area because of a focus", () => {
+    render_({ focus: { id: "b", nonce: 1 }, onSearchArea: jest.fn() });
+
+    expect(
+      screen.queryByRole("button", { name: MAP_LABELS.searchThisArea }),
+    ).not.toBeInTheDocument();
+  });
+});

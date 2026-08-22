@@ -347,6 +347,26 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
     [places, zoom],
   );
 
+  /**
+   * The grouping, readable by the camera effects without being a dependency
+   * of them.
+   *
+   * **This is the fix for a map that fought the reader.** `clusters` is
+   * recomputed from `zoom`, and `zoom` is set on every `moveend` — so a
+   * camera effect listing it as a dependency re-runs every time the map
+   * moves, including every time the *reader* moves it. Tapping `+` zoomed in,
+   * the effect re-ran, and it centred and zoomed back to the restaurant that
+   * was still selected. The zoom controls appeared to be broken and the map
+   * appeared to be locked.
+   *
+   * Effects that move the camera must fire from an intent — a row pointed at,
+   * a button tapped — and never from the camera having moved. Reading the
+   * grouping through a ref is what separates the two: the effect still sees
+   * the current clusters, because it runs after the render that set this.
+   */
+  const grouped = useRef(clusters);
+  grouped.current = clusters;
+
   useEffect(() => {
     const instance = map.current;
 
@@ -514,7 +534,7 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
    */
   useEffect(() => {
     const instance = map.current;
-    const place = placeInClusters(clusters, activeId);
+    const place = placeInClusters(grouped.current, activeId);
 
     if (!instance || !place) {
       return;
@@ -542,7 +562,10 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
       zoom: instance.getZoom(),
       duration: MAP_REVEAL.PAN_MS,
     });
-  }, [activeId, clusters]);
+    // `activeId` alone. Listing `clusters` here re-ran this on every
+    // `moveend` — so panning or zooming the map re-triggered a nudge toward
+    // whatever was still selected, and the reader could not get away from it.
+  }, [activeId]);
 
   /**
    * "Show me this one", asked from a row rather than by pointing at it.
@@ -571,7 +594,7 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
       return;
     }
 
-    const place = placeInClusters(clusters, focus.id);
+    const place = placeInClusters(grouped.current, focus.id);
 
     if (!place || place.longitude == null || place.latitude == null) {
       return;
@@ -600,8 +623,13 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
       window.clearTimeout(timer);
       element.classList.remove("map-pin-pulse");
     };
-    // The nonce is what makes asking twice for the same restaurant pan twice.
-  }, [focus, clusters]);
+    // **The nonce, and nothing else.** It is what makes asking twice for the
+    // same restaurant pan twice — and leaving `clusters` in here is what made
+    // the map unusable afterwards: it changes on every `moveend`, so this
+    // re-ran on every zoom and dragged the camera back to a centre and a
+    // floor the reader had deliberately left. A focus is one camera move for
+    // one tap; after it lands, the map belongs to whoever is holding it.
+  }, [focus]);
 
   /**
    * The restaurant's name, beside its own pin.
