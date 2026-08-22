@@ -32,14 +32,31 @@ jest.mock("@/customHooks/useUseSearch", () => ({
   }),
 }));
 
-const at = (hoursAgo: number) =>
-  new Date(Date.now() - hoursAgo * 3600 * 1000).toISOString();
+/**
+ * A timestamp at midday, N days ago.
+ *
+ * These used to say "one hour ago" and "thirty hours ago", which is only
+ * "today" and "yesterday" if the suite happens to run in the middle of the
+ * day. CI ran it near midnight and one hour ago was yesterday - a test that
+ * passes depending on what time it is is worse than no test, because it
+ * fails on an unrelated commit and teaches everyone to re-run the job.
+ *
+ * Midday is far enough from both boundaries that no timezone the runner
+ * might use can push it into an adjacent day. The hour varies only to order
+ * entries within the same day.
+ */
+const onDay = (daysAgo: number, hour = 12) => {
+  const when = new Date();
+  when.setDate(when.getDate() - daysAgo);
+  when.setHours(hour, 0, 0, 0);
+  return when.toISOString();
+};
 
-const view = (id: number, name: string, hoursAgo: number, over = {}) => ({
+const view = (id: number, name: string, daysAgo: number, over = {}) => ({
   id,
   restaurant_id: id,
   user_id: 1,
-  createdAt: at(hoursAgo),
+  createdAt: onDay(daysAgo),
   restaurant: { id, name, slug: name.toLowerCase(), ...over },
 });
 
@@ -51,7 +68,7 @@ const show = () =>
   );
 
 beforeEach(() => {
-  views = [view(1, "Kame", 1, { neighborhood: "Midtown" })];
+  views = [view(1, "Kame", 0, { neighborhood: "Midtown" })];
   searches = [];
 });
 
@@ -76,7 +93,7 @@ describe("what you looked at", () => {
   it("shows one row per restaurant, however often it was opened", async () => {
     // Somebody comparing three places flips between them repeatedly. A raw
     // list is the same restaurant four times.
-    views = [view(1, "Kame", 1), view(2, "Kame", 2), view(3, "Kame", 3)];
+    views = [view(1, "Kame", 0), view(2, "Kame", 0), view(3, "Kame", 0)];
     show();
 
     await screen.findByText("Kame");
@@ -84,7 +101,7 @@ describe("what you looked at", () => {
   });
 
   it("groups by day instead of stamping a time", async () => {
-    views = [view(1, "Kame", 1), view(2, "Ichiran", 30)];
+    views = [view(1, "Kame", 0), view(2, "Ichiran", 1)];
     show();
 
     await screen.findByText("Kame");

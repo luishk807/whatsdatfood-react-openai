@@ -17,15 +17,32 @@ const view = (id: number, slug: string, iso: string): UserView =>
     restaurant: { id, name: slug, slug },
   }) as unknown as UserView;
 
-const at = (hoursAgo: number) =>
-  new Date(Date.now() - hoursAgo * 3600 * 1000).toISOString();
+/**
+ * A timestamp at midday, N days ago.
+ *
+ * These used to say "one hour ago" and "thirty hours ago", which is only
+ * "today" and "yesterday" if the suite happens to run in the middle of the
+ * day. CI ran it near midnight and one hour ago was yesterday - a test that
+ * passes depending on what time it is is worse than no test, because it
+ * fails on an unrelated commit and teaches everyone to re-run the job.
+ *
+ * Midday is far enough from both boundaries that no timezone the runner
+ * might use can push it into an adjacent day. The hour varies only to order
+ * entries within the same day.
+ */
+const onDay = (daysAgo: number, hour = 12) => {
+  const when = new Date();
+  when.setDate(when.getDate() - daysAgo);
+  when.setHours(hour, 0, 0, 0);
+  return when.toISOString();
+};
 
 describe("one row per restaurant", () => {
   it("collapses repeat visits to a single entry", () => {
     const list = recentlyViewed([
-      view(1, "kame", at(1)),
-      view(2, "kame", at(3)),
-      view(3, "kame", at(5)),
+      view(1, "kame", onDay(0, 14)),
+      view(2, "kame", onDay(0, 12)),
+      view(3, "kame", onDay(0, 10)),
     ]);
 
     expect(list).toHaveLength(1);
@@ -34,8 +51,8 @@ describe("one row per restaurant", () => {
   it("keeps the most recent visit, not the first", () => {
     // The question is "what was I just looking at".
     const list = recentlyViewed([
-      view(1, "kame", at(5)),
-      view(2, "kame", at(1)),
+      view(1, "kame", onDay(0, 10)),
+      view(2, "kame", onDay(0, 14)),
     ]);
 
     expect(list[0].id).toBe(2);
@@ -43,8 +60,8 @@ describe("one row per restaurant", () => {
 
   it("puts the most recently opened restaurant first", () => {
     const list = recentlyViewed([
-      view(1, "older", at(10)),
-      view(2, "newer", at(1)),
+      view(1, "older", onDay(2)),
+      view(2, "newer", onDay(0)),
     ]);
 
     expect(list.map((one) => one.restaurant.slug)).toEqual(["newer", "older"]);
@@ -54,7 +71,7 @@ describe("one row per restaurant", () => {
     // A row with no slug renders a card that goes nowhere.
     const broken = { id: 9, restaurant: { name: "No slug" } } as unknown as UserView;
 
-    expect(recentlyViewed([broken, view(1, "kame", at(1))])).toHaveLength(1);
+    expect(recentlyViewed([broken, view(1, "kame", onDay(0, 14))])).toHaveLength(1);
   });
 
   it("survives an unparseable date rather than dropping the restaurant", () => {
@@ -72,7 +89,7 @@ describe("one row per restaurant", () => {
 describe("grouping by day", () => {
   it("puts today's visits under one heading", () => {
     const groups = groupByDay(
-      recentlyViewed([view(1, "a", at(1)), view(2, "b", at(2))]),
+      recentlyViewed([view(1, "a", onDay(0, 14)), view(2, "b", onDay(0, 12))]),
       relativeDay,
     );
 
@@ -83,7 +100,7 @@ describe("grouping by day", () => {
 
   it("separates yesterday from today", () => {
     const groups = groupByDay(
-      recentlyViewed([view(1, "a", at(1)), view(2, "b", at(30))]),
+      recentlyViewed([view(1, "a", onDay(0, 14)), view(2, "b", onDay(1))]),
       relativeDay,
     );
 
@@ -95,9 +112,9 @@ describe("grouping by day", () => {
     // or a new one - which is why this walks rather than keying a map.
     const groups = groupByDay(
       recentlyViewed([
-        view(1, "a", at(1)),
-        view(2, "b", at(30)),
-        view(3, "c", at(2)),
+        view(1, "a", onDay(0, 14)),
+        view(2, "b", onDay(1)),
+        view(3, "c", onDay(0, 12)),
       ]),
       relativeDay,
     );
