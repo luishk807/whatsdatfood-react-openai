@@ -487,3 +487,72 @@ describe("the list and the map as one interface", () => {
     );
   });
 });
+
+describe("keeping the map in view on a phone", () => {
+  /**
+   * Scrolling the results carried the whole page, so the map left the screen
+   * and every selection after that pointed at somewhere the reader could no
+   * longer see. The map is the geographic context for the list underneath it;
+   * losing it makes the list a directory again.
+   */
+  beforeEach(() => {
+    place.location = { latitude: 40.7686, longitude: -73.8228, label: "Flushing" };
+    place.source = "chosen";
+    nearby.places = [row("1"), row("2")];
+  });
+
+  const mapPanel = (container: HTMLElement) =>
+    container.querySelector<HTMLElement>("[class*='sticky']");
+
+  it("pins the map once it reaches the top", async () => {
+    const { container } = show("/nearby?view=map");
+
+    await screen.findByRole("link", { name: /restaurant 1/i });
+
+    expect(mapPanel(container)).not.toBeNull();
+  });
+
+  it("clears the header rather than sliding under it", async () => {
+    // The header is `sticky top-0` at `h-14`, so a map pinned at 0 would be
+    // half hidden behind it.
+    const { container } = show("/nearby?view=map");
+
+    await screen.findByRole("link", { name: /restaurant 1/i });
+
+    expect(mapPanel(container)?.className).toContain("top-14");
+  });
+
+  it("is not pinned from the moment the page loads", async () => {
+    // The heading, the filters and the location scroll away normally first.
+    // A map fixed on arrival would make the controls above it unreachable.
+    const { container } = show("/nearby?view=map");
+
+    await screen.findByRole("link", { name: /restaurant 1/i });
+
+    expect(mapPanel(container)?.className).not.toMatch(/fixed/);
+  });
+
+  it("measures itself against the visible viewport, not a fixed pixel count", async () => {
+    // `dvh` shrinks and grows with Safari's toolbar; `vh` does not, so a map
+    // sized in `vh` is cut off exactly when the toolbar slides back in. The
+    // `vh` value stays as the fallback for anything without `dvh`.
+    const { container } = show("/nearby?view=map");
+
+    await screen.findByRole("link", { name: /restaurant 1/i });
+
+    const className = mapPanel(container)?.className ?? "";
+
+    expect(className).toContain("dvh");
+    expect(className).toContain("vh]");
+  });
+
+  it("stops being pinned once there is room for both", async () => {
+    // At `lg` the split layout takes over: the map is a column of its own
+    // and pinning it to the top of the window would fight that.
+    const { container } = show("/nearby?view=map");
+
+    await screen.findByRole("link", { name: /restaurant 1/i });
+
+    expect(mapPanel(container)?.className).toContain("lg:static");
+  });
+});

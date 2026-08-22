@@ -293,50 +293,91 @@ const NearbyPage: FC = () => {
            Two columns from `lg` only. Below that the map is a tab, because a
            phone has room for one of these at a time and half a map beside
            half a list is neither. */
-        <div className="flex flex-col gap-3 lg:grid lg:grid-cols-[45fr_55fr] lg:items-start lg:gap-4">
+        /* **One workspace, two panes, one scrollbar that matters.**
+
+           The whole page used to scroll, which meant reading past the sixth
+           restaurant carried the map off the top of the window - and the map
+           is the entire reason for this view. Here the workspace is the
+           height of what is left below the controls, the results pane owns
+           its own scroll, and the map never moves because nothing it sits in
+           is moving.
+
+           `min-h-0` on the grid and on the results pane is load-bearing: a
+           grid item's default `min-height: auto` refuses to shrink below its
+           content, so without it the pane grows to fit every restaurant and
+           the page scrolls after all - the exact bug this replaces.
+
+           The proportions shift with the room. 45/55 where a laptop has to
+           keep the cards legible, 38/62 once there is width to spare, and a
+           floor in pixels so the results never become a column of wrapped
+           fragments - which is also the width the recognition marks
+           (Michelin, Must Visit) will need when they arrive.
+
+           The height is the viewport less the controls above it. `dvh`
+           rather than `vh` because a phone's address bar makes the two
+           differ by the height of a restaurant card, and the subtraction
+           errs generous: too small leaves a strip of empty page, while too
+           large pushes the bottom of the map below the fold and brings back
+           the page scroll this replaces. The floor keeps it usable on a
+           short window, where scrolling a little is better than a map two
+           centimetres tall. */
+        // On a phone the map pins to the top of the viewport once it gets
+        // there, and the results keep scrolling underneath it. Sticky rather
+        // than fixed with a locked page: `position: sticky` needs no scroll
+        // listener, no height arithmetic and no scroll locking, so Safari's
+        // disappearing toolbar and Mapbox's own gesture handling both keep
+        // working - and until the map reaches the top, the page scrolls
+        // normally through the heading, the filters and the location.
+        <div className="flex flex-col gap-3 lg:grid lg:min-h-0 lg:grid-cols-[minmax(380px,45fr)_55fr] lg:h-[calc(100dvh-15rem)] lg:min-h-[26rem] lg:gap-4 xl:grid-cols-[minmax(420px,38fr)_62fr]">
           {/* Second in the source order, first on the screen at `lg`: the
               list is the half that always works, so it is what a screen
               reader and a keyboard reach first. On a phone the map is on
               top, which is the view somebody asked for by tapping Map. */}
-          <div className="lg:order-2 lg:sticky lg:top-[4.5rem]">
-            <div className="relative h-[55vh] overflow-hidden rounded-card border border-line lg:h-[calc(100vh-5.5rem)]">
-              <Suspense
-                fallback={
-                  <div className="h-full w-full animate-pulse bg-surface-sunken motion-reduce:animate-none" />
-                }
-              >
-                {/* Handed the restaurants the list already has. Opening the
-                    map costs a chunk download and not one query, and
-                    pointing at a row costs nothing at all. */}
-                <LazyMap
-                  places={places}
-                  centre={location}
-                  showMe={source === LOCATION_SOURCE.device}
-                  selectedId={selectedId}
-                  hoveredId={hovered}
-                  onSelect={(id) =>
-                    setChosen(id ? { id, fromMap: true } : null)
-                  }
-                  onHover={setHovered}
-                  onSearchArea={area.search}
-                  onRecentre={area.clear}
-                />
-              </Suspense>
-
-              {/* Over the map rather than beside it, and for whatever the
-                  reader is pointing at or has chosen. Everything it shows
-                  arrived with the pin, so previewing one costs no request. */}
-              <RestaurantPreview
-                place={places.find((one) => one.id === previewId) ?? null}
-                onClose={() => {
-                  setChosen(null);
-                  setHovered(null);
-                }}
+          <div className="sticky top-14 z-10 -mx-4 h-[42vh] overflow-hidden border-y border-line bg-surface px-0 [@supports(height:1dvh)]:h-[42dvh] sm:mx-0 sm:rounded-card sm:border lg:static lg:z-auto lg:order-2 lg:h-full lg:border">
+            <Suspense
+              fallback={
+                <div className="h-full w-full animate-pulse bg-surface-sunken motion-reduce:animate-none" />
+              }
+            >
+              {/* Handed the restaurants the list already has. Opening the
+                  map costs a chunk download and not one query, and
+                  pointing at a row costs nothing at all. */}
+              <LazyMap
+                places={places}
+                centre={location}
+                showMe={source === LOCATION_SOURCE.device}
+                selectedId={selectedId}
+                hoveredId={hovered}
+                onSelect={(id) => setChosen(id ? { id, fromMap: true } : null)}
+                onHover={setHovered}
+                onSearchArea={area.search}
+                onRecentre={area.clear}
               />
-            </div>
+            </Suspense>
+
+            {/* The full card, for a restaurant somebody actually chose.
+                Pointing at a row gets a name beside its pin instead — the
+                card carries the dish line and the way into the menu, which
+                is a lot of page to throw up on every row a pointer crosses.
+                Everything it shows arrived with the pin, so it costs no
+                request. */}
+            <RestaurantPreview
+              place={places.find((one) => one.id === selectedId) ?? null}
+              onClose={() => setChosen(null)}
+            />
           </div>
 
-          <div className="min-w-0 lg:order-1">{results}</div>
+          {/* The one scrollable area, and the reason the map can stay still.
+              `overscroll-contain` stops a flick that reaches the end of the
+              list from carrying on into the page behind it. */}
+          {/* Enough below the map that there is something to scroll: a list
+              shorter than the space under a sticky map cannot move, and the
+              map would look stuck rather than pinned. `env(safe-area-inset-
+              bottom)` keeps the last card clear of the iPhone home indicator
+              and of Safari's toolbar when it slides back in. */}
+          <div className="min-w-0 pb-[env(safe-area-inset-bottom)] lg:order-1 lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain lg:pb-4 lg:pr-1">
+            {results}
+          </div>
         </div>
       ) : (
         results
