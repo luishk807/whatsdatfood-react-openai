@@ -51,6 +51,13 @@
   --shadow-sheet: 0 -8px 40px oklch(0% 0 0 / 18%);
 
   --ease-out-soft: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  /* The menu-preparation bar. Indeterminate on purpose: the backend does not
+     know how far through an extraction is, so the bar sweeps rather than
+     fills and no number is ever claimed. Registered here because Tailwind 4
+     is configured in CSS - a JS config is ignored entirely in this project. */
+  --animate-menu-sweep: menu-sweep 1.4s ease-in-out infinite;
+
 }
 
 /**
@@ -150,5 +157,16 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+@keyframes menu-sweep {
+  /* Travels the full track and back, so the bar reads as "working" from any
+     glance rather than only at the start of a cycle. */
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(300%);
   }
 }

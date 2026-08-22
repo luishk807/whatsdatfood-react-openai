@@ -128,11 +128,21 @@ export interface MenuStatusType {
   state: "ready" | "pending" | "unavailable";
   dish_count: number;
   working: boolean;
+  /**
+   * Whether asking again could produce a different answer.
+   *
+   * Owned by the server, like the trending threshold: "has this restaurant
+   * used up its attempts" is a rule about our data, and a copy of it in the
+   * browser is a second source of truth and the one that goes stale.
+   */
+  retryable: boolean;
 }
 
 export interface MenuStatusPanelInterface {
   state?: MenuStatusType["state"];
   /** Past the point where "a few seconds" is an honest thing to say. */
   slow?: boolean;
+  /** False once the restaurant has no attempts left, so no button is drawn. */
+  retryable?: boolean;
   onRetry?: () => void;
 }

@@ -430,10 +430,14 @@ const MenuResults: FC = () => {
               <MenuStatusPanel
                 state={menuStatus.state}
                 slow={menuStatus.slow}
-                onRetry={() => {
-                  menuStatus.retry();
-                  handleFetchRestaurant(true);
-                }}
+                retryable={menuStatus.retryable}
+                /* Through the restaurant query, which is the one place a
+                   menu may be generated from. It is refused by the same
+                   claim, backoff and budget guards as a first visit, so
+                   pressing it repeatedly cannot start a second extraction. */
+                onRetry={() =>
+                  menuStatus.retry(() => handleFetchRestaurant(true))
+                }
               />
             )}
 
@@ -473,13 +477,23 @@ const MenuResults: FC = () => {
             {/* At the very end of the food, before anything about the
                 product itself. This is for the reader who scrolled the whole
                 menu and can see something is not on it — a different person
-                from the one who just arrived to pick something. */}
-            <AddDishAction
-              slug={restaurant || ""}
-              sections={Object.keys(restaurantMenu)}
-              canContribute={!!user?.id}
-              onAdded={() => handleFetchRestaurant(true)}
-            />
+                from the one who just arrived to pick something.
+
+                **Absent while the first menu is still being worked out.**
+                "Add a dish we missed" over an empty page claims we have
+                finished looking and come up short, which is a different
+                thing from not having looked yet — and it asks the reader to
+                do work that is about to be done for them. Once the menu
+                lands, or once we know it is not coming, it is a fair ask
+                again. */}
+            {!menuStatus.pending && (
+              <AddDishAction
+                slug={restaurant || ""}
+                sections={Object.keys(restaurantMenu)}
+                canContribute={!!user?.id}
+                onAdded={() => handleFetchRestaurant(true)}
+              />
+            )}
 
             {/* Below the whole menu on purpose. The food is the page and
                 reputation supports it; a leaderboard above the dishes would
@@ -596,9 +610,7 @@ const MenuResults: FC = () => {
               type="button"
               disabled={!canRecord}
               aria-pressed={!!selectedDish.ordered_by_me}
-              title={
-                canRecord ? undefined : DISH_LABELS.signInToRecordOrder
-              }
+              title={canRecord ? undefined : DISH_LABELS.signInToRecordOrder}
               onClick={async () => {
                 await toggleOrdered(selectedDish);
                 // Bypass the cache: the share and the toggle both move.

@@ -1042,21 +1042,44 @@ export const MAP_LABELS = {
  * it, so nobody sits watching a panel that may not resolve.
  */
 export const MENU_STATUS_LABELS = {
-  pendingTitle: "Getting the menu ready",
-  pendingBody:
-    "We're finding dishes and photos for this restaurant. This may take a " +
-    "few seconds the first time.",
-  slowTitle: "Still working on it…",
+  /**
+   * **It says what is happening to this restaurant, not what the page is
+   * doing.** "Getting the menu ready" beside a two-pixel dot, in the middle
+   * of an otherwise empty panel, read as a page that had failed to load
+   * something — which on a catalogue where most restaurants have no menu is
+   * exactly the wrong impression to give.
+   */
+  pendingTitle: "Preparing this restaurant's menu",
+  pendingBody: "Finding dishes and organising the menu…",
+  /**
+   * The important sentence, and the reason the wait is bearable. The work is
+   * on a background thread and survives the tab being closed, so nobody
+   * needs to sit here guarding it.
+   */
+  keepBrowsing:
+    "You can keep browsing — we'll carry on preparing it in the background.",
+  slowTitle: "This is taking longer than usual",
   slowBody:
-    "You can browse the restaurant now. The menu will appear as soon as " +
-    "it's ready.",
+    "We're still preparing this menu. You can keep browsing and come back " +
+    "later.",
   /**
    * Not an apology and not a dead end. Most restaurants in the world have no
    * menu online, so this is a normal outcome rather than a fault - and the
    * page underneath it is still worth reading.
    */
-  failedTitle: "We couldn't load the menu right now.",
+  failedTitle: "We couldn't prepare this menu right now",
+  failedBody: "Something interrupted the menu preparation.",
+  /**
+   * Said only where it is true. A restaurant that has used up its attempts
+   * gets the sentence and no button — offering one that spends money to fail
+   * a fourth time is worse than offering none.
+   */
+  exhaustedBody:
+    "We couldn't read a menu for this place. You can still add a dish " +
+    "yourself.",
   retry: "Try again",
+  /** The bar's accessible name. It has no percentage, because we have none. */
+  progressLabel: "Preparing the menu",
 } as const;
 
 export const NEARBY_LABELS = {

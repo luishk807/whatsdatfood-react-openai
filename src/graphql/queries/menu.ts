@@ -166,6 +166,7 @@ export const MENU_STATUS = gql`
       state
       dish_count
       working
+      retryable
     }
   }
 `;

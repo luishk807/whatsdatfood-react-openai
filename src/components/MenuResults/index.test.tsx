@@ -2,7 +2,7 @@ import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import MenuResults from "@/components/MenuResults";
-import { DISH_LABELS } from "@/customConstants/labels";
+import { DISH_LABELS, MENU_EDIT_LABELS } from "@/customConstants/labels";
 
 /**
  * The dish sheet reflects the dish, not a copy of it.
@@ -59,14 +59,17 @@ jest.mock("react-router-dom", () => ({
  * tests are about the dish sheet on a restaurant that has a menu - the panel
  * that shows while one is being prepared has its own tests.
  */
+let menuStatus = {
+  state: "ready",
+  pending: false,
+  slow: false,
+  retryable: false,
+  retry: jest.fn(),
+};
+
 jest.mock("@/customHooks/useMenuStatus", () => ({
   __esModule: true,
-  default: () => ({
-    state: "ready",
-    pending: false,
-    slow: false,
-    retry: jest.fn(),
-  }),
+  default: () => menuStatus,
 }));
 
 jest.mock("@/customHooks/useRestaurantMutations", () => ({
@@ -200,6 +203,13 @@ describe("MenuResults dish sheet", () => {
   beforeEach(() => {
     serverMenu = { ...menu, restaurantMenuItems: [dish()] };
     getRestaurantListBySlug.mockClear();
+    menuStatus = {
+      state: "ready",
+      pending: false,
+      slow: false,
+      retryable: false,
+      retry: jest.fn(),
+    };
   });
 
   it("fetches the menu once for a page view", async () => {
@@ -281,5 +291,62 @@ describe("MenuResults dish sheet", () => {
     await screen.findByText("Six pieces");
 
     expect(screen.queryByText(/Have the real dish\?/)).not.toBeInTheDocument();
+  });
+});
+
+describe("while the first menu is still being worked out", () => {
+  beforeEach(() => {
+    // No dishes yet, and a job running - the state most restaurants are in
+    // on their first ever visit.
+    serverMenu = { ...menu, restaurantMenuItems: [] };
+    menuStatus = {
+      state: "pending",
+      pending: true,
+      slow: false,
+      retryable: false,
+      retry: jest.fn(),
+    };
+  });
+
+  it("does not ask the reader to fill a gap we have not finished looking for", async () => {
+    // "Add a dish we missed" over an empty page claims we finished looking
+    // and came up short. We have not looked yet, and the work is about to be
+    // done for them.
+    render(
+      <MemoryRouter>
+        <MenuResults />
+      </MemoryRouter>,
+    );
+
+    await waitFor(() => expect(getRestaurantListBySlug).toHaveBeenCalled());
+
+    expect(screen.queryByText(MENU_EDIT_LABELS.addDish)).not.toBeInTheDocument();
+  });
+
+  it("asks once the menu has arrived", async () => {
+    menuStatus = { ...menuStatus, state: "ready", pending: false };
+    serverMenu = { ...menu, restaurantMenuItems: [dish()] };
+
+    render(
+      <MemoryRouter>
+        <MenuResults />
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText(MENU_EDIT_LABELS.addDish)).toBeInTheDocument();
+  });
+
+  it("asks once we know a menu is not coming", async () => {
+    // Nothing is on its way, so the gap is real and the reader sitting in
+    // the restaurant is the one person who can close it.
+    menuStatus = { ...menuStatus, state: "unavailable", pending: false };
+
+    render(
+      <MemoryRouter>
+        <MenuResults />
+      </MemoryRouter>,
+    );
+
+    expect(await screen.findByText(MENU_EDIT_LABELS.addDish)).toBeInTheDocument();
   });
 });

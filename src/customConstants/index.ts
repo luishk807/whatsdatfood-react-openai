@@ -228,4 +228,23 @@ export const MENU_WAIT = {
    * message exists to tell them the rest of the page works.
    */
   SLOW_AFTER_MS: 10000,
+  /**
+   * How the asking slows down.
+   *
+   * The first half-minute is the interesting one: most menus land there, and
+   * a reader watching the panel should see it change almost as soon as it
+   * does. After that the answer is unlikely to be different a moment later,
+   * and a page somebody left open in a tab should not ask twenty times a
+   * minute forever.
+   *
+   * Never below three seconds. Polling is free of AI cost by construction —
+   * `menuStatus` is one indexed read and cannot start work — but free of AI
+   * cost is not free of server, and a second-by-second poll is a
+   * self-inflicted load test.
+   */
+  POLL_STEPS: [
+    { after: 0, every: 3000 },
+    { after: 30000, every: 8000 },
+    { after: 120000, every: 20000 },
+  ],
 } as const;
