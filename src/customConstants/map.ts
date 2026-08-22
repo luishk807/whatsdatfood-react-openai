@@ -74,6 +74,9 @@ export const MAP_MOVEMENT = {
 export const MAP_MARKER = {
   SIZE: 32,
   SELECTED_SIZE: 40,
+  /** Pointed at, but not chosen. Between the two, because hover is a preview
+   * of a selection rather than a second kind of it. */
+  HOVER_SIZE: 38,
   /** Padding around the dot, so the tap target reaches 44px. */
   TOUCH_PADDING: 6,
   /** The category glyph inside a pin. Small enough to sit inside the 32px
@@ -110,4 +113,40 @@ export const MAP_CLUSTER = {
   LARGE_SIZE: 46,
   /** Past this many, the marker grows. */
   LARGE_COUNT: 10,
+} as const;
+
+/**
+ * Showing the reader where a restaurant they are pointing at actually is.
+ *
+ * Hovering a result used to highlight its marker only when that marker
+ * happened to be drawn on its own. Inside a cluster the reader got nothing:
+ * the cluster is a count, and "somewhere among these seven" does not answer
+ * "where is Busy Bee Cafe".
+ *
+ * **A reveal is a preview, and a preview never mutates the view.** The zoom
+ * the reader chose survives a mouse crossing a row — so a hidden place is
+ * exposed by drawing one extra pin above its cluster at the restaurant's own
+ * coordinates, not by zooming the map until the group splits. Mapbox's
+ * `getClusterExpansionZoom` would do the second, and it is unavailable here
+ * anyway: the grouping is ours (`utils/cluster.ts`) precisely so a marker can
+ * stay a `<div>` that holds a photograph.
+ */
+export const MAP_REVEAL = {
+  /**
+   * How much of each edge counts as "not really on screen".
+   *
+   * A pin two pixels inside the frame is technically visible and practically
+   * missed — and on a phone the bottom of the map is under the preview card.
+   * Inside the inset box the camera stays still, which is the point: the map
+   * must not lurch every time the pointer crosses a row.
+   */
+  EDGE_INSET: 0.15,
+  /**
+   * A short ease, never a flight. This can fire on a mouse moving down a
+   * list, and a dramatic animation there is what makes an interface
+   * irritating rather than responsive.
+   */
+  PAN_MS: 350,
+  /** The name on a revealed pin. See `createReveal` for why only that one. */
+  LABEL_MAX_PX: 168,
 } as const;

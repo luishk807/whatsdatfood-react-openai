@@ -1,4 +1,4 @@
-import { MAP_CLUSTER, MAP_MARKER } from "@/customConstants/map";
+import { MAP_CLUSTER, MAP_MARKER, MAP_REVEAL } from "@/customConstants/map";
 import { NearbyPlaceType, PlaceClusterType } from "@/interfaces/location";
 
 /**
@@ -32,7 +32,15 @@ import { NearbyPlaceType, PlaceClusterType } from "@/interfaces/location";
  * learns how they were formed.
  */
 export interface MarkerState {
+  /** Chosen, and it stays chosen after the pointer leaves. */
   selected: boolean;
+  /**
+   * Pointed at right now — from a mouse over the row, a keyboard focus on it,
+   * or the pointer on the pin itself. A preview, so it is drawn between plain
+   * and selected and it is drawn *above* both: it is the one the reader is
+   * asking about this instant.
+   */
+  hovered?: boolean;
 }
 
 const ROOT_CLASS = "wdf-marker";
@@ -40,6 +48,7 @@ const ROOT_CLASS = "wdf-marker";
 /** Roles the map reads to find where a glyph goes. */
 const PIN = "pin";
 const FACE = "face";
+const LABEL = "label";
 
 const has = (place: NearbyPlaceType): boolean =>
   Boolean(place.top_dish_photo_url);
@@ -112,7 +121,12 @@ export const paintMarker = (
     return;
   }
 
-  const size = state.selected ? MAP_MARKER.SELECTED_SIZE : MAP_MARKER.SIZE;
+  const active = state.selected || state.hovered;
+  const size = state.selected
+    ? MAP_MARKER.SELECTED_SIZE
+    : state.hovered
+      ? MAP_MARKER.HOVER_SIZE
+      : MAP_MARKER.SIZE;
 
   pin.style.width = `${size}px`;
   pin.style.height = `${size}px`;
@@ -134,16 +148,23 @@ export const paintMarker = (
   if (face) {
     face.style.color = has(place) ? "#fff" : "var(--color-ink-muted)";
   }
-  pin.style.border = state.selected
+  // One ring means one thing — "this is the restaurant you are asking
+  // about" — whether the reader is pointing at it or has chosen it. Two
+  // different marks for hover and selection would make the reader learn a
+  // vocabulary to read a map.
+  pin.style.border = active
     ? "3px solid var(--color-ink)"
     : `2px solid ${
         has(place) ? "var(--color-surface-raised)" : "var(--color-line)"
       }`;
-  pin.style.boxShadow = state.selected
+  pin.style.boxShadow = active
     ? "0 4px 12px rgb(0 0 0 / 0.35)"
     : "0 1px 4px rgb(0 0 0 / 0.25)";
 
-  root.style.zIndex = state.selected ? "2" : "1";
+  // Lifted clear of its neighbours, which is half of what "reveal it" means
+  // on a map where pins overlap. Hover sits above selection: it is the more
+  // recent question, and it is the transient one.
+  root.style.zIndex = state.hovered ? "3" : state.selected ? "2" : "1";
 };
 
 
@@ -207,6 +228,82 @@ export const createCluster = (
     event.stopPropagation();
     onZoom();
   });
+
+  return root;
+};
+
+// --- revealing one place inside a group -----------------------------------
+
+const REVEAL_CLASS = "wdf-reveal";
+
+/**
+ * The pin for a restaurant that is currently hidden inside a cluster.
+ *
+ * **This is the answer to "where is Busy Bee Cafe" when Busy Bee Cafe is one
+ * of seven dots drawn as a single "7".** Highlighting the cluster does not
+ * answer it — the reader learns the restaurant is somewhere in a group they
+ * still cannot see into. So the place is drawn again, on its own, at its own
+ * coordinates, above the group.
+ *
+ * **Its own coordinates, never the cluster's centre.** The centre is an
+ * average that may sit on none of its members, and the whole promise here is
+ * "it is *right there*".
+ *
+ * **Zoom is not touched.** Splitting the cluster for real would mean zooming,
+ * and a mouse crossing a list would then rewrite the view the reader chose —
+ * they would come back to a map they had never navigated to. A preview that
+ * mutates the thing it is previewing is not a preview. (Mapbox's
+ * `getClusterExpansionZoom`/`getClusterLeaves` are the API for doing it that
+ * way and are unavailable to us regardless: the grouping is ours, in
+ * `utils/cluster.ts`, so that a marker stays a `<div>` that can hold a dish
+ * photograph rather than a sprite in a symbol layer.)
+ *
+ * **This is the one marker that carries a name**, and the exception earns
+ * itself: every other pin is identifiable by standing alone where the reader
+ * pointed, while this one appears on top of a group and would otherwise just
+ * be an eighth dot. The preview card names it too, but that is in the corner
+ * of the map and reading it means looking away from the pin.
+ *
+ * The label is positioned absolutely so it stays out of the layout box.
+ * Mapbox anchors a marker on the centre of its element: a label in normal
+ * flow would push the pin upward off the coordinate it exists to point at.
+ */
+export const createReveal = (place: NearbyPlaceType): HTMLElement => {
+  const root = createMarker(place, { selected: true, hovered: true });
+
+  root.className = `${ROOT_CLASS} ${REVEAL_CLASS}`;
+  root.dataset.reveal = "true";
+  root.style.position = "relative";
+  // Above every ordinary pin and every cluster, including the one it is
+  // standing on.
+  root.style.zIndex = "5";
+
+  const label = document.createElement("span");
+
+  label.dataset.role = LABEL;
+  label.textContent = place.name;
+  label.style.position = "absolute";
+  label.style.top = "100%";
+  label.style.left = "50%";
+  label.style.transform = "translateX(-50%)";
+  label.style.marginTop = "2px";
+  label.style.maxWidth = `${MAP_REVEAL.LABEL_MAX_PX}px`;
+  label.style.overflow = "hidden";
+  label.style.textOverflow = "ellipsis";
+  label.style.whiteSpace = "nowrap";
+  label.style.padding = "2px 6px";
+  label.style.borderRadius = "9999px";
+  // Tokens, not hexes: this is drawn over a map that flips with the page.
+  label.style.background = "var(--color-surface-raised)";
+  label.style.border = "1px solid var(--color-ink)";
+  label.style.color = "var(--color-ink)";
+  label.style.fontSize = "11px";
+  label.style.fontWeight = "600";
+  label.style.lineHeight = "1.4";
+  label.style.pointerEvents = "none";
+  label.style.boxShadow = "0 2px 8px rgb(0 0 0 / 0.25)";
+
+  root.appendChild(label);
 
   return root;
 };

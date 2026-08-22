@@ -54,8 +54,29 @@ const NearbyPage: FC = () => {
   const view = params.get(NEARBY_PARAMS.view) === "map" ? "map" : "list";
 
   const { location, source } = useDiscoveryLocation();
-  const [selected, setSelected] = useState<string | null>(null);
+  /**
+   * Two states, deliberately, because they answer different questions.
+   *
+   * `hovered` is "what am I pointing at" — a preview that lasts exactly as
+   * long as the pointer or the focus does. `chosen` is "what did I pick",
+   * and it has to survive the pointer moving on: tapping Busy Bee Cafe and
+   * then reading down the list used to throw the choice away on the very
+   * next row, because hover *was* selection.
+   *
+   * `fromMap` rides along because only the map may scroll the list. A row
+   * that scrolls itself under a pointer travelling down it is a list
+   * fighting its reader.
+   */
+  const [hovered, setHovered] = useState<string | null>(null);
+  const [chosen, setChosen] = useState<{ id: string; fromMap: boolean } | null>(
+    null,
+  );
   const [changing, setChanging] = useState(false);
+
+  const selectedId = chosen?.id ?? null;
+  // The card answers the pointer first and the choice second — the reader has
+  // picked one place and is now asking about another.
+  const previewId = hovered ?? selectedId;
 
   const { categories } = useTasteCategories();
   // What the server calls this category. Deriving it from the slug gave
@@ -108,6 +129,47 @@ const NearbyPage: FC = () => {
   };
 
   const showMore = () => (searchedArea ? area.showMore() : nearby.showMore());
+
+  /**
+   * The results, identical in both views.
+   *
+   * Built once rather than written into each branch: on the split the list
+   * and its "show more" are a column, and off it they are the page. Two
+   * copies is how the button ends up under the map on one of them.
+   */
+  const results = (
+    <div className="flex flex-col gap-3">
+      <NearbyList
+        places={places}
+        loading={nearby.loading || area.loading}
+        selectedId={selectedId}
+        hoveredId={hovered}
+        onSelect={(id) => setChosen({ id, fromMap: false })}
+        onHover={setHovered}
+        scrollToId={chosen?.fromMap ? chosen.id : null}
+        filterLabel={cuisine ? cuisineName : undefined}
+        clearFilterHref={buildNearbyPath({ view })}
+      />
+
+      {/* Asked for, never automatic. An infinite scroll would spend a query
+          every time a thumb drifted; this spends one when somebody has read
+          what they were given and wants more. */}
+      {hasMore && (
+        <button
+          type="button"
+          onClick={showMore}
+          disabled={loadingMore}
+          className="mx-auto min-h-11 rounded-pill border border-line px-5 text-sm font-medium text-ink hover:bg-surface-sunken disabled:opacity-60"
+        >
+          {loadingMore
+            ? NEARBY_LABELS.loadingMore
+            : searchedArea
+              ? NEARBY_LABELS.showMoreArea
+              : NEARBY_LABELS.showMore}
+        </button>
+      )}
+    </div>
+  );
 
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-col gap-3 px-4 pb-16 pt-4">
@@ -200,73 +262,64 @@ const NearbyPage: FC = () => {
           {NEARBY_LABELS.unavailable}
         </p>
       ) : view === "map" && location ? (
-        <div className="flex flex-col gap-3">
-          <div className="relative h-[55vh] overflow-hidden rounded-card border border-line">
-            <Suspense
-              fallback={
-                <div className="h-full w-full animate-pulse bg-surface-sunken motion-reduce:animate-none" />
-              }
-            >
-              {/* Handed the restaurants the list already has. Opening the map
-                  costs a chunk download and not one query. */}
-              <LazyMap
-                places={places}
-                centre={location}
-                showMe={source === LOCATION_SOURCE.device}
-                selectedId={selected}
-                onSelect={setSelected}
-                onSearchArea={area.search}
-                onRecentre={area.clear}
-              />
-            </Suspense>
+        /* The split, and it is one interface rather than two sections.
+    
+           Stacked — map on top, results below — the relationship broke the
+           moment the reader scrolled: the map went up past the top of the
+           window and hovering a result became a change to something nobody
+           could see. Side by side with the map pinned, reading down the list
+           and watching the map answer is the whole interaction.
+    
+           Two columns from `lg` only. Below that the map is a tab, because a
+           phone has room for one of these at a time and half a map beside
+           half a list is neither. */
+        <div className="flex flex-col gap-3 lg:grid lg:grid-cols-[45fr_55fr] lg:items-start lg:gap-4">
+          {/* Second in the source order, first on the screen at `lg`: the
+              list is the half that always works, so it is what a screen
+              reader and a keyboard reach first. On a phone the map is on
+              top, which is the view somebody asked for by tapping Map. */}
+          <div className="lg:order-2 lg:sticky lg:top-[4.5rem]">
+            <div className="relative h-[55vh] overflow-hidden rounded-card border border-line lg:h-[calc(100vh-5.5rem)]">
+              <Suspense
+                fallback={
+                  <div className="h-full w-full animate-pulse bg-surface-sunken motion-reduce:animate-none" />
+                }
+              >
+                {/* Handed the restaurants the list already has. Opening the
+                    map costs a chunk download and not one query, and
+                    pointing at a row costs nothing at all. */}
+                <LazyMap
+                  places={places}
+                  centre={location}
+                  showMe={source === LOCATION_SOURCE.device}
+                  selectedId={selectedId}
+                  hoveredId={hovered}
+                  onSelect={(id) =>
+                    setChosen(id ? { id, fromMap: true } : null)
+                  }
+                  onHover={setHovered}
+                  onSearchArea={area.search}
+                  onRecentre={area.clear}
+                />
+              </Suspense>
 
-            {/* Over the map rather than beside it, and only for the pin that
-                was actually tapped. Everything it shows arrived with the pin,
-                so selecting one costs no request. */}
-            <RestaurantPreview
-              place={places.find((one) => one.id === selected) ?? null}
-              onClose={() => setSelected(null)}
-            />
+              {/* Over the map rather than beside it, and for whatever the
+                  reader is pointing at or has chosen. Everything it shows
+                  arrived with the pin, so previewing one costs no request. */}
+              <RestaurantPreview
+                place={places.find((one) => one.id === previewId) ?? null}
+                onClose={() => {
+                  setChosen(null);
+                  setHovered(null);
+                }}
+              />
+            </div>
           </div>
 
-          {/* The list stays under the map rather than being replaced by it.
-              A pin is not reachable with a keyboard, and the answer must not
-              be. */}
-          <NearbyList
-            places={places}
-            selectedId={selected}
-            onSelect={setSelected}
-            filterLabel={cuisine ? cuisineName : undefined}
-            clearFilterHref={buildNearbyPath({ view })}
-          />
+          <div className="min-w-0 lg:order-1">{results}</div>
         </div>
       ) : (
-        <NearbyList
-          places={places}
-          loading={nearby.loading || area.loading}
-          selectedId={selected}
-          onSelect={setSelected}
-          filterLabel={cuisine ? cuisineName : undefined}
-          clearFilterHref={buildNearbyPath({ view })}
-        />
-      )}
-
-      {/* Asked for, never automatic. An infinite scroll would spend a query
-          every time a thumb drifted; this spends one when somebody has read
-          what they were given and wants more. */}
-      {hasMore && (
-        <button
-          type="button"
-          onClick={showMore}
-          disabled={loadingMore}
-          className="mx-auto min-h-11 rounded-pill border border-line px-5 text-sm font-medium text-ink hover:bg-surface-sunken disabled:opacity-60"
-        >
-          {loadingMore
-            ? NEARBY_LABELS.loadingMore
-            : searchedArea
-              ? NEARBY_LABELS.showMoreArea
-              : NEARBY_LABELS.showMore}
-        </button>
+        results
       )}
 
       <LocationSheet open={changing} onClose={() => setChanging(false)} />

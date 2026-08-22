@@ -5,6 +5,7 @@ import { MockedProvider } from "@apollo/client/testing";
 import NearbyPage from "@/components/NearbyPage";
 import { LOCATION_LABELS, NEARBY_LABELS } from "@/customConstants/labels";
 import { CoordinatesType, NearbyPlaceType } from "@/interfaces/location";
+import mapboxgl from "@/test/mapboxMock";
 
 /**
  * The page a cuisine tile lands on.
@@ -405,5 +406,84 @@ describe("the active category", () => {
     show("/nearby");
 
     expect(screen.queryByRole("link", { name: /Clear the/i })).not.toBeInTheDocument();
+  });
+});
+
+describe("the list and the map as one interface", () => {
+  beforeEach(() => {
+    place.location = { latitude: 40.71, longitude: -73.96, label: "Flushing" };
+    place.source = "device";
+    nearby.places = [row("1"), row("2")];
+  });
+
+  it("does not treat pointing at a row as choosing it", async () => {
+    // Hover *was* selection, which is why choosing a restaurant and then
+    // reading down the list discarded the choice on the very next row.
+    show("/nearby");
+
+    const first = await screen.findByRole("link", { name: /restaurant 1/i });
+
+    await userEvent.hover(first);
+
+    expect(first).not.toHaveAttribute("aria-current");
+  });
+
+  it("keeps a pin's choice while the pointer moves down the list", async () => {
+    // The two halves are one interface: a pin chooses, and pointing at rows
+    // afterwards previews without throwing that choice away.
+    show("/nearby?view=map");
+
+    const first = await screen.findByRole("link", { name: /restaurant 1/i });
+    const map = await waitFor(() => {
+      const built = mapboxgl.lastMap();
+
+      if (!built) {
+        throw new Error("no map yet");
+      }
+
+      return built;
+    });
+
+    // Both restaurants sit at the same coordinates in this fixture, so they
+    // are drawn as one cluster — which is exactly the case that used to
+    // leave the reader unable to tell where either of them was.
+    await userEvent.click(map.markers[0].getElement());
+    await userEvent.hover(first);
+
+    expect(screen.getByRole("link", { name: /restaurant 2/i })).toBeInTheDocument();
+    expect(area.search).not.toHaveBeenCalled();
+  });
+
+  it("shows the map beside the results rather than above them", async () => {
+    // Stacked, the relationship broke the moment the reader scrolled: the
+    // map went up past the top of the window, and hovering a result became a
+    // change to something nobody could see.
+    show("/nearby?view=map");
+
+    await waitFor(() =>
+      expect(screen.getByRole("link", { name: /restaurant 1/i })).toBeInTheDocument(),
+    );
+
+    // Both halves are on the page at once, and the list is not replaced.
+    expect(screen.getByRole("link", { name: /restaurant 2/i })).toBeInTheDocument();
+  });
+
+  it("spends no query on pointing at a restaurant", async () => {
+    // Hover is client-side map state over rows already in hand. If this ever
+    // fails, reading the list has grown a bill.
+    show("/nearby?view=map");
+
+    const first = await screen.findByRole("link", { name: /restaurant 1/i });
+    const calls = useNearbyRestaurants.mock.calls.length;
+
+    await userEvent.hover(first);
+    await userEvent.unhover(first);
+
+    // Nothing was searched, and the hook was never asked a different
+    // question — so Apollo answers from the same cache entry it already had.
+    expect(area.search).not.toHaveBeenCalled();
+    expect(useNearbyRestaurants).toHaveBeenLastCalledWith(
+      ...useNearbyRestaurants.mock.calls[calls - 1],
+    );
   });
 });

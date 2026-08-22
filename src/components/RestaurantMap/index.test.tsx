@@ -299,3 +299,173 @@ describe("what an individual pin says it is", () => {
     expect(marker.querySelector("svg")).toBeNull();
   });
 });
+
+describe("finding the restaurant somebody is pointing at", () => {
+  /** Three restaurants close enough to be drawn as one "3" at this zoom. */
+  const crowd = [
+    place({ id: "a", name: "Dunkin'" }),
+    place({ id: "b", name: "Busy Bee Cafe", latitude: 40.7102, longitude: -73.9602 }),
+    place({ id: "c", name: "Los Marinillos", latitude: 40.7104, longitude: -73.9601 }),
+  ];
+
+  const revealed = (): HTMLElement | undefined =>
+    instance()
+      .markers.map((one) => one.getElement())
+      .find((element) => element.dataset.reveal === "true");
+
+  it("draws the restaurant on its own when a cluster is hiding it", () => {
+    // The reported problem. Hovering "Busy Bee Cafe" highlighted a disc
+    // reading "3", which tells the reader it is one of three somethings —
+    // not where it is.
+    show({ places: crowd, hoveredId: "b" });
+
+    expect(revealed()).toBeDefined();
+    expect(revealed()?.textContent).toContain("Busy Bee Cafe");
+  });
+
+  it("puts it at its own coordinates, not the group's centre", () => {
+    // A centre is an average that may sit on none of its members, and the
+    // promise being made is "it is right there".
+    show({ places: crowd, hoveredId: "b" });
+
+    const pin = instance().markers.find(
+      (one) => one.getElement().dataset.reveal === "true",
+    );
+
+    expect(pin?.lngLat).toEqual([-73.9602, 40.7102]);
+  });
+
+  it("never changes the zoom to expose it", () => {
+    // A preview that mutates the view is not a preview: a mouse travelling
+    // down the list would rewrite the map the reader chose, and they would
+    // come back to somewhere they never navigated to.
+    show({ places: crowd, hoveredId: "b" });
+
+    expect(instance().getZoom()).toBe(14);
+  });
+
+  it("takes the extra pin away when the pointer leaves", () => {
+    const { rerender } = show({ places: crowd, hoveredId: "b" });
+
+    expect(revealed()).toBeDefined();
+
+    rerender(
+      <MemoryRouter>
+        <RestaurantMap places={crowd} centre={centre} hoveredId={null} />
+      </MemoryRouter>,
+    );
+
+    expect(revealed()).toBeUndefined();
+  });
+
+  it("draws no second pin for a restaurant that already has its own", () => {
+    // A cluster of one *is* the marker. Drawing it again on top of itself is
+    // the same dot twice, and the emphasis is already carrying the answer.
+    show({ places: [place({ id: "a" })], hoveredId: "a" });
+
+    expect(revealed()).toBeUndefined();
+    expect(instance().markers).toHaveLength(1);
+  });
+
+  it("says which restaurant it is, in words", () => {
+    // This is the one marker that carries a name, and it earns it: every
+    // other pin is identifiable by standing alone where the reader pointed,
+    // while this one appears on top of a group of seven.
+    show({ places: crowd, hoveredId: "c" });
+
+    expect(revealed()?.textContent).toContain("Los Marinillos");
+  });
+
+  it("keeps the category glyph, so the pin still says what it is", () => {
+    show({ places: crowd, hoveredId: "b" });
+
+    expect(revealed()?.querySelector("svg")).toBeInTheDocument();
+  });
+
+  it("falls back to the chosen restaurant when nothing is hovered", () => {
+    // Selection is persistent: it must not stop being answered because the
+    // pointer moved off the row that made it.
+    show({ places: crowd, selectedId: "b", hoveredId: null });
+
+    expect(revealed()?.textContent).toContain("Busy Bee Cafe");
+  });
+});
+
+describe("how much the map moves while somebody reads the list", () => {
+  it("stays exactly where it is for a place already on screen", () => {
+    // The common case — the list and the map show the same ten results.
+    const { rerender } = show({ places: [place()] });
+    const before = instance().getCenter();
+
+    rerender(
+      <MemoryRouter>
+        <RestaurantMap places={[place()]} centre={centre} hoveredId="1" />
+      </MemoryRouter>,
+    );
+
+    expect(instance().getCenter()).toEqual(before);
+  });
+
+  it("pans to a place that is off screen", () => {
+    const far = place({ id: "2", latitude: 41.5, longitude: -73.96 });
+
+    show({ places: [place(), far], hoveredId: "2" });
+
+    expect(instance().getCenter().lat).toBeCloseTo(41.5, 2);
+  });
+
+  it("pans without changing the zoom the reader chose", () => {
+    const far = place({ id: "2", latitude: 41.5, longitude: -73.96 });
+
+    show({ places: [place(), far], hoveredId: "2" });
+
+    expect(instance().getZoom()).toBe(14);
+  });
+
+  it("never offers to search the area because of a hover", async () => {
+    // The cost rule. A hover is not an ask, and a pan the page performed on
+    // the reader's behalf must not look like the reader going looking.
+    const onSearchArea = jest.fn();
+    const far = place({ id: "2", latitude: 41.5, longitude: -73.96 });
+
+    show({ places: [place(), far], hoveredId: "2", onSearchArea });
+
+    expect(
+      screen.queryByRole("button", { name: MAP_LABELS.searchThisArea }),
+    ).not.toBeInTheDocument();
+    expect(onSearchArea).not.toHaveBeenCalled();
+  });
+});
+
+describe("the map answering back", () => {
+  it("tells the page which row to light up when a pin is pointed at", async () => {
+    const onHover = jest.fn();
+    show({ onHover });
+
+    await userEvent.hover(instance().markers[0].getElement());
+
+    expect(onHover).toHaveBeenCalledWith("1");
+  });
+
+  it("stops previewing when the pointer leaves the pin", async () => {
+    const onHover = jest.fn();
+    show({ onHover });
+
+    await userEvent.hover(instance().markers[0].getElement());
+    await userEvent.unhover(instance().markers[0].getElement());
+
+    expect(onHover).toHaveBeenLastCalledWith(null);
+  });
+
+  it("puts a selection down when the map itself is tapped", () => {
+    // Clicking empty map space clears it. The pin handlers stop their own
+    // clicks reaching here, so choosing one pin after another never clears
+    // in the same tick it selects.
+    const onSelect = jest.fn();
+    show({ onSelect, selectedId: "1" });
+
+    act(() => instance().emit("click"));
+
+    expect(onSelect).toHaveBeenCalledWith(null);
+  });
+});

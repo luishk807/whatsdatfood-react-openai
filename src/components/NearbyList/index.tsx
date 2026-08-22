@@ -1,4 +1,4 @@
-import { type FC } from "react";
+import { type FC, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import clsx from "clsx";
 import RestaurantCover from "@/components/RestaurantCover";
@@ -23,10 +23,44 @@ const NearbyList: FC<NearbyListInterface> = ({
   places,
   loading,
   selectedId,
+  hoveredId,
   onSelect,
+  onHover,
+  scrollToId,
   filterLabel,
   clearFilterHref,
 }) => {
+  // The row nodes, so a pin on the map can bring its own row into view.
+  const rows = useRef<Map<string, HTMLLIElement>>(new Map());
+
+  /**
+   * Bring the row the map just selected into view.
+   *
+   * **Only ever from the map.** `scrollToId` is set by a pin being tapped and
+   * by nothing the list itself did — scrolling on hover would move the list
+   * out from under a pointer that is travelling down it, which is the list
+   * fighting the person reading it.
+   *
+   * `block: "nearest"` is doing real work: a row already on screen is left
+   * exactly where it is, so choosing pins for restaurants that are all
+   * visible never moves the page at all. This is the same trap the category
+   * bar hit — there, `scrollIntoView` scrolled the page as well as the chip
+   * strip and cancelled the jump the reader had just asked for — and the
+   * defence is the same: never scroll when nothing needs to move.
+   */
+  useEffect(() => {
+    if (!scrollToId) {
+      return;
+    }
+
+    rows.current.get(scrollToId)?.scrollIntoView({
+      block: "nearest",
+      behavior: window.matchMedia?.("(prefers-reduced-motion: reduce)").matches
+        ? "auto"
+        : "smooth",
+    });
+  }, [scrollToId]);
+
   if (loading && !places.length) {
     return (
       <ul className="flex flex-col gap-2">
@@ -71,17 +105,38 @@ const NearbyList: FC<NearbyListInterface> = ({
   return (
     <ul className="flex flex-col gap-2">
       {places.map((place) => (
-        <li key={place.id}>
+        <li
+          key={place.id}
+          ref={(node) => {
+            if (node) {
+              rows.current.set(place.id, node);
+            } else {
+              rows.current.delete(place.id);
+            }
+          }}
+        >
           <Link
             to={place.slug ? buildMenuResultsPath(place.slug) : "#"}
-            onFocus={() => onSelect?.(place.id)}
-            onMouseEnter={() => onSelect?.(place.id)}
+            /* Focus does everything hover does. The map is the half no
+               keyboard reaches, so if pointing were the only way to ask
+               "where is this one", the answer would be unavailable to
+               anybody using one. */
+            onFocus={() => onHover?.(place.id)}
+            onBlur={() => onHover?.(null)}
+            onMouseEnter={() => onHover?.(place.id)}
+            onMouseLeave={() => onHover?.(null)}
+            onClick={() => onSelect?.(place.id)}
             aria-current={selectedId === place.id ? "true" : undefined}
             className={clsx(
               "flex gap-3 rounded-card border p-3",
+              /* Chosen and still chosen after the pointer moved on, so it is
+                 the stronger of the two marks. Being pointed at is a
+                 preview and reads as one. */
               selectedId === place.id
                 ? "border-ink bg-surface-sunken"
-                : "border-line bg-surface-raised",
+                : hoveredId === place.id
+                  ? "border-line bg-surface-sunken"
+                  : "border-line bg-surface-raised",
             )}
           >
             <RestaurantCover

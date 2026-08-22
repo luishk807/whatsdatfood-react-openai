@@ -6,6 +6,7 @@ import { RecentreIcon } from "@/components/icons";
 import {
   MAP_MARKER,
   MAP_MOVEMENT,
+  MAP_REVEAL,
   MAP_STYLE,
   MAP_VIEW,
   MAPBOX_TOKEN,
@@ -14,9 +15,21 @@ import { MAP_LABELS } from "@/customConstants/labels";
 import { THEME } from "@/customConstants/theme";
 import useTheme from "@/customHooks/useTheme";
 import { NearbyPlaceType, RestaurantMapInterface } from "@/interfaces/location";
-import { clusterPlaces, zoomIntoCluster } from "@/utils/cluster";
+import {
+  clusterPlaces,
+  findCluster,
+  insideView,
+  placeInClusters,
+  zoomIntoCluster,
+} from "@/utils/cluster";
 import { restaurantCategoryIcon } from "@/customConstants/foodIcons";
-import { createCluster, createMarker, markerFace, paintMarker } from "./markers";
+import {
+  createCluster,
+  createMarker,
+  createReveal,
+  markerFace,
+  paintMarker,
+} from "./markers";
 
 /**
  * The map half of nearby discovery.
@@ -39,12 +52,21 @@ import { createCluster, createMarker, markerFace, paintMarker } from "./markers"
  * reader reads a tile layer, so the map is the appealing half and the list is
  * the load-bearing one.
  */
+/** One taxonomy for every pin, revealed or not. */
+const renderGlyph = (place: NearbyPlaceType) => {
+  const Glyph = restaurantCategoryIcon(place);
+
+  return <Glyph size={MAP_MARKER.GLYPH_SIZE} />;
+};
+
 const RestaurantMap: FC<RestaurantMapInterface> = ({
   places,
   centre,
   showMe,
   selectedId,
+  hoveredId,
   onSelect,
+  onHover,
   onSearchArea,
   onRecentre,
 }) => {
@@ -52,6 +74,10 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
   const map = useRef<mapboxgl.Map | null>(null);
   const markers = useRef<Map<string, mapboxgl.Marker>>(new Map());
   const me = useRef<mapboxgl.Marker | null>(null);
+  // The extra pin drawn for a place its cluster is currently hiding. One at
+  // a time, and never one of the markers above — it is a temporary answer to
+  // "which of these seven", not a member of the drawn set.
+  const reveal = useRef<mapboxgl.Marker | null>(null);
   // Where the view sat when its contents were last fetched. "Moved enough" is
   // measured against this rather than against the previous frame, so a slow
   // drift across a city still adds up to having moved.
@@ -69,12 +95,22 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
   const [faces, setFaces] = useState<
     { id: string; node: HTMLElement; place: NearbyPlaceType }[]
   >([]);
+  // The glyph slot inside the revealed pin, kept apart from the list above
+  // because that one is rebuilt whenever the grouping changes and this one
+  // comes and goes with the pointer.
+  const [revealFace, setRevealFace] = useState<{
+    id: string;
+    node: HTMLElement;
+    place: NearbyPlaceType;
+  } | null>(null);
 
   // Read inside a listener that is created once, so it goes through a ref.
   // Re-subscribing whenever the selection changed would drop the very click
   // that changed it.
   const select = useRef(onSelect);
   select.current = onSelect;
+  const hover = useRef(onHover);
+  hover.current = onHover;
 
   const { resolved } = useTheme();
   const style = resolved === THEME.dark ? MAP_STYLE.dark : MAP_STYLE.light;
@@ -154,11 +190,21 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
       setMoved(farEnough(instance));
     });
 
+    // Tapping the map away from any pin puts it down. The marker handlers
+    // stop their own clicks from reaching here, so choosing one pin straight
+    // after another never clears in the same tick it selects.
+    instance.on("click", () => {
+      select.current?.(null);
+      hover.current?.(null);
+    });
+
     map.current = instance;
 
     return () => {
       markers.current.forEach((marker) => marker.remove());
       markers.current.clear();
+      reveal.current?.remove();
+      reveal.current = null;
       me.current?.remove();
       me.current = null;
       instance.remove();
@@ -273,6 +319,13 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
         select.current?.(place.id);
       });
 
+      // The other direction of the same relationship: pointing at a pin
+      // lights up its row in the list, exactly as pointing at a row lights
+      // up its pin. Reported upward rather than painted here, so one piece
+      // of state drives both halves and they cannot disagree.
+      element.addEventListener("mouseenter", () => hover.current?.(place.id));
+      element.addEventListener("mouseleave", () => hover.current?.(null));
+
       markers.current.set(
         place.id,
         new mapboxgl.Marker({ element }).setLngLat(point).addTo(instance),
@@ -303,10 +356,125 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
       const element = markers.current.get(place.id)?.getElement();
 
       if (element) {
-        paintMarker(element, place, { selected: place.id === selectedId });
+        paintMarker(element, place, {
+          selected: place.id === selectedId,
+          hovered: place.id === hoveredId,
+        });
       }
     });
-  }, [selectedId, clusters]);
+  }, [selectedId, hoveredId, clusters]);
+
+  /**
+   * The restaurant the map is currently answering about.
+   *
+   * Hover wins over selection while it lasts, because it is the more recent
+   * question — the reader has chosen one place and is now asking about
+   * another. When the pointer leaves, the answer falls back to what they
+   * chose rather than to nothing.
+   */
+  const activeId = hoveredId ?? selectedId ?? null;
+
+  /**
+   * The extra pin for a place its own cluster is hiding.
+   *
+   * Only when the group has more than one member: a cluster of one *is* the
+   * restaurant's marker, and it has already been emphasised in place, so a
+   * second pin on top of it would be the same dot drawn twice.
+   */
+  useEffect(() => {
+    const instance = map.current;
+
+    if (!instance) {
+      return;
+    }
+
+    reveal.current?.remove();
+    reveal.current = null;
+    setRevealFace(null);
+
+    const cluster = findCluster(clusters, activeId);
+    const place = placeInClusters(clusters, activeId);
+
+    if (
+      !cluster ||
+      !place ||
+      cluster.places.length < 2 ||
+      place.latitude == null ||
+      place.longitude == null
+    ) {
+      return;
+    }
+
+    const element = createReveal(place);
+
+    element.addEventListener("click", (event) => {
+      event.stopPropagation();
+      select.current?.(place.id);
+    });
+    // Moving onto the revealed pin itself must not read as leaving the
+    // restaurant — without this the pin removes itself the moment it is
+    // pointed at, which looks like a flicker and is impossible to click.
+    element.addEventListener("mouseenter", () => hover.current?.(place.id));
+
+    reveal.current = new mapboxgl.Marker({ element })
+      .setLngLat([place.longitude, place.latitude])
+      .addTo(instance);
+
+    const face = markerFace(element);
+
+    if (face) {
+      setRevealFace({ id: `reveal:${place.id}`, node: face, place });
+    }
+  }, [activeId, clusters]);
+
+  /**
+   * Move the camera only when the answer is off screen.
+   *
+   * A map that re-centres on every row the pointer crosses is unusable: the
+   * frame the reader was comparing places in keeps sliding out from under
+   * them. So a place already comfortably in view is emphasised where it
+   * stands and nothing moves at all — which is the common case, since the
+   * list and the map are showing the same ten results.
+   *
+   * When it does move it is a short pan at the **same zoom**. Changing the
+   * zoom would rewrite the view the reader chose, and this fires from a
+   * mouse crossing a list.
+   *
+   * `easeTo` carries no `originalEvent`, so none of this offers "Search this
+   * area" — a fresh query must stay something the reader asked for, and a
+   * hover is not an ask.
+   */
+  useEffect(() => {
+    const instance = map.current;
+    const place = placeInClusters(clusters, activeId);
+
+    if (!instance || !place) {
+      return;
+    }
+
+    const bounds = instance.getBounds();
+
+    if (!bounds) {
+      return;
+    }
+
+    const view = {
+      north: bounds.getNorth(),
+      south: bounds.getSouth(),
+      east: bounds.getEast(),
+      west: bounds.getWest(),
+    };
+
+    if (insideView(view, place)) {
+      return;
+    }
+
+    instance.easeTo({
+      center: [place.longitude as number, place.latitude as number],
+      zoom: instance.getZoom(),
+      duration: MAP_REVEAL.PAN_MS,
+    });
+  }, [activeId, clusters]);
 
   const searchHere = () => {
     const instance = map.current;
@@ -343,11 +511,19 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
           Rendered through a portal into a node the marker already reserved,
           which is what keeps the taste picker, the homepage tiles, the nearby
           list and the map on one icon taxonomy. */}
-      {faces.map(({ id, node, place }) => {
-        const Glyph = restaurantCategoryIcon(place);
+      {faces.map(({ id, node, place }) =>
+        createPortal(renderGlyph(place), node, id),
+      )}
 
-        return createPortal(<Glyph size={MAP_MARKER.GLYPH_SIZE} />, node, id);
-      })}
+      {/* The revealed pin gets the same treatment: it is drawn to say *which*
+          restaurant, so it has to carry the same category glyph as the pin it
+          is standing in for. */}
+      {revealFace &&
+        createPortal(
+          renderGlyph(revealFace.place),
+          revealFace.node,
+          revealFace.id,
+        )}
 
       {/* Only once the reader has moved it, and moved it far enough to be
           looking somewhere else. Offered sooner, it invites a tap that

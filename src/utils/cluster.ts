@@ -1,6 +1,10 @@
-import { MAP_CLUSTER } from "@/customConstants/map";
-import { NearbyPlaceType } from "@/interfaces/location";
-import { PlaceClusterType } from "@/interfaces/location";
+import { MAP_CLUSTER, MAP_REVEAL } from "@/customConstants/map";
+import {
+  CoordinatesType,
+  MapBoundsType,
+  NearbyPlaceType,
+  PlaceClusterType,
+} from "@/interfaces/location";
 
 /**
  * Grouping pins that would otherwise land on top of each other.
@@ -149,4 +153,45 @@ export const placeInClusters = (
   const cluster = findCluster(clusters, placeId);
 
   return cluster?.places.find((place) => place.id === placeId) ?? null;
+};
+
+/**
+ * Whether a point is comfortably on screen, rather than merely on screen.
+ *
+ * This is what decides if pointing at a result moves the camera at all. The
+ * rule is "only when it has to": a pin already in view is emphasised where it
+ * stands, because a map that re-centres every time the pointer crosses a row
+ * is unusable, and the reader loses the frame they were comparing places in.
+ *
+ * The inset is why "has to" is generous. A marker two pixels inside the frame
+ * is visible to a bounds check and missed by a person, and on a phone the
+ * bottom strip of the map is under the preview card. Measured as a fraction
+ * of the visible span, so it means the same thing at every zoom.
+ *
+ * Pure, and deliberately: this is the arithmetic worth testing, and it needs
+ * no WebGL to test.
+ */
+export const insideView = (
+  view: MapBoundsType,
+  point: Partial<CoordinatesType>,
+  inset: number = MAP_REVEAL.EDGE_INSET,
+): boolean => {
+  if (point.latitude == null || point.longitude == null) {
+    // Never geocoded, so it is on no screen anywhere. Reported as inside so
+    // that nothing tries to fly to a restaurant that has no position — the
+    // list still carries it.
+    return true;
+  }
+
+  const height = Math.abs(view.north - view.south);
+  const width = Math.abs(view.east - view.west);
+  const padY = height * inset;
+  const padX = width * inset;
+
+  return (
+    point.latitude <= view.north - padY &&
+    point.latitude >= view.south + padY &&
+    point.longitude <= view.east - padX &&
+    point.longitude >= view.west + padX
+  );
 };

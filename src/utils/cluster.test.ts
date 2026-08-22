@@ -1,6 +1,7 @@
 import {
   clusterPlaces,
   findCluster,
+  insideView,
   placeInClusters,
   project,
   zoomIntoCluster,
@@ -198,5 +199,50 @@ describe("finding a place the map has grouped away", () => {
 
     expect(findCluster(clusters, null)).toBeNull();
     expect(findCluster(clusters, undefined)).toBeNull();
+  });
+});
+
+describe("whether the camera has to move at all", () => {
+  // A degree-ish box around Flushing. The inset is a fraction of this, so
+  // every case below is expressed in terms of the same visible span.
+  const view = { north: 40.76, south: 40.74, east: -73.98, west: -74.0 };
+
+  it("leaves the camera alone for a place in the middle of the view", () => {
+    // The common case, and the important one: the list and the map are
+    // showing the same ten results, so most of them are already on screen.
+    // A map that re-centres on every row the pointer crosses is unusable.
+    expect(insideView(view, { latitude: 40.75, longitude: -73.99 })).toBe(true);
+  });
+
+  it("moves for a place outside the view entirely", () => {
+    expect(insideView(view, { latitude: 40.9, longitude: -73.99 })).toBe(false);
+    expect(insideView(view, { latitude: 40.75, longitude: -74.2 })).toBe(false);
+  });
+
+  it("moves for a place technically on screen but against the edge", () => {
+    // Visible to a bounds check, missed by a person — and on a phone the
+    // bottom strip of the map is under the preview card.
+    const justInside = { latitude: 40.7599, longitude: -73.99 };
+
+    expect(
+      insideView(view, justInside, 0),
+    ).toBe(true);
+    expect(insideView(view, justInside)).toBe(false);
+  });
+
+  it("measures the inset against the visible span, not in degrees", () => {
+    // So "near the edge" means the same thing zoomed in as zoomed out.
+    const tight = { north: 40.7505, south: 40.7495, east: -73.99, west: -73.991 };
+    const point = { latitude: 40.75045, longitude: -73.9905 };
+
+    expect(insideView(tight, point)).toBe(false);
+    expect(insideView(view, point)).toBe(true);
+  });
+
+  it("never flies to a restaurant that was never geocoded", () => {
+    // It is on no screen anywhere. The list still carries it.
+    expect(insideView(view, { latitude: undefined, longitude: undefined })).toBe(
+      true,
+    );
   });
 });
