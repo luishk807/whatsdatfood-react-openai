@@ -71,9 +71,11 @@ export const MAP_MOVEMENT = {
  * a 32px pin inside a 44px hit area is the phone rule, and on a map it is the
  * difference between selecting a restaurant and panning by accident.
  */
+const MAP_MARKER_SELECTED_SIZE = 40;
+
 export const MAP_MARKER = {
   SIZE: 32,
-  SELECTED_SIZE: 40,
+  SELECTED_SIZE: MAP_MARKER_SELECTED_SIZE,
   /** Pointed at, but not chosen. Between the two, because hover is a preview
    * of a selection rather than a second kind of it. */
   HOVER_SIZE: 38,
@@ -147,6 +149,20 @@ export const MAP_REVEAL = {
    * irritating rather than responsive.
    */
   PAN_MS: 350,
-  /** The name on a revealed pin. See `createReveal` for why only that one. */
-  LABEL_MAX_PX: 168,
+  /**
+   * How far the name sits from the middle of the pin it belongs to.
+   *
+   * Radial, and handed to `mapboxgl.Popup` rather than applied by hand: the
+   * library flips the anchor when the label would leave the container — top
+   * near the bottom edge, right near the left one — and applies this offset
+   * in whichever direction it chose. Half the largest pin plus a few pixels,
+   * so the label clears the disc without floating away from it.
+   *
+   * The label used to be a `position: absolute` span inside the marker
+   * element, which put it visibly to one side: that element is Mapbox's, it
+   * is transformed on every frame, and it carries `line-height: 0` and touch
+   * padding of its own. Anything measured against it is measured against a
+   * moving target.
+   */
+  LABEL_OFFSET_PX: MAP_MARKER_SELECTED_SIZE / 2 + 8,
 } as const;

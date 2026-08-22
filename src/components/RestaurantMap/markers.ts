@@ -255,55 +255,56 @@ const REVEAL_CLASS = "wdf-reveal";
  * mutates the thing it is previewing is not a preview. (Mapbox's
  * `getClusterExpansionZoom`/`getClusterLeaves` are the API for doing it that
  * way and are unavailable to us regardless: the grouping is ours, in
- * `utils/cluster.ts`, so that a marker stays a `<div>` that can hold a dish
+ * `utils/cluster.ts`, so that a marker can stay a `<div>` that can hold a dish
  * photograph rather than a sprite in a symbol layer.)
  *
- * **This is the one marker that carries a name**, and the exception earns
- * itself: every other pin is identifiable by standing alone where the reader
- * pointed, while this one appears on top of a group and would otherwise just
- * be an eighth dot. The preview card names it too, but that is in the corner
- * of the map and reading it means looking away from the pin.
- *
- * The label is positioned absolutely so it stays out of the layout box.
- * Mapbox anchors a marker on the centre of its element: a label in normal
- * flow would push the pin upward off the coordinate it exists to point at.
+ * **The name is not drawn here.** It was, as a `position: absolute` span
+ * inside this element, and it rendered visibly to one side of the pin — the
+ * marker root is a node Mapbox owns and transforms, and it carries
+ * `line-height: 0` and touch padding of its own, so a label positioned
+ * against it is positioned against a moving target. `hoverLabel` and a real
+ * `mapboxgl.Popup` do it instead: the library already knows where a
+ * coordinate is on screen through every transform the map has, which is
+ * exactly the arithmetic that should never be re-derived by hand.
  */
 export const createReveal = (place: NearbyPlaceType): HTMLElement => {
   const root = createMarker(place, { selected: true, hovered: true });
 
   root.className = `${ROOT_CLASS} ${REVEAL_CLASS}`;
   root.dataset.reveal = "true";
-  root.style.position = "relative";
   // Above every ordinary pin and every cluster, including the one it is
   // standing on.
   root.style.zIndex = "5";
 
+  return root;
+};
+
+// --- the name beside the pin ----------------------------------------------
+
+export const HOVER_LABEL_CLASS = "wdf-hover-label";
+/** Styled in `index.css`, against the theme tokens rather than Mapbox's own
+ * white. A popup painted in a literal colour is the one thing on the page
+ * that does not flip with the rest of it. */
+export const HOVER_POPUP_CLASS = "wdf-hover-popup";
+
+/**
+ * The restaurant's name, for a `mapboxgl.Popup` to carry.
+ *
+ * **A name and nothing else.** Hovering is "which one is this" — a question
+ * answered by two words — while the full card with the dish line and the way
+ * into the menu belongs to a selection somebody actually made. Showing the
+ * whole card on every row a pointer crosses turns reading a list into a
+ * slideshow.
+ *
+ * Text through `textContent`, so a restaurant named with a stray angle
+ * bracket is a restaurant name rather than markup.
+ */
+export const hoverLabel = (place: NearbyPlaceType): HTMLElement => {
   const label = document.createElement("span");
 
-  label.dataset.role = LABEL;
+  label.className = HOVER_LABEL_CLASS;
+  label.dataset.placeId = place.id;
   label.textContent = place.name;
-  label.style.position = "absolute";
-  label.style.top = "100%";
-  label.style.left = "50%";
-  label.style.transform = "translateX(-50%)";
-  label.style.marginTop = "2px";
-  label.style.maxWidth = `${MAP_REVEAL.LABEL_MAX_PX}px`;
-  label.style.overflow = "hidden";
-  label.style.textOverflow = "ellipsis";
-  label.style.whiteSpace = "nowrap";
-  label.style.padding = "2px 6px";
-  label.style.borderRadius = "9999px";
-  // Tokens, not hexes: this is drawn over a map that flips with the page.
-  label.style.background = "var(--color-surface-raised)";
-  label.style.border = "1px solid var(--color-ink)";
-  label.style.color = "var(--color-ink)";
-  label.style.fontSize = "11px";
-  label.style.fontWeight = "600";
-  label.style.lineHeight = "1.4";
-  label.style.pointerEvents = "none";
-  label.style.boxShadow = "0 2px 8px rgb(0 0 0 / 0.25)";
 
-  root.appendChild(label);
-
-  return root;
+  return label;
 };

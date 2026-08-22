@@ -33,6 +33,7 @@ export const lastMap = (): FakeMap | null => built;
 export class FakeMap {
   handlers = new Map<string, Handler[]>();
   markers: FakeMarker[] = [];
+  popups: FakePopup[] = [];
   controls: unknown[] = [];
   style: string;
   removed = false;
@@ -158,12 +159,55 @@ export class FakeMarker {
   }
 }
 
+/**
+ * The name label beside a pin.
+ *
+ * A recorder like the rest of this file. What is worth asserting is that the
+ * label is placed at the *restaurant's* coordinates rather than at a cluster
+ * centre, that exactly one exists at a time, and that no anchor is pinned —
+ * withholding it is what lets Mapbox flip the label away from a container
+ * edge, and that flipping is the library's arithmetic rather than ours.
+ */
+export class FakePopup {
+  lngLat: [number, number] | null = null;
+  content: HTMLElement | null = null;
+  map: FakeMap | null = null;
+
+  constructor(public options: Record<string, unknown> = {}) {}
+
+  setLngLat(point: [number, number]) {
+    this.lngLat = point;
+    return this;
+  }
+
+  setDOMContent(node: HTMLElement) {
+    this.content = node;
+    return this;
+  }
+
+  addTo(map: FakeMap) {
+    this.map = map;
+    map.popups.push(this);
+    return this;
+  }
+
+  remove() {
+    if (this.map) {
+      this.map.popups = this.map.popups.filter((one) => one !== this);
+      this.map = null;
+    }
+
+    return this;
+  }
+}
+
 class FakeNavigationControl {}
 
 const mapboxgl = {
   accessToken: "",
   Map: FakeMap,
   Marker: FakeMarker,
+  Popup: FakePopup,
   NavigationControl: FakeNavigationControl,
   lastMap,
 };

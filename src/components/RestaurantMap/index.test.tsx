@@ -320,7 +320,6 @@ describe("finding the restaurant somebody is pointing at", () => {
     show({ places: crowd, hoveredId: "b" });
 
     expect(revealed()).toBeDefined();
-    expect(revealed()?.textContent).toContain("Busy Bee Cafe");
   });
 
   it("puts it at its own coordinates, not the group's centre", () => {
@@ -367,13 +366,15 @@ describe("finding the restaurant somebody is pointing at", () => {
     expect(instance().markers).toHaveLength(1);
   });
 
-  it("says which restaurant it is, in words", () => {
-    // This is the one marker that carries a name, and it earns it: every
-    // other pin is identifiable by standing alone where the reader pointed,
-    // while this one appears on top of a group of seven.
+  it("names it where it actually is, not at the middle of the group", () => {
+    // A cluster centre is an average that may sit on none of its members. A
+    // name floating there says the restaurant is somewhere it is not.
     show({ places: crowd, hoveredId: "c" });
 
-    expect(revealed()?.textContent).toContain("Los Marinillos");
+    const [popup] = instance().popups;
+
+    expect(popup.content?.textContent).toBe("Los Marinillos");
+    expect(popup.lngLat).toEqual([-73.9601, 40.7104]);
   });
 
   it("keeps the category glyph, so the pin still says what it is", () => {
@@ -387,7 +388,7 @@ describe("finding the restaurant somebody is pointing at", () => {
     // pointer moved off the row that made it.
     show({ places: crowd, selectedId: "b", hoveredId: null });
 
-    expect(revealed()?.textContent).toContain("Busy Bee Cafe");
+    expect(revealed()).toBeDefined();
   });
 });
 
@@ -467,5 +468,94 @@ describe("the map answering back", () => {
     act(() => instance().emit("click"));
 
     expect(onSelect).toHaveBeenCalledWith(null);
+  });
+});
+
+describe("the name beside the pin", () => {
+  const crowd = [
+    place({ id: "a", name: "Dunkin'" }),
+    place({ id: "b", name: "Busy Bee Cafe", latitude: 40.7102, longitude: -73.9602 }),
+  ];
+
+  it("is placed at the restaurant's own coordinates", () => {
+    // Not at a cluster centre, and not at a screen position we worked out
+    // ourselves. Mapbox is handed a coordinate and does the rest.
+    show({ places: [place({ id: "1", name: "UNICORN GLOW" })], hoveredId: "1" });
+
+    const [popup] = instance().popups;
+
+    expect(popup.content?.textContent).toBe("UNICORN GLOW");
+    expect(popup.lngLat).toEqual([-73.96, 40.71]);
+  });
+
+  it("lets Mapbox choose the side it opens on", () => {
+    // Withholding the anchor is the whole edge-collision behaviour: given
+    // none, the library picks from the space left in the container, so a pin
+    // against the right edge gets a label opening left and one against the
+    // top gets a label below. Pinning an anchor here is what makes a label
+    // clip at the boundary — at some container width, zoom or pixel ratio we
+    // will never have looked at.
+    show({ places: [place()], hoveredId: "1" });
+
+    const [popup] = instance().popups;
+
+    expect(popup.options.anchor).toBeUndefined();
+    expect(popup.options.offset).toBeGreaterThan(0);
+  });
+
+  it("shows one label at a time while the pointer travels down the list", () => {
+    // Moving Dunkin' -> Busy Bee Cafe updates one preview. A trail of names
+    // left behind is worse than none.
+    const { rerender } = show({ places: crowd, hoveredId: "a" });
+
+    expect(instance().popups).toHaveLength(1);
+
+    rerender(
+      <MemoryRouter>
+        <RestaurantMap places={crowd} centre={centre} hoveredId="b" />
+      </MemoryRouter>,
+    );
+
+    expect(instance().popups).toHaveLength(1);
+    expect(instance().popups[0].content?.textContent).toBe("Busy Bee Cafe");
+  });
+
+  it("goes when the pointer goes", () => {
+    const { rerender } = show({ places: crowd, hoveredId: "a" });
+
+    rerender(
+      <MemoryRouter>
+        <RestaurantMap places={crowd} centre={centre} hoveredId={null} />
+      </MemoryRouter>,
+    );
+
+    expect(instance().popups).toHaveLength(0);
+  });
+
+  it("does not double up on the restaurant whose card is already open", () => {
+    // The full card names it, gives the dish line and the way into the menu.
+    // A second label saying only the name is clutter over the same pin.
+    show({ places: crowd, selectedId: "a", hoveredId: "a" });
+
+    expect(instance().popups).toHaveLength(0);
+  });
+
+  it("still labels a different restaurant while one is selected", () => {
+    show({ places: crowd, selectedId: "a", hoveredId: "b" });
+
+    expect(instance().popups).toHaveLength(1);
+    expect(instance().popups[0].content?.textContent).toBe("Busy Bee Cafe");
+  });
+
+  it("takes the name as text, never as markup", () => {
+    show({
+      places: [place({ id: "1", name: "Bob <b>& Sons</b>" })],
+      hoveredId: "1",
+    });
+
+    const [popup] = instance().popups;
+
+    expect(popup.content?.textContent).toBe("Bob <b>& Sons</b>");
+    expect(popup.content?.querySelector("b")).toBeNull();
   });
 });

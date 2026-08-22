@@ -24,9 +24,11 @@ import {
 } from "@/utils/cluster";
 import { restaurantCategoryIcon } from "@/customConstants/foodIcons";
 import {
+  HOVER_POPUP_CLASS,
   createCluster,
   createMarker,
   createReveal,
+  hoverLabel,
   markerFace,
   paintMarker,
 } from "./markers";
@@ -78,6 +80,9 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
   // a time, and never one of the markers above — it is a temporary answer to
   // "which of these seven", not a member of the drawn set.
   const reveal = useRef<mapboxgl.Marker | null>(null);
+  // The name beside the pin somebody is pointing at. One at a time, always —
+  // reading down a list must not leave a trail of labels behind.
+  const label = useRef<mapboxgl.Popup | null>(null);
   // Where the view sat when its contents were last fetched. "Moved enough" is
   // measured against this rather than against the previous frame, so a slow
   // drift across a city still adds up to having moved.
@@ -205,6 +210,8 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
       markers.current.clear();
       reveal.current?.remove();
       reveal.current = null;
+      label.current?.remove();
+      label.current = null;
       me.current?.remove();
       me.current = null;
       instance.remove();
@@ -475,6 +482,69 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
       duration: MAP_REVEAL.PAN_MS,
     });
   }, [activeId, clusters]);
+
+  /**
+   * The restaurant's name, beside its own pin.
+   *
+   * **Mapbox positions this, not us.** It was a `position: absolute` span
+   * inside the marker element, and it rendered visibly to one side: that
+   * element belongs to the library, it is transformed on every frame, and it
+   * carries `line-height: 0` and touch padding of its own — so a label
+   * measured against it is measured against a moving target. A `Popup` is
+   * given a coordinate and works out where that is on screen through every
+   * transform the map has. Container size, zoom, pixel ratio and a sticky
+   * pane are all its arithmetic, and none of them are ours to re-derive.
+   *
+   * **No anchor is passed on purpose.** Given none, Mapbox chooses from the
+   * space left in the container and flips near an edge — the label opens left
+   * of a pin against the right edge, below one against the top. Passing a
+   * fixed anchor is what makes a label clip at the boundary.
+   *
+   * **Hover only, and never for the restaurant whose card is already open.**
+   * Pointing asks "which one is this" and a name answers it; the card with
+   * the dish line and the way into the menu belongs to a choice somebody
+   * made. Drawing both for one restaurant is two labels saying one thing.
+   */
+  useEffect(() => {
+    const instance = map.current;
+
+    if (!instance) {
+      return;
+    }
+
+    label.current?.remove();
+    label.current = null;
+
+    if (!hoveredId || hoveredId === selectedId) {
+      return;
+    }
+
+    const place = placeInClusters(clusters, hoveredId);
+
+    if (!place || place.latitude == null || place.longitude == null) {
+      return;
+    }
+
+    label.current = new mapboxgl.Popup({
+      className: HOVER_POPUP_CLASS,
+      closeButton: false,
+      // It belongs to the pointer, not to a dismissal: it goes when the
+      // pointer goes.
+      closeOnClick: false,
+      // Moving the keyboard's focus to a label that appeared under a mouse
+      // would take it away from the list the reader is travelling down.
+      focusAfterOpen: false,
+      offset: MAP_REVEAL.LABEL_OFFSET_PX,
+      maxWidth: "none",
+    })
+      // The restaurant's own coordinates. A place inside a cluster is labelled
+      // where it actually is, never at the group's centre — the centre is an
+      // average that may sit on none of its members, and a name floating there
+      // says the restaurant is somewhere it is not.
+      .setLngLat([place.longitude, place.latitude])
+      .setDOMContent(hoverLabel(place))
+      .addTo(instance);
+  }, [hoveredId, selectedId, clusters]);
 
   const searchHere = () => {
     const instance = map.current;

@@ -170,3 +170,44 @@
     transform: translateX(300%);
   }
 }
+
+/**
+ * The name label beside a map pin.
+ *
+ * Mapbox ships this popup painted white with a white tip, which is the one
+ * thing on the page that would not flip with the theme - the exact bug the
+ * tokens exist to prevent, and one that already shipped once in the search
+ * suggestions and both modals. These are the same tokens the rest of the app
+ * styles through, reachable from plain CSS as custom properties.
+ *
+ * The tip is hidden rather than themed. It is a CSS triangle built from
+ * borders, so every one of the eight anchors colours a different side - and
+ * Mapbox chooses the anchor itself, which is precisely what keeps the label
+ * off the container edge. Eight rules to maintain means the one anchor
+ * nobody tested renders a black wedge on the map. A pill sitting a few
+ * pixels off the pin reads as attached without one.
+ */
+.wdf-hover-popup {
+  /* It belongs to the pointer. Catching the pointer itself would mean the
+     label removing the hover that created it - a flicker with no way out -
+     and it would swallow clicks meant for the pin underneath. */
+  pointer-events: none;
+  z-index: 6;
+}
+
+.wdf-hover-popup .mapboxgl-popup-content {
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--color-ink);
+  background: var(--color-surface-raised);
+  color: var(--color-ink);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+  box-shadow: var(--shadow-tile);
+}
+
+.wdf-hover-popup .mapboxgl-popup-tip {
+  display: none;
+}

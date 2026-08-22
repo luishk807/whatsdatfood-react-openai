@@ -130,6 +130,11 @@ const NearbyPage: FC = () => {
 
   const showMore = () => (searchedArea ? area.showMore() : nearby.showMore());
 
+  // Both halves on screen at once, which is a `lg` decision and a map-view
+  // one. Below that the map is a tab, because a phone has room for one of
+  // these at a time and two cramped columns is neither.
+  const workspace = view === "map" && Boolean(location) && !nearby.unavailable;
+
   /**
    * The results, identical in both views.
    *
@@ -172,7 +177,22 @@ const NearbyPage: FC = () => {
   );
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-3 px-4 pb-16 pt-4">
+    <div
+      className={clsx(
+        "mx-auto flex w-full flex-col gap-3 px-4 pt-4",
+        /* **The map view is a workspace, not a page with a map on it.**
+           Every other screen in this product is a column of content and
+           belongs at the shell's width. This one is a tool: the map is the
+           larger half, the results scroll inside it, and constraining the
+           pair to a reading measure wastes the width that makes a map worth
+           looking at. Capped rather than edge-to-edge - a map three
+           thousand pixels wide is not more useful, it is just further from
+           the list. */
+        workspace
+          ? "max-w-[1800px] pb-4"
+          : "max-w-5xl pb-16",
+      )}
+    >
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <div className="flex min-w-0 flex-col">
           <h1 className="truncate text-xl font-semibold tracking-tight text-ink">
