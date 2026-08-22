@@ -141,6 +141,8 @@ export interface MenuStatusType {
    * browser is a second source of truth and the one that goes stale.
    */
   retryable: boolean;
+  /** `official` | `community` | `partial` | `unavailable`. */
+  availability: string;
 }
 
 export interface MenuStatusPanelInterface {
@@ -150,4 +152,24 @@ export interface MenuStatusPanelInterface {
   /** False once the restaurant has no attempts left, so no button is drawn. */
   retryable?: boolean;
   onRetry?: () => void;
+}
+
+export interface MenuMissingInterface {
+  /**
+   * Opens the camera for a photograph of the menu itself.
+   *
+   * Optional, and absent renders no button: a control that opens a camera and
+   * then has nowhere to send the photograph is worse than one that is not
+   * there, because it spends somebody's goodwill on a dead end. The
+   * restaurant-level menu photo needs a store and a moderation path of its
+   * own, and until those exist the dish contribution below is the working
+   * way in.
+   */
+  onAddPhoto?: () => void;
+  uploading?: boolean;
+}
+
+export interface MenuProvenanceInterface {
+  /** `official` | `community` | `partial` | `unavailable`. */
+  availability: string;
 }

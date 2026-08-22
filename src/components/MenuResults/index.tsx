@@ -33,6 +33,8 @@ import ClaimRestaurantButton from "@/components/ClaimRestaurantButton";
 import TopDishStrip from "@/components/TopDishStrip";
 import DishGrid from "@/components/DishGrid";
 import MenuStatusPanel from "@/components/MenuStatusPanel";
+import MenuMissing from "@/components/MenuMissing";
+import MenuProvenance from "@/components/MenuProvenance";
 import useMenuStatus from "@/customHooks/useMenuStatus";
 import DishPhoto from "@/components/DishPhoto";
 import BottomSheet from "@/components/BottomSheet";
@@ -424,9 +426,19 @@ const MenuResults: FC = () => {
               />
             )}
 
-            {/* Where the food goes when there is no food yet. Renders
-                nothing once there are dishes. */}
-            {categories.length === 0 && (
+            {/* **The designed empty state, not an error.** Most restaurants
+                in the world do not publish a menu online, so on this
+                catalogue this is the ordinary outcome — and a page that reads
+                as broken is a page nobody contributes to. Shown only once the
+                waiting is genuinely over: while a job is still running the
+                panel below says so instead. */}
+            {categories.length === 0 && menuStatus.state === "unavailable" && (
+              <MenuMissing />
+            )}
+
+            {/* Where the food goes while it is still being worked out.
+                Renders nothing once there are dishes. */}
+            {categories.length === 0 && menuStatus.state !== "unavailable" && (
               <MenuStatusPanel
                 state={menuStatus.state}
                 slow={menuStatus.slow}
@@ -439,6 +451,14 @@ const MenuResults: FC = () => {
                   menuStatus.retry(() => handleFetchRestaurant(true))
                 }
               />
+            )}
+
+            {/* Whose menu this is, said once. A restaurant that has spoken
+                for itself gets no qualifier — everything else says whose
+                information it is, because an incomplete list presented as
+                *the* menu is the one mistake this product cannot afford. */}
+            {categories.length > 0 && (
+              <MenuProvenance availability={menuStatus.availability} />
             )}
 
             {categories.map((category) => (

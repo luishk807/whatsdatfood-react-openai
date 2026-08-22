@@ -1060,6 +1060,47 @@ export const MAP_LABELS = {
  * are a normal wait. Past that it is worth saying the page is usable without
  * it, so nobody sits watching a panel that may not resolve.
  */
+/**
+ * What the page may claim about a menu.
+ *
+ * **No reliable menu is better than an invented one**, so these words are
+ * chosen to under-claim rather than over-claim. "Menu" unqualified is
+ * reserved for a restaurant that has spoken for itself; everything else says
+ * whose information it is.
+ */
+export const MENU_AVAILABILITY = {
+  official: "official",
+  community: "community",
+  partial: "partial",
+  unavailable: "unavailable",
+} as const;
+
+export const MENU_AVAILABILITY_LABELS: Record<string, string> = {
+  // Nothing at all: the restaurant spoke, so the page needs no qualifier.
+  [MENU_AVAILABILITY.official]: "",
+  [MENU_AVAILABILITY.community]: "Added by diners — may not be the full menu",
+  [MENU_AVAILABILITY.partial]: "Partial menu — read automatically, not confirmed",
+};
+
+/**
+ * The designed state for a restaurant with no menu.
+ *
+ * **Not an error, and not a spinner that gave up.** Most restaurants in the
+ * world do not publish a menu online, so this is the ordinary case on this
+ * catalogue rather than a failure — and a page that reads as broken is a page
+ * nobody contributes to. It names the absence, offers the two things somebody
+ * standing in the restaurant can actually do, and says nothing about
+ * extraction.
+ */
+export const MENU_MISSING_LABELS = {
+  title: "We don't have this menu yet",
+  body: "This restaurant may not publish its menu online.",
+  photo: "Add a menu photo",
+  photoHint: "A printed menu, a board, a counter sign — whatever is in front of you.",
+  dish: "Add a dish you tried",
+  invite: "Know this place? Help others see what's good here.",
+} as const;
+
 export const MENU_STATUS_LABELS = {
   /**
    * **It says what is happening to this restaurant, not what the page is

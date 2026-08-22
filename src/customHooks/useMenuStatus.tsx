@@ -58,6 +58,12 @@ const useMenuStatus = (
    * threshold lives on the server.
    */
   const retryable = Boolean(status?.retryable);
+  /**
+   * What the page may claim about the menu: official, community, partial or
+   * unavailable. The server decides — one dish an owner confirmed outranks
+   * two hundred a model produced, and that is a rule about our data.
+   */
+  const availability = status?.availability ?? "unavailable";
 
   // How long this reader has been waiting, so the wording and the asking can
   // both change. Reset whenever the wait restarts rather than measured from
@@ -146,6 +152,7 @@ const useMenuStatus = (
     slow,
     /** Whether the server says another attempt is worth offering. */
     retryable,
+    availability,
     /** For the "Try again" control. */
     retry,
   };
