@@ -191,6 +191,17 @@ export class FakePopup {
     return this;
   }
 
+  /** The shell Mapbox paints white, which the component repaints in tokens. */
+  getElement() {
+    const root = document.createElement("div");
+    const content = document.createElement("div");
+
+    content.className = "mapboxgl-popup-content";
+    root.appendChild(content);
+
+    return root;
+  }
+
   remove() {
     if (this.map) {
       this.map.popups = this.map.popups.filter((one) => one !== this);

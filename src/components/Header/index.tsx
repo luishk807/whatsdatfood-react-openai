@@ -20,7 +20,7 @@ import { SITE_LABELS } from "@/customConstants/labels";
 const Header = () => {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-surface/95 backdrop-blur">
-      <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-3 px-4">
+      <div className="mx-auto flex h-[var(--height-header)] max-w-5xl items-center justify-between gap-3 px-4">
         <Link
           to={ROUTES.home}
           className="truncate text-base font-semibold tracking-tight text-ink"

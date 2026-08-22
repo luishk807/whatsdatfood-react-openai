@@ -30,6 +30,7 @@ import {
   createReveal,
   hoverLabel,
   markerFace,
+  paintLabel,
   paintMarker,
 } from "./markers";
 
@@ -544,6 +545,14 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
       .setLngLat([place.longitude, place.latitude])
       .setDOMContent(hoverLabel(place))
       .addTo(instance);
+
+    // After `addTo`, because the shell Mapbox paints white does not exist
+    // until then.
+    const shell = label.current.getElement?.();
+
+    if (shell) {
+      paintLabel(shell);
+    }
   }, [hoveredId, selectedId, clusters]);
 
   const searchHere = () => {

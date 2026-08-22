@@ -501,10 +501,26 @@ describe("keeping the map in view on a phone", () => {
     nearby.places = [row("1"), row("2")];
   });
 
+  /**
+   * The map's own panel, not the workspace around it.
+   *
+   * Both are sticky now — the workspace pins the whole split below the header
+   * at `lg`, the panel pins the map above the list on a phone — so "the first
+   * element with sticky in its class" stopped meaning anything. The panel is
+   * the one pinned at every width, so its `top-` carries no breakpoint
+   * prefix.
+   *
+   * Layout is the one thing jsdom cannot actually exercise: it applies no
+   * Tailwind and lays nothing out. These assertions are deliberately few and
+   * they check the two facts that have broken before — what the map is
+   * pinned against, and what it is measured in.
+   */
   const mapPanel = (container: HTMLElement) =>
-    container.querySelector<HTMLElement>("[class*='sticky']");
+    [...container.querySelectorAll<HTMLElement>("[class*='sticky']")].find(
+      (element) => /(^|\s)top-\[/.test(element.className),
+    ) ?? null;
 
-  it("pins the map once it reaches the top", async () => {
+  it("pins the map so the results scroll underneath it", async () => {
     const { container } = show("/nearby?view=map");
 
     await screen.findByRole("link", { name: /restaurant 1/i });
@@ -512,14 +528,19 @@ describe("keeping the map in view on a phone", () => {
     expect(mapPanel(container)).not.toBeNull();
   });
 
-  it("clears the header rather than sliding under it", async () => {
-    // The header is `sticky top-0` at `h-14`, so a map pinned at 0 would be
-    // half hidden behind it.
+  it("pins it against the header's own height rather than a copy of it", async () => {
+    // The header height was written three times in three numbers — `h-14` on
+    // the header, `top-14` here, `scroll-mt-16` on the menu. Anything pinned
+    // below the bar was guessing at how tall it is, and a guess made against
+    // a desktop window is still a guess when it renders on a phone. One
+    // token, and it includes the bar's 1px border: offset by the bar alone,
+    // sticky content sits a hair high and shows a sliver of whatever is
+    // scrolling behind it.
     const { container } = show("/nearby?view=map");
 
     await screen.findByRole("link", { name: /restaurant 1/i });
 
-    expect(mapPanel(container)?.className).toContain("top-14");
+    expect(mapPanel(container)?.className).toContain("top-[var(--offset-header)]");
   });
 
   it("is not pinned from the moment the page loads", async () => {
@@ -529,7 +550,7 @@ describe("keeping the map in view on a phone", () => {
 
     await screen.findByRole("link", { name: /restaurant 1/i });
 
-    expect(mapPanel(container)?.className).not.toMatch(/fixed/);
+    expect(mapPanel(container)?.className).not.toMatch(/fixed/);
   });
 
   it("measures itself against the visible viewport, not a fixed pixel count", async () => {
@@ -546,13 +567,72 @@ describe("keeping the map in view on a phone", () => {
     expect(className).toContain("vh]");
   });
 
-  it("stops being pinned once there is room for both", async () => {
-    // At `lg` the split layout takes over: the map is a column of its own
-    // and pinning it to the top of the window would fight that.
+  it("stops being pinned to the top once the split takes over", async () => {
+    // At `lg` the map is a column of its own inside a workspace that is
+    // itself pinned. Two things pinning the same element fight each other.
     const { container } = show("/nearby?view=map");
 
     await screen.findByRole("link", { name: /restaurant 1/i });
 
     expect(mapPanel(container)?.className).toContain("lg:static");
+  });
+});
+
+describe("who owns the scroll in the workspace", () => {
+  beforeEach(() => {
+    place.location = { latitude: 40.71, longitude: -73.96, label: "Flushing" };
+    place.source = "chosen";
+    nearby.places = [row("1"), row("2")];
+    nearby.hasMore = true;
+  });
+
+  const resultsPane = (container: HTMLElement) =>
+    container.querySelector<HTMLElement>(".results-scroll");
+
+  it("gives the results their own scroller rather than the page", async () => {
+    // The whole page used to scroll, so reading past the sixth restaurant
+    // carried the map off the top of the window - and the map is the entire
+    // reason for this view.
+    const { container } = show("/nearby?view=map");
+
+    await screen.findByRole("link", { name: /restaurant 1/i });
+
+    expect(resultsPane(container)?.className).toContain("lg:overflow-y-auto");
+  });
+
+  it("lets the scroll out at the edges rather than trapping it", async () => {
+    // `overscroll-contain` refuses to hand the scroll onward at all, so a
+    // reader who had run out of restaurants could not reach the footer
+    // without moving the pointer off the list first. Chaining *is* the
+    // handoff: the pane moves while it has room, the page takes over at the
+    // top and bottom edges.
+    const { container } = show("/nearby?view=map");
+
+    await screen.findByRole("link", { name: /restaurant 1/i });
+
+    expect(resultsPane(container)?.className).not.toMatch(/overscroll-contain/);
+  });
+
+  it("can shrink below its contents, which is what makes it scroll", async () => {
+    // A grid item defaults to `min-height: auto` and refuses to shrink below
+    // its content, so without this the pane grows to fit every restaurant,
+    // never overflows, never scrolls, and the document scrolls instead.
+    const { container } = show("/nearby?view=map");
+
+    await screen.findByRole("link", { name: /restaurant 1/i });
+
+    expect(resultsPane(container)?.className).toContain("lg:min-h-0");
+  });
+
+  it("keeps show-more inside the list it belongs to", async () => {
+    // Outside the scroller it would sit under the map, unreachable by
+    // scrolling the list it loads more of.
+    const { container } = show("/nearby?view=map");
+
+    await screen.findByRole("link", { name: /restaurant 1/i });
+
+    const more = screen.getByRole("button", { name: NEARBY_LABELS.showMore });
+
+    expect(resultsPane(container)?.contains(more)).toBe(true);
   });
 });

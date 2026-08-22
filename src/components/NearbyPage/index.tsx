@@ -313,14 +313,21 @@ const NearbyPage: FC = () => {
            fragments - which is also the width the recognition marks
            (Michelin, Must Visit) will need when they arrive.
 
-           The height is the viewport less the controls above it. `dvh`
+           **The height is the viewport under the header, and the offset is
+           the header's own `h-14`** rather than a number measured off one
+           screenshot. An earlier version subtracted a guess at everything
+           above the workspace — title, location line, filter chip — which is
+           a figure that changes the moment a filter is applied, and being
+           wrong high pushes the bottom of the map below the fold and brings
+           back the page scroll this exists to remove.
+
+           Sticky, so the reader gets both: the title and filters scroll away
+           like ordinary page content, then the workspace reaches the header
+           and pins. Its parent is exactly this plus those controls, so the
+           travel available to the sticky element is the height of the
+           controls — it pins when they are gone and stays pinned. `dvh`
            rather than `vh` because a phone's address bar makes the two
-           differ by the height of a restaurant card, and the subtraction
-           errs generous: too small leaves a strip of empty page, while too
-           large pushes the bottom of the map below the fold and brings back
-           the page scroll this replaces. The floor keeps it usable on a
-           short window, where scrolling a little is better than a map two
-           centimetres tall. */
+           differ by the height of a restaurant card. */
         // On a phone the map pins to the top of the viewport once it gets
         // there, and the results keep scrolling underneath it. Sticky rather
         // than fixed with a locked page: `position: sticky` needs no scroll
@@ -328,12 +335,12 @@ const NearbyPage: FC = () => {
         // disappearing toolbar and Mapbox's own gesture handling both keep
         // working - and until the map reaches the top, the page scrolls
         // normally through the heading, the filters and the location.
-        <div className="flex flex-col gap-3 lg:grid lg:min-h-0 lg:grid-cols-[minmax(380px,45fr)_55fr] lg:h-[calc(100dvh-15rem)] lg:min-h-[26rem] lg:gap-4 xl:grid-cols-[minmax(420px,38fr)_62fr]">
+        <div className="flex flex-col gap-3 lg:sticky lg:top-[var(--offset-header)] lg:grid lg:h-[calc(100dvh-var(--offset-header))] lg:min-h-0 lg:grid-cols-[minmax(380px,45fr)_55fr] lg:gap-4 xl:grid-cols-[minmax(420px,38fr)_62fr]">
           {/* Second in the source order, first on the screen at `lg`: the
               list is the half that always works, so it is what a screen
               reader and a keyboard reach first. On a phone the map is on
               top, which is the view somebody asked for by tapping Map. */}
-          <div className="sticky top-14 z-10 -mx-4 h-[42vh] overflow-hidden border-y border-line bg-surface px-0 [@supports(height:1dvh)]:h-[42dvh] sm:mx-0 sm:rounded-card sm:border lg:static lg:z-auto lg:order-2 lg:h-full lg:border">
+          <div className="sticky top-[var(--offset-header)] z-10 -mx-4 h-[42vh] overflow-hidden border-y border-line bg-surface px-0 [@supports(height:1dvh)]:h-[42dvh] sm:mx-0 sm:rounded-card sm:border lg:static lg:z-auto lg:order-2 lg:h-full lg:border">
             <Suspense
               fallback={
                 <div className="h-full w-full animate-pulse bg-surface-sunken motion-reduce:animate-none" />
@@ -367,15 +374,33 @@ const NearbyPage: FC = () => {
             />
           </div>
 
-          {/* The one scrollable area, and the reason the map can stay still.
-              `overscroll-contain` stops a flick that reaches the end of the
-              list from carrying on into the page behind it. */}
-          {/* Enough below the map that there is something to scroll: a list
-              shorter than the space under a sticky map cannot move, and the
-              map would look stuck rather than pinned. `env(safe-area-inset-
+          {/* **The one scrollable area inside the workspace**, which is what
+              lets the map stay still: a wheel over this pane moves the pane,
+              because the browser scrolls the innermost scroller that can
+              still move before it touches the document.
+
+              **Scroll chaining is deliberately left on.** It was
+              `overscroll-contain`, which is the opposite of what this needs:
+              contain refuses to hand the scroll onward at all, so a reader
+              who had run out of restaurants could not reach the footer
+              without first moving the pointer off the list. Chaining *is*
+              the handoff — the pane scrolls while it has room, and the page
+              takes over at the top and bottom edges, in whichever direction
+              the pane can no longer move.
+
+              `lg:min-h-0` is load-bearing. A grid item defaults to
+              `min-height: auto` and refuses to shrink below its content, so
+              without it this pane grows to fit every restaurant, never
+              overflows, never scrolls, and the document scrolls instead —
+              carrying the map off the top of the window, which is the whole
+              complaint.
+
+              Below `lg` there is no inner scroller at all: the map is pinned
+              above and the list is ordinary page content under it, which is
+              the one-thumb version of the same idea. `env(safe-area-inset-
               bottom)` keeps the last card clear of the iPhone home indicator
               and of Safari's toolbar when it slides back in. */}
-          <div className="min-w-0 pb-[env(safe-area-inset-bottom)] lg:order-1 lg:min-h-0 lg:overflow-y-auto lg:overscroll-contain lg:pb-4 lg:pr-1">
+          <div className="results-scroll min-w-0 pb-[env(safe-area-inset-bottom)] lg:order-1 lg:min-h-0 lg:overflow-y-auto lg:pb-4 lg:pr-1">
             {results}
           </div>
         </div>

@@ -172,13 +172,35 @@ our own cuisine artwork.**
 - **List → Map fetches nothing.** The map is handed the array the list already
   has. Panning and zooming fetch nothing. Only "Search this area" spends a
   query, and only ten rows of one. Pointing at a row spends nothing either.
-- **On the map view from `lg`, the results are a column and the map is pinned
-  beside them** (`45fr_55fr`, `lg:sticky`). Stacked, the relationship broke the
-  moment the reader scrolled: the map went up past the top of the window and
-  hovering a result changed something nobody could see. Below `lg` it stays a
-  tab — a phone has room for one of these at a time, and half a map beside
-  half a list is neither. It splits inside the app-wide `max-w-5xl`; widening
-  one page past the header and footer is a shell decision, not a page one.
+- **The map view is a workspace, not a page with a map on it.** From `lg` the
+  results are a column and the map is the larger half beside them
+  (45/55, widening to 38/62 at `xl`, with a pixel floor so the cards never
+  become wrapped fragments — the width the recognition marks will need). It
+  is the one screen allowed past the shell's `max-w-5xl`, because every other
+  screen is a column of reading and this one is a tool.
+- **The workspace pins under the header and the results own the scroll.** The
+  title and filters scroll away like ordinary page content, then the split
+  reaches the header and stays. Inside it the results pane is the only
+  scroller, so a wheel over the list moves the list — the browser scrolls the
+  innermost scroller that can still move before it touches the document.
+  **Never `overscroll-contain` here**: chaining *is* the handoff, and
+  containing it strands a reader who has run out of restaurants above a
+  footer they cannot reach. `lg:min-h-0` on the pane is load-bearing — a grid
+  item refuses to shrink below its content, so without it the pane grows to
+  fit every restaurant and the document scrolls instead, carrying the map off
+  the top of the window. The scrollbar is deliberately visible; a pane that
+  scrolls without saying so reads as a list that simply ends.
+- **`--offset-header` is the only thing to pin against.** The bar's height was
+  written three times in three numbers (`h-14`, `top-14`, `scroll-mt-16`), so
+  anything sticky was guessing at it — and a guess made against a desktop
+  window still renders on a phone. The token includes the bar's 1px border,
+  because offsetting by the bar alone leaves a sliver of scrolling content
+  above whatever is pinned.
+- **Below `lg` the map pins above the list instead.** One thumb, one column:
+  the map holds the top of the screen at `42dvh` and the results scroll under
+  it. `dvh` rather than `vh` — Safari's toolbar makes them differ by the
+  height of a restaurant card, and a map sized in `vh` is cut off exactly
+  when the toolbar slides back.
 - **Hover and selection are two states.** Hover is a preview lasting exactly
   as long as the pointer or the focus; a choice survives the pointer moving
   on. They were one, so tapping a pin and then reading down the list threw the
@@ -207,6 +229,15 @@ meant revisiting rather than stretching. Paging raised it.
 - **Tapping a cluster is a camera move, never a search.** It zooms over places
   already in hand. A test asserts no query fires, and that our own `easeTo`
   does not then offer "Search this area".
+- **Hovering shows a name; choosing shows the card.** The hover label is a
+  real `mapboxgl.Popup` at the restaurant's own coordinates. It was a
+  `position: absolute` span inside the marker element and rendered visibly to
+  one side — that element belongs to Mapbox, it is transformed every frame,
+  and it carries `line-height: 0` and touch padding of its own, so anything
+  measured against it is measured against a moving target. **No anchor is
+  passed**, which is the whole edge-collision behaviour: given none, Mapbox
+  picks from the space left in the container and flips the label near an
+  edge. Never both for one restaurant.
 - **Hovering a result reveals it even when a cluster is hiding it.**
   `findCluster`/`placeInClusters` find the place, and the map draws *one extra
   pin* at its own coordinates above the group, carrying its name — the only

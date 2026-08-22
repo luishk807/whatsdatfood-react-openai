@@ -282,10 +282,61 @@ export const createReveal = (place: NearbyPlaceType): HTMLElement => {
 // --- the name beside the pin ----------------------------------------------
 
 export const HOVER_LABEL_CLASS = "wdf-hover-label";
-/** Styled in `index.css`, against the theme tokens rather than Mapbox's own
- * white. A popup painted in a literal colour is the one thing on the page
- * that does not flip with the rest of it. */
 export const HOVER_POPUP_CLASS = "wdf-hover-popup";
+
+/**
+ * Repaint Mapbox's popup shell in this product's colours.
+ *
+ * **Styled here rather than in `index.css`, and the reason is the bundle.**
+ * Tailwind's stylesheet is inlined into the main chunk, so a rule naming
+ * `.mapboxgl-popup-content` puts the string "mapbox" there — which is
+ * exactly what `grep -c mapbox dist/main.*.js` looks for to prove the 1.78
+ * MiB library is not being shipped to everybody. A false positive on that
+ * check is worse than an awkward function: it is a safety rule people learn
+ * to ignore. Everything Mapbox-shaped stays in the chunk only a reader who
+ * tapped Map downloads, which is also where `markers.ts` already paints
+ * every pin by hand.
+ *
+ * Tokens, not hexes. Mapbox ships this popup white with a white tip, and a
+ * white pill is the one thing on the page that would not flip with the
+ * theme — the bug that already shipped once in the search suggestions and
+ * both modals.
+ *
+ * The tip is hidden rather than themed: it is a CSS triangle built from
+ * borders, so each of the eight anchors colours a different side, and Mapbox
+ * picks the anchor itself — which is precisely what keeps the label off the
+ * container edge. Eight cases to maintain means the one nobody tested
+ * renders a black wedge on the map. A pill sitting a few pixels off the pin
+ * reads as attached without one.
+ */
+export const paintLabel = (root: HTMLElement): void => {
+  // It belongs to the pointer. Catching the pointer itself would mean the
+  // label removing the hover that created it — a flicker with no way out —
+  // and it would swallow clicks meant for the pin underneath.
+  root.style.pointerEvents = "none";
+  root.style.zIndex = "6";
+
+  const content = root.querySelector<HTMLElement>(".mapboxgl-popup-content");
+
+  if (content) {
+    content.style.padding = "0.25rem 0.5rem";
+    content.style.borderRadius = "var(--radius-pill)";
+    content.style.border = "1px solid var(--color-ink)";
+    content.style.background = "var(--color-surface-raised)";
+    content.style.color = "var(--color-ink)";
+    content.style.fontSize = "0.6875rem";
+    content.style.fontWeight = "600";
+    content.style.lineHeight = "1.4";
+    content.style.whiteSpace = "nowrap";
+    content.style.boxShadow = "var(--shadow-tile)";
+  }
+
+  const tip = root.querySelector<HTMLElement>(".mapboxgl-popup-tip");
+
+  if (tip) {
+    tip.style.display = "none";
+  }
+};
 
 /**
  * The restaurant's name, for a `mapboxgl.Popup` to carry.
