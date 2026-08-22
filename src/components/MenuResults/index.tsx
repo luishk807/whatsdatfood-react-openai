@@ -34,6 +34,7 @@ import TopDishStrip from "@/components/TopDishStrip";
 import DishGrid from "@/components/DishGrid";
 import MenuStatusPanel from "@/components/MenuStatusPanel";
 import MenuMissing from "@/components/MenuMissing";
+import useMenuPhotoUpload from "@/customHooks/useMenuPhotoUpload";
 import MenuProvenance from "@/components/MenuProvenance";
 import useMenuStatus from "@/customHooks/useMenuStatus";
 import DishPhoto from "@/components/DishPhoto";
@@ -165,6 +166,9 @@ const MenuResults: FC = () => {
     Boolean(restaurantInfo),
   );
   const wasPending = useRef(false);
+  // The restaurant's own slug: the endpoint takes whatever identifies the
+  // restaurant, and the page already has it.
+  const menuPhoto = useMenuPhotoUpload(restaurantInfo?.id);
 
   useEffect(() => {
     // It arrived. Pull the menu in without making the reader find a reload
@@ -433,7 +437,12 @@ const MenuResults: FC = () => {
                 waiting is genuinely over: while a job is still running the
                 panel below says so instead. */}
             {categories.length === 0 && menuStatus.state === "unavailable" && (
-              <MenuMissing />
+              <MenuMissing
+                onSelectPhoto={menuPhoto.upload}
+                uploading={menuPhoto.uploading}
+                queued={menuPhoto.queued}
+                error={menuPhoto.error}
+              />
             )}
 
             {/* Where the food goes while it is still being worked out.

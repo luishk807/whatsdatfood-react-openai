@@ -44,20 +44,16 @@ describe("what it says", () => {
 });
 
 describe("the camera path", () => {
-  it("offers a photo control when there is somewhere to send it", async () => {
-    const onAddPhoto = jest.fn();
+  it("offers a photo control when there is somewhere to send it", () => {
+    render(<MenuMissing onSelectPhoto={jest.fn()} />);
 
-    render(<MenuMissing onAddPhoto={onAddPhoto} />);
-
-    await userEvent.click(
+    expect(
       screen.getByRole("button", { name: MENU_MISSING_LABELS.photo }),
-    );
-
-    expect(onAddPhoto).toHaveBeenCalled();
+    ).toBeInTheDocument();
   });
 
   it("offers none when there is not", () => {
-    // A button that opens a camera and then has nowhere to send the
+    // A control that opens a camera and then has nowhere to send the
     // photograph spends somebody's goodwill on a dead end.
     render(<MenuMissing />);
 
@@ -70,8 +66,38 @@ describe("the camera path", () => {
     // `AddDishAction` sits directly below with its own control and sheet,
     // already worded for a restaurant with no menu. Two buttons doing one
     // thing is two things to keep in step.
-    render(<MenuMissing onAddPhoto={jest.fn()} />);
+    render(<MenuMissing onSelectPhoto={jest.fn()} />);
 
     expect(screen.getAllByRole("button")).toHaveLength(1);
+  });
+});
+
+describe("after the photograph is sent", () => {
+  it("says it is queued, never that it is published", async () => {
+    // Promising it is live when it is waiting is a promise that breaks the
+    // next time they look.
+    render(<MenuMissing onSelectPhoto={jest.fn()} queued />);
+
+    expect(screen.getByText(MENU_MISSING_LABELS.queued)).toBeInTheDocument();
+  });
+
+  it("stops offering the camera once one is in", () => {
+    render(<MenuMissing onSelectPhoto={jest.fn()} queued />);
+
+    expect(
+      screen.queryByRole("button", { name: MENU_MISSING_LABELS.photo }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("shows the server's own words when it refuses", () => {
+    // "That photo is too large" and "that file is not an image we can read"
+    // each explain what to do differently; a generic failure explains none.
+    render(
+      <MenuMissing onSelectPhoto={jest.fn()} error="That photo is too large." />,
+    );
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "That photo is too large.",
+    );
   });
 });

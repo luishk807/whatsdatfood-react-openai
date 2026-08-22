@@ -609,6 +609,35 @@ which ones deserve attention.
   been established, and a backend test asserts the catalogue holds none. Ask
   before building any ingestion.
 
+## A menu photograph is an artifact, not a menu
+
+- **The photograph is the source and stays the source.** Whatever is read out
+  of it later is derived, and derived things can be wrong and be corrected
+  against this. Nothing deletes the original once dishes exist.
+- **Uploading publishes no dishes**, and neither does approving one. Reading a
+  menu out of an image is a separate step and a separate decision — a wrong
+  dish is somebody ordering something that does not exist. Tests hold both,
+  and assert the service exposes no extraction at all.
+- **It waits for review**, unlike a dish photo. Food goes up immediately
+  because a contributor who sees nothing until tomorrow does not come back;
+  this is a document that may carry a phone number or a face at the next
+  table, it is not what a reader came to see, and nothing is lost by looking
+  first.
+- **Never square-cropped.** `process_image` fits to the short edge, which is
+  right for a grid of food and destructive here — a portrait photograph of a
+  menu board loses its top and bottom, which is where the menu is.
+  `process_document` keeps the aspect ratio and holds it larger, because the
+  point is that the words can be read. Validation, screening, storage and
+  duplicate handling are the dish path's.
+- **The camera control is `PhotoUploadAction`**, like every other entry point.
+  It owns the hidden input, `capture` and the reset that lets the same file be
+  chosen twice.
+- **The page says queued, never published.** Promising it is live when it is
+  waiting is a promise that breaks the next time they look.
+- **No Food Cred for it.** A dish photograph is a finished contribution the
+  moment it lands; this is raw material whose worth is unknown until somebody
+  has looked, and paying up front is an incentive to upload anything.
+
 ## Contributor reputation — Food Cred
 
 The server owns every number. The frontend renders what it is told and computes

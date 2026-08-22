@@ -1,5 +1,5 @@
 import { type FC } from "react";
-import { CameraIcon } from "@/components/icons";
+import PhotoUploadAction from "@/components/PhotoUploadAction";
 import { MENU_MISSING_LABELS } from "@/customConstants/labels";
 import { MenuMissingInterface } from "@/interfaces/menu";
 
@@ -26,7 +26,12 @@ import { MenuMissingInterface } from "@/interfaces/menu";
  * the page and belongs to the restaurant rather than to the reader, and two
  * asks stacked together make both easier to skip.
  */
-const MenuMissing: FC<MenuMissingInterface> = ({ onAddPhoto, uploading }) => (
+const MenuMissing: FC<MenuMissingInterface> = ({
+  onSelectPhoto,
+  uploading,
+  queued,
+  error,
+}) => (
   <section
     aria-labelledby="menu-missing"
     className="flex flex-col items-center gap-3 rounded-card border border-line bg-surface-raised px-6 py-10 text-center"
@@ -48,17 +53,26 @@ const MenuMissing: FC<MenuMissingInterface> = ({ onAddPhoto, uploading }) => (
         directly below with its own control and sheet, already worded for a
         restaurant with no menu, and a second button doing the same thing is
         two things to keep in step. */}
-    {onAddPhoto && (
+    {queued && (
+      <p role="status" className="max-w-sm text-sm font-medium text-ink">
+        {MENU_MISSING_LABELS.queued}
+      </p>
+    )}
+
+    {error && (
+      <p role="alert" className="max-w-sm text-sm text-danger">
+        {error}
+      </p>
+    )}
+
+    {onSelectPhoto && !queued && (
       <>
-        <button
-          type="button"
-          onClick={onAddPhoto}
-          disabled={uploading}
-          className="inline-flex min-h-11 items-center justify-center gap-2 rounded-pill border border-ink px-4 text-sm font-medium text-ink hover:bg-surface-sunken disabled:opacity-60"
-        >
-          <CameraIcon size={16} />
-          {MENU_MISSING_LABELS.photo}
-        </button>
+        <PhotoUploadAction
+          onSelect={onSelectPhoto}
+          label={MENU_MISSING_LABELS.photo}
+          uploadingLabel={MENU_MISSING_LABELS.uploading}
+          uploading={uploading}
+        />
 
         <p className="max-w-sm text-xs text-ink-muted">
           {MENU_MISSING_LABELS.photoHint}

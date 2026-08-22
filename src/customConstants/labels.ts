@@ -1099,6 +1099,15 @@ export const MENU_MISSING_LABELS = {
   photoHint: "A printed menu, a board, a counter sign — whatever is in front of you.",
   dish: "Add a dish you tried",
   invite: "Know this place? Help others see what's good here.",
+  uploading: "Sending…",
+  signInToUpload: "Sign in to add a menu photo",
+  uploadFailed: "That photo didn't upload. Try again?",
+  /**
+   * Said after an upload, and it says *queued* rather than *published*.
+   * Promising it is live when it is waiting is a promise that breaks the next
+   * time they look.
+   */
+  queued: "Thank you — we'll check it and add the dishes we can read.",
 } as const;
 
 export const MENU_STATUS_LABELS = {

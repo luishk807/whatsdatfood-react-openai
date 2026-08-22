@@ -165,8 +165,20 @@ export interface MenuMissingInterface {
    * own, and until those exist the dish contribution below is the working
    * way in.
    */
-  onAddPhoto?: () => void;
+  /**
+   * Receives the chosen file. The control itself is `PhotoUploadAction`,
+   * which owns the hidden input, `capture` and the reset that lets the same
+   * file be chosen twice — four copies of that is how one entry point quietly
+   * stops opening the camera.
+   */
+  onSelectPhoto?: (file: File) => void;
   uploading?: boolean;
+  /** The photograph is with us and waiting to be checked. Said as queued,
+   *  never as published. */
+  queued?: boolean;
+  /** The server's own words about a refusal — each explains what to do
+   *  differently, and a generic failure explains none of them. */
+  error?: string | null;
 }
 
 export interface MenuProvenanceInterface {
