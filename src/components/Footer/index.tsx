@@ -13,7 +13,7 @@ import { ROUTES } from "@/customConstants/routes";
  * photographs comes from.
  */
 const Footer = () => (
-  <footer className="border-t border-line bg-surface">
+  <footer className="min-h-[var(--height-footer)] border-t border-line bg-surface">
     <div className="mx-auto flex max-w-5xl flex-col gap-2 px-4 py-6 text-sm sm:flex-row sm:items-center sm:justify-between">
       <div>
         <p className="font-semibold text-ink">{SITE_LABELS.brand}</p>

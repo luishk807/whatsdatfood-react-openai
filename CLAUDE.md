@@ -190,6 +190,22 @@ our own cuisine artwork.**
   fit every restaurant and the document scrolls instead, carrying the map off
   the top of the window. The scrollbar is deliberately visible; a pane that
   scrolls without saying so reads as a list that simply ends.
+- **The app shell must not wrap `Header` in a second `<header>`.** A sticky
+  element can only travel inside its containing block, and that wrapper was a
+  box exactly the height of the bar — travel of zero, so the bar scrolled away
+  with the page and had never actually been pinned. Nothing looked wrong until
+  something was pinned *below* it: the nearby map went on reserving a bar's
+  height for a bar no longer on screen, and the list showed through the strip.
+  A test asserts one `banner` landmark, which is the readable symptom of the
+  same fault.
+- **The map workspace subtracts the footer as well as the header.** A
+  viewport-tall pinned element and a footer below it in the document cannot
+  both be on screen — revealing the footer means the workspace moving up,
+  which clips the top of the map and takes the zoom controls with it. Padding
+  and sticky travel do not help; the only fix is leaving room, so bar +
+  workspace + footer add up to one screen. `--height-footer` is the footer's
+  own `min-height`, so the number describes the footer rather than guessing at
+  it.
 - **`--offset-header` is the only thing to pin against.** The bar's height was
   written three times in three numbers (`h-14`, `top-14`, `scroll-mt-16`), so
   anything sticky was guessing at it — and a guess made against a desktop

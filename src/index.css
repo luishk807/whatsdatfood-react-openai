@@ -79,6 +79,20 @@
      class on the element, so the breakpoint that overrides it actually can. */
   --height-map-phone: 42vh;
 
+  /* How much room the footer needs at the bottom of the window.
+     
+     The map workspace subtracts it. A viewport-tall pinned element and a
+     footer below it in the document cannot both be on screen — to reveal the
+     footer the pinned element has to move up, and no amount of padding or
+     sticky travel changes that; it just clips the top of the map and takes
+     the zoom controls with it. Sized to leave room for both instead, so the
+     bar, the workspace and the footer add up to one screen and nothing is
+     ever cut off.
+     
+     `Footer` carries this as its `min-height`, so the number is a
+     description of the footer rather than a guess about it. */
+  --height-footer: 6rem;
+
   /* The menu-preparation bar. Indeterminate on purpose: the backend does not
      know how far through an extraction is, so the bar sweeps rather than
      fills and no number is ever claimed. Registered here because Tailwind 4

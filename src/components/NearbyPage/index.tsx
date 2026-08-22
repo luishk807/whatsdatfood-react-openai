@@ -325,9 +325,17 @@ const NearbyPage: FC = () => {
            like ordinary page content, then the workspace reaches the header
            and pins. Its parent is exactly this plus those controls, so the
            travel available to the sticky element is the height of the
-           controls — it pins when they are gone and stays pinned. `dvh`
-           rather than `vh` because a phone's address bar makes the two
-           differ by the height of a restaurant card. */
+           controls — it pins when they are gone and stays pinned.
+
+           **The footer's height comes off the top of that**, and it has to.
+           A workspace the full height of the window and a footer below it in
+           the document cannot both be on screen: revealing the footer means
+           the pinned workspace moving up, which clips the top of the map and
+           takes the zoom controls with it. No amount of padding or sticky
+           travel avoids that — the only fix is leaving room, so the bar, the
+           workspace and the footer add up to one screen. `dvh` rather than
+           `vh` because a phone's address bar makes the two differ by the
+           height of a restaurant card. */
         // On a phone the map pins to the top of the viewport once it gets
         // there, and the results keep scrolling underneath it. Sticky rather
         // than fixed with a locked page: `position: sticky` needs no scroll
@@ -335,7 +343,7 @@ const NearbyPage: FC = () => {
         // disappearing toolbar and Mapbox's own gesture handling both keep
         // working - and until the map reaches the top, the page scrolls
         // normally through the heading, the filters and the location.
-        <div className="flex flex-col gap-3 lg:sticky lg:top-[var(--offset-header)] lg:grid lg:h-[calc(100dvh-var(--offset-header))] lg:min-h-0 lg:grid-cols-[minmax(380px,45fr)_55fr] lg:gap-4 xl:grid-cols-[minmax(420px,38fr)_62fr]">
+        <div className="flex flex-col gap-3 lg:sticky lg:top-[var(--offset-header)] lg:grid lg:h-[calc(100dvh-var(--offset-header)-var(--height-footer))] lg:min-h-0 lg:grid-cols-[minmax(380px,45fr)_55fr] lg:gap-4 xl:grid-cols-[minmax(420px,38fr)_62fr]">
           {/* Second in the source order, first on the screen at `lg`: the
               list is the half that always works, so it is what a screen
               reader and a keyboard reach first. On a phone the map is on

@@ -672,3 +672,40 @@ describe("the phone map height still falls back", () => {
     expect(css).toMatch(/--height-map-phone:\s*42dvh/);
   });
 });
+
+describe("the workspace leaves room for what is under it", () => {
+  beforeEach(() => {
+    place.location = { latitude: 40.71, longitude: -73.96, label: "Flushing" };
+    place.source = "chosen";
+    nearby.places = [row("1"), row("2")];
+  });
+
+  const workspace = (container: HTMLElement) =>
+    container.querySelector<HTMLElement>("[class*='lg:sticky']");
+
+  it("subtracts the header and the footer from the window", async () => {
+    // A workspace the full height of the window and a footer below it in the
+    // document cannot both be on screen: revealing the footer means the
+    // pinned workspace moving up, which clips the top of the map and takes
+    // the zoom controls with it. Padding and sticky travel do not help - the
+    // fix is leaving room, so the bar, the workspace and the footer add up
+    // to one screen.
+    const { container } = show("/nearby?view=map");
+
+    await screen.findByRole("link", { name: /restaurant 1/i });
+
+    expect(workspace(container)?.className).toContain(
+      "lg:h-[calc(100dvh-var(--offset-header)-var(--height-footer))]",
+    );
+  });
+
+  it("pins against the header rather than a copy of its height", async () => {
+    const { container } = show("/nearby?view=map");
+
+    await screen.findByRole("link", { name: /restaurant 1/i });
+
+    expect(workspace(container)?.className).toContain(
+      "lg:top-[var(--offset-header)]",
+    );
+  });
+});
