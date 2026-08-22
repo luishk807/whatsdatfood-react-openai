@@ -30,3 +30,36 @@ export interface RecognitionBadgesInterface {
   /** Cards sit tighter than a detail page. */
   compact?: boolean;
 }
+
+/** The admin view of a row: everything, including what is not public. */
+export interface AdminRecognitionType extends RecognitionType {
+  id: string;
+  level?: number | null;
+  status: string;
+  verified_at?: string | null;
+  review_due_at?: string | null;
+  valid_from?: string | null;
+  valid_to?: string | null;
+  internal_notes?: string | null;
+}
+
+export interface NewRecognitionType {
+  award: string;
+  source: string;
+  referenceUrl: string;
+  year?: number | null;
+  internalNotes?: string | null;
+}
+
+export interface RecognitionQueueInterface {
+  recognitions: AdminRecognitionType[];
+  loading?: boolean;
+  /** Which row is mid-decision, so its buttons can be disabled. */
+  busyId?: string | null;
+  /** A server refusal, shown verbatim — each one explains a rule. */
+  error?: string | null;
+  onAdd: (fields: NewRecognitionType) => Promise<void>;
+  onVerify: (id: string) => Promise<void>;
+  onUnpublish: (id: string) => Promise<void>;
+  onExpire: (id: string) => Promise<void>;
+}

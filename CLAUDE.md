@@ -552,6 +552,23 @@ which ones deserve attention.
 - **"Why Must Visit?" describes only what was counted**, and says nothing when
   there is nothing real to describe. An official award never gets our words —
   the guide's reasoning is theirs.
+- **An admin curates external recognitions in `/admin`, not in SQL.**
+  `RecognitionQueue` is a short list with contextual actions under the queues,
+  because a distinction is moderation metadata rather than a product area of
+  its own — there is deliberately no awards dashboard. Saving records a row;
+  it stays hidden until somebody verifies it against the source, and the form
+  says so. Our own signals appear read-only: they are recomputed on every
+  trending run, so a button to edit one would be undone by the next.
+- **The wording is "Admin verified", never "Michelin verified".** A person
+  checked a source and believes it is currently accurate; they are not the
+  guide, and we have no relationship with the guide. A test asserts the copy
+  contains neither that phrase nor "official Michelin".
+- **Server refusals are shown verbatim.** No source, no reference link, a
+  duplicate edition, one of our own signals typed by hand — each explains a
+  rule, and rewording them turns an explanation into a failure message.
+- **`internal_notes` and `status` never reach a public read.** They are
+  working notes about what was ambiguous; on a card they would be our internal
+  deliberation printed under somebody else's name.
 - **Nothing external is populated.** The table exists with provenance columns;
   the Michelin rows are absent because no source whose terms permit reuse has
   been established, and a backend test asserts the catalogue holds none. Ask

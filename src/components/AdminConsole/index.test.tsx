@@ -37,6 +37,25 @@ jest.mock("@/customHooks/useAdminQueues", () => ({
  * The cost panel talks to Apollo directly and has its own test. Mocked here so
  * the queue tests do not need a provider.
  */
+// Its own Apollo query, and this suite renders without a client on purpose -
+// the console's job is composing queues, and the recognition section has its
+// own tests.
+jest.mock("@/customHooks/useRecognitionAdmin", () => ({
+  __esModule: true,
+  default: () => ({
+    recognitions: [],
+    opened: false,
+    loading: false,
+    busyId: null,
+    error: null,
+    open: jest.fn(),
+    add: jest.fn(),
+    verify: jest.fn(),
+    unpublish: jest.fn(),
+    expire: jest.fn(),
+  }),
+}));
+
 jest.mock("@/components/ApiUsagePanel", () => ({
   __esModule: true,
   default: () => <div>api usage</div>,

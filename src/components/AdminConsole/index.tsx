@@ -2,6 +2,9 @@ import { type FC, useCallback, useEffect, useState } from "react";
 import useAdminQueues from "@/customHooks/useAdminQueues";
 import useMenuCorrections from "@/customHooks/useMenuCorrections";
 import ApiUsagePanel from "@/components/ApiUsagePanel";
+import RecognitionQueue from "@/components/RecognitionQueue";
+import useRecognitionAdmin from "@/customHooks/useRecognitionAdmin";
+import { RECOGNITION_ADMIN_LABELS } from "@/customConstants/recognition";
 import FeatureStatus from "@/components/FeatureStatus";
 import CorrectionQueue from "@/components/CorrectionQueue";
 import DishSubmissionQueue from "@/components/DishSubmissionQueue";
@@ -36,6 +39,8 @@ import { ManagedDishType } from "@/interfaces/menu";
  * cost one glance rather than three scrolls past three empty sections.
  */
 const AdminConsole: FC = () => {
+  const [lookingUp, setLookingUp] = useState("");
+  const recognition = useRecognitionAdmin();
   const { user } = useAuth();
   const { loadClaims, loadReports, decideClaim, resolveReport, loading } =
     useAdminQueues();
@@ -167,6 +172,51 @@ const AdminConsole: FC = () => {
           {FEATURE_LABELS.title}
         </h2>
         <FeatureStatus />
+      </div>
+
+      {/* Below the queues, because nothing here is waiting on a decision:
+          a recognition is looked up when somebody has a restaurant in mind,
+          rather than arriving in a list that needs working through. */}
+      <div className="flex flex-col gap-3">
+        <h2 className="text-sm font-semibold text-ink">
+          {RECOGNITION_ADMIN_LABELS.title}
+        </h2>
+
+        <form
+          className="flex flex-wrap items-end gap-2"
+          onSubmit={(event) => {
+            event.preventDefault();
+            void recognition.open(lookingUp.trim());
+          }}
+        >
+          <label className="flex flex-1 flex-col gap-1 text-xs text-ink-muted">
+            {RECOGNITION_ADMIN_LABELS.restaurant}
+            <input
+              value={lookingUp}
+              onChange={(event) => setLookingUp(event.target.value)}
+              className="min-h-9 rounded-card border border-line bg-surface-raised px-2 text-sm text-ink"
+            />
+          </label>
+          <button
+            type="submit"
+            className="min-h-9 rounded-pill border border-line px-3 text-xs font-medium text-ink"
+          >
+            {RECOGNITION_ADMIN_LABELS.look}
+          </button>
+        </form>
+
+        {recognition.opened && (
+          <RecognitionQueue
+            recognitions={recognition.recognitions}
+            loading={recognition.loading}
+            busyId={recognition.busyId}
+            error={recognition.error}
+            onAdd={recognition.add}
+            onVerify={recognition.verify}
+            onUnpublish={recognition.unpublish}
+            onExpire={recognition.expire}
+          />
+        )}
       </div>
 
       <div className="flex flex-col gap-3">

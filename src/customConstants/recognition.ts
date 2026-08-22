@@ -111,3 +111,70 @@ export const RECOGNITION_DETAIL_LIMIT = 8;
 
 /** The word for our own family, said once where it needs saying. */
 export const RECOGNITION_HOUSE_SOURCE = "What's Dat Food";
+
+/**
+ * Curation state. Only `verified` is ever public — the gate is enforced on
+ * the server, and this exists so the admin list can say which is which.
+ */
+export const RECOGNITION_STATUS = {
+  draft: "draft",
+  pending: "pending_review",
+  verified: "verified",
+  expired: "expired",
+  rejected: "rejected",
+} as const;
+
+/**
+ * What an admin may award.
+ *
+ * Our own signals are absent on purpose: they are earned from stored activity
+ * on every trending recompute, and a Must Visit typed by hand is exactly the
+ * fabricated popularity this product refuses to invent.
+ */
+export const CURATABLE_AWARDS: string[] = [
+  RECOGNITION_AWARD.michelinOne,
+  RECOGNITION_AWARD.michelinTwo,
+  RECOGNITION_AWARD.michelinThree,
+  RECOGNITION_AWARD.bibGourmand,
+  RECOGNITION_AWARD.michelinSelected,
+];
+
+/**
+ * The admin section's words.
+ *
+ * **Never "Michelin verified".** The person checked a source and believes it
+ * is currently accurate; they are not the guide, and we have no relationship
+ * with the guide. "Admin verified" is the honest description of what happened.
+ */
+export const RECOGNITION_ADMIN_LABELS = {
+  title: "Recognitions",
+  loading: "Loading recognitions…",
+  empty: "No recognitions recorded for this restaurant.",
+  add: "+ Add recognition",
+  award: "Recognition",
+  provider: "Awarded by",
+  reference: "Source you checked",
+  year: "Guide year",
+  notes: "Internal notes",
+  save: "Save",
+  cancel: "Cancel",
+  verify: "Verify",
+  unpublish: "Unpublish",
+  expire: "Expire",
+  source: "Open source",
+  ours: "Earned from activity — recomputed automatically.",
+  addingIsNotPublishing:
+    "Saving records it. It stays hidden until somebody verifies it against the source.",
+  lastChecked: (when: string) =>
+    `Last checked ${new Date(when).toLocaleDateString()}`,
+  status: (value: string) =>
+    ({
+      draft: "Not published",
+      pending_review: "Waiting for review",
+      verified: "Admin verified",
+      expired: "Expired",
+      rejected: "Rejected",
+    })[value] ?? value,
+  restaurant: "Restaurant slug",
+  look: "Look up",
+} as const;
