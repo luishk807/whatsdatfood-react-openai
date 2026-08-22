@@ -2,6 +2,7 @@ import { render, screen, act } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router-dom";
 import RestaurantMap from "@/components/RestaurantMap";
+import { MAP_REVEAL } from "@/customConstants/map";
 import mapboxgl, { FakeMap } from "@/test/mapboxMock";
 import { MAP_LABELS } from "@/customConstants/labels";
 import { NearbyPlaceType } from "@/interfaces/location";
@@ -630,5 +631,68 @@ describe("when the container changes size", () => {
 
     expect(instance()).toBe(before);
     expect(before.removed).toBe(false);
+  });
+});
+
+describe("show me this one", () => {
+  /**
+   * The explicit ask from a row, as distinct from pointing at it. Hover
+   * nudges only when a pin is off screen and never changes the zoom; this
+   * means *go there*, so it always centres and closes in.
+   */
+  const somewhere = [
+    place({ id: "1", latitude: 40.76, longitude: -73.98 }),
+    place({ id: "2", latitude: 40.77, longitude: -73.99 }),
+  ];
+
+  it("goes to the restaurant that was asked for", () => {
+    show({ places: somewhere, focus: { id: "2", nonce: 1 } });
+
+    const where = instance().getCenter();
+
+    expect(where.lng).toBeCloseTo(-73.99, 2);
+    expect(where.lat).toBeCloseTo(40.77, 2);
+  });
+
+  it("closes in to street level", () => {
+    show({ places: somewhere, focus: { id: "1", nonce: 1 } });
+
+    expect(instance().getZoom()).toBe(MAP_REVEAL.FOCUS_ZOOM);
+  });
+
+  it("never zooms back out on somebody who was already closer", () => {
+    // Being closer than street level is a choice they made. Pulling them out
+    // to a fixed number would undo it.
+    const { rerender } = show({ places: somewhere });
+
+    act(() => instance().moveTo(-73.98, 40.76, MAP_REVEAL.FOCUS_ZOOM + 3));
+
+    rerender(
+      <MemoryRouter>
+        <RestaurantMap
+          places={somewhere}
+          centre={centre}
+          focus={{ id: "1", nonce: 1 }}
+        />
+      </MemoryRouter>,
+    );
+
+    expect(instance().getZoom()).toBe(MAP_REVEAL.FOCUS_ZOOM + 3);
+  });
+
+  it("does nothing without an ask", () => {
+    show({ places: somewhere });
+
+    expect(instance().getZoom()).not.toBe(MAP_REVEAL.FOCUS_ZOOM);
+  });
+
+  it("offers no area search for having moved itself", () => {
+    // `easeTo` carries no `originalEvent`. The reader asked to see a
+    // restaurant, not to run a query.
+    show({ places: somewhere, focus: { id: "2", nonce: 1 } });
+
+    expect(
+      screen.queryByRole("button", { name: MAP_LABELS.searchThisArea }),
+    ).not.toBeInTheDocument();
   });
 });

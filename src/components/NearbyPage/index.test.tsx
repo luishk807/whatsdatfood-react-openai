@@ -5,7 +5,7 @@ import { readFileSync } from "fs";
 import { join } from "path";
 import { MockedProvider } from "@apollo/client/testing";
 import NearbyPage from "@/components/NearbyPage";
-import { LOCATION_LABELS, NEARBY_LABELS } from "@/customConstants/labels";
+import { LOCATION_LABELS, MAP_LABELS, NEARBY_LABELS } from "@/customConstants/labels";
 import { CoordinatesType, NearbyPlaceType } from "@/interfaces/location";
 import mapboxgl from "@/test/mapboxMock";
 
@@ -284,7 +284,7 @@ describe("the list and the map are the same ten restaurants", () => {
 
     const before = useNearbyRestaurants.mock.calls.length;
 
-    await userEvent.click(screen.getByRole("button", { name: /map/i }));
+    await userEvent.click(screen.getByRole("button", { name: MAP_LABELS.map }));
 
     // Re-rendering calls the hook again; what matters is that it is called
     // with the same arguments, so Apollo answers from cache and no request
@@ -300,9 +300,9 @@ describe("the list and the map are the same ten restaurants", () => {
   it("remembers which half is showing", async () => {
     show("/nearby");
 
-    await userEvent.click(screen.getByRole("button", { name: /map/i }));
+    await userEvent.click(screen.getByRole("button", { name: MAP_LABELS.map }));
 
-    expect(screen.getByRole("button", { name: /map/i })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: MAP_LABELS.map })).toHaveAttribute(
       "aria-pressed",
       "true",
     );

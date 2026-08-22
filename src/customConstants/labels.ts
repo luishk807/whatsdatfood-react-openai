@@ -1112,6 +1112,8 @@ export const NEARBY_LABELS = {
    */
   findingMore: "Finding more places nearby…",
   unavailable: "Nearby search is not available right now.",
+  /** On the row, beside the name. Says what it does, not what it is. */
+  showOnMap: (name: string) => `Show ${name} on the map`,
   seeDishes: "See dishes",
   noPhotos: "No dish photos yet",
   addFirst: "Add the first photo",

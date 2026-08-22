@@ -70,6 +70,7 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
   hoveredId,
   onSelect,
   onHover,
+  focus,
   onSearchArea,
   onRecentre,
 }) => {
@@ -542,6 +543,65 @@ const RestaurantMap: FC<RestaurantMapInterface> = ({
       duration: MAP_REVEAL.PAN_MS,
     });
   }, [activeId, clusters]);
+
+  /**
+   * "Show me this one", asked from a row rather than by pointing at it.
+   *
+   * Stronger than the hover nudge above on purpose: that one keeps the zoom
+   * and moves only when the pin is off screen, because it fires from a mouse
+   * crossing a list. This fires from a tap that means *go there*, so it
+   * always centres and closes in.
+   *
+   * The zoom is a floor rather than a setting. Somebody already closer than
+   * street level asked for that, and yanking them back out to a fixed number
+   * would undo a deliberate choice - so `Math.max`, never a plain assignment.
+   *
+   * The pin then flashes once. The reader's eye was on a card a moment ago
+   * and has to find its way to a pin among others; a short pulse is what
+   * carries it there, and it is removed afterwards so nothing on the map
+   * animates forever.
+   *
+   * `easeTo` carries no `originalEvent`, so this does not offer "Search this
+   * area" either - the reader asked to see a restaurant, not to run a query.
+   */
+  useEffect(() => {
+    const instance = map.current;
+
+    if (!instance || !focus) {
+      return;
+    }
+
+    const place = placeInClusters(clusters, focus.id);
+
+    if (!place || place.longitude == null || place.latitude == null) {
+      return;
+    }
+
+    instance.easeTo({
+      center: [place.longitude, place.latitude],
+      zoom: Math.max(instance.getZoom(), MAP_REVEAL.FOCUS_ZOOM),
+      duration: MAP_REVEAL.FOCUS_MS,
+    });
+
+    const element = markers.current.get(focus.id)?.getElement();
+
+    if (!element) {
+      return;
+    }
+
+    element.classList.add("map-pin-pulse");
+
+    const timer = window.setTimeout(
+      () => element.classList.remove("map-pin-pulse"),
+      MAP_REVEAL.PULSE_MS,
+    );
+
+    return () => {
+      window.clearTimeout(timer);
+      element.classList.remove("map-pin-pulse");
+    };
+    // The nonce is what makes asking twice for the same restaurant pan twice.
+  }, [focus, clusters]);
 
   /**
    * The restaurant's name, beside its own pin.

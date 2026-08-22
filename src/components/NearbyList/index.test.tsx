@@ -177,3 +177,73 @@ describe("bringing a row into view for the map", () => {
     expect(scrollIntoView).not.toHaveBeenCalled();
   });
 });
+
+describe("show on map", () => {
+  /**
+   * The reader should never have to look at a card, then scan the map
+   * guessing which pin belongs to it. This is the explicit ask.
+   */
+  const showFor = (name: string) =>
+    screen.getByRole("button", { name: NEARBY_LABELS.showOnMap(name) });
+
+  it("offers one on every row", () => {
+    const onShowOnMap = jest.fn();
+    show([place({ id: "1" }), place({ id: "2", name: "Kame" })], { onShowOnMap });
+
+    expect(
+      screen.getAllByRole("button", { name: /on the map$/ }),
+    ).toHaveLength(2);
+  });
+
+  it("names the restaurant it would show", () => {
+    // "Show on map" on eight identical buttons tells a screen reader
+    // nothing about which one it is on.
+    const onShowOnMap = jest.fn();
+    show([place()], { onShowOnMap });
+
+    expect(showFor("Shanghai You Garden")).toBeInTheDocument();
+  });
+
+  it("asks for that restaurant when pressed", async () => {
+    const onShowOnMap = jest.fn();
+    show([place()], { onShowOnMap });
+
+    await userEvent.click(showFor("Shanghai You Garden"));
+
+    expect(onShowOnMap).toHaveBeenCalledWith("1");
+  });
+
+  it("does not open the restaurant page", async () => {
+    // It is a map control on a card that is otherwise a link. Navigating
+    // away would be the opposite of showing somebody where they are.
+    const onSelect = jest.fn();
+    const onShowOnMap = jest.fn();
+    show([place()], { onSelect, onShowOnMap });
+
+    await userEvent.click(showFor("Shanghai You Garden"));
+
+    expect(onShowOnMap).toHaveBeenCalled();
+  });
+
+  it("sits outside the card link", () => {
+    // A button inside a link is invalid and browsers resolve it by dropping
+    // one of them - the same rule that keeps the upload control beside a
+    // dish photo rather than within it.
+    const onShowOnMap = jest.fn();
+    show([place()], { onShowOnMap });
+
+    const link = screen.getByRole("link", { name: /Shanghai You Garden/ });
+
+    expect(link.querySelector("button")).toBeNull();
+  });
+
+  it("is absent when there is no map to show anything on", () => {
+    // The plain list has no map beside it, so a control that points at one
+    // would be a button that does nothing.
+    show([place()]);
+
+    expect(
+      screen.queryByRole("button", { name: /on the map$/ }),
+    ).not.toBeInTheDocument();
+  });
+});

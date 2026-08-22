@@ -2,6 +2,7 @@ import { type FC, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import clsx from "clsx";
 import RestaurantCover from "@/components/RestaurantCover";
+import { PinIcon } from "@/components/icons";
 import { LOCATION_LABELS, NEARBY_LABELS } from "@/customConstants/labels";
 import { buildMenuResultsPath } from "@/customConstants/routes";
 import { NearbyListInterface } from "@/interfaces/location";
@@ -26,6 +27,7 @@ const NearbyList: FC<NearbyListInterface> = ({
   hoveredId,
   onSelect,
   onHover,
+  onShowOnMap,
   scrollToId,
   filterLabel,
   clearFilterHref,
@@ -107,6 +109,9 @@ const NearbyList: FC<NearbyListInterface> = ({
       {places.map((place) => (
         <li
           key={place.id}
+          // The button above is positioned against this, so the row is the
+          // containing block rather than whatever ancestor happened to be.
+          className="relative"
           ref={(node) => {
             if (node) {
               rows.current.set(place.id, node);
@@ -115,6 +120,24 @@ const NearbyList: FC<NearbyListInterface> = ({
             }
           }}
         >
+          {/* A sibling of the card, never inside it: a button nested in a
+              link is invalid and browsers resolve it by dropping one of
+              them - the same rule that keeps the upload control beside a
+              dish photo rather than within it. Absolutely positioned so the
+              card's own layout does not have to make room, and `z-10` so it
+              stays above the card's hit area. */}
+          {onShowOnMap && (
+            <button
+              type="button"
+              onClick={() => onShowOnMap(place.id)}
+              aria-label={NEARBY_LABELS.showOnMap(place.name ?? "")}
+              title={NEARBY_LABELS.showOnMap(place.name ?? "")}
+              className="absolute right-2 top-2 z-10 flex h-9 w-9 items-center justify-center rounded-full text-ink-muted hover:bg-surface-sunken hover:text-ink"
+            >
+              <PinIcon size={16} />
+            </button>
+          )}
+
           <Link
             to={place.slug ? buildMenuResultsPath(place.slug) : "#"}
             /* Focus does everything hover does. The map is the half no
@@ -146,7 +169,7 @@ const NearbyList: FC<NearbyListInterface> = ({
             />
 
             <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-              <span className="truncate text-sm font-semibold text-ink">
+              <span className="truncate pr-8 text-sm font-semibold text-ink">
                 {place.name}
               </span>
 

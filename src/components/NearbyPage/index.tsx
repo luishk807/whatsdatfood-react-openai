@@ -1,4 +1,12 @@
-import { type FC, lazy, Suspense, useEffect, useState } from "react";
+import {
+  type FC,
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import clsx from "clsx";
 import { CloseIcon, ListIcon, MapIcon } from "@/components/icons";
@@ -68,6 +76,17 @@ const NearbyPage: FC = () => {
    * fighting its reader.
    */
   const [hovered, setHovered] = useState<string | null>(null);
+  /**
+   * The standing request to show a restaurant on the map.
+   *
+   * A nonce rather than a bare id: tapping the same row's button twice has to
+   * pan twice, and two identical props are nothing for the map to react to.
+   */
+  const [focus, setFocus] = useState<{ id: string; nonce: number } | null>(
+    null,
+  );
+  /** The map's box, for deciding whether it needs bringing into view. */
+  const mapPanel = useRef<HTMLDivElement>(null);
   const [chosen, setChosen] = useState<{ id: string; fromMap: boolean } | null>(
     null,
   );
@@ -133,6 +152,37 @@ const NearbyPage: FC = () => {
   // Both halves on screen at once, which is a `lg` decision and a map-view
   // one. Below that the map is a tab, because a phone has room for one of
   // these at a time and two cramped columns is neither.
+  /**
+   * "Show me where this is", from the button on a row.
+   *
+   * Three things, in the order they have to happen: choose the restaurant so
+   * both halves mark it, bring the map into view if it is not on screen, and
+   * ask the map to go there. The nonce is what makes a second tap on the same
+   * row pan again - without it React sees an identical prop and does nothing.
+   *
+   * The scroll is deliberately conditional. On a phone the map is pinned at
+   * the top and is usually already visible, and scrolling the page under
+   * somebody who tapped a small button is exactly the jumpiness this is
+   * supposed to remove. Tapping the *card* never scrolls anything.
+   */
+  const showOnMap = useCallback((id: string) => {
+    setChosen({ id, fromMap: false });
+    setFocus((current) => ({ id, nonce: (current?.nonce ?? 0) + 1 }));
+
+    const node = mapPanel.current;
+
+    if (!node) {
+      return;
+    }
+
+    const box = node.getBoundingClientRect();
+    const hidden = box.bottom < 0 || box.top > window.innerHeight;
+
+    if (hidden) {
+      node.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, []);
+
   const workspace = view === "map" && Boolean(location) && !nearby.unavailable;
 
   /**
@@ -151,6 +201,7 @@ const NearbyPage: FC = () => {
         hoveredId={hovered}
         onSelect={(id) => setChosen({ id, fromMap: false })}
         onHover={setHovered}
+        onShowOnMap={showOnMap}
         scrollToId={chosen?.fromMap ? chosen.id : null}
         filterLabel={cuisine ? cuisineName : undefined}
         clearFilterHref={buildNearbyPath({ view })}
@@ -357,7 +408,9 @@ const NearbyPage: FC = () => {
               list is the half that always works, so it is what a screen
               reader and a keyboard reach first. On a phone the map is on
               top, which is the view somebody asked for by tapping Map. */}
-          <div className="sticky top-[var(--offset-header)] z-10 -mx-4 h-[var(--height-map-phone)] overflow-hidden border-y border-line bg-surface px-0 sm:mx-0 sm:rounded-card sm:border lg:static lg:z-auto lg:order-2 lg:h-full lg:border">
+          <div
+            ref={mapPanel}
+            className="sticky top-[var(--offset-header)] z-10 -mx-4 h-[var(--height-map-phone)] overflow-hidden border-y border-line bg-surface px-0 sm:mx-0 sm:rounded-card sm:border lg:static lg:z-auto lg:order-2 lg:h-full lg:border">
             <Suspense
               fallback={
                 <div className="h-full w-full animate-pulse bg-surface-sunken motion-reduce:animate-none" />
@@ -374,6 +427,7 @@ const NearbyPage: FC = () => {
                 hoveredId={hovered}
                 onSelect={(id) => setChosen(id ? { id, fromMap: true } : null)}
                 onHover={setHovered}
+                focus={focus}
                 onSearchArea={area.search}
                 onRecentre={area.clear}
               />

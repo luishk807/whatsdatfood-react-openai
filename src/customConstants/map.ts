@@ -150,6 +150,26 @@ export const MAP_REVEAL = {
    */
   PAN_MS: 350,
   /**
+   * Where "show me this one" takes the camera.
+   *
+   * Street level rather than as close as the map goes: the question is
+   * "which corner is this on", and a view with one building in it has lost
+   * the streets that answer it.
+   *
+   * A floor, never a setting - `Math.max` against the current zoom - because
+   * somebody who has already zoomed in past this asked for that, and pulling
+   * them back out to a fixed number would undo it.
+   */
+  FOCUS_ZOOM: 16,
+  /** Longer than a hover's nudge, because this one was asked for. */
+  FOCUS_MS: 600,
+  /**
+   * How long the pin flashes afterwards. Long enough to catch the eye that
+   * was on the list a moment ago, short enough not to become decoration -
+   * a marker that pulses forever stops meaning "this one".
+   */
+  PULSE_MS: 700,
+  /**
    * How far the name sits from the middle of the pin it belongs to.
    *
    * Radial, and handed to `mapboxgl.Popup` rather than applied by hand: the

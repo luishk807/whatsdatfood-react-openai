@@ -113,6 +113,15 @@ export interface NearbyListInterface {
   /** Null on the way out — the row was left, and nothing is being previewed. */
   onHover?: (id: string | null) => void;
   /**
+   * The explicit "show me where this is" control on a row.
+   *
+   * Separate from tapping the card, which selects and previews without
+   * moving anything. This one is a request to go there, so it may pan and
+   * zoom - the difference between pointing at a restaurant and asking to be
+   * taken to it.
+   */
+  onShowOnMap?: (id: string) => void;
+  /**
    * Bring this row into view, because the reader asked for it somewhere the
    * row is not: a pin on the map. Never set from anything the list itself
    * did — scrolling the list out from under a pointer that is moving down it
@@ -164,6 +173,16 @@ export interface RestaurantMapInterface {
   /** A pin was pointed at, so the row in the list can answer. */
   onHover?: (id: string | null) => void;
   /** "Search this area", once the map has been moved far enough to matter. */
+  /**
+   * An explicit "show me this one", asked from the list.
+   *
+   * Carries a nonce because asking twice for the same restaurant has to
+   * pan again: without it the second tap is an identical prop and React
+   * has nothing to react to. Distinct from `selectedId` on purpose - a pin
+   * clicked on the map selects without the map then moving itself under
+   * the reader's finger.
+   */
+  focus?: { id: string; nonce: number } | null;
   onSearchArea?: (bounds: MapBoundsType) => void;
   onRecentre?: () => void;
 }
