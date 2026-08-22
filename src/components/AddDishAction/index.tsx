@@ -178,6 +178,7 @@ const AddDishForm: FC<AddDishFormInterface> = ({
 };
 
 const AddDishAction: FC<AddDishActionInterface> = ({
+  empty,
   slug,
   sections,
   canContribute,
@@ -208,7 +209,12 @@ const AddDishAction: FC<AddDishActionInterface> = ({
            must not compete with it. */
         className="min-h-12 rounded-pill border border-line px-5 text-sm font-medium text-ink hover:bg-surface-sunken"
       >
-        {MENU_EDIT_LABELS.addDish}
+        {/* "Add a dish we missed" claims we read this menu and overlooked
+            one dish. Where extraction found nothing that is false twice: we
+            have no menu, and this is the first entry rather than a
+            correction. It also understates the ask — somebody patching a gap
+            adds one dish, where the honest framing invites the menu. */}
+        {empty ? MENU_EDIT_LABELS.startMenu : MENU_EDIT_LABELS.addDish}
       </button>
 
       <BottomSheet

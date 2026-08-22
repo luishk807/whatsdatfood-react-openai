@@ -445,6 +445,11 @@ minute. Design for the phone and let desktop be the override, never the reverse.
   continues in the background, because it does and nobody should sit guarding
   it. "Add a dish we missed" is absent while the first menu is still coming —
   over an empty page it claims we finished looking and came up short.
+- **"Add a dish we missed" becomes "Help add this menu" when there is none.**
+  The first wording claims we read the menu and overlooked one dish; where
+  extraction found nothing that is false twice over — we have no menu, and
+  this is the first entry rather than a correction. It also understates the
+  ask: somebody patching a gap adds one dish.
 - **"Try again" runs the restaurant query, never a retry mutation.** There is
   exactly one call site allowed to generate a menu and
   `tests/test_menus_stay_demand_driven.py` fails if a second appears, so retry

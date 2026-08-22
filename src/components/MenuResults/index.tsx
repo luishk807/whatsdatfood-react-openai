@@ -488,6 +488,7 @@ const MenuResults: FC = () => {
                 again. */}
             {!menuStatus.pending && (
               <AddDishAction
+                empty={categories.length === 0}
                 slug={restaurant || ""}
                 sections={Object.keys(restaurantMenu)}
                 canContribute={!!user?.id}

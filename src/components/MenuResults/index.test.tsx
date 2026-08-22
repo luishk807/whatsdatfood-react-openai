@@ -336,9 +336,11 @@ describe("while the first menu is still being worked out", () => {
     expect(await screen.findByText(MENU_EDIT_LABELS.addDish)).toBeInTheDocument();
   });
 
-  it("asks once we know a menu is not coming", async () => {
+  it("asks for the whole menu once we know none is coming", async () => {
     // Nothing is on its way, so the gap is real and the reader sitting in
-    // the restaurant is the one person who can close it.
+    // the restaurant is the one person who can close it. "Add a dish we
+    // missed" would be false twice over here: we read no menu, and this is
+    // the first entry rather than a correction to one.
     menuStatus = { ...menuStatus, state: "unavailable", pending: false };
 
     render(
@@ -347,6 +349,8 @@ describe("while the first menu is still being worked out", () => {
       </MemoryRouter>,
     );
 
-    expect(await screen.findByText(MENU_EDIT_LABELS.addDish)).toBeInTheDocument();
+    expect(
+      await screen.findByText(MENU_EDIT_LABELS.startMenu),
+    ).toBeInTheDocument();
   });
 });

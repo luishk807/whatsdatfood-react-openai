@@ -54,7 +54,11 @@ const refused = {
   error: new Error("Porterhouse is already on this menu."),
 };
 
-const show = (mocks: MockedResponse[] = [], canContribute = true) =>
+const show = (
+  mocks: MockedResponse[] = [],
+  canContribute = true,
+  empty = false,
+) =>
   render(
     <MockedProvider mocks={mocks} addTypename={false}>
       <MemoryRouter>
@@ -62,6 +66,7 @@ const show = (mocks: MockedResponse[] = [], canContribute = true) =>
           slug="peter-luger"
           sections={["Small plates", "Mains"]}
           canContribute={canContribute}
+          empty={empty}
         />
       </MemoryRouter>
     </MockedProvider>,
@@ -163,5 +168,31 @@ describe("AddDishAction", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent(
       /already on this menu/i,
     );
+  });
+});
+
+describe("when there is no menu at all", () => {
+  it("asks for the menu rather than for a correction to one", () => {
+    // "Add a dish we missed" claims we read this menu and overlooked one
+    // dish. Where extraction found nothing that is false twice over: we have
+    // no menu, and this is the first entry rather than a correction. It also
+    // understates the ask - somebody patching a gap adds one dish, where the
+    // honest framing invites the menu.
+    show([], true, true);
+
+    expect(
+      screen.getByRole("button", { name: MENU_EDIT_LABELS.startMenu }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: MENU_EDIT_LABELS.addDish }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("still admits the gap is ours once a menu exists", () => {
+    show();
+
+    expect(
+      screen.getByRole("button", { name: MENU_EDIT_LABELS.addDish }),
+    ).toBeInTheDocument();
   });
 });

@@ -760,6 +760,16 @@ export const CORRECTION_LABELS = {
  */
 export const MENU_EDIT_LABELS = {
   addDish: "Add a dish we missed",
+  /**
+   * When there is no menu at all.
+   *
+   * "Add a dish we missed" claims we read this menu and overlooked one dish.
+   * On a restaurant where extraction found nothing, that is false twice over:
+   * we have no menu, and what is being asked for is not a correction but the
+   * first entry. It also understates the ask — somebody who thinks they are
+   * patching a gap adds one dish, where the honest framing invites the menu.
+   */
+  startMenu: "Help add this menu",
   /** In the review queue, where the reviewer is not the contributor. */
   queueTitle: "Dishes diners added",
   queueEmpty: "No dishes waiting.",

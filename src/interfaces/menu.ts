@@ -69,6 +69,11 @@ export interface AddDishFormInterface {
 }
 
 export interface AddDishActionInterface {
+  /**
+   * True when extraction produced nothing at all, so the control asks for the
+   * menu rather than for a correction to one.
+   */
+  empty?: boolean;
   slug: string;
   sections: string[];
   /** Somebody signed out is shown the ask and sent to sign in, never a form
