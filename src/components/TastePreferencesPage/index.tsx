@@ -1,7 +1,10 @@
 import { type FC, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import TastePreferencePicker from "@/components/TastePreferencePicker";
 import { TASTE_LABELS } from "@/customConstants/labels";
+import useAuth from "@/customHooks/useAuth";
 import useTastePreferences from "@/customHooks/useTastePreferences";
+import { ROUTES } from "@/customConstants/routes";
 import { TastePreferencesPageInterface } from "@/interfaces/tastes";
 
 /**
@@ -23,6 +26,8 @@ const TastePreferencesPage: FC<TastePreferencesPageInterface> = ({
 }) => {
   const { categories, selected, save, saving, saved, error, loading } =
     useTastePreferences();
+  // A guest personalises too, and has no settings page to go back to.
+  const signedIn = Boolean(useAuth().user);
 
   // Edited as a draft so a half-made change is written nowhere until Save.
   const [draft, setDraft] = useState<string[]>([]);
@@ -63,6 +68,29 @@ const TastePreferencesPage: FC<TastePreferencesPageInterface> = ({
         error={error}
         variant="manage"
       />
+
+      {/* On its own page this was a dead end: saved, a line saying so, and
+          nothing to press. Embedded in Settings the layout already provides
+          "‹ Settings", so this would be a second way back beside it. */}
+      {!embedded && saved && (
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            to={ROUTES.home}
+            className="inline-flex min-h-11 items-center rounded-pill bg-brand px-5 text-sm font-medium text-white hover:bg-brand-strong"
+          >
+            {TASTE_LABELS.seeFeed}
+          </Link>
+
+          {signedIn && (
+            <Link
+              to={ROUTES.settings}
+              className="inline-flex min-h-11 items-center rounded-pill border border-line px-4 text-sm text-ink hover:border-ink"
+            >
+              {TASTE_LABELS.backToSettings}
+            </Link>
+          )}
+        </div>
+      )}
     </div>
   );
 };

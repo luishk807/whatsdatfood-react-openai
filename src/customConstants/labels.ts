@@ -949,6 +949,16 @@ export const TASTE_LABELS = {
   manageTitle: "Taste preferences",
   manageBlurb: "What you are into, and what your feed uses.",
   /**
+   * Where to go once it is saved.
+   *
+   * On its own page this was a dead end: the tastes saved, a line said so,
+   * and there was nothing to press and nowhere to go - so the only way on was
+   * the browser's back button. The whole point of saving these is the feed
+   * that uses them, so that is what it offers.
+   */
+  seeFeed: "See what is near you",
+  backToSettings: "Back to settings",
+  /**
    * Group headings. An unrecognised kind is title-cased rather than dropped —
    * the server may invent one, and a category that silently fails to render
    * is worse than an unstyled heading.

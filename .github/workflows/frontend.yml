@@ -118,6 +118,13 @@ jobs:
         run: |
           case "$REACT_APP_MAPBOX_TOKEN" in
             "")
+              # A warning annotation rather than only a summary line. The
+              # map vanished from production and the only record of it was
+              # a line in a job summary nobody reads - it was reported by
+              # somebody using the site. Still not fatal: a deployment with
+              # no token is a legitimate configuration, and the list is the
+              # half that always works.
+              echo "::warning::No REACT_APP_MAPBOX_TOKEN. Deployed WITHOUT a map. Set it in Settings > Secrets and variables > Actions > Variables."
               echo "No REACT_APP_MAPBOX_TOKEN: deployed without a map." \
                 >> "$GITHUB_STEP_SUMMARY"
               ;;
@@ -130,6 +137,17 @@ jobs:
               exit 1
               ;;
             pk.*)
+              # Assert it actually reached the bundle rather than trusting
+              # that it did, exactly as the API URL is asserted above. An
+              # empty define is not a build error, so a token supplied and
+              # silently not compiled in would report "Map enabled" over a
+              # site with no map - the worst of the three outcomes, because
+              # it looks correct from here.
+              if ! grep -rqF "$REACT_APP_MAPBOX_TOKEN" dist/; then
+                echo "A pk. token was supplied but is not in the bundle." >&2
+                echo "The map would be missing in production." >&2
+                exit 1
+              fi
               echo "Map enabled." >> "$GITHUB_STEP_SUMMARY"
               ;;
             *)
