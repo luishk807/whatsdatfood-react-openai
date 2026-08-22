@@ -30,6 +30,7 @@ const row = (over: Partial<AdminRecognitionType> = {}): AdminRecognitionType => 
 
 const handlers = () => ({
   onAdd: jest.fn().mockResolvedValue(undefined),
+  onEdit: jest.fn().mockResolvedValue(undefined),
   onVerify: jest.fn().mockResolvedValue(undefined),
   onUnpublish: jest.fn().mockResolvedValue(undefined),
   onExpire: jest.fn().mockResolvedValue(undefined),
@@ -224,5 +225,116 @@ describe("when the server refuses", () => {
     expect(screen.getByRole("alert")).toHaveTextContent(
       "Link the source you checked.",
     );
+  });
+});
+
+describe("amending one", () => {
+  const open = async (label: string) =>
+    userEvent.click(screen.getByRole("button", { name: label }));
+
+  it("reuses the same form rather than a second one", async () => {
+    // Same facts about the same thing. Two forms is two places for the rules
+    // to drift - which is how a field ends up required when adding and
+    // optional when editing.
+    show([row()]);
+
+    await open(RECOGNITION_ADMIN_LABELS.edit);
+
+    expect(
+      screen.getByLabelText(RECOGNITION_ADMIN_LABELS.reference),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(RECOGNITION_ADMIN_LABELS.award),
+    ).toBeInTheDocument();
+  });
+
+  it("opens with what the row already says", async () => {
+    show([
+      row({
+        award: RECOGNITION_AWARD.bibGourmand,
+        year: 2024,
+        reference_url: "https://guide.example/bib",
+        internal_notes: "checked twice",
+      }),
+    ]);
+
+    await open(RECOGNITION_ADMIN_LABELS.edit);
+
+    expect(screen.getByLabelText(RECOGNITION_ADMIN_LABELS.reference)).toHaveValue(
+      "https://guide.example/bib",
+    );
+    expect(screen.getByLabelText(RECOGNITION_ADMIN_LABELS.year)).toHaveValue("2024");
+    expect(screen.getByLabelText(RECOGNITION_ADMIN_LABELS.notes)).toHaveValue(
+      "checked twice",
+    );
+    expect(screen.getByLabelText(RECOGNITION_ADMIN_LABELS.award)).toHaveValue(
+      RECOGNITION_AWARD.bibGourmand,
+    );
+  });
+
+  it("hands the amendment up against that row", async () => {
+    const spies = show([row({ id: "7" })]);
+
+    await open(RECOGNITION_ADMIN_LABELS.edit);
+    await userEvent.clear(screen.getByLabelText(RECOGNITION_ADMIN_LABELS.year));
+    await userEvent.type(
+      screen.getByLabelText(RECOGNITION_ADMIN_LABELS.year),
+      "2027",
+    );
+    await open(RECOGNITION_ADMIN_LABELS.save);
+
+    expect(spies.onEdit).toHaveBeenCalledWith(
+      "7",
+      expect.objectContaining({ year: 2027 }),
+    );
+    expect(spies.onAdd).not.toHaveBeenCalled();
+  });
+
+  it("warns that amending takes the badge off the site", async () => {
+    // Somebody asserted that *those* values were accurate. Changing them
+    // withdraws that assertion, and the person doing it should know before
+    // they save rather than afterwards.
+    show([row({ status: RECOGNITION_STATUS.verified })]);
+
+    await open(RECOGNITION_ADMIN_LABELS.edit);
+
+    expect(
+      screen.getByText(RECOGNITION_ADMIN_LABELS.editingUnpublishes),
+    ).toBeInTheDocument();
+  });
+
+  it("says the milder thing when adding a new one", async () => {
+    show([]);
+
+    await open(RECOGNITION_ADMIN_LABELS.add);
+
+    expect(
+      screen.getByText(RECOGNITION_ADMIN_LABELS.addingIsNotPublishing),
+    ).toBeInTheDocument();
+  });
+
+  it("offers no way to edit one of our own signals", async () => {
+    show([
+      row({
+        kind: RECOGNITION_KIND.house,
+        award: RECOGNITION_AWARD.mustVisit,
+        status: RECOGNITION_STATUS.verified,
+      }),
+    ]);
+
+    expect(
+      screen.queryByRole("button", { name: RECOGNITION_ADMIN_LABELS.edit }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("closes the form once the amendment lands", async () => {
+    show([row()]);
+
+    await open(RECOGNITION_ADMIN_LABELS.edit);
+    await open(RECOGNITION_ADMIN_LABELS.save);
+
+    expect(
+      screen.queryByLabelText(RECOGNITION_ADMIN_LABELS.reference),
+    ).not.toBeInTheDocument();
   });
 });

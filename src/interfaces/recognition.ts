@@ -59,6 +59,11 @@ export interface RecognitionQueueInterface {
   /** A server refusal, shown verbatim — each one explains a rule. */
   error?: string | null;
   onAdd: (fields: NewRecognitionType) => Promise<void>;
+  /**
+   * Amend one. The same fields as adding, because they are the same facts —
+   * a second form would be a second place for the rules to drift.
+   */
+  onEdit: (id: string, fields: NewRecognitionType) => Promise<void>;
   onVerify: (id: string) => Promise<void>;
   onUnpublish: (id: string) => Promise<void>;
   onExpire: (id: string) => Promise<void>;

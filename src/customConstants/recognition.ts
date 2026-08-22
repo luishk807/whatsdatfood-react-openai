@@ -158,6 +158,7 @@ export const RECOGNITION_ADMIN_LABELS = {
   notes: "Internal notes",
   save: "Save",
   cancel: "Cancel",
+  edit: "Edit",
   verify: "Verify",
   unpublish: "Unpublish",
   expire: "Expire",
@@ -165,6 +166,13 @@ export const RECOGNITION_ADMIN_LABELS = {
   ours: "Earned from activity — recomputed automatically.",
   addingIsNotPublishing:
     "Saving records it. It stays hidden until somebody verifies it against the source.",
+  /**
+   * The sharper warning, and the honest one. Somebody asserted that *those*
+   * values were accurate; changing them withdraws that assertion, so the
+   * badge comes off the site until it is checked again.
+   */
+  editingUnpublishes:
+    "Changing what this says withdraws its verification, and takes the badge off the site until somebody checks it again.",
   lastChecked: (when: string) =>
     `Last checked ${new Date(when).toLocaleDateString()}`,
   status: (value: string) =>

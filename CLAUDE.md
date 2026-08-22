@@ -559,6 +559,13 @@ which ones deserve attention.
   it stays hidden until somebody verifies it against the source, and the form
   says so. Our own signals appear read-only: they are recomputed on every
   trending run, so a button to edit one would be undone by the next.
+- **One form, two modes.** Adding and amending are the same facts about the
+  same thing, so `RecognitionQueue` opens the same fields either way — a
+  second form is a second place for the rules to drift, which is how a field
+  ends up required when adding and optional when editing. Amending warns that
+  it withdraws the verification and takes the badge off the site, because
+  somebody asserted that *those* values were accurate and the person changing
+  them should know before they save rather than after.
 - **The wording is "Admin verified", never "Michelin verified".** A person
   checked a source and believes it is currently accurate; they are not the
   guide, and we have no relationship with the guide. A test asserts the copy

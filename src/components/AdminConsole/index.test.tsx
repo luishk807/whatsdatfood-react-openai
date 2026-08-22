@@ -50,6 +50,7 @@ jest.mock("@/customHooks/useRecognitionAdmin", () => ({
     error: null,
     open: jest.fn(),
     add: jest.fn(),
+    edit: jest.fn(),
     verify: jest.fn(),
     unpublish: jest.fn(),
     expire: jest.fn(),

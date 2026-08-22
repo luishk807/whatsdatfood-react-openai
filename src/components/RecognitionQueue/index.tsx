@@ -6,7 +6,10 @@ import {
   RECOGNITION_STATUS,
   CURATABLE_AWARDS,
 } from "@/customConstants/recognition";
-import { RecognitionQueueInterface } from "@/interfaces/recognition";
+import {
+  AdminRecognitionType,
+  RecognitionQueueInterface,
+} from "@/interfaces/recognition";
 import { recognitionLabel } from "@/utils/recognition";
 
 /**
@@ -32,16 +35,35 @@ const RecognitionQueue: FC<RecognitionQueueInterface> = ({
   busyId,
   error,
   onAdd,
+  onEdit,
   onVerify,
   onUnpublish,
   onExpire,
 }) => {
-  const [adding, setAdding] = useState(false);
+  /**
+   * The one form, in two modes.
+   *
+   * `null` is closed, an entry with no id is a new recognition, and an entry
+   * with one is amending that row. Deliberately not a second component: they
+   * are the same facts about the same thing, and two forms is two places for
+   * the rules to drift apart — which is how a field ends up required when
+   * adding and optional when editing.
+   */
+  const [form, setForm] = useState<{ id: string | null } | null>(null);
   const [award, setAward] = useState<string>(CURATABLE_AWARDS[0]);
   const [source, setSource] = useState("michelin");
   const [referenceUrl, setReferenceUrl] = useState("");
   const [year, setYear] = useState("");
   const [notes, setNotes] = useState("");
+
+  const openFor = (one: AdminRecognitionType | null) => {
+    setAward(one?.award ?? CURATABLE_AWARDS[0]);
+    setSource(one?.source ?? "michelin");
+    setReferenceUrl(one?.reference_url ?? "");
+    setYear(one?.year ? String(one.year) : "");
+    setNotes(one?.internal_notes ?? "");
+    setForm({ id: one?.id ?? null });
+  };
 
   if (loading) {
     return (
@@ -50,18 +72,17 @@ const RecognitionQueue: FC<RecognitionQueueInterface> = ({
   }
 
   const submit = async () => {
-    await onAdd({
+    const fields = {
       award,
       source,
       referenceUrl,
       year: year ? Number(year) : null,
       internalNotes: notes || null,
-    });
+    };
 
-    setReferenceUrl("");
-    setYear("");
-    setNotes("");
-    setAdding(false);
+    await (form?.id ? onEdit(form.id, fields) : onAdd(fields));
+
+    setForm(null);
   };
 
   return (
@@ -144,6 +165,15 @@ const RecognitionQueue: FC<RecognitionQueueInterface> = ({
                 </p>
               ) : (
                 <div className="flex flex-wrap gap-2 pt-1">
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => openFor(one)}
+                    className="min-h-9 rounded-pill border border-line px-3 text-xs text-ink disabled:opacity-60"
+                  >
+                    {RECOGNITION_ADMIN_LABELS.edit}
+                  </button>
+
                   {one.status !== RECOGNITION_STATUS.verified && (
                     <button
                       type="button"
@@ -183,7 +213,7 @@ const RecognitionQueue: FC<RecognitionQueueInterface> = ({
         })}
       </ul>
 
-      {adding ? (
+      {form ? (
         <div className="flex flex-col gap-2 rounded-card border border-line p-3">
           <label className="flex flex-col gap-1 text-xs text-ink-muted">
             {RECOGNITION_ADMIN_LABELS.award}
@@ -248,23 +278,28 @@ const RecognitionQueue: FC<RecognitionQueueInterface> = ({
             </button>
             <button
               type="button"
-              onClick={() => setAdding(false)}
+              onClick={() => setForm(null)}
               className="min-h-9 rounded-pill border border-line px-3 text-xs text-ink-muted"
             >
               {RECOGNITION_ADMIN_LABELS.cancel}
             </button>
           </div>
 
-          {/* Said where somebody is about to publish an award: adding it does
-              not show it, and the tick is a person saying they checked. */}
+          {/* Said where somebody is about to publish an award: saving does
+              not show it, and the tick is a person saying they checked.
+              While amending a published one, the warning is the sharper of
+              the two — changing what it says withdraws the verification,
+              which takes the badge off the site until somebody looks again. */}
           <p className="text-xs text-ink-muted">
-            {RECOGNITION_ADMIN_LABELS.addingIsNotPublishing}
+            {form.id
+              ? RECOGNITION_ADMIN_LABELS.editingUnpublishes
+              : RECOGNITION_ADMIN_LABELS.addingIsNotPublishing}
           </p>
         </div>
       ) : (
         <button
           type="button"
-          onClick={() => setAdding(true)}
+          onClick={() => openFor(null)}
           className="self-start min-h-9 rounded-pill border border-line px-3 text-xs font-medium text-ink"
         >
           {RECOGNITION_ADMIN_LABELS.add}

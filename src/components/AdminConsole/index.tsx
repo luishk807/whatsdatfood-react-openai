@@ -212,6 +212,7 @@ const AdminConsole: FC = () => {
             busyId={recognition.busyId}
             error={recognition.error}
             onAdd={recognition.add}
+            onEdit={recognition.edit}
             onVerify={recognition.verify}
             onUnpublish={recognition.unpublish}
             onExpire={recognition.expire}

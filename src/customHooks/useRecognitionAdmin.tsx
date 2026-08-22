@@ -3,6 +3,7 @@ import { useLazyQuery, useMutation } from "@apollo/client";
 import {
   ADD_RECOGNITION,
   ADMIN_RECOGNITIONS,
+  EDIT_RECOGNITION,
   EXPIRE_RECOGNITION,
   UNPUBLISH_RECOGNITION,
   VERIFY_RECOGNITION,
@@ -38,6 +39,7 @@ const useRecognitionAdmin = () => {
   });
 
   const [addOne] = useMutation(ADD_RECOGNITION);
+  const [editOne] = useMutation(EDIT_RECOGNITION);
   const [verifyOne] = useMutation(VERIFY_RECOGNITION);
   const [unpublishOne] = useMutation(UNPUBLISH_RECOGNITION);
   const [expireOne] = useMutation(EXPIRE_RECOGNITION);
@@ -97,6 +99,10 @@ const useRecognitionAdmin = () => {
     add: (fields: NewRecognitionType) =>
       decide(null, () =>
         addOne({ variables: { restaurantId, ...fields } }),
+      ),
+    edit: (id: string, fields: NewRecognitionType) =>
+      decide(id, () =>
+        editOne({ variables: { recognitionId: id, ...fields } }),
       ),
     verify: (id: string) =>
       decide(id, () => verifyOne({ variables: { recognitionId: id } })),
