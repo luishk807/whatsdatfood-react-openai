@@ -40,6 +40,18 @@ jest.mock("@/customHooks/useAdminQueues", () => ({
 // Its own Apollo query, and this suite renders without a client on purpose -
 // the console's job is composing queues, and the recognition section has its
 // own tests.
+// Its own Apollo query, like the recognition panel beside it. The duplicate
+// queue has its own tests; this suite is about the console composing queues.
+jest.mock("@/customHooks/useDuplicateQueue", () => ({
+  __esModule: true,
+  default: () => ({
+    pairs: [],
+    loading: false,
+    busyId: null,
+    resolve: jest.fn(),
+  }),
+}));
+
 jest.mock("@/customHooks/useRecognitionAdmin", () => ({
   __esModule: true,
   default: () => ({

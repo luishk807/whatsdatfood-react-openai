@@ -1333,3 +1333,32 @@ export const FEATURE_LABELS = {
       live: "Publicly available.",
     })[state] ?? "",
 } as const;
+
+/**
+ * The duplicate queue.
+ *
+ * **Nothing here merges or deletes.** "Mark as duplicate" records a decision
+ * and stops — moving photographs, votes and menu items between two
+ * restaurants safely is its own piece of work, and doing it badly loses
+ * contributions permanently. The wording says so rather than implying an
+ * action the product cannot yet take.
+ */
+export const DUPLICATE_LABELS = {
+  title: "Possible duplicates",
+  empty: "No pairs waiting.",
+  loading: "Looking…",
+  confirm: "Mark as duplicate",
+  reject: "Not a duplicate",
+  dismiss: "Dismiss",
+  apart: (metres: number) =>
+    metres < 1000
+      ? `${Math.round(metres)} m apart`
+      : `${(metres / 1000).toFixed(1)} km apart`,
+  chain: (count: number) => `This name is at ${count} addresses`,
+  confidence: (score: number) => `Score ${score.toFixed(2)}`,
+  /** Said once, above the queue, so nobody expects a merge to happen. */
+  noMerge:
+    "Marking a pair records the decision. Nothing is merged or deleted — the two records stay exactly as they are.",
+  noMenu: "no menu",
+  dishes: (count: number) => (count === 1 ? "1 dish" : `${count} dishes`),
+} as const;

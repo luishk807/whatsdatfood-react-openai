@@ -2,9 +2,12 @@ import { type FC, useCallback, useEffect, useState } from "react";
 import useAdminQueues from "@/customHooks/useAdminQueues";
 import useMenuCorrections from "@/customHooks/useMenuCorrections";
 import ApiUsagePanel from "@/components/ApiUsagePanel";
+import DuplicateQueue from "@/components/DuplicateQueue";
 import RecognitionQueue from "@/components/RecognitionQueue";
+import useDuplicateQueue from "@/customHooks/useDuplicateQueue";
 import useRecognitionAdmin from "@/customHooks/useRecognitionAdmin";
 import { RECOGNITION_ADMIN_LABELS } from "@/customConstants/recognition";
+import { DUPLICATE_LABELS } from "@/customConstants/labels";
 import FeatureStatus from "@/components/FeatureStatus";
 import CorrectionQueue from "@/components/CorrectionQueue";
 import DishSubmissionQueue from "@/components/DishSubmissionQueue";
@@ -41,6 +44,7 @@ import { ManagedDishType } from "@/interfaces/menu";
 const AdminConsole: FC = () => {
   const [lookingUp, setLookingUp] = useState("");
   const recognition = useRecognitionAdmin();
+  const duplicates = useDuplicateQueue();
   const { user } = useAuth();
   const { loadClaims, loadReports, decideClaim, resolveReport, loading } =
     useAdminQueues();
@@ -172,6 +176,22 @@ const AdminConsole: FC = () => {
           {FEATURE_LABELS.title}
         </h2>
         <FeatureStatus />
+      </div>
+
+      {/* A data-quality queue rather than a moderation one, so it sits with
+          the other things an admin works through. Nothing in it merges or
+          deletes: it records what somebody concluded about a pair. */}
+      <div className="flex flex-col gap-3">
+        <h2 className="text-sm font-semibold text-ink">
+          {DUPLICATE_LABELS.title}
+          {duplicates.pairs.length > 0 && ` (${duplicates.pairs.length})`}
+        </h2>
+        <DuplicateQueue
+          pairs={duplicates.pairs}
+          loading={duplicates.loading}
+          busyId={duplicates.busyId}
+          onResolve={duplicates.resolve}
+        />
       </div>
 
       {/* Below the queues, because nothing here is waiting on a decision:
