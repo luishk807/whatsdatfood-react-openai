@@ -1,4 +1,10 @@
-import { clusterPlaces, project, zoomIntoCluster } from "@/utils/cluster";
+import {
+  clusterPlaces,
+  findCluster,
+  placeInClusters,
+  project,
+  zoomIntoCluster,
+} from "@/utils/cluster";
 import { MAP_CLUSTER } from "@/customConstants/map";
 import { NearbyPlaceType } from "@/interfaces/location";
 
@@ -141,5 +147,56 @@ describe("zooming into a cluster", () => {
     // Two restaurants in one building cannot be separated by zooming, and
     // failing at it from six inches away is worse than stopping.
     expect(zoomIntoCluster(MAP_CLUSTER.MAX_ZOOM)).toBe(MAP_CLUSTER.MAX_ZOOM);
+  });
+});
+
+describe("finding a place the map has grouped away", () => {
+  /**
+   * Hovering a result highlighted its marker only when that marker happened
+   * to be drawn on its own. Inside a cluster the reader got nothing useful -
+   * a cluster is a count, and "somewhere among these seven" does not answer
+   * "where is Busy Bee Cafe".
+   */
+  const near = [place("a", 40.75, -73.99), place("b", 40.7501, -73.9901)];
+  const far = [place("c", 40.9, -73.5)];
+
+  it("says which cluster is hiding a place", () => {
+    const clusters = clusterPlaces([...near, ...far], 14);
+    const found = findCluster(clusters, "b");
+
+    expect(found?.places.map((one) => one.id)).toContain("b");
+  });
+
+  it("distinguishes a lone pin from a place inside a group", () => {
+    // A cluster of one is the place's own marker and needs only emphasis; a
+    // cluster of several is hiding it and has to be opened up.
+    const clusters = clusterPlaces([...near, ...far], 14);
+
+    expect(findCluster(clusters, "c")?.places).toHaveLength(1);
+    expect(findCluster(clusters, "a")!.places.length).toBeGreaterThan(1);
+  });
+
+  it("returns the place at its own coordinates, not the cluster centre", () => {
+    // A centre is an average that may sit on none of its members, and the
+    // whole point is saying where this restaurant actually is.
+    const clusters = clusterPlaces(near, 14);
+    const found = placeInClusters(clusters, "b");
+
+    expect(found?.latitude).toBe(40.7501);
+    expect(found?.longitude).toBe(-73.9901);
+  });
+
+  it("finds nothing for a place that is not on the map", () => {
+    const clusters = clusterPlaces(near, 14);
+
+    expect(findCluster(clusters, "missing")).toBeNull();
+    expect(placeInClusters(clusters, "missing")).toBeNull();
+  });
+
+  it("copes with nothing hovered", () => {
+    const clusters = clusterPlaces(near, 14);
+
+    expect(findCluster(clusters, null)).toBeNull();
+    expect(findCluster(clusters, undefined)).toBeNull();
   });
 });

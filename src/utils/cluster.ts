@@ -103,3 +103,50 @@ const mean = (values: number[]): number =>
  */
 export const zoomIntoCluster = (zoom: number): number =>
   Math.min(zoom + MAP_CLUSTER.ZOOM_STEP, MAP_CLUSTER.MAX_ZOOM);
+
+/**
+ * Which drawn cluster is hiding a given place, and whether it is hiding it.
+ *
+ * Hovering a result highlighted its marker only when that marker happened to
+ * be drawn on its own. Inside a cluster the reader got nothing useful — the
+ * cluster is a count, and "somewhere among these seven" is not an answer to
+ * "where is Busy Bee Cafe".
+ *
+ * This is the lookup the map needs to answer that. Returning the cluster
+ * rather than a boolean lets the caller tell the two cases apart without
+ * searching twice: a cluster of one is the place's own marker and needs only
+ * emphasis, while a cluster of several is hiding it and has to be opened up.
+ *
+ * Pure, because the alternative is the map recomputing geography to find
+ * something it has already grouped.
+ */
+export const findCluster = (
+  clusters: PlaceClusterType[],
+  placeId?: string | null,
+): PlaceClusterType | null => {
+  if (!placeId) {
+    return null;
+  }
+
+  return (
+    clusters.find((cluster) =>
+      cluster.places.some((place) => place.id === placeId),
+    ) ?? null
+  );
+};
+
+/**
+ * The place itself, out of whatever cluster holds it.
+ *
+ * Its real coordinates, not the cluster's centre — the whole point is to say
+ * where this restaurant actually is, and a cluster centre is an average that
+ * may sit on none of its members.
+ */
+export const placeInClusters = (
+  clusters: PlaceClusterType[],
+  placeId?: string | null,
+): NearbyPlaceType | null => {
+  const cluster = findCluster(clusters, placeId);
+
+  return cluster?.places.find((place) => place.id === placeId) ?? null;
+};
