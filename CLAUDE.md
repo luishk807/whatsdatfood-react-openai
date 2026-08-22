@@ -516,6 +516,28 @@ which ones deserve attention.
   `Emoji_Presentation` character and no `img` or `svg`.
 - **An award with no label renders nothing**, rather than a raw slug. A signal
   invented on the server appears once it has words.
+- **On the map, recognition is drawn around the glyph, never instead of it.**
+  A reader telling coffee from sushi at a glance is the pin's whole job, and
+  an award mark replacing that trades the thing every pin can say for
+  something almost none of them can. A guide's award is a small typographic
+  star in the corner; one of ours is a `brand-soft` ring around the disc.
+  Neither changes the pin's size or colour. Forty pins each shouting is a map
+  nobody can read — the value of a mark is entirely in how few there are.
+- **The detail page shows all of them, a card shows two.** `RECOGNITION_
+  DETAIL_LIMIT` against `RECOGNITION_CARD_LIMIT`: a card is a glance, and the
+  page somebody chose to open is where the full list has to be readable.
+- **Our own signals are earned on the server, in the trending recompute.**
+  They come off the same measurement the score does, so the badge and the
+  ranking cannot disagree about the same window, and they are precomputed so a
+  page costs one indexed query. Must Visit needs a score well clear of the
+  trending floor *and* real contributions *and* more than one contributor —
+  activity, never completeness, because ranking on completeness is how the
+  first run in Flushing nominated a Dunkin' Donuts. Signals are replaced
+  wholesale so one can be lost; the delete filters on `kind = house`, because
+  a bug in our ranking must never retract a guide's judgement.
+- **"Why Must Visit?" describes only what was counted**, and says nothing when
+  there is nothing real to describe. An official award never gets our words —
+  the guide's reasoning is theirs.
 - **Nothing external is populated.** The table exists with provenance columns;
   the Michelin rows are absent because no source whose terms permit reuse has
   been established, and a backend test asserts the catalogue holds none. Ask

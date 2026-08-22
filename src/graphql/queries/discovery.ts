@@ -61,6 +61,13 @@ export const TRENDING_NEARBY = gql`
         top_dish_name
         top_dish_photo_url
         photo_count
+        recognitions {
+          kind
+          award
+          source
+          year
+          reference_url
+        }
         contributor_count
       }
       restaurants {
@@ -74,6 +81,13 @@ export const TRENDING_NEARBY = gql`
         top_dish_name
         top_dish_photo_url
         photo_count
+        recognitions {
+          kind
+          award
+          source
+          year
+          reference_url
+        }
         contributor_count
       }
     }

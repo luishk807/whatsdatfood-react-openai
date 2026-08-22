@@ -1,5 +1,6 @@
 import { type FC } from "react";
 import { Link } from "react-router-dom";
+import RecognitionBadges from "@/components/RecognitionBadges";
 import RestaurantCover from "@/components/RestaurantCover";
 import { CloseIcon } from "@/components/icons";
 import {
@@ -71,6 +72,11 @@ const RestaurantPreview: FC<RestaurantPreviewInterface> = ({
             <span className="truncate text-sm font-semibold text-ink">
               {place.name}
             </span>
+
+            {/* The pin said "worth noticing" with a star or a ring; this is
+                where it says which. A mark on the map is a hint, and the card
+                that opens from it is where the hint gets its words. */}
+            <RecognitionBadges recognitions={place.recognitions} compact />
 
             {details.length > 0 && (
               <span className="truncate text-xs text-ink-muted">

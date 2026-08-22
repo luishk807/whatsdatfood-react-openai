@@ -100,5 +100,14 @@ export const RECOGNITION_PRIORITY: string[] = [
  */
 export const RECOGNITION_CARD_LIMIT = 2;
 
+/**
+ * How many a restaurant's own page shows.
+ *
+ * All of them, effectively. A card is a glance and has room for two; this is
+ * the screen somebody chose to open, and hiding a distinction here would mean
+ * there is nowhere at all to read the full list.
+ */
+export const RECOGNITION_DETAIL_LIMIT = 8;
+
 /** The word for our own family, said once where it needs saying. */
 export const RECOGNITION_HOUSE_SOURCE = "What's Dat Food";

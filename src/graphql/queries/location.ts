@@ -36,6 +36,13 @@ export const NEARBY_RESTAURANTS = gql`
       top_dish_name
       top_dish_photo_url
       photo_count
+      recognitions {
+        kind
+        award
+        source
+        year
+        reference_url
+      }
       contributor_count
     }
   }
@@ -74,6 +81,13 @@ export const RESTAURANTS_IN_AREA = gql`
       top_dish_name
       top_dish_photo_url
       photo_count
+      recognitions {
+        kind
+        award
+        source
+        year
+        reference_url
+      }
       contributor_count
     }
   }
@@ -115,6 +129,13 @@ export const NEARBY_DISCOVERY = gql`
         photographer
         score
         photo_count
+        recognitions {
+          kind
+          award
+          source
+          year
+          reference_url
+        }
         vote_count
         contributor_count
       }

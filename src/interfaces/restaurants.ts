@@ -1,3 +1,4 @@
+import { RecognitionType } from "@/interfaces/recognition";
 import { UserRating } from "@/interfaces/users";
 import { BusinessHours } from "@/interfaces/businessHours";
 
@@ -61,6 +62,14 @@ export interface RestCategoryMenu {
 }
 
 export interface RestaurantType {
+  /**
+   * Why this restaurant is worth attention, and who says so.
+   *
+   * The detail page shows every one; a card shows two. Empty for almost the
+   * whole catalogue — nothing external is populated, and our own signals are
+   * earned from activity rather than granted.
+   */
+  recognitions?: RecognitionType[] | null;
   id?: number;
   name: string;
   address?: string;

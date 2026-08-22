@@ -2,10 +2,12 @@ import { FC } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import MenuTrust from "@/components/MenuTrust";
+import RecognitionBadges from "@/components/RecognitionBadges";
 import VerifiedBadge from "@/components/VerifiedBadge";
 import { MANAGE_MENU_LABELS } from "@/customConstants/labels";
 import { buildManageMenuPath } from "@/customConstants/routes";
 import { RestaurantHeaderInterface } from "@/interfaces/venue";
+import { RECOGNITION_DETAIL_LIMIT } from "@/customConstants/recognition";
 import { VENUE_LABELS } from "@/customConstants/labels";
 import { ROUTES } from "@/customConstants/routes";
 import { displayRating, hasDetails, priceRange } from "@/utils/venue";
@@ -91,6 +93,16 @@ const RestaurantHeader: FC<RestaurantHeaderInterface> = ({
                   printed on every restaurant in it. */}
               <VerifiedBadge verified={restaurant?.is_verified_business} />
             </div>
+
+            {/* Above the cuisine and the price, because it is the reason to
+                be on this page at all — and full size rather than the
+                compact form a card gets, since this is the one screen with
+                room to say the whole thing. `limit` is deliberately absent:
+                a card shows two and the rest live here. */}
+            <RecognitionBadges
+              recognitions={restaurant?.recognitions}
+              limit={RECOGNITION_DETAIL_LIMIT}
+            />
 
             <p className="mt-0.5 text-sm text-ink-muted">
               {meta.join(" · ")}

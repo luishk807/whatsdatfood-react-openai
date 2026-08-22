@@ -1,4 +1,6 @@
 import { MAP_CLUSTER, MAP_MARKER, MAP_REVEAL } from "@/customConstants/map";
+import { RECOGNITION_KIND } from "@/customConstants/recognition";
+import { rankRecognitions } from "@/utils/recognition";
 import { NearbyPlaceType, PlaceClusterType } from "@/interfaces/location";
 
 /**
@@ -52,6 +54,18 @@ const LABEL = "label";
 
 const has = (place: NearbyPlaceType): boolean =>
   Boolean(place.top_dish_photo_url);
+
+/**
+ * The strongest thing this restaurant holds, if it holds anything.
+ *
+ * **The pin still says what kind of food it is.** A reader recognising coffee
+ * from sushi at a glance is the map's whole job, and replacing that with an
+ * award mark would trade the thing every pin can say for something almost
+ * none of them can. Recognition is drawn *around* the glyph, never instead of
+ * it.
+ */
+const topHonour = (place: NearbyPlaceType) =>
+  rankRecognitions(place.recognitions, 1)[0] ?? null;
 
 /**
  * Where a category glyph goes.
@@ -160,6 +174,8 @@ export const paintMarker = (
   pin.style.boxShadow = active
     ? "0 4px 12px rgb(0 0 0 / 0.35)"
     : "0 1px 4px rgb(0 0 0 / 0.25)";
+
+  paintHonour(root, pin, place);
 
   // Lifted clear of its neighbours, which is half of what "reveal it" means
   // on a map where pins overlap. Hover sits above selection: it is the more
@@ -358,4 +374,68 @@ export const hoverLabel = (place: NearbyPlaceType): HTMLElement => {
   label.textContent = place.name;
 
   return label;
+};
+
+
+// --- recognition on a pin -------------------------------------------------
+
+const HONOUR = "honour";
+
+/**
+ * A mark on the pin for a restaurant worth noticing.
+ *
+ * **Subtle, and subtle is the requirement.** Forty pins each shouting is a
+ * map nobody can read, and the value of a mark is entirely in how few of them
+ * there are. A guide's star is a small character in the corner; one of ours
+ * is a ring in `brand-soft` around the disc. Neither changes the pin's size,
+ * its colour, or the cuisine glyph inside it — the reader still sees coffee,
+ * sushi, ramen first.
+ *
+ * The two families stay as distinguishable here as they are on a card: a
+ * drawn star is a guide's, a tinted ring is ours. A map that let our own
+ * ranking wear a star would be making a claim we have no standing to make.
+ */
+const paintHonour = (
+  root: HTMLElement,
+  pin: HTMLElement,
+  place: NearbyPlaceType,
+): void => {
+  const existing = root.querySelector<HTMLElement>(`[data-role="${HONOUR}"]`);
+
+  existing?.remove();
+  pin.style.outline = "";
+  pin.style.outlineOffset = "";
+
+  const honour = topHonour(place);
+
+  if (!honour) {
+    return;
+  }
+
+  if (honour.kind === RECOGNITION_KIND.house) {
+    // A ring rather than a badge: it reads at a glance, costs no space, and
+    // cannot be mistaken for somebody else's award.
+    pin.style.outline = "2px solid var(--color-brand-soft)";
+    pin.style.outlineOffset = "2px";
+
+    return;
+  }
+
+  const star = document.createElement("span");
+
+  star.dataset.role = HONOUR;
+  // Typographic, because Michelin's mark is theirs and we have not
+  // established that we may use it.
+  star.textContent = "★";
+  star.style.position = "absolute";
+  star.style.top = "-2px";
+  star.style.right = "-2px";
+  star.style.fontSize = "11px";
+  star.style.lineHeight = "1";
+  star.style.color = "var(--color-ink)";
+  star.style.textShadow = "0 0 3px var(--color-surface-raised)";
+  star.style.pointerEvents = "none";
+
+  root.style.position = "relative";
+  root.appendChild(star);
 };

@@ -696,3 +696,65 @@ describe("show me this one", () => {
     ).not.toBeInTheDocument();
   });
 });
+
+describe("recognition on the map", () => {
+  const starred = place({
+    id: "1",
+    name: "Kaiseki",
+    recognitions: [
+      { kind: "official", award: "michelin_1_star", source: "michelin", year: 2026 },
+    ],
+  });
+
+  const ours = place({
+    id: "1",
+    name: "Busy Bee Cafe",
+    recognitions: [
+      { kind: "house", award: "must_visit", source: "whatsdatfood" },
+    ],
+  });
+
+  const pin = () => instance().markers[0].getElement();
+
+  it("keeps the cuisine glyph, which is what a pin is for", () => {
+    // A reader recognising coffee from sushi at a glance is the map's whole
+    // job. Replacing that with an award mark trades the thing every pin can
+    // say for something almost none of them can.
+    show({ places: [starred] });
+
+    expect(pin().querySelector("svg")).toBeInTheDocument();
+  });
+
+  it("marks a guide's award with a drawn star", () => {
+    show({ places: [starred] });
+
+    expect(pin().textContent).toContain("★");
+  });
+
+  it("does not let our own signal wear a star", () => {
+    // A map that let our ranking borrow a guide's mark would make a claim we
+    // have no standing to make.
+    show({ places: [ours] });
+
+    expect(pin().textContent ?? "").not.toContain("★");
+  });
+
+  it("marks our own signal with a ring instead", () => {
+    show({ places: [ours] });
+
+    const disc = pin().querySelector<HTMLElement>('[data-role="pin"]');
+
+    expect(disc?.style.outline).toContain("brand-soft");
+  });
+
+  it("leaves an ordinary restaurant completely unmarked", () => {
+    // The value of a mark is entirely in how few of them there are. Forty
+    // pins each shouting is a map nobody can read.
+    show({ places: [place()] });
+
+    const disc = pin().querySelector<HTMLElement>('[data-role="pin"]');
+
+    expect(pin().textContent ?? "").not.toContain("★");
+    expect(disc?.style.outline).toBe("");
+  });
+});
