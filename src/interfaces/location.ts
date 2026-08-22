@@ -1,3 +1,5 @@
+import { RecognitionType } from "@/interfaces/recognition";
+
 export interface CoordinatesType {
   latitude: number;
   longitude: number;
@@ -36,6 +38,15 @@ export interface NearbyPlaceType extends Partial<CoordinatesType> {
   google_photo_attribution?: string | null;
   google_photo_attribution_url?: string | null;
   logo_url?: string | null;
+  /**
+   * Why this restaurant is worth attention, and who says so.
+   *
+   * Absent for almost every row today: the table exists, our own signals are
+   * not derived yet, and nothing external is populated because no source
+   * whose terms permit reuse has been established. A card renders nothing
+   * when it is empty, which is the common case.
+   */
+  recognitions?: RecognitionType[] | null;
 }
 
 export interface TrendingDishType {

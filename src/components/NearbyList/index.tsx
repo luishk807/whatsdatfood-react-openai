@@ -1,6 +1,7 @@
 import { type FC, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import clsx from "clsx";
+import RecognitionBadges from "@/components/RecognitionBadges";
 import RestaurantCover from "@/components/RestaurantCover";
 import { PinIcon } from "@/components/icons";
 import { LOCATION_LABELS, NEARBY_LABELS } from "@/customConstants/labels";

@@ -488,6 +488,39 @@ minute. Design for the phone and let desktop be the override, never the reverse.
   around it — a button inside a button, which no after-the-fact state update can
   unrender. The open-the-sheet control is an absolutely positioned sibling.
 
+## Recognition — why this restaurant, out of thirty
+
+`RecognitionBadges`, `customConstants/recognition.ts`, `utils/recognition.ts`.
+Thirty restaurants within a mile is a directory; this is what lets a card say
+which ones deserve attention.
+
+- **Two families, drawn so they can never be confused.** An outlined ink mark
+  is somebody else's judgement — a guide with a name worth citing. A filled
+  `brand-soft` chip is ours, from what this community has done. A badge that
+  lets our ranking borrow a guide's authority is a lie about who is
+  recommending the place, and it is the kind a product only gets to tell once.
+  Our own marks name us in their accessible label, because a screen reader
+  gets nothing from the difference between an outline and a tint.
+- **Never `brand` itself.** Brand is the vote's colour; a recommendation badge
+  in it trades one signal for another.
+- **The exact distinction, never its family.** A Bib Gourmand is not a star and
+  Michelin Selected is not one either. `RECOGNITION_LABELS` maps the award the
+  server sent to words — the server never sends the words, for the same reason
+  the database stores `coffee` and not `CoffeeIcon`.
+- **Two on a card, hardest to earn first.** Past that the badges become the
+  card and the reader is back to reading everything. The rest belong on the
+  restaurant's own page.
+- **No logos and no emoji.** Michelin's mark is theirs and we have not
+  established that we may use it, so stars are typographic — U+2605 renders as
+  text everywhere and takes the surrounding colour. A test asserts no
+  `Emoji_Presentation` character and no `img` or `svg`.
+- **An award with no label renders nothing**, rather than a raw slug. A signal
+  invented on the server appears once it has words.
+- **Nothing external is populated.** The table exists with provenance columns;
+  the Michelin rows are absent because no source whose terms permit reuse has
+  been established, and a backend test asserts the catalogue holds none. Ask
+  before building any ingestion.
+
 ## Contributor reputation — Food Cred
 
 The server owns every number. The frontend renders what it is told and computes
