@@ -16,6 +16,7 @@ import useCuisineTiles from "@/customHooks/useCuisineTiles";
 import useDiscoveryLocation from "@/customHooks/useDiscoveryLocation";
 import { useNearbyDiscovery } from "@/customHooks/useNearby";
 import useTrendingNearby from "@/customHooks/useTrendingNearby";
+import useAuth from "@/customHooks/useAuth";
 import useTastePreferences from "@/customHooks/useTastePreferences";
 
 const LazyMainSearch = lazy(() => import("@/components/MainSearchBar"));
@@ -47,9 +48,28 @@ const Homepage: FC = () => {
   const { location, nameArea } = useDiscoveryLocation();
   const [changing, setChanging] = useState(false);
   const { discovery, loading: discoveryLoading } = useNearbyDiscovery(location);
-  const { trending, loading: trendingLoading } = useTrendingNearby(location);
   const { preferences, categories, loading: tastesLoading } =
     useTastePreferences();
+  const { user } = useAuth();
+
+  /**
+   * Saved tastes, sent only for a guest.
+   *
+   * Somebody signed in already has these on the server, and sending a second
+   * copy would make the browser the authority on what they like. A guest's
+   * live in `localStorage` and have never been sent, so for them this is the
+   * only way the boost can happen — and it is a boost either way. A very
+   * popular Korean place stays on the page for somebody whose tastes are
+   * sushi and coffee.
+   */
+  const guestTastes = user?.id
+    ? undefined
+    : preferences.map((one) => one.slug);
+
+  const { trending, loading: trendingLoading } = useTrendingNearby(
+    location,
+    guestTastes,
+  );
 
   // The server names the area from the nearest restaurant it knows; the
   // browser only ever had coordinates. Nothing here reverse-geocodes anybody

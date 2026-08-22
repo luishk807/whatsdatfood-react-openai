@@ -46,8 +46,18 @@ export const RESOLVE_PLACE = gql`
  * the server owns it.
  */
 export const TRENDING_NEARBY = gql`
-  query trendingNearby($latitude: Float!, $longitude: Float!, $limit: Int) {
-    trendingNearby(latitude: $latitude, longitude: $longitude, limit: $limit) {
+  query trendingNearby(
+    $latitude: Float!
+    $longitude: Float!
+    $limit: Int
+    $tastes: [String!]
+  ) {
+    trendingNearby(
+      latitude: $latitude
+      longitude: $longitude
+      limit: $limit
+      tastes: $tastes
+    ) {
       mode
       area_label
       hot_pick {
