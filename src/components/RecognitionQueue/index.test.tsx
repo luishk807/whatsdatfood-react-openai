@@ -338,3 +338,49 @@ describe("amending one", () => {
     ).not.toBeInTheDocument();
   });
 });
+
+describe("clearing an optional field", () => {
+  const open = async (label: string) =>
+    userEvent.click(screen.getByRole("button", { name: label }));
+
+  it("sends an explicit null rather than leaving it out", async () => {
+    // Omitting it means "leave this alone", so an emptied box has to arrive
+    // as a null or the old value quietly survives - which is what used to
+    // happen, while the admin was told the edit had worked.
+    const spies = show([row({ id: "9", year: 2026 })]);
+
+    await open(RECOGNITION_ADMIN_LABELS.edit);
+    await userEvent.clear(screen.getByLabelText(RECOGNITION_ADMIN_LABELS.year));
+    await open(RECOGNITION_ADMIN_LABELS.save);
+
+    expect(spies.onEdit).toHaveBeenCalledWith(
+      "9",
+      expect.objectContaining({ year: null }),
+    );
+  });
+
+  it("sends an explicit null for a cleared note", async () => {
+    const spies = show([row({ id: "9", internal_notes: "checked twice" })]);
+
+    await open(RECOGNITION_ADMIN_LABELS.edit);
+    await userEvent.clear(screen.getByLabelText(RECOGNITION_ADMIN_LABELS.notes));
+    await open(RECOGNITION_ADMIN_LABELS.save);
+
+    expect(spies.onEdit).toHaveBeenCalledWith(
+      "9",
+      expect.objectContaining({ internalNotes: null }),
+    );
+  });
+
+  it("still sends a value that was left alone", async () => {
+    const spies = show([row({ id: "9", year: 2026 })]);
+
+    await open(RECOGNITION_ADMIN_LABELS.edit);
+    await open(RECOGNITION_ADMIN_LABELS.save);
+
+    expect(spies.onEdit).toHaveBeenCalledWith(
+      "9",
+      expect.objectContaining({ year: 2026 }),
+    );
+  });
+});
