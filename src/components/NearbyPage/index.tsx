@@ -189,7 +189,16 @@ const NearbyPage: FC = () => {
            thousand pixels wide is not more useful, it is just further from
            the list. */
         workspace
-          ? "max-w-[1800px] pb-4"
+          /* **No bottom padding under the workspace at `lg`.** Padding on
+             this container adds to the document's height without adding any
+             sticky travel — the box that constrains a sticky element is its
+             parent's *content* box, and padding sits outside that. So every
+             pixel here is a pixel the page can scroll after the workspace has
+             stopped moving, and each one slides the map up under the header:
+             `pb-4` put sixteen pixels of it, zoom controls included, behind
+             the bar. Header, workspace and footer are sized to add up to one
+             screen; anything extra below them takes it out of the map. */
+          ? "max-w-[1800px] pb-4 lg:pb-0"
           : "max-w-5xl pb-16",
       )}
     >

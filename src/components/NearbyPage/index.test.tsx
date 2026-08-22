@@ -699,6 +699,22 @@ describe("the workspace leaves room for what is under it", () => {
     );
   });
 
+  it("leaves nothing below the workspace to scroll past", async () => {
+    // Padding here adds document height without adding sticky travel - the
+    // box constraining a sticky element is its parent's content box, and
+    // padding is outside it. So every pixel below the workspace is a pixel
+    // the page scrolls after the workspace has stopped moving, sliding the
+    // map up under the header. `pb-4` hid sixteen of them, zoom controls
+    // included.
+    const { container } = show("/nearby?view=map");
+
+    await screen.findByRole("link", { name: /restaurant 1/i });
+
+    const page = container.querySelector<HTMLElement>("[class*='max-w-[1800px]']");
+
+    expect(page?.className).toContain("lg:pb-0");
+  });
+
   it("pins against the header rather than a copy of its height", async () => {
     const { container } = show("/nearby?view=map");
 
